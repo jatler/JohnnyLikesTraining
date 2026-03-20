@@ -1,0 +1,14 @@
+# Xcode
+**/xcuserdata/
+DerivedData/
+build/
+
+# Secrets
+TrainingApp/Secrets.xcconfig
+TrainingApp/Sources/App/Config.swift
+
+# Supabase local
+supabase/.temp/
+
+# macOS
+.DS_Store

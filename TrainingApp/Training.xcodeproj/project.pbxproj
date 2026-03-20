@@ -1,0 +1,567 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		09774BD7EFE32B98FAA923B5 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4032AFBD2C6810AEB4A5C08C /* AuthService.swift */; };
+		0D2EEE071B59721CE1F0030C /* WorkoutType.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC41AACC3D838045702D918B /* WorkoutType.swift */; };
+		16A10EAA3636112CCEFFD4E6 /* ProgressDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918F92B620FAA4E228B0FEA8 /* ProgressDashboardView.swift */; };
+		1B8213915BFA541F5519E418 /* PlanCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07D906017FBE990E96F50C52 /* PlanCalendarView.swift */; };
+		318F754953A5B84505A9ECBD /* OuraDaily.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38427D1E7D9E72609E2756A6 /* OuraDaily.swift */; };
+		38E21BCC2AE7689810BC810C /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD128F03DE17FF51C05DD6BB /* TodayView.swift */; };
+		428D482FC220B2EED7ED9E42 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5D0A2D62A393B66AB94F79 /* ContentView.swift */; };
+		45A9B030933515CFFDBBC98B /* TrainingPlanStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F7D70B55AEC2E0E3D0A3F1 /* TrainingPlanStore.swift */; };
+		4FEB95CBCCFD82F3BB85C43E /* SupabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4A6D8A749283F165620F1C8 /* SupabaseService.swift */; };
+		5A65C86A30E9432549A86497 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 011590607C69E2FCB2E332C7 /* Supabase */; };
+		5C6B00911C4B919BE7AA7B0E /* PlanEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F8ED3535E0F5907E9AE4267 /* PlanEditView.swift */; };
+		6F888519D7D6238904329600 /* SessionDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF23FA6E5F2C1983F9EF2ADA /* SessionDetailSheet.swift */; };
+		73B281FD62E689360910B786 /* champion_plan_100k.json in Resources */ = {isa = PBXBuildFile; fileRef = 2B21B45B9C3E88F085CD54AC /* champion_plan_100k.json */; };
+		7AE26BE9849E3E857DF2C1C8 /* WeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3467C238F8B38FFA08AC33 /* WeekView.swift */; };
+		7E970DC72D9B0BFC9FEA675C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BF1F9E0F6BDC1529AB3ECEB /* SettingsView.swift */; };
+		81C19CA3CED21D9AD1984C4C /* TrainingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F87F3437D6620980FC04F13 /* TrainingApp.swift */; };
+		82789C46467BC97AF87E0EF2 /* StravaActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3895561C0376F954DE01A693 /* StravaActivity.swift */; };
+		8878823BC2582FB11DCE301D /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1312B17F09C9B5D35ACDBBB8 /* SignInView.swift */; };
+		921A51DCF553D7FC53574F9F /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 0F711C2ADA26F108C95B0FE4 /* Auth */; };
+		954A34C6625409E4D3FD985C /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE119AE0121335DC62EE5944 /* KeychainService.swift */; };
+		9C2A27A2D2E68576CCD068FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A38A933814A196F882D4075 /* Assets.xcassets */; };
+		A49A52EEDFEFF45B719A8233 /* OuraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152863264984F21AC0331C8B /* OuraService.swift */; };
+		BE8DE2E89F3AD00D912A8DF4 /* PlanTemplateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCB069788F05CECEBBE77DB1 /* PlanTemplateService.swift */; };
+		CA291CF1F9930B3639E76625 /* PlannedSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4CD0A46894A328DDC0FE678 /* PlannedSession.swift */; };
+		D4D65A6A404CF56CDAAB7CCC /* SessionSwap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 886214F674543E3860A250BC /* SessionSwap.swift */; };
+		DF1736FB90575F6A86C69889 /* StravaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B8AD52D85ACBA9D427AB25 /* StravaService.swift */; };
+		E1963A5737DE23227CF28C39 /* SessionSkip.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE203E8195572E02039CA8A7 /* SessionSkip.swift */; };
+		E688C16BC8826DF7E7C0299E /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80616D13A59D3EE3E33D4BB0 /* Config.swift */; };
+		ECA172E1A515382BE4F35587 /* TrainingPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45B651E1F7E6BF915FDAD19D /* TrainingPlan.swift */; };
+		F01A1E8C6E3FCF41A197A9B2 /* TrainingPlanTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9CDAEB606327522B08C1277 /* TrainingPlanTemplate.swift */; };
+		F4FFC0062D790C1D4126144D /* PlanSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3922D09D3B1CE07E2DC0618A /* PlanSetupView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		02C33C9015C1F9FCA1CD7F9C /* Training.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Training.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		05ED34708B6E8C9B19B9424F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
+		07D906017FBE990E96F50C52 /* PlanCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCalendarView.swift; sourceTree = "<group>"; };
+		1312B17F09C9B5D35ACDBBB8 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
+		13B8AD52D85ACBA9D427AB25 /* StravaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StravaService.swift; sourceTree = "<group>"; };
+		152863264984F21AC0331C8B /* OuraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OuraService.swift; sourceTree = "<group>"; };
+		2B21B45B9C3E88F085CD54AC /* champion_plan_100k.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = champion_plan_100k.json; sourceTree = "<group>"; };
+		2BF1F9E0F6BDC1529AB3ECEB /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		38427D1E7D9E72609E2756A6 /* OuraDaily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OuraDaily.swift; sourceTree = "<group>"; };
+		3895561C0376F954DE01A693 /* StravaActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StravaActivity.swift; sourceTree = "<group>"; };
+		3922D09D3B1CE07E2DC0618A /* PlanSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanSetupView.swift; sourceTree = "<group>"; };
+		3D5D0A2D62A393B66AB94F79 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		4032AFBD2C6810AEB4A5C08C /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		45B651E1F7E6BF915FDAD19D /* TrainingPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlan.swift; sourceTree = "<group>"; };
+		73F7D70B55AEC2E0E3D0A3F1 /* TrainingPlanStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlanStore.swift; sourceTree = "<group>"; };
+		80616D13A59D3EE3E33D4BB0 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		886214F674543E3860A250BC /* SessionSwap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSwap.swift; sourceTree = "<group>"; };
+		8F8ED3535E0F5907E9AE4267 /* PlanEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanEditView.swift; sourceTree = "<group>"; };
+		918F92B620FAA4E228B0FEA8 /* ProgressDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressDashboardView.swift; sourceTree = "<group>"; };
+		9A38A933814A196F882D4075 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9F87F3437D6620980FC04F13 /* TrainingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingApp.swift; sourceTree = "<group>"; };
+		B4A6D8A749283F165620F1C8 /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
+		B4CD0A46894A328DDC0FE678 /* PlannedSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlannedSession.swift; sourceTree = "<group>"; };
+		B9CDAEB606327522B08C1277 /* TrainingPlanTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlanTemplate.swift; sourceTree = "<group>"; };
+		CC41AACC3D838045702D918B /* WorkoutType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutType.swift; sourceTree = "<group>"; };
+		CCB069788F05CECEBBE77DB1 /* PlanTemplateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanTemplateService.swift; sourceTree = "<group>"; };
+		CD128F03DE17FF51C05DD6BB /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
+		DC3467C238F8B38FFA08AC33 /* WeekView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekView.swift; sourceTree = "<group>"; };
+		EE203E8195572E02039CA8A7 /* SessionSkip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSkip.swift; sourceTree = "<group>"; };
+		FE119AE0121335DC62EE5944 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		FF23FA6E5F2C1983F9EF2ADA /* SessionDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDetailSheet.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		59FFE3EB9115A5922CAF934A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5A65C86A30E9432549A86497 /* Supabase in Frameworks */,
+				921A51DCF553D7FC53574F9F /* Auth in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		19103FB29F773ACAC5CB56BD /* App */ = {
+			isa = PBXGroup;
+			children = (
+				80616D13A59D3EE3E33D4BB0 /* Config.swift */,
+				3D5D0A2D62A393B66AB94F79 /* ContentView.swift */,
+				9F87F3437D6620980FC04F13 /* TrainingApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		1F075F0DF15A55FF3B56AACA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				02C33C9015C1F9FCA1CD7F9C /* Training.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		34FBD45B0DA2F8C734812922 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				9A38A933814A196F882D4075 /* Assets.xcassets */,
+				2B21B45B9C3E88F085CD54AC /* champion_plan_100k.json */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		43D61DA79F66CFF81438133C /* Plan */ = {
+			isa = PBXGroup;
+			children = (
+				8F8ED3535E0F5907E9AE4267 /* PlanEditView.swift */,
+				3922D09D3B1CE07E2DC0618A /* PlanSetupView.swift */,
+			);
+			path = Plan;
+			sourceTree = "<group>";
+		};
+		510BB2D4CDD4CCC5591335D9 /* Today */ = {
+			isa = PBXGroup;
+			children = (
+				CD128F03DE17FF51C05DD6BB /* TodayView.swift */,
+			);
+			path = Today;
+			sourceTree = "<group>";
+		};
+		5F11213DB4AFEE7167EE2EA8 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				FCC05996813178FEA4350200 /* Auth */,
+				889602FE3371F5BECC36EAAF /* Calendar */,
+				43D61DA79F66CFF81438133C /* Plan */,
+				F0E53572223BE6C4FEAECD4E /* Progress */,
+				D64D17B3A4A4E3A81AFAC975 /* Settings */,
+				510BB2D4CDD4CCC5591335D9 /* Today */,
+				E219DEB298E9E41BC55A4D99 /* Week */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		66E760F8DE27D63C3D1EE641 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				4032AFBD2C6810AEB4A5C08C /* AuthService.swift */,
+				FE119AE0121335DC62EE5944 /* KeychainService.swift */,
+				152863264984F21AC0331C8B /* OuraService.swift */,
+				CCB069788F05CECEBBE77DB1 /* PlanTemplateService.swift */,
+				13B8AD52D85ACBA9D427AB25 /* StravaService.swift */,
+				B4A6D8A749283F165620F1C8 /* SupabaseService.swift */,
+				73F7D70B55AEC2E0E3D0A3F1 /* TrainingPlanStore.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		889602FE3371F5BECC36EAAF /* Calendar */ = {
+			isa = PBXGroup;
+			children = (
+				07D906017FBE990E96F50C52 /* PlanCalendarView.swift */,
+				FF23FA6E5F2C1983F9EF2ADA /* SessionDetailSheet.swift */,
+			);
+			path = Calendar;
+			sourceTree = "<group>";
+		};
+		AC138D8B2E4E582ED903FDBD /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				19103FB29F773ACAC5CB56BD /* App */,
+				E5A0C08C318ACD5520C8CE05 /* Models */,
+				66E760F8DE27D63C3D1EE641 /* Services */,
+				5F11213DB4AFEE7167EE2EA8 /* Views */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		CCF67F2ED023CB6B8C398D7F /* TrainingApp */ = {
+			isa = PBXGroup;
+			children = (
+				05ED34708B6E8C9B19B9424F /* Secrets.xcconfig */,
+			);
+			name = TrainingApp;
+			path = .;
+			sourceTree = "<group>";
+		};
+		CD659A4A3C871F9F1446BEC7 = {
+			isa = PBXGroup;
+			children = (
+				34FBD45B0DA2F8C734812922 /* Resources */,
+				AC138D8B2E4E582ED903FDBD /* Sources */,
+				CCF67F2ED023CB6B8C398D7F /* TrainingApp */,
+				1F075F0DF15A55FF3B56AACA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D64D17B3A4A4E3A81AFAC975 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				2BF1F9E0F6BDC1529AB3ECEB /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		E219DEB298E9E41BC55A4D99 /* Week */ = {
+			isa = PBXGroup;
+			children = (
+				DC3467C238F8B38FFA08AC33 /* WeekView.swift */,
+			);
+			path = Week;
+			sourceTree = "<group>";
+		};
+		E5A0C08C318ACD5520C8CE05 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				38427D1E7D9E72609E2756A6 /* OuraDaily.swift */,
+				B4CD0A46894A328DDC0FE678 /* PlannedSession.swift */,
+				EE203E8195572E02039CA8A7 /* SessionSkip.swift */,
+				886214F674543E3860A250BC /* SessionSwap.swift */,
+				3895561C0376F954DE01A693 /* StravaActivity.swift */,
+				45B651E1F7E6BF915FDAD19D /* TrainingPlan.swift */,
+				B9CDAEB606327522B08C1277 /* TrainingPlanTemplate.swift */,
+				CC41AACC3D838045702D918B /* WorkoutType.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		F0E53572223BE6C4FEAECD4E /* Progress */ = {
+			isa = PBXGroup;
+			children = (
+				918F92B620FAA4E228B0FEA8 /* ProgressDashboardView.swift */,
+			);
+			path = Progress;
+			sourceTree = "<group>";
+		};
+		FCC05996813178FEA4350200 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				1312B17F09C9B5D35ACDBBB8 /* SignInView.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		18F6C878EF626BA5B3598160 /* Training */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2AD80760D1819F2EC5F7FDD5 /* Build configuration list for PBXNativeTarget "Training" */;
+			buildPhases = (
+				ADA6FB32284B0DA86B97218B /* Sources */,
+				8FF9FB036F7681F1785BE0C9 /* Resources */,
+				59FFE3EB9115A5922CAF934A /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Training;
+			packageProductDependencies = (
+				011590607C69E2FCB2E332C7 /* Supabase */,
+				0F711C2ADA26F108C95B0FE4 /* Auth */,
+			);
+			productName = Training;
+			productReference = 02C33C9015C1F9FCA1CD7F9C /* Training.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F87A075ACE17116F1975ED18 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = D381DBB95A13027C41FD3B7B /* Build configuration list for PBXProject "Training" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = CD659A4A3C871F9F1446BEC7;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				4BD20ED3F30B92F135537AD1 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 1F075F0DF15A55FF3B56AACA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				18F6C878EF626BA5B3598160 /* Training */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8FF9FB036F7681F1785BE0C9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C2A27A2D2E68576CCD068FA /* Assets.xcassets in Resources */,
+				73B281FD62E689360910B786 /* champion_plan_100k.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		ADA6FB32284B0DA86B97218B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				09774BD7EFE32B98FAA923B5 /* AuthService.swift in Sources */,
+				E688C16BC8826DF7E7C0299E /* Config.swift in Sources */,
+				428D482FC220B2EED7ED9E42 /* ContentView.swift in Sources */,
+				954A34C6625409E4D3FD985C /* KeychainService.swift in Sources */,
+				318F754953A5B84505A9ECBD /* OuraDaily.swift in Sources */,
+				A49A52EEDFEFF45B719A8233 /* OuraService.swift in Sources */,
+				1B8213915BFA541F5519E418 /* PlanCalendarView.swift in Sources */,
+				5C6B00911C4B919BE7AA7B0E /* PlanEditView.swift in Sources */,
+				F4FFC0062D790C1D4126144D /* PlanSetupView.swift in Sources */,
+				BE8DE2E89F3AD00D912A8DF4 /* PlanTemplateService.swift in Sources */,
+				CA291CF1F9930B3639E76625 /* PlannedSession.swift in Sources */,
+				16A10EAA3636112CCEFFD4E6 /* ProgressDashboardView.swift in Sources */,
+				6F888519D7D6238904329600 /* SessionDetailSheet.swift in Sources */,
+				E1963A5737DE23227CF28C39 /* SessionSkip.swift in Sources */,
+				D4D65A6A404CF56CDAAB7CCC /* SessionSwap.swift in Sources */,
+				7E970DC72D9B0BFC9FEA675C /* SettingsView.swift in Sources */,
+				8878823BC2582FB11DCE301D /* SignInView.swift in Sources */,
+				82789C46467BC97AF87E0EF2 /* StravaActivity.swift in Sources */,
+				DF1736FB90575F6A86C69889 /* StravaService.swift in Sources */,
+				4FEB95CBCCFD82F3BB85C43E /* SupabaseService.swift in Sources */,
+				38E21BCC2AE7689810BC810C /* TodayView.swift in Sources */,
+				81C19CA3CED21D9AD1984C4C /* TrainingApp.swift in Sources */,
+				ECA172E1A515382BE4F35587 /* TrainingPlan.swift in Sources */,
+				45A9B030933515CFFDBBC98B /* TrainingPlanStore.swift in Sources */,
+				F01A1E8C6E3FCF41A197A9B2 /* TrainingPlanTemplate.swift in Sources */,
+				7AE26BE9849E3E857DF2C1C8 /* WeekView.swift in Sources */,
+				0D2EEE071B59721CE1F0030C /* WorkoutType.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		0A792ABC923B7A88933D13AE /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 05ED34708B6E8C9B19B9424F /* Secrets.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		4149FA723B2CFA01B86DF49E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Training.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jatler.Training;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A0AA935C6E125CAE21BDC33A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Training.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jatler.Training;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BB24FBEFC7C942EC134DAAF0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 05ED34708B6E8C9B19B9424F /* Secrets.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2AD80760D1819F2EC5F7FDD5 /* Build configuration list for PBXNativeTarget "Training" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A0AA935C6E125CAE21BDC33A /* Debug */,
+				4149FA723B2CFA01B86DF49E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D381DBB95A13027C41FD3B7B /* Build configuration list for PBXProject "Training" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BB24FBEFC7C942EC134DAAF0 /* Debug */,
+				0A792ABC923B7A88933D13AE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		4BD20ED3F30B92F135537AD1 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		011590607C69E2FCB2E332C7 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4BD20ED3F30B92F135537AD1 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+		0F711C2ADA26F108C95B0FE4 /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4BD20ED3F30B92F135537AD1 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = F87A075ACE17116F1975ED18 /* Project object */;
+}
