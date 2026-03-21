@@ -6,6 +6,8 @@ struct TrainingApp: App {
     @State private var planStore = TrainingPlanStore()
     @State private var stravaService = StravaService()
     @State private var ouraService = OuraService()
+    @State private var strengthStore = StrengthStore()
+    @State private var heatStore = HeatStore()
 
     var body: some Scene {
         WindowGroup {
@@ -14,6 +16,8 @@ struct TrainingApp: App {
                 .environment(planStore)
                 .environment(stravaService)
                 .environment(ouraService)
+                .environment(strengthStore)
+                .environment(heatStore)
         }
     }
 }

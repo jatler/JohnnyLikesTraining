@@ -2,6 +2,8 @@ import SwiftUI
 
 struct PlanEditView: View {
     @Environment(TrainingPlanStore.self) private var planStore
+    @Environment(StrengthStore.self) private var strengthStore
+    @Environment(HeatStore.self) private var heatStore
     @Environment(AuthService.self) private var auth
     @Environment(\.dismiss) private var dismiss
 
@@ -133,6 +135,27 @@ struct PlanEditView: View {
 
         if replaceTemplate, let template = selectedTemplate, let userId = auth.currentUserId {
             planStore.replacePlan(raceName: trimmedName, raceDate: raceDate, template: template, userId: userId)
+
+            strengthStore.clearAll()
+            heatStore.clearAll()
+            if let plan = planStore.activePlan {
+                if let strengthExercises = template.strengthExercises, !strengthExercises.isEmpty {
+                    strengthStore.initializeFromTemplate(
+                        strengthExercises,
+                        planId: plan.id,
+                        planStartDate: plan.planStartDate,
+                        totalWeeks: template.durationWeeks
+                    )
+                }
+                if let heatTemplates = template.heatSessions, !heatTemplates.isEmpty {
+                    heatStore.initializeFromTemplate(
+                        heatTemplates,
+                        planId: plan.id,
+                        planStartDate: plan.planStartDate,
+                        totalWeeks: template.durationWeeks
+                    )
+                }
+            }
         } else {
             if trimmedName != planStore.activePlan?.name {
                 planStore.updateRaceName(trimmedName)

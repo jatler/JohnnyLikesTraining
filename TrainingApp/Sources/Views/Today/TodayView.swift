@@ -4,12 +4,16 @@ struct TodayView: View {
     @Environment(TrainingPlanStore.self) private var planStore
     @Environment(StravaService.self) private var strava
     @Environment(OuraService.self) private var oura
+    @Environment(StrengthStore.self) private var strengthStore
+    @Environment(HeatStore.self) private var heatStore
 
     @State private var showingPlanSetup = false
     @State private var showingPlanEdit = false
     @State private var showingSwapConfirmation = false
     @State private var showingSkipOptions = false
     @State private var showingSwapPicker = false
+    @State private var showingStrengthDay = false
+    @State private var selectedHeatSession: HeatSession?
 
     var body: some View {
         NavigationStack {
@@ -56,11 +60,25 @@ struct TodayView: View {
                     }
                 }
 
+                todayStrengthSection
+
+                todayHeatSection
+
                 if let plan = planStore.activePlan {
                     planInfoBar(plan)
                 }
             }
             .padding()
+        }
+        .sheet(item: $selectedHeatSession) { session in
+            HeatLogSheet(session: session)
+        }
+        .sheet(isPresented: $showingStrengthDay) {
+            if let week = planStore.currentWeekNumber {
+                let dayOfWeek = Calendar.current.component(.weekday, from: Date())
+                let adjustedDay = dayOfWeek == 1 ? 7 : dayOfWeek - 1
+                StrengthDayDetailView(weekNumber: week, dayOfWeek: adjustedDay)
+            }
         }
     }
 
@@ -304,18 +322,24 @@ struct TodayView: View {
                 .opacity(skipped ? 0.5 : 1)
             }
 
-            if let pace = session.targetPaceDescription, !pace.isEmpty {
+            let coachText = session.verbatimCoachNotesForDisplay
+            let pace = session.targetPaceDescription?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let paceRedundant = pace.map { coachText.lowercased().contains($0.lowercased()) } ?? true
+
+            if let pace, !pace.isEmpty, !paceRedundant {
                 Label(pace, systemImage: "gauge.with.needle")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .opacity(skipped ? 0.5 : 1)
             }
 
-            if let notes = session.notes, !notes.isEmpty {
-                Text(notes)
+            if !coachText.isEmpty {
+                Text(coachText)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-                    .lineLimit(nil)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .textSelection(.enabled)
                     .opacity(skipped ? 0.5 : 1)
             }
 
@@ -464,6 +488,160 @@ struct TodayView: View {
         .presentationDetents([.medium])
     }
 
+    // MARK: - Today Strength Section
+
+    @ViewBuilder
+    private var todayStrengthSection: some View {
+        let today = Date()
+        let daySessions = strengthStore.sessions(for: today)
+
+        if !daySessions.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Label("Strength", systemImage: "dumbbell.fill")
+                        .font(.headline)
+                        .foregroundStyle(.indigo)
+
+                    Spacer()
+
+                    let completed = strengthStore.completedExerciseCount(for: today)
+                    let total = daySessions.count
+
+                    if completed > 0 {
+                        Text("\(completed)/\(total) done")
+                            .font(.caption)
+                            .foregroundStyle(.green)
+                    }
+
+                    Button {
+                        showingStrengthDay = true
+                    } label: {
+                        Label("Log", systemImage: "checkmark.circle")
+                            .font(.caption)
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .tint(.indigo)
+                }
+
+                ForEach(daySessions) { session in
+                    HStack(spacing: 10) {
+                        let complete = strengthStore.isSessionComplete(session.id)
+
+                        Image(systemName: complete ? "checkmark.circle.fill" : "circle")
+                            .font(.subheadline)
+                            .foregroundStyle(complete ? .green : .secondary.opacity(0.5))
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(session.exerciseName)
+                                .font(.subheadline)
+                                .strikethrough(complete)
+                                .foregroundStyle(complete ? .secondary : .primary)
+
+                            Text(strengthPrescription(session))
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
+                        }
+
+                        Spacer()
+
+                        if session.isDeload {
+                            Text("Deload")
+                                .font(.caption2.bold())
+                                .foregroundStyle(.orange)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(.orange.opacity(0.15), in: Capsule())
+                        }
+                    }
+                }
+            }
+            .padding()
+            .background(.indigo.opacity(0.06), in: RoundedRectangle(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(.indigo.opacity(0.15), lineWidth: 1)
+            )
+        }
+    }
+
+    private func strengthPrescription(_ session: StrengthSession) -> String {
+        var text = "\(session.prescribedSets)×\(session.prescribedReps)"
+        if let kg = session.prescribedWeightKg {
+            text += " @ \(Int(kg * 2.205)) lbs"
+        }
+        return text
+    }
+
+    // MARK: - Today Heat Section
+
+    @ViewBuilder
+    private var todayHeatSection: some View {
+        let today = Date()
+        let heatSessions = heatStore.sessions(for: today)
+
+        if !heatSessions.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Label("Heat", systemImage: "flame.fill")
+                        .font(.headline)
+                        .foregroundStyle(.orange)
+
+                    Spacer()
+                }
+
+                ForEach(heatSessions) { session in
+                    let complete = heatStore.isComplete(session.id)
+                    let log = heatStore.log(for: session.id)
+
+                    Button {
+                        selectedHeatSession = session
+                    } label: {
+                        HStack(spacing: 10) {
+                            Image(systemName: complete ? "checkmark.circle.fill" : "flame.fill")
+                                .font(.subheadline)
+                                .foregroundStyle(complete ? .green : .orange)
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(session.sessionType.displayName)
+                                    .font(.subheadline)
+                                    .foregroundStyle(complete ? .secondary : .primary)
+
+                                if let log {
+                                    Text("\(log.actualDurationMinutes) min completed")
+                                        .font(.caption)
+                                        .foregroundStyle(.green)
+                                } else {
+                                    Text("Target: \(session.targetDurationMinutes) min")
+                                        .font(.caption)
+                                        .foregroundStyle(.tertiary)
+                                }
+                            }
+
+                            Spacer()
+
+                            if !complete {
+                                Text("Log")
+                                    .font(.caption.bold())
+                                    .foregroundStyle(.orange)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 4)
+                                    .background(.orange.opacity(0.15), in: Capsule())
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding()
+            .background(.orange.opacity(0.06), in: RoundedRectangle(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(.orange.opacity(0.15), lineWidth: 1)
+            )
+        }
+    }
+
     // MARK: - No Session Today
 
     private var noSessionToday: some View {
@@ -559,4 +737,6 @@ struct TodayView: View {
         .environment(TrainingPlanStore())
         .environment(StravaService())
         .environment(OuraService())
+        .environment(StrengthStore())
+        .environment(HeatStore())
 }

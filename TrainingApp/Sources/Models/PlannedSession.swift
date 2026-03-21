@@ -16,6 +16,27 @@ struct PlannedSession: Codable, Identifiable {
         targetDistanceKm.map { $0 / 1.609 }
     }
 
+    /// Full coaching text for display: session `notes` plus `targetPaceDescription` when that line is not already contained in the notes (templates often split them across JSON fields).
+    var verbatimCoachNotesForDisplay: String {
+        let paceTrimmed = targetPaceDescription?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let bodyTrimmed = notes?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let pace = paceTrimmed.isEmpty ? nil : paceTrimmed
+        let body = bodyTrimmed.isEmpty ? nil : bodyTrimmed
+        switch (pace, body) {
+        case (nil, nil):
+            return ""
+        case let (p?, nil):
+            return p
+        case let (nil, b?):
+            return b
+        case let (p?, b?):
+            if b.lowercased().contains(p.lowercased()) {
+                return b
+            }
+            return "\(p)\n\n\(b)"
+        }
+    }
+
     enum CodingKeys: String, CodingKey {
         case id
         case planId = "plan_id"

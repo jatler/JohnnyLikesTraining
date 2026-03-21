@@ -1,0 +1,612 @@
+{
+  "id": "winter_plan_10w",
+  "name": "10-Week Winter Plan",
+  "author": "David Roche & Megan Roche, MD PhD",
+  "source": "SWAP Running",
+  "description": "A 10-week winter plan focused on Z2 efficiency and top-end power. Options for indoor training and ski; flexible day placement for weather and life.",
+  "duration_weeks": 10,
+  "target_distances": [
+    "Winter base",
+    "Spring race prep"
+  ],
+  "sessions": [
+    {
+      "week": 1,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal like sauna or hot tub. You can be active with light bike or hike, but full rest is great!"
+    },
+    {
+      "week": 1,
+      "day": 2,
+      "workout_type": "intervals",
+      "target_distance_km": 9.7,
+      "pace_description": "Hills or track effort",
+      "notes": "2-4 miles easy warm-up, 6-10 x 30 second slight hills fast with jog back recovery, 1-2 miles moderate, 1-2 miles easy On the easy running, think light on feet and relaxed. Easy runs can be a big mix of paces--on days you feel good it can be a bit faster, and on days you feel tired, it can be very slow. On the hills, find a gradual grade 3-5% and run up quick, thinking 3k to mile effort. By the end of the workout, it should feel like the muscles are fatigued but you could keep doing more. On the moderate running, aim for moderate and relaxed effort, around 50k effort for advanced athletes. This works on lactate shuttling after the hills"
+    },
+    {
+      "week": 1,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": null,
+      "pace_description": "Z2 uphill treadmill",
+      "notes": "60-90 min uphill treadmill in Zone 2 Z2 uphill treadmill is about finding a sustainable high-aerobic effort without much impact on the body. Aim for 10-15% grade, and whatever pace corresponds to the correct effort. It’s ok for effort to drift into Z3 as you go. Here is a tutorial. Practice fueling and hydration on these sessions!"
+    },
+    {
+      "week": 1,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Easy/mod x-train or ski",
+      "notes": "1-2 hours easy/mod x-train or ski day! On the x-train days, it can be bike, elliptical, stairmaster, or a mix of similar activities. In a perfect world, you use winter to improve at biking, since that provides more long-term room for growth. Easy/mod x-train just means to ride freely--you can include shorter moderate sections, virtual bike climbs, and generally just have some fun indoors. You can also use Thursdays for ski/winter sports, and those days can be longer!"
+    },
+    {
+      "week": 1,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 14.5,
+      "pace_description": "Very easy",
+      "notes": "6-12 miles very easy Friday runs can be so relaxed, just aiming to get to the weekend feeling good!"
+    },
+    {
+      "week": 1,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 20.9,
+      "pace_description": "Easy with strides / hills",
+      "notes": "10-16 miles easy with 5 x 45 second hills fast (think 3k effort) near the end. On the long run, think smooth and fun, rather than pushing. Generally that will mean Z2, but the effort can vary based on terrain and the day, and even be higher quality when you feel good. On the fatigue resistance hills, the goal is to activate nervous system pathways for high output at the end of the long run. A 4-6% grade is ideal, easing into the effort to avoid straining a muscle. Practice fueling and hydration on every long run!"
+    },
+    {
+      "week": 1,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 17.7,
+      "pace_description": "Easy or x-train flex",
+      "notes": "8-14 miles easy or 1-2+ hours easy x-train/uphill TM Sunday is an adventure flex day! If you like winter sports, it’s a great time to go play on the snow for as long as you want. If you want to stay indoors, bike or uphill treadmill. Or you can go outside and add up some easy miles!"
+    },
+    {
+      "week": 2,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal!"
+    },
+    {
+      "week": 2,
+      "day": 2,
+      "workout_type": "intervals",
+      "target_distance_km": 9.7,
+      "pace_description": "Hills or track effort",
+      "notes": "2-3 miles easy warm-up with a couple light strides, 2-3 x (4 x 400 fast) with 90 seconds easy jog between intervals and 3 min easy between sets, 1-2 miles steady, 1-3 miles easy On the 400s, think 5k effort or so, practicing smooth speed. You can do this session on the track or on roads if you’d prefer to avoid the track."
+    },
+    {
+      "week": 2,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": null,
+      "pace_description": "Z2 uphill treadmill",
+      "notes": "60-105 min uphill treadmill in Z2"
+    },
+    {
+      "week": 2,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Easy/mod x-train or ski",
+      "notes": "1-2 hours easy/mod x-train or ski day You can have fun and push these sessions a bit, even doing something like a Zwift race if that sounds fun. Keep it playful!"
+    },
+    {
+      "week": 2,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 14.5,
+      "pace_description": "Very easy",
+      "notes": "6-12 miles very easy plus 6 x 20 second slight hills. The hills are ideal for building speed and power!"
+    },
+    {
+      "week": 2,
+      "day": 6,
+      "workout_type": "tempo",
+      "target_distance_km": 20.9,
+      "pace_description": "Steady flow",
+      "notes": "10-16 miles steady. Start easy and work into it, settling into a smooth flow. The exact effort can vary, but generally high Z2/low Z3 style effort (in 5-zone model!). Generally, you want it to feel purposeful but not hard!"
+    },
+    {
+      "week": 2,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 17.7,
+      "pace_description": "Easy or x-train flex",
+      "notes": "8-14 miles easy or 1-2+ hours easy x-train/uphill TM. If you’re x-training or on the snow, you can go longer on these days if that sounds fun!"
+    },
+    {
+      "week": 3,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal!"
+    },
+    {
+      "week": 3,
+      "day": 2,
+      "workout_type": "intervals",
+      "target_distance_km": 9.7,
+      "pace_description": "Hills or track effort",
+      "notes": "2-4 miles easy warm-up, 8-12 x 40 second hills fast (think 3k effort), 2-4 miles easy cool-down Same type of workout as in week 1, just building up the duration a bit (and without the steady running given the workout tomorrow). The final 10 seconds of these intervals will be spicy at the end. Practice relaxing in your form as things get more challenging."
+    },
+    {
+      "week": 3,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": null,
+      "pace_description": "1-hour effort on uphill threshold intervals",
+      "notes": "75-105 min uphill treadmill with 8-12 x 3 minutes around 1-hour effort with light progression with 1 min easy recovery These types of bigger uphill threshold workouts are wonderful for winter training, allowing athletes to build aerobic fitness without much impact. The ideal grade for the intervals is 8%, keeping the recoveries at 8% but just slowing them down a lot. You can also do these workouts at lower grades (even flat) if that brings you the most joy!"
+    },
+    {
+      "week": 3,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Easy/mod x-train or ski",
+      "notes": "1-2 hours easy x-train or ski day Keep this day very easy on the body, more Z1 than other weeks."
+    },
+    {
+      "week": 3,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 14.5,
+      "pace_description": "Very easy",
+      "notes": "6-12 miles very easy Another pure recovery day before going a bit longer on Saturday!"
+    },
+    {
+      "week": 3,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 25.7,
+      "pace_description": "Easy with strides / hills",
+      "notes": "12-20 miles easy with 5 x 45 second hills near the end around 3k effort You should notice some comfort with the fatigue resistance after the workout in the first week! Have fun with these long runs and move them around for the best weather windows. Really emphasize fueling and hydration!"
+    },
+    {
+      "week": 3,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 17.7,
+      "pace_description": "Easy or x-train flex",
+      "notes": "8-14 miles easy plus 5 x 20 second slight hills fast or 1-2+ hours easy x-train/uphill TM with 5 x 30 seconds harder near the end Some light strides at the end of this one to go into next week feeling strong!"
+    },
+    {
+      "week": 4,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal!"
+    },
+    {
+      "week": 4,
+      "day": 2,
+      "workout_type": "recovery",
+      "target_distance_km": 14.5,
+      "pace_description": "Very easy",
+      "notes": "6-12 miles very easy"
+    },
+    {
+      "week": 4,
+      "day": 3,
+      "workout_type": "tempo",
+      "target_distance_km": 16.9,
+      "pace_description": "Steady flow (Z2)",
+      "notes": "8-13 miles steady, with nice smooth flow. A big goal of this plan is to improve Z2 paces, and this type of aerobic week will be a great time to practice!"
+    },
+    {
+      "week": 4,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Easy/mod x-train or ski",
+      "notes": "1-2 hours easy x-train or ski day"
+    },
+    {
+      "week": 4,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 14.5,
+      "pace_description": "Very easy",
+      "notes": "6-12 miles very easy"
+    },
+    {
+      "week": 4,
+      "day": 6,
+      "workout_type": "tempo",
+      "target_distance_km": 20.9,
+      "pace_description": "Steady flow",
+      "notes": "10-16 miles steady flow"
+    },
+    {
+      "week": 4,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 14.5,
+      "pace_description": "Easy or x-train flex",
+      "notes": "6-12 miles easy plus 5 x 30 second hills or 1-2+ hours x-train/uphill TM with 5 x 30 seconds harder near the end"
+    },
+    {
+      "week": 5,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal!"
+    },
+    {
+      "week": 5,
+      "day": 2,
+      "workout_type": "intervals",
+      "target_distance_km": 8.0,
+      "pace_description": "Hills or track effort",
+      "notes": "2-3 miles easy warm-up with a couple light strides, 6-10 x 500 fast with 300 easy recovery (think 5k effort), 4 x 200 fast with 200 slow recovery (push these a bit), 2-3 miles easy cool-down Really relax in the first 300 of each interval, making sure you aren’t going too hard. On the 200s, let yourself open up in the final 200 to work on top-end sustainable speed!"
+    },
+    {
+      "week": 5,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": null,
+      "pace_description": "Z2 uphill treadmill",
+      "notes": "75-105 min uphill TM in Z2"
+    },
+    {
+      "week": 5,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Easy/mod x-train or ski",
+      "notes": "1-2 hours easy/mod x-train or ski day You can have fun with some light pushes on this one if feeling good, but nothing too hard!"
+    },
+    {
+      "week": 5,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 14.5,
+      "pace_description": "Very easy",
+      "notes": "6-12 miles very easy plus 5 x 20 second slight hills fast"
+    },
+    {
+      "week": 5,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 22.5,
+      "pace_description": "Easy with strides / hills",
+      "notes": "10-18 miles easy. Nice and relaxed on this one, really dialing back the intensity!"
+    },
+    {
+      "week": 5,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 17.7,
+      "pace_description": "Easy or x-train flex",
+      "notes": "8-14 miles easy or 1-2 hours easy x-train/uphill TM"
+    },
+    {
+      "week": 6,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal!"
+    },
+    {
+      "week": 6,
+      "day": 2,
+      "workout_type": "tempo",
+      "target_distance_km": 16.1,
+      "pace_description": "Steady",
+      "notes": "8-12 miles steady, thinking smooth and relaxed! Fuel this one really well!"
+    },
+    {
+      "week": 6,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": null,
+      "pace_description": "1-hour effort on uphill threshold intervals",
+      "notes": "75-105 min uphill treadmill with 5-8 x 5 minutes around 1-hour effort with 2 minutes easy recovery. A bigger threshold session here--you should start feeling more comfortable with lactate shuttling!"
+    },
+    {
+      "week": 6,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Easy/mod x-train or ski",
+      "notes": "1-2 hours easy x-train or ski day Think Z1 on this one, nice and relaxed!"
+    },
+    {
+      "week": 6,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 14.5,
+      "pace_description": "Very easy",
+      "notes": "6-12 miles very easy"
+    },
+    {
+      "week": 6,
+      "day": 6,
+      "workout_type": "tempo",
+      "target_distance_km": 20.9,
+      "pace_description": "Steady flow",
+      "notes": "10-16 miles steady. You should feel much better with sustained (yet relaxed) efforts"
+    },
+    {
+      "week": 6,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 17.7,
+      "pace_description": "Easy or x-train flex",
+      "notes": "8-14 miles easy or 1-2 hours easy x-train/uphill TM"
+    },
+    {
+      "week": 7,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal!"
+    },
+    {
+      "week": 7,
+      "day": 2,
+      "workout_type": "intervals",
+      "target_distance_km": 10.5,
+      "pace_description": "Hills or track effort",
+      "notes": "2-4 miles easy warm-up, 8-12 x 45 second hills fast (think 3k) with jog down recovery, 1-3 miles steady, 1-2 miles easy"
+    },
+    {
+      "week": 7,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": null,
+      "pace_description": "Z2 uphill treadmill",
+      "notes": "75-120 min uphill TM in Z2 2 hour uphill sessions are really big and require major fueling and hydration!"
+    },
+    {
+      "week": 7,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Easy/mod x-train or ski",
+      "notes": "1-2 hours easy/mod x-train or ski day"
+    },
+    {
+      "week": 7,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 14.5,
+      "pace_description": "Very easy",
+      "notes": "6-12 miles very easy"
+    },
+    {
+      "week": 7,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 25.7,
+      "pace_description": "Easy with strides / hills",
+      "notes": "12-20 miles easy with 6 x 1 min hills near the end around 5k effort, pushing a bit as you go"
+    },
+    {
+      "week": 7,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 17.7,
+      "pace_description": "Easy or x-train flex",
+      "notes": "8-14 miles easy or 1-2 hours easy x-train/uphill TM"
+    },
+    {
+      "week": 8,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal!"
+    },
+    {
+      "week": 8,
+      "day": 2,
+      "workout_type": "recovery",
+      "target_distance_km": 14.5,
+      "pace_description": "Very easy",
+      "notes": "6-12 miles very easy"
+    },
+    {
+      "week": 8,
+      "day": 3,
+      "workout_type": "tempo",
+      "target_distance_km": 19.3,
+      "pace_description": "Steady flow (Z2)",
+      "notes": "10-14 miles steady"
+    },
+    {
+      "week": 8,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Easy/mod x-train or ski",
+      "notes": "1-2 hours easy x-train or ski day"
+    },
+    {
+      "week": 8,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 14.5,
+      "pace_description": "Very easy",
+      "notes": "6-12 miles very easy"
+    },
+    {
+      "week": 8,
+      "day": 6,
+      "workout_type": "tempo",
+      "target_distance_km": 24.1,
+      "pace_description": "Steady flow",
+      "notes": "12-18 miles steady flow"
+    },
+    {
+      "week": 8,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 17.7,
+      "pace_description": "Easy or x-train flex",
+      "notes": "8-14 miles easy plus 5 x 30 second hills or 1-2+ hours x-train/uphill TM with 5 x 30 seconds harder near the end"
+    },
+    {
+      "week": 9,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal!"
+    },
+    {
+      "week": 9,
+      "day": 2,
+      "workout_type": "intervals",
+      "target_distance_km": 8.0,
+      "pace_description": "Hills or track effort",
+      "notes": "2-3 miles easy warm-up with a couple strides, 3-5 x 600/400/200 fast with 200 recovery after intervals and 400 recovery between sets, 4 x 200 fast with 200 slow recovery (pushing a bit), 2-3 miles easy cool-down"
+    },
+    {
+      "week": 9,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": null,
+      "pace_description": "Z2 uphill treadmill",
+      "notes": "75-120 min uphill TM in Z2"
+    },
+    {
+      "week": 9,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Easy/mod x-train or ski",
+      "notes": "1-2 hours easy/mod x-train or ski day"
+    },
+    {
+      "week": 9,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 14.5,
+      "pace_description": "Very easy",
+      "notes": "6-12 miles very easy plus 5 x 20 second slight hills fast"
+    },
+    {
+      "week": 9,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 22.5,
+      "pace_description": "Easy with strides / hills",
+      "notes": "10-18 miles easy. Nice and relaxed, emphasizing feeling good at the end!"
+    },
+    {
+      "week": 9,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 17.7,
+      "pace_description": "Easy or x-train flex",
+      "notes": "8-14 miles easy or 1-2 hours easy x-train/uphill TM"
+    },
+    {
+      "week": 10,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal!"
+    },
+    {
+      "week": 10,
+      "day": 2,
+      "workout_type": "tempo",
+      "target_distance_km": 16.1,
+      "pace_description": "Steady",
+      "notes": "8-12 miles steady"
+    },
+    {
+      "week": 10,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": null,
+      "pace_description": "1-hour effort on uphill threshold intervals",
+      "notes": "75-105 min uphill TM with 3-6 x 10 minutes around 1-hour effort with 3 minutes easy recovery"
+    },
+    {
+      "week": 10,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Easy/mod x-train or ski",
+      "notes": "1-2 hours easy x-train or ski day"
+    },
+    {
+      "week": 10,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 14.5,
+      "pace_description": "Very easy",
+      "notes": "6-12 miles very easy"
+    },
+    {
+      "week": 10,
+      "day": 6,
+      "workout_type": "tempo",
+      "target_distance_km": 20.9,
+      "pace_description": "Steady flow",
+      "notes": "10-16 miles steady At this point, you should be seeing major running economy improvements from the start of the plan!"
+    },
+    {
+      "week": 10,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 17.7,
+      "pace_description": "Easy or x-train flex",
+      "notes": "8-14 miles easy plus 4 x 30 second hills or 1-2 hours easy x-train/uphill TM"
+    }
+  ],
+  "strength_exercises": [
+    {
+      "day": 3,
+      "exercise_name": "Mountain Legs",
+      "target_sets": 1,
+      "target_reps": 1,
+      "target_weight_kg": null,
+      "is_bodyweight": true,
+      "target_rpe": null,
+      "notes": "Mountain Legs routine after your run. Single-leg rear lunges (20-50 reps per leg) and single-leg step-ups (30-100 reps per leg).",
+      "sort_order": 1
+    },
+    {
+      "day": 5,
+      "exercise_name": "Mountain Legs",
+      "target_sets": 1,
+      "target_reps": 1,
+      "target_weight_kg": null,
+      "is_bodyweight": true,
+      "target_rpe": null,
+      "notes": "Mountain Legs routine. Single-leg rear lunges and single-leg step-ups.",
+      "sort_order": 1
+    }
+  ],
+  "heat_sessions": [
+    {
+      "day": 1,
+      "session_type": "sauna",
+      "target_duration_minutes": 25,
+      "notes": "Heat ideal like sauna or hot tub. Passive heat acclimation on rest days."
+    },
+    {
+      "day": 5,
+      "session_type": "sauna",
+      "target_duration_minutes": 25,
+      "notes": "Heat ideal. Passive heat acclimation on recovery days."
+    }
+  ]
+}

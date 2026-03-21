@@ -14,6 +14,9 @@ final class PlanTemplateService {
         if let champion = loadBundledTemplate(named: "champion_plan_100k") {
             templates.append(champion)
         }
+        if let winter = loadBundledTemplate(named: "winter_plan_10w") {
+            templates.append(winter)
+        }
         return templates
     }
 

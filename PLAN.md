@@ -33,13 +33,63 @@ The target race is user-configured via the plan setup screen. Example values:
 
 ### 1. Training Plan Selection & Import
 
-- Select a training plan from a **dropdown of bundled templates** (currently one: The Champion Plan for 100K).
+- Select a training plan from a **dropdown of bundled templates**: **The Champion Plan for 100K to 100 Miles** (16 weeks, ultra) and **10-Week Winter Plan** (SWAP winter base, Z2/uphill treadmill focus, optional ski/x-train).
 - Each template is a structured JSON file containing week-by-week sessions with: workout type, target distance (km), effort/pace description, and detailed coaching notes.
+- **Coach notes are always the original, verbatim text** from the plan source (e.g. bundled JSON / publisher PDF). They are stored in full in `planned_sessions.notes` and shown in full in the app. We do **not** replace them with AI-generated summaries in templates, sync, or UI. If we ever add AI helpers (e.g. “quick recap”), they must be additive (separate field or collapsible section), not a substitute for the stored notes.
+- **Bundled templates** keep the full coaching block in `notes` (including the effort/pace line when it would otherwise live only in `pace_description`), so nothing is split across fields in a way that looks “cut off.” On sync load, if the bundle has **longer** notes than Supabase for the same week/day/workout (e.g. after an app update ships richer JSON), the app **backfills** `planned_sessions.notes` for sessions that are not user-overridden.
 - The user sets a **target race date**; the app back-calculates the plan start date and maps each session to a calendar date.
 - Support common plan structures: week-based (e.g., 16-week ultra plan) with designated easy, tempo, interval, long run, recovery, rest, race, and cross-training days.
 - **Edit plan after creation**: the user can change the race name, race date, or selected plan template at any time from the Plan Management screen. Changing the race date re-maps all sessions to new calendar dates. Changing the template replaces the plan entirely (with a confirmation prompt, since swaps/skips would be reset).
 - Store the instantiated plan in Supabase so it syncs across sessions and survives reinstalls.
 - **Future**: add more bundled templates and allow CSV import for custom plans.
+
+#### Importing coach notes from a PDF (repeatable for every new template)
+
+Use this whenever you add or refresh a bundled plan whose **original source is a PDF**. The goal is to fill `sessions[].notes` with **verbatim publisher text**, not summaries.
+
+**1. Preconditions**
+
+- You have the **source PDF** (e.g. SWAP plan document) and the right to use its text in the app.
+- The app already has (or you have drafted) a **template JSON** that matches `TrainingPlanTemplate`: `sessions[]` with correct `week` (1-based), `day` (1 = Monday … 7 = Sunday), `workout_type`, `target_distance_km`, `pace_description`, and any extra rows (e.g. `strength` on the same calendar day as a run). The import script **only updates `notes`**; it does not invent distances or workout types.
+- **PDF layout:** The Champion workflow assumes a **grid**: rows labeled `Week 1` … `Week N` and columns **Mon … Sun**. If a future PDF is not table-shaped, you cannot reuse the same script as-is — use pdfplumber (or manual copy-edit) to map cells to `(week, day)` yourself, then merge into JSON.
+
+**2. Tooling**
+
+```bash
+cd /path/to/Training   # repo root
+pip install -r scripts/requirements.txt   # installs pdfplumber
+```
+
+**3. Champion plan (current automation)**
+
+- Script: `scripts/sync_champion_plan_from_pdf.py`
+- Default output: `TrainingApp/Resources/champion_plan_100k.json`
+- Run (PDF path optional; default is `~/Downloads/The Champion Plan for 100 km to 100 miles.pdf`):
+
+```bash
+python3 scripts/sync_champion_plan_from_pdf.py "/path/to/The Champion Plan for 100 km to 100 miles.pdf"
+```
+
+**4. Adapting for a *new* bundled template**
+
+1. Add `TrainingApp/Resources/<your_plan_id>.json` with the full session list (structure aligned with `champion_plan_100k.json` and `SessionTemplate` / `TrainingPlanTemplate` in code).
+2. **Copy** `scripts/sync_champion_plan_from_pdf.py` to e.g. `scripts/sync_<your_plan_id>_from_pdf.py` and change:
+   - `JSON_PATH` → your new resource file.
+   - `DEFAULT_PDF` → default location or name for that plan’s PDF.
+3. Adjust **`fix_typos()`** in the copy if that PDF has different recurring OCR glitches (the Champion script normalizes a few known artifacts).
+4. Reuse the same **splitting rules** unless the new PDF uses different wording:
+   - If a cell contains **`Light Strength`**, the **main** workout row gets the text **before** that phrase; the **`strength`** row on the same day gets from **`Light Strength`** onward.
+   - If the same calendar day has both a **main** session and **`strength`**, and the cell ends with a **`Mountain Legs`…** tail, the main session drops that tail and **strength** keeps it (avoids duplicating the full cell in both rows).
+5. Run your new script against the PDF; commit the updated JSON.
+6. **Register the template** in `PlanTemplateService` / bundled resources so it appears in the template picker.
+7. **Ship / verify:** After users update the app, `TrainingPlanStore` **reconciles** longer bundled `notes` into Supabase for non-overridden sessions on next load; testers can also create a fresh plan from the template to pick up new copy immediately.
+
+**5. QA checklist**
+
+- Spot-check **early week, a hard week, race/taper week** (e.g. weeks 1, 8, 16) for truncated cells or wrong day alignment.
+- Build the iOS target and open a few **SessionDetailSheet** / **Today** entries to confirm length and formatting.
+- If the PDF is revised by the publisher, re-run the script and ship a new app version (or rely on reconcile for existing installs).
+- **10-Week Winter Plan (`winter_plan_10w.json`):** After generating or editing from the PDF, sanity-check **Wednesday** cells: steady **road** miles → `tempo`; **Z2-only** uphill treadmill (no `N–M x K minutes` reps) → `easy` with pace **Z2 uphill treadmill**; **uphill TM with `N–M x K minutes` around 1-hour effort** → `intervals` with pace **1-hour effort on uphill threshold intervals** (same idea as the Champion plan). For **Tuesday** interval sessions, `target_distance_km` should reflect the **sum of mile-range midpoints** in the warm-up / main / cool-down (not just the first range).
 
 ### 2. Daily Run Prescription
 
@@ -105,7 +155,7 @@ The target race is user-configured via the plan setup screen. Example values:
 - `workout_type` (enum: easy, tempo, intervals, long_run, recovery, rest, race, cross_train)
 - `target_distance_km` (decimal, nullable)
 - `target_pace_description` (text, e.g., "4:30–4:45/km" or "easy effort")
-- `notes` (text, nullable)
+- `notes` (text, nullable — **full verbatim coach notes** from the plan template, not shortened or AI-summarized)
 - `sort_order` (int)
 
 ### `session_swaps`
@@ -151,6 +201,78 @@ The target race is user-configured via the plan setup screen. Example values:
 - `synced_at` (timestamp)
 - `matched_session_id` (FK → planned_sessions, nullable)
 
+### `session_overrides`
+- `id` (uuid, PK)
+- `session_id` (FK → planned_sessions, unique)
+- `original_workout_type` (enum, nullable — stores original before override)
+- `original_target_distance_km` (decimal, nullable)
+- `original_target_pace_description` (text, nullable)
+- `original_notes` (text, nullable)
+- `override_reason` (text, nullable)
+- `overridden_at` (timestamp)
+
+### `strength_templates`
+- `id` (uuid, PK)
+- `plan_id` (FK → training_plans)
+- `created_at` (timestamp)
+- `updated_at` (timestamp)
+
+### `strength_template_exercises`
+- `id` (uuid, PK)
+- `template_id` (FK → strength_templates)
+- `day_of_week` (int, 1=Mon..7=Sun)
+- `exercise_name` (text)
+- `target_sets` (int)
+- `target_reps` (int)
+- `target_weight_kg` (decimal, nullable — null = bodyweight)
+- `target_rpe` (decimal, nullable)
+- `is_bodyweight` (boolean, default false)
+- `sort_order` (int)
+- `notes` (text, nullable)
+
+### `strength_sessions`
+- `id` (uuid, PK)
+- `plan_id` (FK → training_plans)
+- `template_exercise_id` (FK → strength_template_exercises, nullable — null if one-off)
+- `scheduled_date` (date)
+- `week_number` (int)
+- `day_of_week` (int)
+- `exercise_name` (text)
+- `prescribed_sets` (int)
+- `prescribed_reps` (int)
+- `prescribed_weight_kg` (decimal, nullable)
+- `prescribed_rpe` (decimal, nullable)
+- `is_deload` (boolean, default false)
+- `is_template_override` (boolean, default false — true if user made a one-off edit)
+
+### `strength_logs`
+- `id` (uuid, PK)
+- `session_id` (FK → strength_sessions)
+- `set_number` (int)
+- `actual_reps` (int)
+- `actual_weight_kg` (decimal, nullable)
+- `rpe` (decimal, nullable)
+- `completed_at` (timestamp)
+- `notes` (text, nullable)
+
+### `heat_sessions`
+- `id` (uuid, PK)
+- `plan_id` (FK → training_plans)
+- `scheduled_date` (date)
+- `week_number` (int)
+- `day_of_week` (int, 1=Mon..7=Sun)
+- `session_type` (text — sauna, hot_tub, heat_suit)
+- `target_duration_minutes` (int)
+- `notes` (text, nullable)
+
+### `heat_logs`
+- `id` (uuid, PK)
+- `session_id` (FK → heat_sessions)
+- `actual_duration_minutes` (int)
+- `session_type` (text — sauna, hot_tub, heat_suit)
+- `completed_at` (timestamp)
+- `notes` (text, nullable)
+
 ### `oauth_tokens`
 - `id` (uuid, PK)
 - `user_id` (FK → users)
@@ -170,7 +292,10 @@ The target race is user-configured via the plan setup screen. Example values:
 6. **Mileage Chart** — Bar chart of weekly mileage (actual from Strava vs. planned) plotted across the entire training block. Highlights the current week, shows a target mileage line, and makes it easy to spot ramp-up, taper, and any weeks where you fell short.
 7. **Progress** — Compliance stats, readiness trends, race readiness summary.
 8. **Plan Management** — View/edit active plan: change race name, race date, or plan template. Editing race date re-maps sessions; switching template replaces the plan (with confirmation).
-9. **Settings** — Account, connected services, notifications.
+9. **Strength & Heat** (tab) — Weekly strength template editor. Shows exercises grouped by day of week. Inline editing for sets, reps, weight. "Apply to all future weeks" toggle. Progression suggestions shown as badges on exercises ready to progress. Heat section at the bottom for managing prescribed heat days (add/remove days, view type and duration).
+10. **Strength Day Detail** — Logging view for a single day's strength work. Shows prescribed exercises with target sets/reps/weight. User taps each set to log actual reps and weight. Completion state tracked per set.
+11. **Exercise History** — Per-exercise progression chart showing weight × reps over time. Accessible from the strength template or from a logged session.
+12. **Settings** — Account, connected services, notifications.
 
 ## API Integration Notes
 
@@ -186,6 +311,63 @@ The target race is user-configured via the plan setup screen. Example values:
 - OAuth2 authorization code flow with `activity:read` scope.
 - Webhook subscription available for real-time activity push (Strava → Supabase Edge Function → DB).
 - Rate limit: 200 requests per 15 minutes, 2000 per day.
+
+### 8. Manual Workout Adjustments (Week View)
+
+- Tap any session in the **Week View** to open an **editable detail sheet** (not just read-only).
+- Editable fields: workout type, target distance, effort/pace description, and coaching notes.
+- Changes are saved as **session overrides** — the original template values are preserved so the user can "reset to plan" at any time.
+- Override history is logged (what changed, when) for accountability and debugging.
+- Visual indicator on overridden sessions (e.g., a small pencil icon or subtle badge) so the user can distinguish manually adjusted workouts from the original plan.
+- Overrides are per-session by default with the option to propagate to other weeks on the same day.
+
+### 9. Strength Training Program
+
+A dedicated **Strength tab** at the bottom of the app for managing a weekly strength program that runs alongside the running plan.
+
+#### Weekly Strength Template
+- The user defines a **weekly strength template**: a set of exercises assigned to specific days of the week.
+- To start the strength template is pulled in from the training plan.
+- Each exercise entry includes: exercise name, target sets, target reps, target weight (or bodyweight flag), RPE target (optional), and notes.
+- The template is organized by day (e.g., Monday = upper body push/pull, Thursday = lower body + core).
+- Editing the template **propagates changes forward** to all future weeks automatically. Past weeks (already completed) are not retroactively changed.
+- Users can also make **one-off edits** to a specific week's strength session without affecting the template.
+
+#### Dynamic Load Progression
+- Week-over-week strength load (sets, reps, weight) **dynamically adjusts** based on:
+  - **Past lifting data**: if the user consistently hits all target reps at a given weight, the system suggests a weight increase (e.g., +2.5 kg / +5 lbs) or rep increase for the next week.
+  - **Running load**: during high-mileage or hard running weeks, strength volume is automatically scaled back (fewer sets, maintained weight) to manage total training stress. During taper or lower-volume running weeks, strength volume can increase.
+  - **Recovery signals**: if Oura readiness trends downward over multiple days, strength suggestions become more conservative (maintain or reduce load rather than progress).
+- Progression follows a simple **linear periodization** model by default:
+  - **Accumulation phase**: increase reps within a range (e.g., 3×8 → 3×10 → 3×12).
+  - **Intensification phase**: once the top of the rep range is hit, increase weight and reset to the bottom of the rep range (e.g., 3×12 @ 60 kg → 3×8 @ 65 kg).
+  - **Deload weeks**: every 4th week (configurable), reduce volume by ~40% (fewer sets, same weight) to allow recovery.
+- The user can override any suggestion — the system learns from what they actually do, not just what it prescribed.
+- A **progression log** shows weight/rep history per exercise over time (line chart or simple table).
+
+#### Strength–Running Integration
+- The Week View shows both running and strength sessions for each day, so the user sees total training load at a glance.
+- The Today View includes strength work if scheduled for that day, displayed below the running prescription.
+- Strength completion can be logged manually (sets × reps × weight for each exercise) since there's no Strava equivalent for lifting.
+
+### 10. Heat Training
+
+Track passive heat acclimation sessions (sauna, hot tub, heat suit) prescribed by the training plan.
+
+#### Prescribed Heat Days
+- Heat sessions are pulled from the training plan template — certain days (typically rest and easy days) are flagged for heat acclimation. Default days are **Monday** (rest) and **Friday** (recovery).
+- Each prescribed session includes: session type (sauna, hot tub, heat suit), target duration in minutes, and notes.
+- The template defines a weekly pattern of heat days; on plan import, `HeatSession` records are generated for each week.
+- Heat days are **editable from the Strength & Heat tab** — add new heat days, remove existing ones, choose session type and duration. Changes propagate across all weeks.
+
+#### Logging
+- Tap a heat indicator on the Week View or Today View to log a completed session.
+- Log fields: session type (sauna / hot tub / heat suit), actual duration in minutes.
+- Completion is shown as a flame icon on the Week View, Today View, and Calendar View.
+
+#### Heat–Running Integration
+- The Today View shows scheduled heat work alongside running and strength.
+- The Week View displays a flame icon on days with prescribed heat, with a checkmark when completed.
 
 ## Open Questions
 
@@ -204,6 +386,7 @@ The target race is user-configured via the plan setup screen. Example values:
 - **No offline support.** Requires connectivity for Oura/Strava sync and Supabase.
 - **Unmatched Strava activities still appear.** Any Strava activity that doesn't match a planned session shows up on that day's view as an "extra" activity (cross-training, bonus runs, etc.).
 - **Apple Watch companion app** is future scope — not in the initial build.
+- **Coach notes stay original.** Verbatim text end-to-end; no AI summary replaces `planned_sessions.notes` or bundled template `notes`. Optional AI features must not overwrite that field.
 
 ## Milestones
 
@@ -219,7 +402,7 @@ The target race is user-configured via the plan setup screen. Example values:
 ### M2 — Plan Setup & Import ✅
 - [x] Training plan template system (`TrainingPlanTemplate`, `SessionTemplate` models).
 - [x] `PlanTemplateService` — loads bundled JSON templates, back-calculates start date from race date, generates `TrainingPlan` + `PlannedSession` array.
-- [x] Bundled "Champion Plan for 100K" template (`champion_plan_100k.json`) — 16 weeks, 112 sessions, parsed from SWAP Running PDF.
+- [x] Bundled "Champion Plan for 100K" template (`champion_plan_100k.json`) — 16 weeks; coach `notes` synced from the publisher PDF. **Process:** documented under **Training Plan Selection & Import** → **Importing coach notes from a PDF** (`scripts/sync_champion_plan_from_pdf.py`, `scripts/requirements.txt`).
 - [x] `TrainingPlanStore` — `@Observable` state container holding the active plan and sessions, with computed helpers for today's session and current week.
 - [x] `PlanSetupView` — user inputs race name, picks race date, selects a plan template from a dropdown, sees computed plan summary (duration, start date, total sessions). Tahoe Rim Trail 100K used as placeholder example.
 - [x] Plan setup wired into `TodayView` — empty state prompts plan creation; once created, shows today's workout card with type, distance, effort, and notes.
@@ -274,6 +457,44 @@ The target race is user-configured via the plan setup screen. Example values:
 - [ ] Onboarding flow — guided first-launch experience (sign in → connect services → create plan).
 - [ ] Edge cases: handle expired/revoked OAuth tokens gracefully, network error retry, plan deletion cleanup.
 
+### M7 — Manual Workout Adjustments & Strength Training ✅
+- [x] `SessionOverride` model and Supabase migration for `session_overrides` table.
+- [x] Editable `SessionDetailSheet` — tap into any session from the Week View to edit workout type, distance, effort, and notes. Original values preserved for "reset to plan."
+- [x] Override propagation option — when editing a session, the user can choose to apply the same change to the matching day across other weeks (e.g., change all Tuesdays). Default is single-session only.
+- [x] Override indicator (pencil badge) on `WeekView` and `PlanCalendarView` for modified sessions.
+- [x] `StrengthTemplate`, `StrengthTemplateExercise`, `StrengthSession`, `StrengthLog` models.
+- [x] Supabase migration for strength tables (`strength_templates`, `strength_template_exercises`, `strength_sessions`, `strength_logs`).
+- [x] Add strength exercises to the bundled training plan JSON (`champion_plan_100k.json`) — initial strength template is seeded from the plan template, not created from scratch.
+- [x] `StrengthStore` — `@Observable` state container for the strength template and weekly sessions. On plan import, populate the strength template from the plan's bundled strength data. Handles template propagation to future weeks, one-off overrides, and deload week detection.
+- [x] `StrengthTemplateView` — the Strength tab. Edit the weekly template (exercises grouped by day). Add/remove/reorder exercises. Inline editing for sets, reps, weight.
+- [x] Template propagation logic — when the template changes, regenerate `strength_sessions` for all future weeks. Past weeks untouched.
+- [x] `StrengthDayDetailView` — logging view for a day's strength work. Tap each set to log actual reps/weight. Mark exercises complete.
+- [x] Dynamic load progression engine:
+  - Analyze `strength_logs` to detect when user consistently hits target reps → suggest weight increase.
+  - Cross-reference running load from `planned_sessions` (weekly distance, workout intensity) to scale strength volume.
+  - Integrate Oura readiness trends to moderate progression suggestions.
+  - Auto-insert deload weeks (every 4th week by default, configurable).
+- [x] Progression suggestions UI — badges on exercises ready to progress, with accept/dismiss actions.
+- [x] `ExerciseHistoryView` — per-exercise chart (weight over time, reps over time).
+- [x] Strength display on `WeekView` — show strength sessions alongside running sessions per day.
+- [x] Strength display on `TodayView` — show today's strength work below the running prescription.
+- [x] New Strength tab added to `ContentView` tab bar.
+- [x] Supabase persistence for all strength data (template, sessions, logs).
+
+### M8 — Heat Training ✅
+- [x] `HeatSession` and `HeatLog` models.
+- [x] Supabase migration for heat tables (`heat_sessions`, `heat_logs`).
+- [x] Add `heat_sessions` to the bundled training plan JSON template (`champion_plan_100k.json`) — prescribed heat days on Monday (day 1) and Friday (day 5).
+- [x] Update `TrainingPlanTemplate` model with `HeatSessionTemplate` struct.
+- [x] `HeatStore` — `@Observable` state container. Initialize from template on plan import. Log completion. Query helpers for today/week/date. Add/remove heat days with propagation across all weeks.
+- [x] `HeatLogSheet` — simple logging view: session type picker, duration stepper, save.
+- [x] Heat display on `TodayView` — show prescribed heat session with log button.
+- [x] Heat display on `WeekView` — flame icon on days with prescribed heat, checkmark when done.
+- [x] Heat indicator on `PlanCalendarView` — flame icon overlay on calendar cells.
+- [x] Heat editing in Strength & Heat tab — add/remove heat days, choose session type and duration. `AddHeatDaySheet` for adding new days.
+- [x] Wire `HeatStore` into `TrainingApp`, `ContentView`, `PlanSetupView`, `PlanEditView`.
+- [x] Supabase persistence for all heat data (sessions, logs).
+
 ## Project Structure
 
 ```
@@ -297,29 +518,44 @@ TrainingApp/
     │   ├── WorkoutType.swift
     │   ├── SessionSwap.swift
     │   ├── SessionSkip.swift
+    │   ├── SessionOverride.swift          # Manual workout adjustments
     │   ├── StravaActivity.swift
-    │   └── OuraDaily.swift
+    │   ├── OuraDaily.swift
+    │   ├── StrengthTemplate.swift         # Weekly strength template + exercises
+    │   ├── StrengthSession.swift          # Per-week prescribed strength work
+    │   ├── StrengthLog.swift              # Actual logged sets/reps/weight
+    │   ├── HeatSession.swift              # Prescribed heat acclimation sessions
+    │   └── HeatLog.swift                  # Actual logged heat sessions
     ├── Services/
     │   ├── SupabaseService.swift
     │   ├── AuthService.swift
-    │   ├── PlanTemplateService.swift     # Load templates, generate plans
-    │   ├── TrainingPlanStore.swift       # Active plan state (@Observable)
-    │   ├── StravaService.swift           # OAuth2, activity import, auto-match
-    │   ├── OuraService.swift             # OAuth2, readiness/sleep sync
-    │   └── KeychainService.swift         # Secure token storage
+    │   ├── PlanTemplateService.swift      # Load templates, generate plans
+    │   ├── TrainingPlanStore.swift        # Active plan state (@Observable)
+    │   ├── StrengthStore.swift            # Strength template, sessions, progression
+    │   ├── ProgressionEngine.swift        # Dynamic load adjustment logic
+    │   ├── HeatStore.swift                # Heat sessions, logging
+    │   ├── StravaService.swift            # OAuth2, activity import, auto-match
+    │   ├── OuraService.swift              # OAuth2, readiness/sleep sync
+    │   └── KeychainService.swift          # Secure token storage
     └── Views/
         ├── Auth/SignInView.swift
         ├── Plan/PlanSetupView.swift
         ├── Plan/PlanEditView.swift
-        ├── Today/TodayView.swift         # Recovery card, swap suggestions
-        ├── Week/WeekView.swift           # Week summary, completion status
+        ├── Today/TodayView.swift          # Recovery card, swap suggestions, strength
+        ├── Week/WeekView.swift            # Week summary, completion, strength
         ├── Calendar/PlanCalendarView.swift # Completion dots
-        ├── Calendar/SessionDetailSheet.swift # Plan vs actual comparison
+        ├── Calendar/SessionDetailSheet.swift # Editable plan vs actual comparison
+        ├── Heat/HeatLogSheet.swift              # Log heat session duration
+        ├── Strength/StrengthTemplateView.swift  # Strength tab — weekly template editor
+        ├── Strength/StrengthDayDetailView.swift # Log sets/reps/weight for a day
+        ├── Strength/ExerciseHistoryView.swift   # Per-exercise progression chart
         ├── Progress/ProgressDashboardView.swift # Charts, compliance, readiness
-        └── Settings/SettingsView.swift   # Strava/Oura connect/disconnect
+        └── Settings/SettingsView.swift    # Strava/Oura connect/disconnect
 
 supabase/
 ├── config.toml
 └── migrations/
-    └── 20260318000000_initial_schema.sql
+    ├── 20260318000000_initial_schema.sql
+    ├── 20260320000000_strength_and_overrides.sql
+    └── 20260320200000_heat_training.sql
 ```

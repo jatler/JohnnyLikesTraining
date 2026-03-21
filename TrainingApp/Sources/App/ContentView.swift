@@ -22,6 +22,8 @@ struct MainTabView: View {
     @Environment(TrainingPlanStore.self) private var planStore
     @Environment(StravaService.self) private var strava
     @Environment(OuraService.self) private var oura
+    @Environment(StrengthStore.self) private var strengthStore
+    @Environment(HeatStore.self) private var heatStore
 
     var body: some View {
         TabView {
@@ -35,9 +37,9 @@ struct MainTabView: View {
                     Label("Week", systemImage: "calendar")
                 }
 
-            PlanCalendarView()
+            StrengthTemplateView()
                 .tabItem {
-                    Label("Plan", systemImage: "calendar.badge.clock")
+                    Label("Strength", systemImage: "dumbbell.fill")
                 }
 
             ProgressDashboardView()
@@ -54,6 +56,21 @@ struct MainTabView: View {
             guard let userId = auth.currentUserId else { return }
             if !planStore.hasPlan {
                 await planStore.loadPlan(userId: userId)
+            }
+            if let plan = planStore.activePlan {
+                if !strengthStore.hasTemplate {
+                    await strengthStore.loadData(planId: plan.id)
+                }
+                if !heatStore.hasSessions {
+                    await heatStore.loadData(planId: plan.id)
+                }
+                if let week = planStore.currentWeekNumber {
+                    strengthStore.computeSuggestions(
+                        runningSessions: planStore.sessions,
+                        ouraData: oura.dailyData,
+                        currentWeek: week
+                    )
+                }
             }
             if strava.isConnected {
                 await strava.loadActivities(userId: userId)
@@ -72,4 +89,6 @@ struct MainTabView: View {
         .environment(TrainingPlanStore())
         .environment(StravaService())
         .environment(OuraService())
+        .environment(StrengthStore())
+        .environment(HeatStore())
 }

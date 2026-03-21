@@ -3,22 +3,21 @@ import SwiftUI
 struct PlanCalendarView: View {
     @Environment(TrainingPlanStore.self) private var planStore
     @Environment(StravaService.self) private var strava
+    @Environment(HeatStore.self) private var heatStore
 
     @State private var selectedSession: PlannedSession?
 
     private let dayLabels = ["M", "T", "W", "T", "F", "S", "S"]
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if planStore.hasPlan {
-                    calendarContent
-                } else {
-                    emptyState
-                }
+        Group {
+            if planStore.hasPlan {
+                calendarContent
+            } else {
+                emptyState
             }
-            .navigationTitle("Plan")
         }
+        .navigationTitle("Plan")
     }
 
     // MARK: - Calendar Content
@@ -168,6 +167,10 @@ struct PlanCalendarView: View {
             weekSessions.filter { $0.workoutType == .strength }.map(\.dayOfWeek)
         )
 
+        let heatWeekSessions = heatStore.sessions(for: weekNumber)
+        let daysWithHeat = Set(heatWeekSessions.map(\.dayOfWeek))
+        let daysWithHeatDone = Set(heatWeekSessions.filter { heatStore.isComplete($0.id) }.map(\.dayOfWeek))
+
         return HStack(spacing: 4) {
             Text("W\(weekNumber)")
                 .font(.caption2.bold())
@@ -175,17 +178,24 @@ struct PlanCalendarView: View {
                 .frame(width: 32)
 
             ForEach(primarySessions) { session in
-                dayCell(session, isCurrentWeek: isCurrentWeek, hasStrength: daysWithStrength.contains(session.dayOfWeek))
-                    .onTapGesture { selectedSession = session }
+                dayCell(
+                    session,
+                    isCurrentWeek: isCurrentWeek,
+                    hasStrength: daysWithStrength.contains(session.dayOfWeek),
+                    hasHeat: daysWithHeat.contains(session.dayOfWeek),
+                    heatDone: daysWithHeatDone.contains(session.dayOfWeek)
+                )
+                .onTapGesture { selectedSession = session }
             }
         }
     }
 
     // MARK: - Day Cell
 
-    private func dayCell(_ session: PlannedSession, isCurrentWeek: Bool, hasStrength: Bool = false) -> some View {
+    private func dayCell(_ session: PlannedSession, isCurrentWeek: Bool, hasStrength: Bool = false, hasHeat: Bool = false, heatDone: Bool = false) -> some View {
         let isToday = Calendar.current.isDateInToday(session.scheduledDate)
         let skipped = planStore.isSkipped(session.id)
+        let overridden = planStore.isOverridden(session.id)
         let dayNum = Calendar.current.component(.day, from: session.scheduledDate)
         let hasActivity = strava.activity(for: session.id) != nil
 
@@ -212,6 +222,20 @@ struct PlanCalendarView: View {
                         .font(.system(size: 6))
                         .foregroundStyle(.indigo)
                         .offset(x: -8, y: -6)
+                }
+
+                if overridden {
+                    Image(systemName: "pencil.circle.fill")
+                        .font(.system(size: 6))
+                        .foregroundStyle(.orange)
+                        .offset(x: 8, y: 6)
+                }
+
+                if hasHeat {
+                    Image(systemName: heatDone ? "checkmark.circle.fill" : "flame.fill")
+                        .font(.system(size: 6))
+                        .foregroundStyle(heatDone ? .green : .orange)
+                        .offset(x: -8, y: 6)
                 }
             }
         }
@@ -254,7 +278,10 @@ struct PlanCalendarView: View {
 }
 
 #Preview {
-    PlanCalendarView()
-        .environment(TrainingPlanStore())
-        .environment(StravaService())
+    NavigationStack {
+        PlanCalendarView()
+    }
+    .environment(TrainingPlanStore())
+    .environment(StravaService())
+    .environment(HeatStore())
 }

@@ -3,6 +3,8 @@ import SwiftUI
 struct PlanSetupView: View {
     @Environment(AuthService.self) private var auth
     @Environment(TrainingPlanStore.self) private var planStore
+    @Environment(StrengthStore.self) private var strengthStore
+    @Environment(HeatStore.self) private var heatStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var raceName = ""
@@ -122,6 +124,26 @@ struct PlanSetupView: View {
             userId: userId
         )
 
+        if let plan = planStore.activePlan {
+            if let strengthExercises = template.strengthExercises, !strengthExercises.isEmpty {
+                strengthStore.initializeFromTemplate(
+                    strengthExercises,
+                    planId: plan.id,
+                    planStartDate: plan.planStartDate,
+                    totalWeeks: template.durationWeeks
+                )
+            }
+
+            if let heatTemplates = template.heatSessions, !heatTemplates.isEmpty {
+                heatStore.initializeFromTemplate(
+                    heatTemplates,
+                    planId: plan.id,
+                    planStartDate: plan.planStartDate,
+                    totalWeeks: template.durationWeeks
+                )
+            }
+        }
+
         dismiss()
     }
 }
@@ -144,4 +166,6 @@ extension TrainingPlanTemplate: Hashable {
     PlanSetupView()
         .environment(AuthService())
         .environment(TrainingPlanStore())
+        .environment(StrengthStore())
+        .environment(HeatStore())
 }

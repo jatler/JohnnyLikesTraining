@@ -5,13 +5,28 @@ struct SessionDetailSheet: View {
     @Environment(TrainingPlanStore.self) private var planStore
     @Environment(StravaService.self) private var strava
     @Environment(OuraService.self) private var oura
+    @Environment(StrengthStore.self) private var strengthStore
+    @Environment(HeatStore.self) private var heatStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var showingSwapTargets = false
     @State private var showingSkipOptions = false
+    @State private var isEditing = false
+    @State private var editWorkoutType: WorkoutType = .easy
+    @State private var editDistanceMi = ""
+    @State private var editPace = ""
+    @State private var editNotes = ""
+    @State private var propagateToSameDay = false
+    @State private var selectedStrengthDay: StrengthDaySelection?
+    @State private var selectedHeatSession: HeatSession?
+    @State private var sheetDetent: PresentationDetent = .large
 
     private var isSkipped: Bool {
         planStore.isSkipped(session.id)
+    }
+
+    private var isOverridden: Bool {
+        planStore.isOverridden(session.id)
     }
 
     private var matchedActivity: StravaActivity? {
@@ -26,37 +41,10 @@ struct SessionDetailSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 20) {
-                    workoutHeader
-
-                    if let recovery = dayRecovery {
-                        recoveryRow(recovery)
-                    }
-
-                    if let distance = session.targetDistanceKm {
-                        distanceRow(distance)
-                    }
-
-                    if let pace = session.targetPaceDescription, !pace.isEmpty {
-                        paceRow(pace)
-                    }
-
-                    if let notes = session.notes, !notes.isEmpty {
-                        notesSection(notes)
-                    }
-
-                    strengthSection
-
-                    if let activity = matchedActivity {
-                        Divider()
-                        planVsActualSection(activity)
-                    }
-
-                    Divider()
-
-                    actionsSection
-
-                    if showingSwapTargets {
-                        swapTargetsSection
+                    if isEditing {
+                        editForm
+                    } else {
+                        readOnlyContent
                     }
                 }
                 .padding()
@@ -65,12 +53,160 @@ struct SessionDetailSheet: View {
             .navigationTitle(formattedDate)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    if isEditing {
+                        Button("Cancel") {
+                            isEditing = false
+                        }
+                    }
+                }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                    if isEditing {
+                        Button("Save") { saveOverride() }
+                    } else {
+                        Button("Done") { dismiss() }
+                    }
                 }
             }
         }
-        .presentationDetents([.medium, .large])
+        .presentationDetents([.large, .medium], selection: $sheetDetent)
+        .sheet(item: $selectedStrengthDay) { selection in
+            StrengthDayDetailView(weekNumber: selection.weekNumber, dayOfWeek: selection.dayOfWeek)
+        }
+        .sheet(item: $selectedHeatSession) { session in
+            HeatLogSheet(session: session)
+        }
+    }
+
+    // MARK: - Read-Only Content
+
+    private var readOnlyContent: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            workoutHeader
+
+            if let recovery = dayRecovery {
+                recoveryRow(recovery)
+            }
+
+            if let distance = session.targetDistanceKm {
+                distanceRow(distance)
+            }
+
+            let coachText = session.verbatimCoachNotesForDisplay
+            let pace = session.targetPaceDescription?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let paceRedundant = pace.map { coachText.lowercased().contains($0.lowercased()) } ?? true
+
+            if let pace, !pace.isEmpty, !paceRedundant {
+                paceRow(pace)
+            }
+
+            if !coachText.isEmpty {
+                notesSection(coachText)
+            }
+
+            strengthSection
+
+            heatSection
+
+            if let activity = matchedActivity {
+                Divider()
+                planVsActualSection(activity)
+            }
+
+            Divider()
+
+            actionsSection
+            editButton
+
+            if showingSwapTargets {
+                swapTargetsSection
+            }
+        }
+    }
+
+    // MARK: - Edit Form
+
+    private var editForm: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Section {
+                Text("Edit Workout")
+                    .font(.headline)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Workout Type")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.secondary)
+
+                Picker("Type", selection: $editWorkoutType) {
+                    ForEach(WorkoutType.allCases.filter { $0 != .strength }) { type in
+                        Text(type.displayName).tag(type)
+                    }
+                }
+                .pickerStyle(.menu)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Distance (miles)")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.secondary)
+
+                TextField("e.g. 8.0", text: $editDistanceMi)
+                    .keyboardType(.decimalPad)
+                    .textFieldStyle(.roundedBorder)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Effort / Pace")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.secondary)
+
+                TextField("e.g. Easy effort, Z1/Z2", text: $editPace)
+                    .textFieldStyle(.roundedBorder)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Coach notes")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.secondary)
+
+                ZStack(alignment: .topLeading) {
+                    if editNotes.isEmpty {
+                        Text("Optional — full text from your plan is kept here")
+                            .foregroundStyle(.tertiary)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 14)
+                            .allowsHitTesting(false)
+                    }
+                    TextEditor(text: $editNotes)
+                        .font(.body)
+                        .frame(minHeight: 260)
+                        .scrollContentBackground(.hidden)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 6)
+                }
+                .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .strokeBorder(Color(.separator), lineWidth: 1)
+                )
+            }
+
+            Toggle("Apply to all \(dayOfWeekName)s", isOn: $propagateToSameDay)
+                .font(.subheadline)
+
+            if isOverridden {
+                Button {
+                    planStore.resetToOriginal(session.id)
+                    isEditing = false
+                } label: {
+                    Label("Reset to Original Plan", systemImage: "arrow.uturn.backward")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .tint(.orange)
+            }
+        }
     }
 
     // MARK: - Subviews
@@ -84,10 +220,18 @@ struct SessionDetailSheet: View {
                 .background(session.workoutType.swiftUIColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 10))
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(session.workoutType.displayName)
-                    .font(.title3.bold())
-                    .strikethrough(isSkipped)
-                    .opacity(isSkipped ? 0.5 : 1)
+                HStack(spacing: 6) {
+                    Text(session.workoutType.displayName)
+                        .font(.title3.bold())
+                        .strikethrough(isSkipped)
+                        .opacity(isSkipped ? 0.5 : 1)
+
+                    if isOverridden {
+                        Image(systemName: "pencil.circle.fill")
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                    }
+                }
 
                 Text("Week \(session.weekNumber) \u{2022} Day \(session.dayOfWeek)")
                     .font(.subheadline)
@@ -177,30 +321,134 @@ struct SessionDetailSheet: View {
 
     private func notesSection(_ notes: String) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Coach Notes")
+            Text("Coach notes")
                 .font(.subheadline.bold())
                 .foregroundStyle(.secondary)
             Text(notes)
                 .font(.body)
                 .foregroundStyle(isSkipped ? .secondary : .primary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+                .textSelection(.enabled)
         }
     }
 
     @ViewBuilder
     private var strengthSection: some View {
-        if let strength = planStore.strengthSession(for: session),
-           let notes = strength.notes, !notes.isEmpty {
-            VStack(alignment: .leading, spacing: 6) {
-                Label("Strength", systemImage: "dumbbell.fill")
-                    .font(.subheadline.bold())
-                    .foregroundStyle(.indigo)
-                Text(notes)
-                    .font(.body)
-                    .foregroundStyle(isSkipped ? .secondary : .primary)
+        let daySessions = strengthStore.sessions(for: session.scheduledDate)
+
+        if !daySessions.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Label("Strength", systemImage: "dumbbell.fill")
+                        .font(.subheadline.bold())
+                        .foregroundStyle(.indigo)
+
+                    Spacer()
+
+                    Button {
+                        selectedStrengthDay = StrengthDaySelection(
+                            weekNumber: session.weekNumber,
+                            dayOfWeek: session.dayOfWeek
+                        )
+                    } label: {
+                        Label("Log", systemImage: "checkmark.circle")
+                            .font(.caption)
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .tint(.indigo)
+                }
+
+                ForEach(daySessions) { s in
+                    HStack(spacing: 8) {
+                        let complete = strengthStore.isSessionComplete(s.id)
+
+                        if complete {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.caption)
+                                .foregroundStyle(.green)
+                        } else {
+                            Image(systemName: "circle")
+                                .font(.caption)
+                                .foregroundStyle(.quaternary)
+                        }
+
+                        Text(s.exerciseName)
+                            .font(.caption)
+                            .foregroundStyle(complete ? .secondary : .primary)
+
+                        Spacer()
+
+                        Text(formatPrescription(s))
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(.indigo.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+            .opacity(isSkipped ? 0.5 : 1)
+        }
+    }
+
+    private func formatPrescription(_ session: StrengthSession) -> String {
+        var text = "\(session.prescribedSets)×\(session.prescribedReps)"
+        if let kg = session.prescribedWeightKg {
+            text += " @ \(Int(kg * 2.205)) lbs"
+        }
+        return text
+    }
+
+    @ViewBuilder
+    private var heatSection: some View {
+        let heatSessions = heatStore.sessions(for: session.scheduledDate)
+
+        if !heatSessions.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Label("Heat", systemImage: "flame.fill")
+                        .font(.subheadline.bold())
+                        .foregroundStyle(.orange)
+
+                    Spacer()
+                }
+
+                ForEach(heatSessions) { hs in
+                    let complete = heatStore.isComplete(hs.id)
+                    let log = heatStore.log(for: hs.id)
+
+                    Button {
+                        selectedHeatSession = hs
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: complete ? "checkmark.circle.fill" : "flame")
+                                .font(.caption)
+                                .foregroundStyle(complete ? .green : .orange)
+
+                            Text(hs.sessionType.displayName)
+                                .font(.caption)
+
+                            Spacer()
+
+                            if let log {
+                                Text("\(log.actualDurationMinutes) min")
+                                    .font(.caption)
+                                    .foregroundStyle(.green)
+                            } else {
+                                Text("\(hs.targetDurationMinutes) min")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(.orange.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
             .opacity(isSkipped ? 0.5 : 1)
         }
     }
@@ -332,6 +580,22 @@ struct SessionDetailSheet: View {
         }
     }
 
+    private var editButton: some View {
+        Button {
+            editWorkoutType = session.workoutType
+            editDistanceMi = session.targetDistanceMi.map { String(format: "%.1f", $0) } ?? ""
+            editPace = session.targetPaceDescription ?? ""
+            editNotes = session.notes ?? ""
+            propagateToSameDay = false
+            isEditing = true
+        } label: {
+            Label("Edit Workout", systemImage: "pencil")
+                .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.bordered)
+        .tint(.indigo)
+    }
+
     private var swapTargetsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Select a day to swap with:")
@@ -382,7 +646,27 @@ struct SessionDetailSheet: View {
         session.scheduledDate.formatted(.dateTime.weekday(.wide).month(.abbreviated).day())
     }
 
+    private var dayOfWeekName: String {
+        session.scheduledDate.formatted(.dateTime.weekday(.wide))
+    }
+
     private func skipWithReason(_ reason: String?) {
         planStore.skipSession(session.id, reason: reason)
+    }
+
+    private func saveOverride() {
+        let distanceKm = Double(editDistanceMi).map { $0 * 1.609 }
+
+        planStore.overrideSession(
+            session.id,
+            workoutType: editWorkoutType,
+            distanceKm: distanceKm,
+            paceDescription: editPace.isEmpty ? nil : editPace,
+            notes: editNotes.isEmpty ? nil : editNotes,
+            reason: nil,
+            propagateToSameDay: propagateToSameDay
+        )
+        isEditing = false
+        dismiss()
     }
 }

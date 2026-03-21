@@ -3,10 +3,14 @@ import SwiftUI
 struct WeekView: View {
     @Environment(TrainingPlanStore.self) private var planStore
     @Environment(StravaService.self) private var strava
+    @Environment(StrengthStore.self) private var strengthStore
+    @Environment(HeatStore.self) private var heatStore
 
     @State private var selectedWeek: Int = 1
     @State private var selectedSession: PlannedSession?
     @State private var hasInitialized = false
+    @State private var selectedStrengthDay: StrengthDaySelection?
+    @State private var selectedHeatSession: HeatSession?
 
     var body: some View {
         NavigationStack {
@@ -18,6 +22,15 @@ struct WeekView: View {
                 }
             }
             .navigationTitle("Week \(selectedWeek)")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        PlanCalendarView()
+                    } label: {
+                        Image(systemName: "calendar.badge.clock")
+                    }
+                }
+            }
         }
     }
 
@@ -51,6 +64,12 @@ struct WeekView: View {
         }
         .sheet(item: $selectedSession) { session in
             SessionDetailSheet(session: session)
+        }
+        .sheet(item: $selectedStrengthDay) { selection in
+            StrengthDayDetailView(weekNumber: selection.weekNumber, dayOfWeek: selection.dayOfWeek)
+        }
+        .sheet(item: $selectedHeatSession) { session in
+            HeatLogSheet(session: session)
         }
     }
 
@@ -145,7 +164,9 @@ struct WeekView: View {
         let skipped = planStore.isSkipped(session.id)
         let isToday = Calendar.current.isDateInToday(session.scheduledDate)
         let activity = strava.activity(for: session.id)
-        let strength = planStore.strengthSession(for: session)
+        let overridden = planStore.isOverridden(session.id)
+        let daySessions = strengthStore.sessions(for: session.scheduledDate)
+        let dayHeat = heatStore.sessions(for: session.scheduledDate)
 
         return HStack(spacing: 12) {
             VStack(spacing: 2) {
@@ -169,10 +190,31 @@ struct WeekView: View {
                         .font(.headline)
                         .strikethrough(skipped)
 
-                    if strength != nil {
+                    if overridden {
+                        Image(systemName: "pencil.circle.fill")
+                            .font(.caption2)
+                            .foregroundStyle(.orange)
+                    }
+
+                    if !daySessions.isEmpty {
                         Label("Strength", systemImage: "dumbbell.fill")
                             .font(.caption2)
                             .foregroundStyle(.indigo)
+                    }
+
+                    if let heat = dayHeat.first {
+                        Button {
+                            selectedHeatSession = heat
+                        } label: {
+                            Label {
+                                Text(heatStore.isComplete(heat.id) ? "Done" : "\(heat.targetDurationMinutes)m")
+                            } icon: {
+                                Image(systemName: heatStore.isComplete(heat.id) ? "checkmark.circle.fill" : "flame.fill")
+                            }
+                            .font(.caption2)
+                            .foregroundStyle(heatStore.isComplete(heat.id) ? .green : .orange)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
 
@@ -187,6 +229,10 @@ struct WeekView: View {
                         .font(.caption)
                         .foregroundStyle(.tertiary)
                         .lineLimit(1)
+                }
+
+                if !daySessions.isEmpty {
+                    strengthSummary(daySessions, date: session.scheduledDate)
                 }
             }
 
@@ -223,6 +269,23 @@ struct WeekView: View {
         .opacity(skipped ? 0.6 : 1.0)
     }
 
+    private func strengthSummary(_ sessions: [StrengthSession], date: Date) -> some View {
+        let completed = strengthStore.completedExerciseCount(for: date)
+        let total = sessions.count
+
+        return HStack(spacing: 4) {
+            if completed > 0 {
+                Text("\(completed)/\(total)")
+                    .font(.caption2)
+                    .foregroundStyle(.indigo)
+            } else {
+                Text("\(total) exercises")
+                    .font(.caption2)
+                    .foregroundStyle(.indigo.opacity(0.6))
+            }
+        }
+    }
+
     // MARK: - Empty State
 
     private var emptyState: some View {
@@ -252,4 +315,6 @@ struct WeekView: View {
     WeekView()
         .environment(TrainingPlanStore())
         .environment(StravaService())
+        .environment(StrengthStore())
+        .environment(HeatStore())
 }

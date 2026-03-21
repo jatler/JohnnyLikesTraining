@@ -8,6 +8,7 @@ final class TrainingPlanStore {
     private(set) var sessions: [PlannedSession] = []
     private(set) var skips: [SessionSkip] = []
     private(set) var swaps: [SessionSwap] = []
+    private(set) var overrides: [SessionOverride] = []
     private(set) var isLoading = false
 
     private let supabase = SupabaseService.shared.client
@@ -71,6 +72,14 @@ final class TrainingPlanStore {
 
     func isSkipped(_ sessionId: UUID) -> Bool {
         skips.contains { $0.sessionId == sessionId }
+    }
+
+    func isOverridden(_ sessionId: UUID) -> Bool {
+        overrides.contains { $0.sessionId == sessionId }
+    }
+
+    func override(for sessionId: UUID) -> SessionOverride? {
+        overrides.first { $0.sessionId == sessionId }
     }
 
     /// Nearest easy, recovery, or rest day in the same week — for quick swap.
@@ -232,6 +241,105 @@ final class TrainingPlanStore {
         }
     }
 
+    // MARK: - Override Session (Manual Edit)
+
+    func overrideSession(
+        _ sessionId: UUID,
+        workoutType: WorkoutType?,
+        distanceKm: Double?,
+        paceDescription: String?,
+        notes: String?,
+        reason: String?,
+        propagateToSameDay: Bool = false
+    ) {
+        guard let index = sessions.firstIndex(where: { $0.id == sessionId }) else { return }
+        let original = sessions[index]
+
+        if !isOverridden(sessionId) {
+            let overrideRecord = SessionOverride(
+                id: UUID(),
+                sessionId: sessionId,
+                originalWorkoutType: original.workoutType,
+                originalTargetDistanceKm: original.targetDistanceKm,
+                originalTargetPaceDescription: original.targetPaceDescription,
+                originalNotes: original.notes,
+                overrideReason: reason,
+                overriddenAt: Date()
+            )
+            overrides.append(overrideRecord)
+            Task { await persistOverride(overrideRecord) }
+        }
+
+        if let wt = workoutType { sessions[index].workoutType = wt }
+        if let d = distanceKm { sessions[index].targetDistanceKm = d }
+        sessions[index].targetPaceDescription = paceDescription
+        sessions[index].notes = notes
+
+        Task { await persistSessionFieldUpdate(sessions[index]) }
+
+        if propagateToSameDay {
+            let dayOfWeek = original.dayOfWeek
+            let otherSessions = sessions.enumerated().filter {
+                $0.element.dayOfWeek == dayOfWeek
+                    && $0.element.id != sessionId
+                    && $0.element.workoutType != .strength
+            }
+
+            for (otherIndex, otherSession) in otherSessions {
+                if !isOverridden(otherSession.id) {
+                    let overrideRecord = SessionOverride(
+                        id: UUID(),
+                        sessionId: otherSession.id,
+                        originalWorkoutType: otherSession.workoutType,
+                        originalTargetDistanceKm: otherSession.targetDistanceKm,
+                        originalTargetPaceDescription: otherSession.targetPaceDescription,
+                        originalNotes: otherSession.notes,
+                        overrideReason: reason,
+                        overriddenAt: Date()
+                    )
+                    overrides.append(overrideRecord)
+                    Task { await persistOverride(overrideRecord) }
+                }
+
+                if let wt = workoutType { sessions[otherIndex].workoutType = wt }
+                if let d = distanceKm { sessions[otherIndex].targetDistanceKm = d }
+                sessions[otherIndex].targetPaceDescription = paceDescription
+                sessions[otherIndex].notes = notes
+
+                Task { await persistSessionFieldUpdate(sessions[otherIndex]) }
+            }
+        }
+    }
+
+    func resetToOriginal(_ sessionId: UUID) {
+        guard let overrideIndex = overrides.firstIndex(where: { $0.sessionId == sessionId }),
+              let sessionIndex = sessions.firstIndex(where: { $0.id == sessionId }) else { return }
+
+        let original = overrides[overrideIndex]
+
+        if let wt = original.originalWorkoutType {
+            sessions[sessionIndex].workoutType = wt
+        }
+        sessions[sessionIndex].targetDistanceKm = original.originalTargetDistanceKm
+        sessions[sessionIndex].targetPaceDescription = original.originalTargetPaceDescription
+        sessions[sessionIndex].notes = original.originalNotes
+
+        let overrideId = overrides[overrideIndex].id
+        overrides.remove(at: overrideIndex)
+
+        Task {
+            await persistSessionFieldUpdate(sessions[sessionIndex])
+            do {
+                try await supabase.from("session_overrides")
+                    .delete()
+                    .eq("id", value: overrideId)
+                    .execute()
+            } catch {
+                print("Failed to delete override: \(error)")
+            }
+        }
+    }
+
     // MARK: - Load from Supabase
 
     func loadPlan(userId: UUID) async {
@@ -260,10 +368,12 @@ final class TrainingPlanStore {
                 .value
 
             if !sessions.isEmpty {
+                let sessionIds = sessions.map { $0.id.uuidString }
+
                 skips = try await supabase
                     .from("session_skips")
                     .select()
-                    .in("session_id", values: sessions.map { $0.id.uuidString })
+                    .in("session_id", values: sessionIds)
                     .execute()
                     .value
 
@@ -273,9 +383,55 @@ final class TrainingPlanStore {
                     .eq("plan_id", value: plan.id)
                     .execute()
                     .value
+
+                overrides = try await supabase
+                    .from("session_overrides")
+                    .select()
+                    .in("session_id", values: sessionIds)
+                    .execute()
+                    .value
             }
+
+            reconcileNotesFromBundledTemplateIfNeeded()
         } catch {
             print("Failed to load plan: \(error)")
+        }
+    }
+
+    /// If the bundled template for this plan has longer `notes` than Supabase (e.g. after a template update), backfill without touching user-overridden sessions.
+    private func reconcileNotesFromBundledTemplateIfNeeded() {
+        guard let template = currentTemplate else { return }
+
+        var templateNotesByKey: [String: String] = [:]
+        for row in template.sessions {
+            let key = "\(row.week)-\(row.day)-\(row.workoutType.rawValue)"
+            if let n = row.notes, !n.isEmpty {
+                templateNotesByKey[key] = n
+            }
+        }
+
+        var persisted: [PlannedSession] = []
+
+        for index in sessions.indices {
+            let s = sessions[index]
+            if isOverridden(s.id) { continue }
+
+            let key = "\(s.weekNumber)-\(s.dayOfWeek)-\(s.workoutType.rawValue)"
+            guard let bundled = templateNotesByKey[key], !bundled.isEmpty else { continue }
+
+            let current = s.notes ?? ""
+            guard bundled.count > current.count else { continue }
+
+            sessions[index].notes = bundled
+            persisted.append(sessions[index])
+        }
+
+        guard !persisted.isEmpty else { return }
+
+        Task {
+            for s in persisted {
+                await persistSessionFieldUpdate(s)
+            }
         }
     }
 
@@ -287,6 +443,7 @@ final class TrainingPlanStore {
         sessions = []
         skips = []
         swaps = []
+        overrides = []
 
         if let oldId = oldPlanId {
             Task {
@@ -358,6 +515,30 @@ final class TrainingPlanStore {
             print("Failed to persist skip: \(error)")
         }
     }
+
+    private func persistOverride(_ override: SessionOverride) async {
+        do {
+            try await supabase.from("session_overrides").insert(override).execute()
+        } catch {
+            print("Failed to persist override: \(error)")
+        }
+    }
+
+    private func persistSessionFieldUpdate(_ session: PlannedSession) async {
+        do {
+            try await supabase.from("planned_sessions")
+                .update(SessionFieldUpdate(
+                    workoutType: session.workoutType,
+                    targetDistanceKm: session.targetDistanceKm,
+                    targetPaceDescription: session.targetPaceDescription,
+                    notes: session.notes
+                ))
+                .eq("id", value: session.id)
+                .execute()
+        } catch {
+            print("Failed to persist session field update: \(error)")
+        }
+    }
 }
 
 // MARK: - Supabase Update DTOs
@@ -383,5 +564,19 @@ private struct SessionDateUpdate: Encodable {
     enum CodingKeys: String, CodingKey {
         case scheduledDate = "scheduled_date"
         case dayOfWeek = "day_of_week"
+    }
+}
+
+private struct SessionFieldUpdate: Encodable {
+    let workoutType: WorkoutType
+    let targetDistanceKm: Double?
+    let targetPaceDescription: String?
+    let notes: String?
+
+    enum CodingKeys: String, CodingKey {
+        case workoutType = "workout_type"
+        case targetDistanceKm = "target_distance_km"
+        case targetPaceDescription = "target_pace_description"
+        case notes
     }
 }
