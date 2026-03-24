@@ -301,9 +301,27 @@ python3 scripts/sync_champion_plan_from_pdf.py "/path/to/The Champion Plan for 1
 
 ### Oura API
 - Base URL: `https://api.ouraring.com/v2`
-- Key endpoints: `/usercollection/daily_readiness`, `/usercollection/daily_sleep`
-- OAuth2 authorization code flow.
+- Key endpoints: `/usercollection/daily_readiness`, `/usercollection/daily_sleep`, `/usercollection/sleep` (detailed sleep periods with HR/HRV).
+- OAuth2 authorization code flow with `daily` scope.
+- Redirect URI: `training://oura/callback` (custom URL scheme, intercepted by `ASWebAuthenticationSession`).
 - Daily poll or on-app-open sync.
+- **HRV & resting HR** come from the `/usercollection/sleep` endpoint (detailed sleep periods), **not** from `daily_sleep` or `daily_cardiovascular_age`. The app picks the longest sleep period per day to extract `lowest_heart_rate` and `average_hrv`.
+
+#### Oura Developer App Setup
+
+1. Go to [cloud.ouraring.com](https://cloud.ouraring.com) and sign in with your Oura account.
+2. Navigate to **My Applications** (or the developer section).
+3. Click **Create New Application**:
+   - **App Name**: Training (or whatever you prefer)
+   - **Redirect URI**: `training://oura/callback` — must match `Config.ouraRedirectURI` exactly.
+   - **Scopes**: select at minimum **Daily** (covers readiness, sleep, and detailed sleep periods).
+4. After creation, copy the **Client ID** and **Client Secret**.
+5. Paste them into `TrainingApp/Secrets.xcconfig`:
+   ```
+   OURA_CLIENT_ID = <your client id>
+   OURA_CLIENT_SECRET = <your client secret>
+   ```
+6. Rebuild the app. The Oura connect button in Settings will now trigger the real OAuth flow.
 
 ### Strava API
 - Base URL: `https://www.strava.com/api/v3`
@@ -371,12 +389,10 @@ Track passive heat acclimation sessions (sauna, hot tub, heat suit) prescribed b
 
 ## Open Questions
 
-1. **Strava & Oura API credentials**: I've added placeholder values in `Secrets.xcconfig` (`YOUR_STRAVA_CLIENT_ID`, etc.). Do you already have Strava and Oura developer app registrations, or do you need me to document the setup steps for obtaining credentials?
-2. **Strava webhook vs polling**: Currently the app polls for activities on manual sync or app launch. Strava supports webhooks (push-based) via a Supabase Edge Function, which would auto-import activities without opening the app. Worth implementing now, or leave as a future enhancement?
-3. **Oura API scopes**: The Oura v2 API has granular scopes (`daily`, `personal`, `heartrate`, `workout`, `session`). Currently requesting `daily` scope only. Do you want heart rate or workout data from Oura as well?
-4. **Strava activity types**: Currently filtering for `Run`, `TrailRun`, and `VirtualRun`. Should we also import `Hike`, `Walk`, or other activity types that might count as cross-training?
-5. **Compliance calculation**: The "completed" count in the progress dashboard currently relies on Strava-matched sessions. If Strava is not connected, all past non-rest sessions show as "remaining." Should we add a manual "mark as done" option for users without Strava?
-6. **Token storage strategy**: OAuth tokens are currently stored locally in Keychain only. The Supabase `oauth_tokens` table exists in the schema but tokens are not synced to it yet. Should we persist tokens server-side as well (for multi-device support), or is Keychain-only sufficient?
+1. **Strava webhook vs polling**: Currently the app polls for activities on manual sync or app launch. Strava supports webhooks (push-based) via a Supabase Edge Function, which would auto-import activities without opening the app. Worth implementing now, or leave as a future enhancement?
+2. **Strava activity types**: Currently filtering for `Run`, `TrailRun`, and `VirtualRun`. Should we also import `Hike`, `Walk`, or other activity types that might count as cross-training?
+3. **Compliance calculation**: The "completed" count in the progress dashboard currently relies on Strava-matched sessions. If Strava is not connected, all past non-rest sessions show as "remaining." Should we add a manual "mark as done" option for users without Strava?
+4. **Token storage strategy**: OAuth tokens are currently stored locally in Keychain only. The Supabase `oauth_tokens` table exists in the schema but tokens are not synced to it yet. Should we persist tokens server-side as well (for multi-device support), or is Keychain-only sufficient?
 
 ## Resolved Decisions
 
@@ -387,6 +403,8 @@ Track passive heat acclimation sessions (sauna, hot tub, heat suit) prescribed b
 - **Unmatched Strava activities still appear.** Any Strava activity that doesn't match a planned session shows up on that day's view as an "extra" activity (cross-training, bonus runs, etc.).
 - **Apple Watch companion app** is future scope — not in the initial build.
 - **Coach notes stay original.** Verbatim text end-to-end; no AI summary replaces `planned_sessions.notes` or bundled template `notes`. Optional AI features must not overwrite that field.
+- **API credentials documented.** Strava credentials are live in `Secrets.xcconfig`. Oura developer app setup steps documented under **Oura API** in API Integration Notes. Credentials go in `Secrets.xcconfig`.
+- **Oura `daily` scope is sufficient.** Covers `daily_readiness`, `daily_sleep`, and the detailed `/usercollection/sleep` endpoint (which provides `lowest_heart_rate` and `average_hrv`). No need for `heartrate` scope (that's for raw 5-minute HR samples, which we don't use).
 
 ## Milestones
 
@@ -552,6 +570,11 @@ TrainingApp/
         ├── Progress/ProgressDashboardView.swift # Charts, compliance, readiness
         └── Settings/SettingsView.swift    # Strava/Oura connect/disconnect
 
+docs/                                    # Static site for GitHub Pages
+├── index.html                           # Landing page
+├── privacy.html                         # Privacy policy
+└── terms.html                           # Terms of service
+
 supabase/
 ├── config.toml
 └── migrations/
@@ -559,3 +582,13 @@ supabase/
     ├── 20260320000000_strength_and_overrides.sql
     └── 20260320200000_heat_training.sql
 ```
+
+## Website & Legal
+
+The `docs/` folder contains a static website suitable for GitHub Pages (or any static host). It includes:
+
+- **Landing page** (`index.html`) — app description and feature overview.
+- **Privacy policy** (`privacy.html`) — covers data collection (Oura, Strava, training data), storage (Supabase + Keychain), third-party integrations, and user rights.
+- **Terms of service** (`terms.html`) — acceptable use, health disclaimer, liability limitations.
+
+To deploy via GitHub Pages: go to your repo's **Settings → Pages**, set Source to "Deploy from a branch", branch `main`, folder `/docs`. The site will be at `https://<username>.github.io/<repo>/`. Use these URLs when registering OAuth apps with Oura and Strava.

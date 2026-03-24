@@ -162,7 +162,7 @@ final class OuraService {
             end: formatter.string(from: endDate)
         )
 
-        let heartRateData = try await fetchHeartRate(
+        let sleepPeriods = try await fetchSleepPeriods(
             accessToken: accessToken,
             start: formatter.string(from: startDate),
             end: formatter.string(from: endDate)
@@ -206,11 +206,24 @@ final class OuraService {
             }
         }
 
-        for entry in heartRateData {
+        for entry in sleepPeriods {
             let dateStr = entry.day
             if merged[dateStr] != nil {
-                merged[dateStr]?.restingHr = entry.lowestRestingHr
-                merged[dateStr]?.hrvAverage = entry.hrvAverage
+                merged[dateStr]?.restingHr = entry.lowestHeartRate
+                merged[dateStr]?.hrvAverage = entry.averageHrv
+            } else {
+                let date = formatter.date(from: dateStr) ?? Date()
+                merged[dateStr] = OuraDaily(
+                    id: UUID(),
+                    userId: userId,
+                    date: date,
+                    readinessScore: nil,
+                    sleepScore: nil,
+                    hrvAverage: entry.averageHrv,
+                    restingHr: entry.lowestHeartRate,
+                    temperatureDeviation: nil,
+                    syncedAt: Date()
+                )
             }
         }
 
@@ -260,8 +273,8 @@ final class OuraService {
         return result.data
     }
 
-    private func fetchHeartRate(accessToken: String, start: String, end: String) async throws -> [OuraHeartRateEntry] {
-        var components = URLComponents(string: "\(Config.ouraBaseURL)/usercollection/daily_cardiovascular_age")!
+    private func fetchSleepPeriods(accessToken: String, start: String, end: String) async throws -> [OuraSleepPeriodEntry] {
+        var components = URLComponents(string: "\(Config.ouraBaseURL)/usercollection/sleep")!
         components.queryItems = [
             URLQueryItem(name: "start_date", value: start),
             URLQueryItem(name: "end_date", value: end)
@@ -271,8 +284,22 @@ final class OuraService {
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
         let (data, _) = try await URLSession.shared.data(for: request)
-        let result = try? JSONDecoder().decode(OuraListResponse<OuraHeartRateEntry>.self, from: data)
-        return result?.data ?? []
+        let result = try? JSONDecoder().decode(OuraListResponse<OuraSleepPeriodEntry>.self, from: data)
+        guard let periods = result?.data else { return [] }
+
+        // Multiple sleep periods can exist per day (main sleep, naps).
+        // Keep only the longest period per day for resting HR / HRV.
+        var bestByDay: [String: OuraSleepPeriodEntry] = [:]
+        for period in periods {
+            if let existing = bestByDay[period.day] {
+                if (period.totalSleepDuration ?? 0) > (existing.totalSleepDuration ?? 0) {
+                    bestByDay[period.day] = period
+                }
+            } else {
+                bestByDay[period.day] = period
+            }
+        }
+        return Array(bestByDay.values)
     }
 
     // MARK: - Query Helpers
@@ -346,15 +373,17 @@ private struct OuraSleepEntry: Decodable {
     let score: Int?
 }
 
-private struct OuraHeartRateEntry: Decodable {
+private struct OuraSleepPeriodEntry: Decodable {
     let day: String
-    let lowestRestingHr: Int?
-    let hrvAverage: Double?
+    let lowestHeartRate: Int?
+    let averageHrv: Double?
+    let totalSleepDuration: Int?
 
     enum CodingKeys: String, CodingKey {
         case day
-        case lowestRestingHr = "lowest_resting_heart_rate"
-        case hrvAverage = "average_hrv"
+        case lowestHeartRate = "lowest_heart_rate"
+        case averageHrv = "average_hrv"
+        case totalSleepDuration = "total_sleep_duration"
     }
 }
 

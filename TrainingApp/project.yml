@@ -27,14 +27,19 @@ targets:
       base:
         INFOPLIST_FILE: Info.plist
         CODE_SIGN_ENTITLEMENTS: Training.entitlements
+        PRODUCT_BUNDLE_IDENTIFIER: com.jatler.Training
         SWIFT_VERSION: "5.9"
         MARKETING_VERSION: "1.0.0"
         CURRENT_PROJECT_VERSION: "1"
         GENERATE_INFOPLIST_FILE: false
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_STYLE: Automatic
       configs:
         Debug:
           SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+        Release:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: ""
+          SWIFT_OPTIMIZATION_LEVEL: "-O"
     dependencies:
       - package: Supabase
         product: Supabase

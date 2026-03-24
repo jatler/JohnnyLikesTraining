@@ -25,7 +25,6 @@
 		5C6B00911C4B919BE7AA7B0E /* PlanEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F8ED3535E0F5907E9AE4267 /* PlanEditView.swift */; };
 		6F888519D7D6238904329600 /* SessionDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF23FA6E5F2C1983F9EF2ADA /* SessionDetailSheet.swift */; };
 		73B281FD62E689360910B786 /* champion_plan_100k.json in Resources */ = {isa = PBXBuildFile; fileRef = 2B21B45B9C3E88F085CD54AC /* champion_plan_100k.json */; };
-		W1N73R0010WJSON001 /* winter_plan_10w.json in Resources */ = {isa = PBXBuildFile; fileRef = W1N73R0010WJSON002 /* winter_plan_10w.json */; };
 		79D0EFFA1DAAD88DFBA2187E /* StrengthTemplateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A07FB0277BBF278D299540D8 /* StrengthTemplateView.swift */; };
 		7AE26BE9849E3E857DF2C1C8 /* WeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3467C238F8B38FFA08AC33 /* WeekView.swift */; };
 		7E970DC72D9B0BFC9FEA675C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BF1F9E0F6BDC1529AB3ECEB /* SettingsView.swift */; };
@@ -52,10 +51,11 @@
 		F4CEAA6920AD02C52D1BB794 /* HeatLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCB459B05BE989CD56A6A76 /* HeatLog.swift */; };
 		F4FFC0062D790C1D4126144D /* PlanSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3922D09D3B1CE07E2DC0618A /* PlanSetupView.swift */; };
 		F777CA23AFA5E72C92F490FD /* HeatStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871B7FB896DB1306FC3F295A /* HeatStore.swift */; };
+		W1N73R0010WJSON001 /* winter_plan_10w.json in Resources */ = {isa = PBXBuildFile; fileRef = W1N73R0010WJSON002 /* winter_plan_10w.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		02C33C9015C1F9FCA1CD7F9C /* Training.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Training.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		02C33C9015C1F9FCA1CD7F9C /* Training.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Training.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		05ED34708B6E8C9B19B9424F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		07D906017FBE990E96F50C52 /* PlanCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCalendarView.swift; sourceTree = "<group>"; };
 		0C5EE7269B2B9B861727DE35 /* StrengthDayDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthDayDetailView.swift; sourceTree = "<group>"; };
@@ -63,7 +63,6 @@
 		13B8AD52D85ACBA9D427AB25 /* StravaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StravaService.swift; sourceTree = "<group>"; };
 		152863264984F21AC0331C8B /* OuraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OuraService.swift; sourceTree = "<group>"; };
 		2B21B45B9C3E88F085CD54AC /* champion_plan_100k.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = champion_plan_100k.json; sourceTree = "<group>"; };
-		W1N73R0010WJSON002 /* winter_plan_10w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = winter_plan_10w.json; sourceTree = "<group>"; };
 		2BF1F9E0F6BDC1529AB3ECEB /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		38427D1E7D9E72609E2756A6 /* OuraDaily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OuraDaily.swift; sourceTree = "<group>"; };
 		3895561C0376F954DE01A693 /* StravaActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StravaActivity.swift; sourceTree = "<group>"; };
@@ -100,6 +99,7 @@
 		F88DF00FE0051C419B60EF69 /* HeatLogSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatLogSheet.swift; sourceTree = "<group>"; };
 		FE119AE0121335DC62EE5944 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 		FF23FA6E5F2C1983F9EF2ADA /* SessionDetailSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionDetailSheet.swift; sourceTree = "<group>"; };
+		W1N73R0010WJSON002 /* winter_plan_10w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = winter_plan_10w.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -335,8 +335,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1620;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = D381DBB95A13027C41FD3B7B /* Build configuration list for PBXProject "Training" */;
 			developmentRegion = en;
@@ -488,6 +486,7 @@
 				CODE_SIGN_ENTITLEMENTS = Training.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WHKX4QF56D;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -509,6 +508,7 @@
 				CODE_SIGN_ENTITLEMENTS = Training.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WHKX4QF56D;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
