@@ -13,6 +13,7 @@ struct WeekView: View {
     @State private var selectedStrengthDay: StrengthDaySelection?
     @State private var selectedHeatSession: HeatSession?
     @State private var selectedStretchDay: StretchDaySelection?
+    @State private var showingPlanSetup = false
 
     var body: some View {
         NavigationStack {
@@ -340,7 +341,15 @@ struct WeekView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
 
+            Button("Set Up Your Plan") {
+                showingPlanSetup = true
+            }
+            .buttonStyle(.borderedProminent)
+
             Spacer()
+        }
+        .sheet(isPresented: $showingPlanSetup) {
+            PlanSetupView()
         }
     }
 }

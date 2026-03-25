@@ -6,6 +6,8 @@ struct ProgressDashboardView: View {
     @Environment(StravaService.self) private var strava
     @Environment(OuraService.self) private var oura
 
+    @State private var showingPlanSetup = false
+
     var body: some View {
         NavigationStack {
             Group {
@@ -317,7 +319,15 @@ struct ProgressDashboardView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
 
+            Button("Create a Training Plan") {
+                showingPlanSetup = true
+            }
+            .buttonStyle(.borderedProminent)
+
             Spacer()
+        }
+        .sheet(isPresented: $showingPlanSetup) {
+            PlanSetupView()
         }
     }
 
