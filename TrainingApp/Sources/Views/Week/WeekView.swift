@@ -160,7 +160,7 @@ struct WeekView: View {
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
-        .background(.ultraThinMaterial)
+        .background(.bar)
     }
 
     // MARK: - Session Row
