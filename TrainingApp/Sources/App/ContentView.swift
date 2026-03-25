@@ -13,7 +13,7 @@ struct ContentView: View {
                 SignInView()
             }
         }
-        .animation(.easeInOut, value: auth.isAuthenticated)
+        .animation(.easeOut(duration: 0.3), value: auth.isAuthenticated)
     }
 }
 
