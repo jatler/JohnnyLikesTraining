@@ -42,7 +42,7 @@ struct TodayView: View {
 
     private var todayContent: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 24) {
                 recoveryCard
 
                 let todaySessions = planStore.todaySessions
