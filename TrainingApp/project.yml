@@ -1,4 +1,9 @@
 name: Training
+# Version: MARKETING_VERSION = user-facing (e.g. 1.0.1). CURRENT_PROJECT_VERSION
+# = build number; increment for every App Store / TestFlight upload. Info.plist
+# maps both via $(MARKETING_VERSION) and $(CURRENT_PROJECT_VERSION). Edit here and
+# run `xcodegen generate` in this folder, or change Version / Build in Xcode’s
+# target General tab (no regen needed).
 options:
   bundleIdPrefix: com.jatler
   deploymentTarget:
@@ -29,8 +34,8 @@ targets:
         CODE_SIGN_ENTITLEMENTS: Training.entitlements
         PRODUCT_BUNDLE_IDENTIFIER: com.jatler.Training
         SWIFT_VERSION: "5.9"
-        MARKETING_VERSION: "1.0.0"
-        CURRENT_PROJECT_VERSION: "1"
+        MARKETING_VERSION: "1.0.0" # short version / CFBundleShortVersionString
+        CURRENT_PROJECT_VERSION: "1" # build / CFBundleVersion
         GENERATE_INFOPLIST_FILE: false
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_STYLE: Automatic
@@ -47,3 +52,6 @@ targets:
         product: Auth
     entitlements:
       path: Training.entitlements
+      properties:
+        com.apple.developer.applesignin:
+          - Default
