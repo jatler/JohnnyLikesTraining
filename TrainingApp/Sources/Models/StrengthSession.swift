@@ -12,6 +12,7 @@ struct StrengthSession: Codable, Identifiable {
     var prescribedReps: Int
     var prescribedWeightKg: Double?
     var prescribedRpe: Double?
+    var isTimed: Bool
     var isDeload: Bool
     var isTemplateOverride: Bool
 
@@ -27,6 +28,7 @@ struct StrengthSession: Codable, Identifiable {
         case prescribedReps = "prescribed_reps"
         case prescribedWeightKg = "prescribed_weight_kg"
         case prescribedRpe = "prescribed_rpe"
+        case isTimed = "is_timed"
         case isDeload = "is_deload"
         case isTemplateOverride = "is_template_override"
     }

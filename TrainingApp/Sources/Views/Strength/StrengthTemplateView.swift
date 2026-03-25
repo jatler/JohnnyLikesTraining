@@ -4,6 +4,7 @@ struct StrengthTemplateView: View {
     @Environment(TrainingPlanStore.self) private var planStore
     @Environment(StrengthStore.self) private var strengthStore
     @Environment(HeatStore.self) private var heatStore
+    @Environment(StretchStore.self) private var stretchStore
     @Environment(OuraService.self) private var oura
 
     @State private var showingAddExercise = false
@@ -11,6 +12,10 @@ struct StrengthTemplateView: View {
     @State private var selectedSession: StrengthDaySelection?
     @State private var editingExercise: StrengthTemplateExercise?
     @State private var showingAddHeatDay = false
+    @State private var showingAddStretch = false
+    @State private var addStretchDay: Int = 1
+    @State private var editingStretch: StretchTemplateExercise?
+    @State private var selectedStretchDay: StretchDaySelection?
 
     private let dayNames = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
@@ -23,7 +28,7 @@ struct StrengthTemplateView: View {
                     emptyState
                 }
             }
-            .navigationTitle("Strength & Heat")
+            .navigationTitle("Strength & More")
             .sheet(item: $selectedSession) { selection in
                 StrengthDayDetailView(weekNumber: selection.weekNumber, dayOfWeek: selection.dayOfWeek)
             }
@@ -35,6 +40,15 @@ struct StrengthTemplateView: View {
             }
             .sheet(isPresented: $showingAddHeatDay) {
                 AddHeatDaySheet()
+            }
+            .sheet(isPresented: $showingAddStretch) {
+                AddStretchExerciseSheet(dayOfWeek: addStretchDay)
+            }
+            .sheet(item: $editingStretch) { exercise in
+                EditStretchExerciseSheet(exercise: exercise)
+            }
+            .sheet(item: $selectedStretchDay) { selection in
+                StretchDayDetailView(weekNumber: selection.weekNumber, dayOfWeek: selection.dayOfWeek)
             }
         }
     }
@@ -51,6 +65,8 @@ struct StrengthTemplateView: View {
                 }
 
                 addDayButton
+
+                stretchTemplateSection
 
                 heatTemplateSection
             }
@@ -192,7 +208,8 @@ struct StrengthTemplateView: View {
                 Text(formatPrescription(
                     sets: exercise.targetSets,
                     reps: exercise.targetReps,
-                    weightKg: exercise.targetWeightKg
+                    weightKg: exercise.targetWeightKg,
+                    isTimed: exercise.isTimed
                 ))
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -207,7 +224,14 @@ struct StrengthTemplateView: View {
 
             Spacer()
 
-            if exercise.isBodyweight {
+            if exercise.isTimed {
+                Text("Time")
+                    .font(.caption2.bold())
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(.quaternary, in: Capsule())
+            } else if exercise.isBodyweight {
                 Text("BW")
                     .font(.caption2.bold())
                     .foregroundStyle(.secondary)
@@ -243,6 +267,135 @@ struct StrengthTemplateView: View {
         .buttonStyle(.bordered)
         .tint(.indigo)
         .disabled(strengthStore.daysWithExercises.count >= 7)
+    }
+
+    // MARK: - Stretch Template Section
+
+    private var stretchTemplateSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Stretches", systemImage: "figure.flexibility")
+                .font(.headline)
+                .foregroundStyle(.teal)
+
+            if stretchStore.hasTemplate {
+                ForEach(stretchStore.daysWithExercises, id: \.self) { day in
+                    stretchDaySection(day)
+                }
+
+                stretchAddDayButton
+            } else {
+                Text("No stretches yet — create a plan or add stretches manually.")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            }
+        }
+        .padding()
+        .background(.teal.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(.teal.opacity(0.15), lineWidth: 1)
+        )
+    }
+
+    private func stretchDaySection(_ day: Int) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(dayNames[day])
+                    .font(.subheadline.bold())
+
+                Spacer()
+
+                Button {
+                    addStretchDay = day
+                    showingAddStretch = true
+                } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.teal)
+                }
+
+                if let week = planStore.currentWeekNumber {
+                    Button {
+                        selectedStretchDay = StretchDaySelection(weekNumber: week, dayOfWeek: day)
+                    } label: {
+                        Label("Log", systemImage: "checkmark.circle")
+                            .font(.caption)
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.mini)
+                    .tint(.teal)
+                }
+            }
+
+            ForEach(stretchStore.exercises(for: day)) { exercise in
+                stretchExerciseRow(exercise)
+                    .onTapGesture { editingStretch = exercise }
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    private func stretchExerciseRow(_ exercise: StretchTemplateExercise) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "figure.flexibility")
+                .foregroundStyle(.teal)
+                .frame(width: 24)
+                .font(.caption)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(exercise.stretchName)
+                    .font(.caption.bold())
+
+                Text(exercise.displayDuration)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+
+                if let notes = exercise.notes, !notes.isEmpty {
+                    Text(notes)
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .lineLimit(1)
+                }
+            }
+
+            Spacer()
+
+            if exercise.isBilateral {
+                Text("L+R")
+                    .font(.caption2.bold())
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 5)
+                    .padding(.vertical, 1)
+                    .background(.quaternary, in: Capsule())
+            }
+
+            Image(systemName: "chevron.right")
+                .font(.caption2)
+                .foregroundStyle(.quaternary)
+        }
+        .padding(.vertical, 4)
+        .contentShape(Rectangle())
+    }
+
+    private var stretchAddDayButton: some View {
+        Menu {
+            ForEach(1...7, id: \.self) { day in
+                if !stretchStore.daysWithExercises.contains(day) {
+                    Button(dayNames[day]) {
+                        addStretchDay = day
+                        showingAddStretch = true
+                    }
+                }
+            }
+        } label: {
+            Label("Add Stretches on Another Day", systemImage: "plus.circle")
+                .font(.caption)
+                .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(.bordered)
+        .tint(.teal)
+        .controlSize(.small)
+        .disabled(stretchStore.daysWithExercises.count >= 7)
     }
 
     // MARK: - Heat Template Section
@@ -343,6 +496,8 @@ struct StrengthTemplateView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 40)
 
+                stretchTemplateSection
+
                 heatTemplateSection
             }
             .padding()
@@ -352,12 +507,13 @@ struct StrengthTemplateView: View {
 
     // MARK: - Helpers
 
-    private func formatPrescription(sets: Int, reps: Int, weightKg: Double?) -> String {
+    private func formatPrescription(sets: Int, reps: Int, weightKg: Double?, isTimed: Bool = false) -> String {
+        let repsLabel = isTimed ? "\(reps)s" : "\(reps)"
         if let kg = weightKg {
             let lbs = kg * 2.205
-            return "\(sets)×\(reps) @ \(Int(lbs)) lbs"
+            return "\(sets)×\(repsLabel) @ \(Int(lbs)) lbs"
         }
-        return "\(sets)×\(reps)"
+        return "\(sets)×\(repsLabel)"
     }
 }
 
@@ -379,8 +535,10 @@ struct AddExerciseSheet: View {
     @State private var name = ""
     @State private var sets = 3
     @State private var reps = 10
+    @State private var durationSeconds = 30
     @State private var weightLbs = ""
     @State private var isBodyweight = true
+    @State private var isTimed = false
     @State private var rpe = ""
     @State private var notes = ""
 
@@ -395,7 +553,14 @@ struct AddExerciseSheet: View {
 
                 Section("Prescription") {
                     Stepper("Sets: \(sets)", value: $sets, in: 1...10)
-                    Stepper("Reps: \(reps)", value: $reps, in: 1...50)
+
+                    Toggle("Timed (hold for duration)", isOn: $isTimed)
+
+                    if isTimed {
+                        Stepper("Duration: \(durationSeconds)s", value: $durationSeconds, in: 5...300, step: 5)
+                    } else {
+                        Stepper("Reps: \(reps)", value: $reps, in: 1...50)
+                    }
 
                     Toggle("Bodyweight", isOn: $isBodyweight)
 
@@ -430,14 +595,16 @@ struct AddExerciseSheet: View {
     private func addExercise() {
         let weightKg = Double(weightLbs).map { $0 / 2.205 }
         let targetRpe = Double(rpe)
+        let effectiveReps = isTimed ? durationSeconds : reps
 
         strengthStore.addExercise(
             dayOfWeek: dayOfWeek,
             name: name.trimmingCharacters(in: .whitespaces),
             sets: sets,
-            reps: reps,
+            reps: effectiveReps,
             weightKg: isBodyweight ? nil : weightKg,
             isBodyweight: isBodyweight,
+            isTimed: isTimed,
             rpe: targetRpe,
             notes: notes.isEmpty ? nil : notes
         )
@@ -455,8 +622,10 @@ struct EditExerciseSheet: View {
     @State private var name: String = ""
     @State private var sets: Int = 3
     @State private var reps: Int = 10
+    @State private var durationSeconds: Int = 30
     @State private var weightLbs: String = ""
     @State private var isBodyweight: Bool = true
+    @State private var isTimed: Bool = false
     @State private var rpe: String = ""
     @State private var notes: String = ""
     @State private var showingDeleteConfirmation = false
@@ -471,7 +640,14 @@ struct EditExerciseSheet: View {
 
                 Section("Prescription") {
                     Stepper("Sets: \(sets)", value: $sets, in: 1...10)
-                    Stepper("Reps: \(reps)", value: $reps, in: 1...50)
+
+                    Toggle("Timed (hold for duration)", isOn: $isTimed)
+
+                    if isTimed {
+                        Stepper("Duration: \(durationSeconds)s", value: $durationSeconds, in: 5...300, step: 5)
+                    } else {
+                        Stepper("Reps: \(reps)", value: $reps, in: 1...50)
+                    }
 
                     Toggle("Bodyweight", isOn: $isBodyweight)
 
@@ -530,7 +706,12 @@ struct EditExerciseSheet: View {
             .onAppear {
                 name = exercise.exerciseName
                 sets = exercise.targetSets
-                reps = exercise.targetReps
+                isTimed = exercise.isTimed
+                if exercise.isTimed {
+                    durationSeconds = exercise.targetReps
+                } else {
+                    reps = exercise.targetReps
+                }
                 isBodyweight = exercise.isBodyweight
                 if let kg = exercise.targetWeightKg {
                     weightLbs = String(format: "%.0f", kg * 2.205)
@@ -547,8 +728,9 @@ struct EditExerciseSheet: View {
         var updated = exercise
         updated.exerciseName = name.trimmingCharacters(in: .whitespaces)
         updated.targetSets = sets
-        updated.targetReps = reps
+        updated.targetReps = isTimed ? durationSeconds : reps
         updated.isBodyweight = isBodyweight
+        updated.isTimed = isTimed
         updated.targetWeightKg = isBodyweight ? nil : Double(weightLbs).map { $0 / 2.205 }
         updated.targetRpe = Double(rpe)
         updated.notes = notes.isEmpty ? nil : notes
@@ -635,5 +817,6 @@ private struct AddHeatDaySheet: View {
         .environment(TrainingPlanStore())
         .environment(StrengthStore())
         .environment(HeatStore())
+        .environment(StretchStore())
         .environment(OuraService())
 }

@@ -1340,6 +1340,7 @@
       "target_reps": 45,
       "target_weight_kg": null,
       "is_bodyweight": true,
+      "is_timed": true,
       "target_rpe": 5.0,
       "notes": "Hold for 45 seconds per set. Squeeze glutes, brace core, neutral spine.",
       "sort_order": 4
@@ -1384,6 +1385,7 @@
       "target_reps": 30,
       "target_weight_kg": null,
       "is_bodyweight": true,
+      "is_timed": true,
       "target_rpe": 5.0,
       "notes": "Hold for 30 seconds each side per set. Stack feet or stagger for stability.",
       "sort_order": 4
@@ -1401,6 +1403,134 @@
       "session_type": "sauna",
       "target_duration_minutes": 25,
       "notes": "20-30 min passive heat. Can do sauna, hot tub, or hot bath."
+    }
+  ],
+  "stretch_exercises": [
+    {
+      "day": 2,
+      "stretch_name": "Standing Quad Stretch",
+      "hold_seconds": 45,
+      "sets": 1,
+      "is_bilateral": true,
+      "notes": "Pull heel to glute, keep knees together. Use wall for balance if needed.",
+      "sort_order": 1
+    },
+    {
+      "day": 2,
+      "stretch_name": "Standing Calf Stretch",
+      "hold_seconds": 45,
+      "sets": 1,
+      "is_bilateral": true,
+      "notes": "Wall lean with back leg straight, heel down. Then bend knee for soleus.",
+      "sort_order": 2
+    },
+    {
+      "day": 2,
+      "stretch_name": "Kneeling Hip Flexor Stretch",
+      "hold_seconds": 45,
+      "sets": 1,
+      "is_bilateral": true,
+      "notes": "Half-kneeling, push hips forward gently. Squeeze glute of the back leg.",
+      "sort_order": 3
+    },
+    {
+      "day": 2,
+      "stretch_name": "Seated Hamstring Stretch",
+      "hold_seconds": 45,
+      "sets": 1,
+      "is_bilateral": true,
+      "notes": "One leg extended, fold forward from hips. Keep back flat.",
+      "sort_order": 4
+    },
+    {
+      "day": 6,
+      "stretch_name": "Pigeon Pose",
+      "hold_seconds": 60,
+      "sets": 1,
+      "is_bilateral": true,
+      "notes": "Front shin across body, back leg extended. Fold forward to deepen. Great for glutes and piriformis after long runs.",
+      "sort_order": 1
+    },
+    {
+      "day": 6,
+      "stretch_name": "Couch Stretch",
+      "hold_seconds": 60,
+      "sets": 1,
+      "is_bilateral": true,
+      "notes": "Back foot on wall/couch, front foot forward in lunge. Deep hip flexor and quad stretch.",
+      "sort_order": 2
+    },
+    {
+      "day": 6,
+      "stretch_name": "Standing Calf Stretch",
+      "hold_seconds": 45,
+      "sets": 1,
+      "is_bilateral": true,
+      "notes": "Wall lean — straight leg for gastrocnemius, then bent knee for soleus.",
+      "sort_order": 3
+    },
+    {
+      "day": 6,
+      "stretch_name": "Seated Hamstring Stretch",
+      "hold_seconds": 60,
+      "sets": 1,
+      "is_bilateral": true,
+      "notes": "Extended hold after long run. Fold forward gently, no bouncing.",
+      "sort_order": 4
+    },
+    {
+      "day": 6,
+      "stretch_name": "Supine Figure-4 Stretch",
+      "hold_seconds": 45,
+      "sets": 1,
+      "is_bilateral": true,
+      "notes": "Lie on back, cross ankle over opposite knee, pull thigh toward chest. Targets piriformis and deep glute.",
+      "sort_order": 5
+    },
+    {
+      "day": 7,
+      "stretch_name": "90/90 Hip Stretch",
+      "hold_seconds": 60,
+      "sets": 1,
+      "is_bilateral": true,
+      "notes": "Front and back legs at 90 degrees. Sit tall, lean forward for deeper stretch. Rotate to other side.",
+      "sort_order": 1
+    },
+    {
+      "day": 7,
+      "stretch_name": "Pigeon Pose",
+      "hold_seconds": 60,
+      "sets": 1,
+      "is_bilateral": true,
+      "notes": "Recovery day — hold longer and relax into it.",
+      "sort_order": 2
+    },
+    {
+      "day": 7,
+      "stretch_name": "Couch Stretch",
+      "hold_seconds": 60,
+      "sets": 1,
+      "is_bilateral": true,
+      "notes": "Deep hip flexor and quad stretch. Keep glute engaged on the stretching side.",
+      "sort_order": 3
+    },
+    {
+      "day": 7,
+      "stretch_name": "Adductor Stretch",
+      "hold_seconds": 45,
+      "sets": 1,
+      "is_bilateral": true,
+      "notes": "Wide stance, shift weight to one side. Keep feet flat. Can also do butterfly seated.",
+      "sort_order": 4
+    },
+    {
+      "day": 7,
+      "stretch_name": "Thoracic Spine Rotation",
+      "hold_seconds": 30,
+      "sets": 2,
+      "is_bilateral": true,
+      "notes": "Side-lying, top knee on foam roller. Rotate upper body to open chest. Great for run posture.",
+      "sort_order": 5
     }
   ]
 }

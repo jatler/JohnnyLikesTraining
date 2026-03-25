@@ -98,6 +98,7 @@ final class StrengthStore {
                 targetWeightKg: ex.targetWeightKg,
                 targetRpe: ex.targetRpe,
                 isBodyweight: ex.isBodyweight,
+                isTimed: ex.isTimed ?? false,
                 sortOrder: ex.sortOrder,
                 notes: ex.notes
             )
@@ -155,6 +156,7 @@ final class StrengthStore {
                     prescribedReps: reps,
                     prescribedWeightKg: weight,
                     prescribedRpe: exercise.targetRpe,
+                    isTimed: exercise.isTimed,
                     isDeload: isDeload,
                     isTemplateOverride: false
                 ))
@@ -185,6 +187,7 @@ final class StrengthStore {
         reps: Int,
         weightKg: Double?,
         isBodyweight: Bool,
+        isTimed: Bool = false,
         rpe: Double?,
         notes: String?
     ) {
@@ -201,6 +204,7 @@ final class StrengthStore {
             targetWeightKg: weightKg,
             targetRpe: rpe,
             isBodyweight: isBodyweight,
+            isTimed: isTimed,
             sortOrder: sortOrder,
             notes: notes
         )
@@ -384,6 +388,7 @@ final class StrengthStore {
                 prescribedReps: reps,
                 prescribedWeightKg: weight,
                 prescribedRpe: exercise.targetRpe,
+                isTimed: exercise.isTimed,
                 isDeload: isDeload,
                 isTemplateOverride: false
             )

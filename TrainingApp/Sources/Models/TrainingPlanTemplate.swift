@@ -11,6 +11,7 @@ struct TrainingPlanTemplate: Codable, Identifiable {
     let sessions: [SessionTemplate]
     let strengthExercises: [StrengthExerciseTemplate]?
     let heatSessions: [HeatSessionTemplate]?
+    let stretchExercises: [StretchExerciseTemplate]?
 
     enum CodingKeys: String, CodingKey {
         case id, name, author, source, description
@@ -19,6 +20,7 @@ struct TrainingPlanTemplate: Codable, Identifiable {
         case sessions
         case strengthExercises = "strength_exercises"
         case heatSessions = "heat_sessions"
+        case stretchExercises = "stretch_exercises"
     }
 }
 
@@ -45,6 +47,7 @@ struct StrengthExerciseTemplate: Codable {
     let targetReps: Int
     let targetWeightKg: Double?
     let isBodyweight: Bool
+    let isTimed: Bool?
     let targetRpe: Double?
     let notes: String?
     let sortOrder: Int
@@ -56,6 +59,7 @@ struct StrengthExerciseTemplate: Codable {
         case targetReps = "target_reps"
         case targetWeightKg = "target_weight_kg"
         case isBodyweight = "is_bodyweight"
+        case isTimed = "is_timed"
         case targetRpe = "target_rpe"
         case sortOrder = "sort_order"
     }
@@ -71,5 +75,23 @@ struct HeatSessionTemplate: Codable {
         case day, notes
         case sessionType = "session_type"
         case targetDurationMinutes = "target_duration_minutes"
+    }
+}
+
+struct StretchExerciseTemplate: Codable {
+    let day: Int
+    let stretchName: String
+    let holdSeconds: Int
+    let sets: Int
+    let isBilateral: Bool
+    let notes: String?
+    let sortOrder: Int
+
+    enum CodingKeys: String, CodingKey {
+        case day, sets, notes
+        case stretchName = "stretch_name"
+        case holdSeconds = "hold_seconds"
+        case isBilateral = "is_bilateral"
+        case sortOrder = "sort_order"
     }
 }

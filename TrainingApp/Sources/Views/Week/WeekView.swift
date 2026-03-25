@@ -5,12 +5,14 @@ struct WeekView: View {
     @Environment(StravaService.self) private var strava
     @Environment(StrengthStore.self) private var strengthStore
     @Environment(HeatStore.self) private var heatStore
+    @Environment(StretchStore.self) private var stretchStore
 
     @State private var selectedWeek: Int = 1
     @State private var selectedSession: PlannedSession?
     @State private var hasInitialized = false
     @State private var selectedStrengthDay: StrengthDaySelection?
     @State private var selectedHeatSession: HeatSession?
+    @State private var selectedStretchDay: StretchDaySelection?
 
     var body: some View {
         NavigationStack {
@@ -70,6 +72,9 @@ struct WeekView: View {
         }
         .sheet(item: $selectedHeatSession) { session in
             HeatLogSheet(session: session)
+        }
+        .sheet(item: $selectedStretchDay) { selection in
+            StretchDayDetailView(weekNumber: selection.weekNumber, dayOfWeek: selection.dayOfWeek)
         }
     }
 
@@ -167,6 +172,7 @@ struct WeekView: View {
         let overridden = planStore.isOverridden(session.id)
         let daySessions = strengthStore.sessions(for: session.scheduledDate)
         let dayHeat = heatStore.sessions(for: session.scheduledDate)
+        let dayStretch = stretchStore.sessions(for: session.scheduledDate)
 
         return HStack(spacing: 12) {
             VStack(spacing: 2) {
@@ -216,6 +222,28 @@ struct WeekView: View {
                         }
                         .buttonStyle(.plain)
                     }
+
+                    if !dayStretch.isEmpty {
+                        Button {
+                            selectedStretchDay = StretchDaySelection(
+                                weekNumber: session.weekNumber,
+                                dayOfWeek: session.dayOfWeek
+                            )
+                        } label: {
+                            let completed = stretchStore.completedCount(for: session.scheduledDate)
+                            let total = dayStretch.count
+                            let allDone = completed == total
+
+                            Label {
+                                Text(allDone ? "Done" : "\(completed)/\(total)")
+                            } icon: {
+                                Image(systemName: allDone ? "checkmark.circle.fill" : "figure.flexibility")
+                            }
+                            .font(.caption2)
+                            .foregroundStyle(allDone ? .green : .teal)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
 
                 if let mi = session.targetDistanceMi {
@@ -242,9 +270,15 @@ struct WeekView: View {
                 VStack(alignment: .trailing, spacing: 2) {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(.green)
-                    Text(String(format: "%.1f mi", activity.distanceMi))
-                        .font(.caption2)
-                        .foregroundStyle(.green)
+                    if activity.isRun {
+                        Text(String(format: "%.1f mi", activity.distanceMi))
+                            .font(.caption2)
+                            .foregroundStyle(.green)
+                    } else {
+                        Text(activity.activityTypeDisplay)
+                            .font(.caption2)
+                            .foregroundStyle(.green)
+                    }
                 }
             } else if skipped {
                 Text("Skipped")
@@ -317,4 +351,5 @@ struct WeekView: View {
         .environment(StravaService())
         .environment(StrengthStore())
         .environment(HeatStore())
+        .environment(StretchStore())
 }

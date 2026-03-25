@@ -109,13 +109,14 @@ python3 scripts/sync_champion_plan_from_pdf.py "/path/to/The Champion Plan for 1
 - OAuth2 flow to connect Oura account.
 - Daily sync of: **readiness score**, **sleep score**, **HRV**, **resting heart rate**, and **body temperature deviation**.
 - Display recovery data alongside the daily prescription — a quick visual indicator (green/yellow/red) of whether today is a good day to push hard.
+- **Crown indicator** (👑) on readiness and sleep scores ≥ 85 — shown in the Today recovery card and on the SessionDetailSheet recovery row. Highlights exceptional recovery days at a glance.
 - Use readiness data to power the swap suggestions (e.g., "Your readiness is 58 — consider swapping today's intervals for an easy run").
 
 ### 5. Strava Integration
 
 - OAuth2 flow to connect Strava account.
-- Auto-import completed runs: **distance**, **pace**, **elapsed time**, **heart rate** (if available), **elevation**, and **GPS route**.
-- Match each imported Strava activity to the corresponding planned session for that day.
+- Auto-import completed activities: **runs** (Run, TrailRun, VirtualRun), **cross-training** (CrossCountrySkiing, Elliptical, Hike, RockClimbing, Rowing, StairStepper, Swim, Walk), **strength training** (WeightTraining, Crossfit), and **yoga** (Yoga). Each activity stores its Strava `activity_type` for filtering and display.
+- Match each imported Strava activity to the corresponding planned session for that day. Runs match run sessions; cross-training matches `cross_train` sessions; strength/yoga activities appear as supplementary on any day.
 - Show a **plan vs. actual** comparison: did you hit the target distance? Was your pace in the right zone?
 - **Training block mileage chart**: a bar chart (Swift Charts) showing weekly mileage across the entire training block — planned mileage as a lighter/outline bar, actual (from Strava) as a filled bar. Highlights the current week, and overlays a target mileage trend line so you can see ramp-up and taper at a glance.
 
@@ -197,6 +198,7 @@ python3 scripts/sync_champion_plan_from_pdf.py "/path/to/The Champion Plan for 1
 - `average_hr` (int, nullable)
 - `elevation_gain_m` (decimal, nullable)
 - `map_polyline` (text, nullable)
+- `activity_type` (text — Strava activity type: Run, TrailRun, WeightTraining, Yoga, etc.)
 - `raw_json` (jsonb)
 - `synced_at` (timestamp)
 - `matched_session_id` (FK → planned_sessions, nullable)
@@ -227,6 +229,7 @@ python3 scripts/sync_champion_plan_from_pdf.py "/path/to/The Champion Plan for 1
 - `target_weight_kg` (decimal, nullable — null = bodyweight)
 - `target_rpe` (decimal, nullable)
 - `is_bodyweight` (boolean, default false)
+- `is_timed` (boolean, default false — when true, reps represent seconds)
 - `sort_order` (int)
 - `notes` (text, nullable)
 
@@ -239,9 +242,10 @@ python3 scripts/sync_champion_plan_from_pdf.py "/path/to/The Champion Plan for 1
 - `day_of_week` (int)
 - `exercise_name` (text)
 - `prescribed_sets` (int)
-- `prescribed_reps` (int)
+- `prescribed_reps` (int — stores seconds when `is_timed` is true)
 - `prescribed_weight_kg` (decimal, nullable)
 - `prescribed_rpe` (decimal, nullable)
+- `is_timed` (boolean, default false)
 - `is_deload` (boolean, default false)
 - `is_template_override` (boolean, default false — true if user made a one-off edit)
 
@@ -252,6 +256,41 @@ python3 scripts/sync_champion_plan_from_pdf.py "/path/to/The Champion Plan for 1
 - `actual_reps` (int)
 - `actual_weight_kg` (decimal, nullable)
 - `rpe` (decimal, nullable)
+- `completed_at` (timestamp)
+- `notes` (text, nullable)
+
+### `stretch_templates`
+- `id` (uuid, PK)
+- `plan_id` (FK → training_plans)
+- `created_at` (timestamp)
+- `updated_at` (timestamp)
+
+### `stretch_template_exercises`
+- `id` (uuid, PK)
+- `template_id` (FK → stretch_templates)
+- `day_of_week` (int, 1=Mon..7=Sun)
+- `stretch_name` (text)
+- `hold_seconds` (int)
+- `sets` (int)
+- `is_bilateral` (boolean, default true)
+- `sort_order` (int)
+- `notes` (text, nullable — PT instructions, cues, modifications)
+
+### `stretch_sessions`
+- `id` (uuid, PK)
+- `plan_id` (FK → training_plans)
+- `template_exercise_id` (FK → stretch_template_exercises, nullable)
+- `scheduled_date` (date)
+- `week_number` (int)
+- `day_of_week` (int, 1=Mon..7=Sun)
+- `stretch_name` (text)
+- `prescribed_hold_seconds` (int)
+- `prescribed_sets` (int)
+- `is_bilateral` (boolean)
+
+### `stretch_logs`
+- `id` (uuid, PK)
+- `session_id` (FK → stretch_sessions)
 - `completed_at` (timestamp)
 - `notes` (text, nullable)
 
@@ -292,7 +331,7 @@ python3 scripts/sync_champion_plan_from_pdf.py "/path/to/The Champion Plan for 1
 6. **Mileage Chart** — Bar chart of weekly mileage (actual from Strava vs. planned) plotted across the entire training block. Highlights the current week, shows a target mileage line, and makes it easy to spot ramp-up, taper, and any weeks where you fell short.
 7. **Progress** — Compliance stats, readiness trends, race readiness summary.
 8. **Plan Management** — View/edit active plan: change race name, race date, or plan template. Editing race date re-maps sessions; switching template replaces the plan (with confirmation).
-9. **Strength & Heat** (tab) — Weekly strength template editor. Shows exercises grouped by day of week. Inline editing for sets, reps, weight. "Apply to all future weeks" toggle. Progression suggestions shown as badges on exercises ready to progress. Heat section at the bottom for managing prescribed heat days (add/remove days, view type and duration).
+9. **Strength & More** (tab) — Weekly strength template editor. Shows exercises grouped by day of week. Inline editing for sets, reps, weight. "Apply to all future weeks" toggle. Progression suggestions shown as badges on exercises ready to progress. Stretch section for managing prescribed stretch/mobility days (add/remove days, choose routine type and duration). Heat section at the bottom for managing prescribed heat days (add/remove days, view type and duration).
 10. **Strength Day Detail** — Logging view for a single day's strength work. Shows prescribed exercises with target sets/reps/weight. User taps each set to log actual reps and weight. Completion state tracked per set.
 11. **Exercise History** — Per-exercise progression chart showing weight × reps over time. Accessible from the strength template or from a logged session.
 12. **Settings** — Account, connected services, notifications.
@@ -306,6 +345,7 @@ python3 scripts/sync_champion_plan_from_pdf.py "/path/to/The Champion Plan for 1
 - Redirect URI: `training://oura/callback` (custom URL scheme, intercepted by `ASWebAuthenticationSession`).
 - Daily poll or on-app-open sync.
 - **HRV & resting HR** come from the `/usercollection/sleep` endpoint (detailed sleep periods), **not** from `daily_sleep` or `daily_cardiovascular_age`. The app picks the longest sleep period per day to extract `lowest_heart_rate` and `average_hrv`.
+- **Sleep periods fetch** must check the HTTP response status and use explicit `try` (not `try?`) when decoding so that API errors and JSON decode failures are visible in the console. Debug builds log the raw response and first few parsed periods to aid troubleshooting.
 
 #### Oura Developer App Setup
 
@@ -346,7 +386,8 @@ A dedicated **Strength tab** at the bottom of the app for managing a weekly stre
 #### Weekly Strength Template
 - The user defines a **weekly strength template**: a set of exercises assigned to specific days of the week.
 - To start the strength template is pulled in from the training plan.
-- Each exercise entry includes: exercise name, target sets, target reps, target weight (or bodyweight flag), RPE target (optional), and notes.
+- Each exercise entry includes: exercise name, target sets, target reps **or** target duration in seconds (timed flag), target weight (or bodyweight flag), RPE target (optional), and notes.
+- **Timed exercises**: exercises like planks and side planks are flagged as `is_timed = true`. When timed, the reps field stores seconds and the UI shows "3×45s" instead of "3×45 reps". Logging records seconds held rather than rep count.
 - The template is organized by day (e.g., Monday = upper body push/pull, Thursday = lower body + core).
 - Editing the template **propagates changes forward** to all future weeks automatically. Past weeks (already completed) are not retroactively changed.
 - Users can also make **one-off edits** to a specific week's strength session without affecting the template.
@@ -368,7 +409,28 @@ A dedicated **Strength tab** at the bottom of the app for managing a weekly stre
 - The Today View includes strength work if scheduled for that day, displayed below the running prescription.
 - Strength completion can be logged manually (sets × reps × weight for each exercise) since there's no Strava equivalent for lifting.
 
-### 10. Heat Training
+### 10. Stretch Routines
+
+A dedicated section in the **Strength tab** for managing individual prescribed stretches that run alongside the running and strength programs. Users can add specific stretches recommended by their PT.
+
+#### Weekly Stretch Template
+- The user defines a **weekly stretch template**: individual named stretches assigned to specific days of the week.
+- The initial stretch template is seeded from the training plan, but users can **add, edit, and remove individual stretches** at any time (e.g., adding PT-recommended stretches like "Pigeon Pose", "Couch Stretch").
+- Each stretch entry includes: stretch name, hold duration (seconds), number of sets, bilateral flag (each side), and notes (PT cues, modifications, form tips).
+- The template is organized by day (e.g., Tuesday = post-run stretches, Sunday = full mobility routine).
+- Editing the template **propagates changes forward** to all future weeks. Past weeks are not retroactively changed.
+- Default days: **Tuesday** (post-run basics), **Saturday** (extended post-long-run), **Sunday** (full mobility).
+
+#### Logging
+- Tap a stretch indicator on the Week View or Today View to open the **Stretch Day Detail** view.
+- Each individual stretch can be marked as done with a single tap.
+- Completion is tracked per stretch per day with a running count (e.g., "3/5 done").
+
+#### Stretch–Running Integration
+- The Today View shows all scheduled stretches for the day with individual completion checkmarks.
+- The Week View displays a stretch icon on days with prescribed stretches, with a completion count badge.
+
+### 11. Heat Training
 
 Track passive heat acclimation sessions (sauna, hot tub, heat suit) prescribed by the training plan.
 
@@ -390,7 +452,7 @@ Track passive heat acclimation sessions (sauna, hot tub, heat suit) prescribed b
 ## Open Questions
 
 1. **Strava webhook vs polling**: Currently the app polls for activities on manual sync or app launch. Strava supports webhooks (push-based) via a Supabase Edge Function, which would auto-import activities without opening the app. Worth implementing now, or leave as a future enhancement?
-2. **Strava activity types**: Currently filtering for `Run`, `TrailRun`, and `VirtualRun`. Should we also import `Hike`, `Walk`, or other activity types that might count as cross-training?
+2. ~~**Strava activity types**: Currently filtering for `Run`, `TrailRun`, and `VirtualRun`. Should we also import `Hike`, `Walk`, or other activity types that might count as cross-training?~~ **Resolved**: Now importing runs (Run, TrailRun, VirtualRun), cross-training (CrossCountrySkiing, Elliptical, Hike, RockClimbing, Rowing, StairStepper, Swim, Walk), strength (WeightTraining, Crossfit), and yoga (Yoga). Each activity stores its `activity_type`.
 3. **Compliance calculation**: The "completed" count in the progress dashboard currently relies on Strava-matched sessions. If Strava is not connected, all past non-rest sessions show as "remaining." Should we add a manual "mark as done" option for users without Strava?
 4. **Token storage strategy**: OAuth tokens are currently stored locally in Keychain only. The Supabase `oauth_tokens` table exists in the schema but tokens are not synced to it yet. Should we persist tokens server-side as well (for multi-device support), or is Keychain-only sufficient?
 
@@ -438,8 +500,8 @@ Track passive heat acclimation sessions (sauna, hot tub, heat suit) prescribed b
 - [x] `StravaService` — full OAuth2 authorization code flow via `ASWebAuthenticationSession`, token exchange, refresh, and Keychain persistence.
 - [x] `KeychainService` — lightweight system Keychain wrapper for secure token storage (Strava + Oura access/refresh tokens, expiry timestamps).
 - [x] Config wiring — `STRAVA_CLIENT_ID` and `STRAVA_CLIENT_SECRET` exposed via `Secrets.xcconfig` → `Info.plist` → `Config.swift`. Custom URL scheme `training://` registered for OAuth callbacks.
-- [x] Activity import — paginated fetch from `/athlete/activities`, filters for Run/TrailRun/VirtualRun, converts Strava API response (meters, m/s) to app model (km, min/km).
-- [x] Auto-matching — `autoMatchActivities` matches imported Strava activities to planned sessions by date. `activity(for:)` and `activities(on:)` query helpers.
+- [x] Activity import — paginated fetch from `/athlete/activities`, filters for runs, cross-training, strength, and yoga types, converts Strava API response (meters, m/s) to app model (km, min/km). Stores `activity_type` for each activity.
+- [x] Auto-matching — `autoMatchActivities` matches imported Strava activities to planned sessions by date and type. `activity(for:)` and `activities(on:)` query helpers.
 - [x] Plan vs. actual comparison on `SessionDetailSheet` — when a matched Strava activity exists, shows distance (actual vs planned with % delta), pace, duration, heart rate, and elevation.
 - [x] Strava completion indicators on `WeekView` (checkmark + actual distance) and `PlanCalendarView` (green checkmark overlay on calendar cells).
 - [x] Strava banner on `TodayView` — shows completed run details alongside today's prescription.
@@ -450,9 +512,10 @@ Track passive heat acclimation sessions (sauna, hot tub, heat suit) prescribed b
 - [x] `OuraService` — full OAuth2 flow via `ASWebAuthenticationSession`, token exchange, refresh, Keychain persistence.
 - [x] Config wiring — `OURA_CLIENT_ID` and `OURA_CLIENT_SECRET` via `Secrets.xcconfig` → `Info.plist` → `Config.swift`.
 - [x] Daily sync — fetches readiness, sleep, and heart rate data from Oura v2 API (`/usercollection/daily_readiness`, `/usercollection/daily_sleep`). Merges into unified `OuraDaily` records.
-- [x] Recovery card on `TodayView` — shows readiness score, sleep score, HRV, and resting heart rate with color-coded readiness badge (green/orange/red).
+- [x] Recovery card on `TodayView` — shows readiness score, sleep score, HRV, and resting heart rate with color-coded readiness badge (green/orange/red). Crown icon (👑) on readiness and sleep scores ≥ 85.
 - [x] Readiness-based swap suggestions — when readiness is low and today is a hard session, suggests swapping with nearest easy/rest day. One-tap swap with reason logged ("Low readiness (58)").
-- [x] Recovery row on `SessionDetailSheet` — shows readiness, sleep, and HRV for the session's date.
+- [x] Recovery row on `SessionDetailSheet` — shows readiness, sleep, HRV, and resting HR for the session's date. Crown icon on scores ≥ 85. RHR now displayed alongside other metrics.
+- [x] **Sleep periods fetch fix** — `fetchSleepPeriods` now checks HTTP status (was silently discarding the response) and uses explicit error handling instead of `try?` (was swallowing decode errors). Debug logging added for raw response and parsed values to diagnose HRV/RHR data issues.
 - [x] Settings — connect/disconnect Oura, manual sync button with loading state, last sync timestamp.
 - [x] Supabase persistence — upserts daily data on `(user_id, date)` unique constraint; loads cached data on app launch.
 
@@ -513,6 +576,21 @@ Track passive heat acclimation sessions (sauna, hot tub, heat suit) prescribed b
 - [x] Wire `HeatStore` into `TrainingApp`, `ContentView`, `PlanSetupView`, `PlanEditView`.
 - [x] Supabase persistence for all heat data (sessions, logs).
 
+### M9 — Stretch Routines ✅
+- [x] `StretchTemplate`, `StretchTemplateExercise`, `StretchSession`, `StretchLog` models — follows the same template/session/log pattern as strength training.
+- [x] Supabase migration for stretch tables (`stretch_templates`, `stretch_template_exercises`, `stretch_sessions`, `stretch_logs`).
+- [x] Add `stretch_exercises` to the bundled training plan JSON template (`champion_plan_100k.json`) — individual stretches on Tuesday (post-run basics), Saturday (extended post-long-run), Sunday (full mobility).
+- [x] Update `TrainingPlanTemplate` model with `StretchExerciseTemplate` struct.
+- [x] `StretchStore` — `@Observable` state container following `StrengthStore` pattern. Template management (add/edit/remove individual stretches), per-week session generation, completion logging, future week propagation on template changes.
+- [x] `AddStretchExerciseSheet` — add individual stretches with name, hold time, sets, bilateral toggle, and PT notes.
+- [x] `EditStretchExerciseSheet` — edit or remove individual stretches from the template.
+- [x] `StretchDayDetailView` — logging view for a day's stretches. Tap each stretch to mark done. Progress bar with completion count.
+- [x] Stretch section in Strength tab — shows individual stretches grouped by day with add/edit capability. Users can add PT-recommended stretches.
+- [x] Stretch display on `TodayView` — show individual stretches with per-stretch completion checkmarks and "Log" button.
+- [x] Stretch display on `WeekView` — flexibility icon with completion count badge, tap to open day detail.
+- [x] Wire `StretchStore` into `TrainingApp`, `ContentView`, `PlanSetupView`, `PlanEditView`.
+- [x] Supabase persistence for all stretch data (templates, exercises, sessions, logs).
+
 ## Project Structure
 
 ```
@@ -542,6 +620,8 @@ TrainingApp/
     │   ├── StrengthTemplate.swift         # Weekly strength template + exercises
     │   ├── StrengthSession.swift          # Per-week prescribed strength work
     │   ├── StrengthLog.swift              # Actual logged sets/reps/weight
+    │   ├── StretchSession.swift            # Prescribed stretch/mobility sessions
+    │   ├── StretchLog.swift               # Actual logged stretch sessions
     │   ├── HeatSession.swift              # Prescribed heat acclimation sessions
     │   └── HeatLog.swift                  # Actual logged heat sessions
     ├── Services/
@@ -551,6 +631,7 @@ TrainingApp/
     │   ├── TrainingPlanStore.swift        # Active plan state (@Observable)
     │   ├── StrengthStore.swift            # Strength template, sessions, progression
     │   ├── ProgressionEngine.swift        # Dynamic load adjustment logic
+    │   ├── StretchStore.swift              # Stretch sessions, logging
     │   ├── HeatStore.swift                # Heat sessions, logging
     │   ├── StravaService.swift            # OAuth2, activity import, auto-match
     │   ├── OuraService.swift              # OAuth2, readiness/sleep sync
@@ -563,6 +644,8 @@ TrainingApp/
         ├── Week/WeekView.swift            # Week summary, completion, strength
         ├── Calendar/PlanCalendarView.swift # Completion dots
         ├── Calendar/SessionDetailSheet.swift # Editable plan vs actual comparison
+        ├── Stretch/StretchLogSheet.swift          # Add/edit stretch exercise sheets
+        ├── Stretch/StretchDayDetailView.swift    # Log individual stretches for a day
         ├── Heat/HeatLogSheet.swift              # Log heat session duration
         ├── Strength/StrengthTemplateView.swift  # Strength tab — weekly template editor
         ├── Strength/StrengthDayDetailView.swift # Log sets/reps/weight for a day
@@ -579,8 +662,11 @@ supabase/
 ├── config.toml
 └── migrations/
     ├── 20260318000000_initial_schema.sql
-    ├── 20260320000000_strength_and_overrides.sql
-    └── 20260320200000_heat_training.sql
+    ├── 20260320000000_add_strength_workout_type.sql
+    ├── 20260320100000_strength_and_overrides.sql
+    ├── 20260320200000_heat_training.sql
+    ├── 20260325000000_stretch_sessions.sql
+    └── 20260325100000_timed_exercises_and_activity_types.sql
 ```
 
 ## Website & Legal

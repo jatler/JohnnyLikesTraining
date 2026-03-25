@@ -6,6 +6,7 @@ struct TodayView: View {
     @Environment(OuraService.self) private var oura
     @Environment(StrengthStore.self) private var strengthStore
     @Environment(HeatStore.self) private var heatStore
+    @Environment(StretchStore.self) private var stretchStore
 
     @State private var showingPlanSetup = false
     @State private var showingPlanEdit = false
@@ -14,6 +15,7 @@ struct TodayView: View {
     @State private var showingSwapPicker = false
     @State private var showingStrengthDay = false
     @State private var selectedHeatSession: HeatSession?
+    @State private var showingStretchDay = false
 
     var body: some View {
         NavigationStack {
@@ -62,6 +64,8 @@ struct TodayView: View {
 
                 todayStrengthSection
 
+                todayStretchSection
+
                 todayHeatSection
 
                 if let plan = planStore.activePlan {
@@ -72,6 +76,13 @@ struct TodayView: View {
         }
         .sheet(item: $selectedHeatSession) { session in
             HeatLogSheet(session: session)
+        }
+        .sheet(isPresented: $showingStretchDay) {
+            if let week = planStore.currentWeekNumber {
+                let dayOfWeek = Calendar.current.component(.weekday, from: Date())
+                let adjustedDay = dayOfWeek == 1 ? 7 : dayOfWeek - 1
+                StretchDayDetailView(weekNumber: week, dayOfWeek: adjustedDay)
+            }
         }
         .sheet(isPresented: $showingStrengthDay) {
             if let week = planStore.currentWeekNumber {
@@ -100,12 +111,14 @@ struct TodayView: View {
                     recoveryMetric(
                         title: "Readiness",
                         value: today.readinessScore.map { "\($0)" } ?? "—",
-                        color: readinessColor(today.readinessLevel)
+                        color: readinessColor(today.readinessLevel),
+                        showCrown: (today.readinessScore ?? 0) >= 85
                     )
                     recoveryMetric(
                         title: "Sleep",
                         value: today.sleepScore.map { "\($0)" } ?? "—",
-                        color: .blue
+                        color: .blue,
+                        showCrown: (today.sleepScore ?? 0) >= 85
                     )
                     recoveryMetric(
                         title: "HRV",
@@ -135,11 +148,18 @@ struct TodayView: View {
         }
     }
 
-    private func recoveryMetric(title: String, value: String, color: Color) -> some View {
+    private func recoveryMetric(title: String, value: String, color: Color, showCrown: Bool = false) -> some View {
         VStack(spacing: 4) {
-            Text(value)
-                .font(.title2.bold())
-                .foregroundStyle(color)
+            HStack(spacing: 2) {
+                if showCrown {
+                    Image(systemName: "crown.fill")
+                        .font(.caption)
+                        .foregroundStyle(.yellow)
+                }
+                Text(value)
+                    .font(.title2.bold())
+                    .foregroundStyle(color)
+            }
             Text(title)
                 .font(.caption2)
                 .foregroundStyle(.secondary)
@@ -215,43 +235,55 @@ struct TodayView: View {
                 Text("Completed")
                     .font(.subheadline.bold())
                 Spacer()
+                if !activity.isRun {
+                    Text(activity.activityTypeDisplay)
+                        .font(.caption2.bold())
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(.blue, in: Capsule())
+                }
                 Text(activity.name)
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
 
             HStack(spacing: 16) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Distance")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                    HStack(spacing: 4) {
-                        Text(String(format: "%.1f", activity.distanceMi))
-                            .font(.subheadline.bold())
-                        if let target = session.targetDistanceMi {
-                            Text("/ \(String(format: "%.1f", target)) mi")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                            distanceDelta(actual: activity.distanceMi, target: target)
-                        } else {
-                            Text("mi")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                if activity.isRun || activity.distanceKm > 0.1 {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Distance")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        HStack(spacing: 4) {
+                            Text(String(format: "%.1f", activity.distanceMi))
+                                .font(.subheadline.bold())
+                            if let target = session.targetDistanceMi {
+                                Text("/ \(String(format: "%.1f", target)) mi")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                distanceDelta(actual: activity.distanceMi, target: target)
+                            } else {
+                                Text("mi")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                     }
+
+                    Divider().frame(height: 30)
                 }
 
-                Divider().frame(height: 30)
+                if activity.isRun {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Pace")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        Text(activity.formattedPace)
+                            .font(.subheadline.bold())
+                    }
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Pace")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                    Text(activity.formattedPace)
-                        .font(.subheadline.bold())
+                    Divider().frame(height: 30)
                 }
-
-                Divider().frame(height: 30)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Time")
@@ -259,6 +291,17 @@ struct TodayView: View {
                         .foregroundStyle(.secondary)
                     Text(activity.formattedDuration)
                         .font(.subheadline.bold())
+                }
+
+                if let hr = activity.averageHr, !activity.isRun {
+                    Divider().frame(height: 30)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Avg HR")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        Text("\(hr) bpm")
+                            .font(.subheadline.bold())
+                    }
                 }
             }
         }
@@ -566,11 +609,94 @@ struct TodayView: View {
     }
 
     private func strengthPrescription(_ session: StrengthSession) -> String {
-        var text = "\(session.prescribedSets)×\(session.prescribedReps)"
+        let repsLabel = session.isTimed ? "\(session.prescribedReps)s" : "\(session.prescribedReps)"
+        var text = "\(session.prescribedSets)×\(repsLabel)"
         if let kg = session.prescribedWeightKg {
             text += " @ \(Int(kg * 2.205)) lbs"
         }
         return text
+    }
+
+    // MARK: - Today Stretch Section
+
+    @ViewBuilder
+    private var todayStretchSection: some View {
+        let today = Date()
+        let daySessions = stretchStore.sessions(for: today)
+
+        if !daySessions.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Label("Stretches", systemImage: "figure.flexibility")
+                        .font(.headline)
+                        .foregroundStyle(.teal)
+
+                    Spacer()
+
+                    let completed = stretchStore.completedCount(for: today)
+                    let total = daySessions.count
+
+                    if completed > 0 {
+                        Text("\(completed)/\(total) done")
+                            .font(.caption)
+                            .foregroundStyle(.green)
+                    }
+
+                    Button {
+                        showingStretchDay = true
+                    } label: {
+                        Label("Log", systemImage: "checkmark.circle")
+                            .font(.caption)
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
+                    .tint(.teal)
+                }
+
+                ForEach(daySessions) { session in
+                    HStack(spacing: 10) {
+                        let complete = stretchStore.isComplete(session.id)
+
+                        Image(systemName: complete ? "checkmark.circle.fill" : "circle")
+                            .font(.subheadline)
+                            .foregroundStyle(complete ? .green : .secondary.opacity(0.5))
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(session.stretchName)
+                                .font(.subheadline)
+                                .strikethrough(complete)
+                                .foregroundStyle(complete ? .secondary : .primary)
+
+                            Text(stretchPrescription(session))
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
+                        }
+
+                        Spacer()
+
+                        if session.isBilateral {
+                            Text("L+R")
+                                .font(.caption2.bold())
+                                .foregroundStyle(.secondary)
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 1)
+                                .background(.quaternary, in: Capsule())
+                        }
+                    }
+                }
+            }
+            .padding()
+            .background(.teal.opacity(0.06), in: RoundedRectangle(cornerRadius: 16))
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(.teal.opacity(0.15), lineWidth: 1)
+            )
+        }
+    }
+
+    private func stretchPrescription(_ session: StretchSession) -> String {
+        let perSide = session.isBilateral ? " each side" : ""
+        return "\(session.prescribedSets)×\(session.prescribedHoldSeconds)s\(perSide)"
     }
 
     // MARK: - Today Heat Section
@@ -739,4 +865,5 @@ struct TodayView: View {
         .environment(OuraService())
         .environment(StrengthStore())
         .environment(HeatStore())
+        .environment(StretchStore())
 }

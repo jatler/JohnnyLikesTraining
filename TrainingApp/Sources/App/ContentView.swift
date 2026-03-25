@@ -24,6 +24,7 @@ struct MainTabView: View {
     @Environment(OuraService.self) private var oura
     @Environment(StrengthStore.self) private var strengthStore
     @Environment(HeatStore.self) private var heatStore
+    @Environment(StretchStore.self) private var stretchStore
 
     var body: some View {
         TabView {
@@ -64,6 +65,9 @@ struct MainTabView: View {
                 if !heatStore.hasSessions {
                     await heatStore.loadData(planId: plan.id)
                 }
+                if !stretchStore.hasTemplate {
+                    await stretchStore.loadData(planId: plan.id)
+                }
                 if let week = planStore.currentWeekNumber {
                     strengthStore.computeSuggestions(
                         runningSessions: planStore.sessions,
@@ -91,4 +95,5 @@ struct MainTabView: View {
         .environment(OuraService())
         .environment(StrengthStore())
         .environment(HeatStore())
+        .environment(StretchStore())
 }

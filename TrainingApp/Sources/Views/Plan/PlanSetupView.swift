@@ -5,6 +5,7 @@ struct PlanSetupView: View {
     @Environment(TrainingPlanStore.self) private var planStore
     @Environment(StrengthStore.self) private var strengthStore
     @Environment(HeatStore.self) private var heatStore
+    @Environment(StretchStore.self) private var stretchStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var raceName = ""
@@ -142,6 +143,15 @@ struct PlanSetupView: View {
                     totalWeeks: template.durationWeeks
                 )
             }
+
+            if let stretchExercises = template.stretchExercises, !stretchExercises.isEmpty {
+                stretchStore.initializeFromTemplate(
+                    stretchExercises,
+                    planId: plan.id,
+                    planStartDate: plan.planStartDate,
+                    totalWeeks: template.durationWeeks
+                )
+            }
         }
 
         dismiss()
@@ -168,4 +178,5 @@ extension TrainingPlanTemplate: Hashable {
         .environment(TrainingPlanStore())
         .environment(StrengthStore())
         .environment(HeatStore())
+        .environment(StretchStore())
 }

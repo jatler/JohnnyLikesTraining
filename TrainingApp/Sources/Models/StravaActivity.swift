@@ -13,6 +13,7 @@ struct StravaActivity: Codable, Identifiable {
     var averageHr: Int?
     var elevationGainM: Double?
     var mapPolyline: String?
+    var activityType: String
     var matchedSessionId: UUID?
     let syncedAt: Date
 
@@ -29,8 +30,45 @@ struct StravaActivity: Codable, Identifiable {
         case averageHr = "average_hr"
         case elevationGainM = "elevation_gain_m"
         case mapPolyline = "map_polyline"
+        case activityType = "activity_type"
         case matchedSessionId = "matched_session_id"
         case syncedAt = "synced_at"
+    }
+
+    var isRun: Bool {
+        ["Run", "TrailRun", "VirtualRun"].contains(activityType)
+    }
+
+    var isCrossTraining: Bool {
+        ["CrossCountrySkiing", "Elliptical", "Hike", "RockClimbing", "Rowing", "StairStepper", "Swim", "Walk"].contains(activityType)
+    }
+
+    var isStrength: Bool {
+        ["WeightTraining", "Crossfit"].contains(activityType)
+    }
+
+    var isYoga: Bool {
+        activityType == "Yoga"
+    }
+
+    var activityTypeDisplay: String {
+        switch activityType {
+        case "Run": return "Run"
+        case "TrailRun": return "Trail Run"
+        case "VirtualRun": return "Virtual Run"
+        case "WeightTraining": return "Strength"
+        case "Crossfit": return "CrossFit"
+        case "Yoga": return "Yoga"
+        case "CrossCountrySkiing": return "XC Ski"
+        case "Elliptical": return "Elliptical"
+        case "Hike": return "Hike"
+        case "RockClimbing": return "Climbing"
+        case "Rowing": return "Rowing"
+        case "StairStepper": return "Stairs"
+        case "Swim": return "Swim"
+        case "Walk": return "Walk"
+        default: return activityType
+        }
     }
 
     var distanceMi: Double {

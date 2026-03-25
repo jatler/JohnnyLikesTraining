@@ -24,6 +24,7 @@ struct StrengthTemplateExercise: Codable, Identifiable {
     var targetWeightKg: Double?
     var targetRpe: Double?
     var isBodyweight: Bool
+    var isTimed: Bool
     var sortOrder: Int
     var notes: String?
 
@@ -37,6 +38,7 @@ struct StrengthTemplateExercise: Codable, Identifiable {
         case targetWeightKg = "target_weight_kg"
         case targetRpe = "target_rpe"
         case isBodyweight = "is_bodyweight"
+        case isTimed = "is_timed"
         case sortOrder = "sort_order"
         case notes
     }

@@ -4,6 +4,7 @@ struct PlanEditView: View {
     @Environment(TrainingPlanStore.self) private var planStore
     @Environment(StrengthStore.self) private var strengthStore
     @Environment(HeatStore.self) private var heatStore
+    @Environment(StretchStore.self) private var stretchStore
     @Environment(AuthService.self) private var auth
     @Environment(\.dismiss) private var dismiss
 
@@ -138,6 +139,7 @@ struct PlanEditView: View {
 
             strengthStore.clearAll()
             heatStore.clearAll()
+            stretchStore.clearAll()
             if let plan = planStore.activePlan {
                 if let strengthExercises = template.strengthExercises, !strengthExercises.isEmpty {
                     strengthStore.initializeFromTemplate(
@@ -150,6 +152,14 @@ struct PlanEditView: View {
                 if let heatTemplates = template.heatSessions, !heatTemplates.isEmpty {
                     heatStore.initializeFromTemplate(
                         heatTemplates,
+                        planId: plan.id,
+                        planStartDate: plan.planStartDate,
+                        totalWeeks: template.durationWeeks
+                    )
+                }
+                if let stretchExercises = template.stretchExercises, !stretchExercises.isEmpty {
+                    stretchStore.initializeFromTemplate(
+                        stretchExercises,
                         planId: plan.id,
                         planStartDate: plan.planStartDate,
                         totalWeeks: template.durationWeeks

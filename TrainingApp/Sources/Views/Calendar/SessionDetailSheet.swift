@@ -260,18 +260,30 @@ struct SessionDetailSheet: View {
         HStack(spacing: 16) {
             if let score = recovery.readinessScore {
                 HStack(spacing: 4) {
-                    Circle()
-                        .fill(readinessColor(recovery.readinessLevel))
-                        .frame(width: 8, height: 8)
+                    if score >= 85 {
+                        Image(systemName: "crown.fill")
+                            .font(.caption2)
+                            .foregroundStyle(.yellow)
+                    } else {
+                        Circle()
+                            .fill(readinessColor(recovery.readinessLevel))
+                            .frame(width: 8, height: 8)
+                    }
                     Text("Readiness \(score)")
                         .font(.caption)
                 }
             }
             if let sleep = recovery.sleepScore {
                 HStack(spacing: 4) {
-                    Image(systemName: "moon.fill")
-                        .font(.caption2)
-                        .foregroundStyle(.blue)
+                    if sleep >= 85 {
+                        Image(systemName: "crown.fill")
+                            .font(.caption2)
+                            .foregroundStyle(.yellow)
+                    } else {
+                        Image(systemName: "moon.fill")
+                            .font(.caption2)
+                            .foregroundStyle(.blue)
+                    }
                     Text("Sleep \(sleep)")
                         .font(.caption)
                 }
@@ -282,6 +294,15 @@ struct SessionDetailSheet: View {
                         .font(.caption2)
                         .foregroundStyle(.purple)
                     Text(String(format: "HRV %.0f", hrv))
+                        .font(.caption)
+                }
+            }
+            if let rhr = recovery.restingHr {
+                HStack(spacing: 4) {
+                    Image(systemName: "heart.fill")
+                        .font(.caption2)
+                        .foregroundStyle(.red)
+                    Text("RHR \(rhr)")
                         .font(.caption)
                 }
             }
@@ -394,7 +415,8 @@ struct SessionDetailSheet: View {
     }
 
     private func formatPrescription(_ session: StrengthSession) -> String {
-        var text = "\(session.prescribedSets)×\(session.prescribedReps)"
+        let repsLabel = session.isTimed ? "\(session.prescribedReps)s" : "\(session.prescribedReps)"
+        var text = "\(session.prescribedSets)×\(repsLabel)"
         if let kg = session.prescribedWeightKg {
             text += " @ \(Int(kg * 2.205)) lbs"
         }
@@ -462,6 +484,15 @@ struct SessionDetailSheet: View {
                     .foregroundStyle(.green)
                 Text("Completed: \(activity.name)")
                     .font(.subheadline.bold())
+                if !activity.isRun {
+                    Spacer()
+                    Text(activity.activityTypeDisplay)
+                        .font(.caption2.bold())
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(.blue, in: Capsule())
+                }
             }
 
             LazyVGrid(columns: [
@@ -469,19 +500,23 @@ struct SessionDetailSheet: View {
                 GridItem(.flexible()),
                 GridItem(.flexible())
             ], spacing: 12) {
-                comparisonCell(
-                    title: "Distance",
-                    actual: String(format: "%.1f mi", activity.distanceMi),
-                    planned: session.targetDistanceMi.map { String(format: "%.1f mi", $0) },
-                    delta: session.targetDistanceMi.map { ((activity.distanceMi - $0) / $0) * 100 }
-                )
+                if activity.isRun || activity.distanceKm > 0.1 {
+                    comparisonCell(
+                        title: "Distance",
+                        actual: String(format: "%.1f mi", activity.distanceMi),
+                        planned: session.targetDistanceMi.map { String(format: "%.1f mi", $0) },
+                        delta: session.targetDistanceMi.map { ((activity.distanceMi - $0) / $0) * 100 }
+                    )
+                }
 
-                comparisonCell(
-                    title: "Pace",
-                    actual: activity.formattedPace,
-                    planned: nil,
-                    delta: nil
-                )
+                if activity.isRun {
+                    comparisonCell(
+                        title: "Pace",
+                        actual: activity.formattedPace,
+                        planned: nil,
+                        delta: nil
+                    )
+                }
 
                 comparisonCell(
                     title: "Duration",
@@ -498,7 +533,7 @@ struct SessionDetailSheet: View {
                         .foregroundStyle(.red)
                 }
 
-                if let elev = activity.elevationGainM {
+                if let elev = activity.elevationGainM, activity.isRun {
                     Label(String(format: "%.0f ft", elev * 3.281), systemImage: "mountain.2.fill")
                         .font(.caption)
                         .foregroundStyle(.green)

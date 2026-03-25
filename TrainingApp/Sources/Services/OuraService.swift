@@ -10,6 +10,7 @@ final class OuraService {
     private(set) var lastSyncDate: Date?
 
     private let supabase = SupabaseService.shared.client
+    private var authSession: ASWebAuthenticationSession?
 
     init() {
         isConnected = KeychainService.get(.ouraAccessToken) != nil
@@ -33,10 +34,11 @@ final class OuraService {
         ]
 
         let code = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
-            let session = ASWebAuthenticationSession(
+            self.authSession = ASWebAuthenticationSession(
                 url: components.url!,
                 callbackURLScheme: "training"
-            ) { callbackURL, error in
+            ) { [weak self] callbackURL, error in
+                self?.authSession = nil
                 if let error {
                     continuation.resume(throwing: error)
                     return
@@ -49,9 +51,9 @@ final class OuraService {
                 }
                 continuation.resume(returning: code)
             }
-            session.prefersEphemeralWebBrowserSession = false
-            session.presentationContextProvider = ASWebAuthPresentationContext.shared
-            session.start()
+            self.authSession?.prefersEphemeralWebBrowserSession = false
+            self.authSession?.presentationContextProvider = ASWebAuthPresentationContext.shared
+            self.authSession?.start()
         }
 
         try await exchangeCodeForToken(code)
@@ -63,17 +65,27 @@ final class OuraService {
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
 
-        let params = [
-            "client_id=\(Config.ouraClientId)",
-            "client_secret=\(Config.ouraClientSecret)",
-            "code=\(code)",
-            "grant_type=authorization_code",
-            "redirect_uri=\(Config.ouraRedirectURI)"
-        ].joined(separator: "&")
-        request.httpBody = Data(params.utf8)
+        #if DEBUG
+        print("Oura client_id: [\(Config.ouraClientId)]")
+        print("Oura client_secret: [\(Config.ouraClientSecret)]")
+        print("Oura redirect_uri: [\(Config.ouraRedirectURI)]")
+        #endif
+
+        var components = URLComponents()
+        components.queryItems = [
+            URLQueryItem(name: "client_id", value: Config.ouraClientId),
+            URLQueryItem(name: "client_secret", value: Config.ouraClientSecret),
+            URLQueryItem(name: "code", value: code),
+            URLQueryItem(name: "grant_type", value: "authorization_code"),
+            URLQueryItem(name: "redirect_uri", value: Config.ouraRedirectURI)
+        ]
+        request.httpBody = components.percentEncodedQuery?.data(using: .utf8)
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            let body = String(data: data, encoding: .utf8) ?? "no body"
+            let status = (response as? HTTPURLResponse)?.statusCode ?? -1
+            print("Oura token exchange failed (\(status)): \(body)")
             throw OuraError.tokenExchangeFailed
         }
 
@@ -96,16 +108,19 @@ final class OuraService {
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
 
-        let params = [
-            "client_id=\(Config.ouraClientId)",
-            "client_secret=\(Config.ouraClientSecret)",
-            "refresh_token=\(refreshToken)",
-            "grant_type=refresh_token"
-        ].joined(separator: "&")
-        request.httpBody = Data(params.utf8)
+        var components = URLComponents()
+        components.queryItems = [
+            URLQueryItem(name: "client_id", value: Config.ouraClientId),
+            URLQueryItem(name: "client_secret", value: Config.ouraClientSecret),
+            URLQueryItem(name: "refresh_token", value: refreshToken),
+            URLQueryItem(name: "grant_type", value: "refresh_token")
+        ]
+        request.httpBody = components.percentEncodedQuery?.data(using: .utf8)
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            let body = String(data: data, encoding: .utf8) ?? "no body"
+            print("Oura token refresh failed: \(body)")
             throw OuraError.tokenRefreshFailed
         }
 
@@ -208,9 +223,10 @@ final class OuraService {
 
         for entry in sleepPeriods {
             let dateStr = entry.day
+            let hrv = entry.averageHrv.map(Double.init)
             if merged[dateStr] != nil {
                 merged[dateStr]?.restingHr = entry.lowestHeartRate
-                merged[dateStr]?.hrvAverage = entry.averageHrv
+                merged[dateStr]?.hrvAverage = hrv
             } else {
                 let date = formatter.date(from: dateStr) ?? Date()
                 merged[dateStr] = OuraDaily(
@@ -219,13 +235,41 @@ final class OuraService {
                     date: date,
                     readinessScore: nil,
                     sleepScore: nil,
-                    hrvAverage: entry.averageHrv,
+                    hrvAverage: hrv,
                     restingHr: entry.lowestHeartRate,
                     temperatureDeviation: nil,
                     syncedAt: Date()
                 )
             }
         }
+
+        // When today has readiness/sleep scores but no HRV/RHR (sleep period
+        // not processed yet), fill forward from the most recent sleep period.
+        let todayStr = formatter.string(from: Date())
+        if var todayEntry = merged[todayStr],
+           todayEntry.hrvAverage == nil || todayEntry.restingHr == nil {
+            let mostRecent = sleepPeriods
+                .sorted(by: { $0.day > $1.day })
+                .first
+            if let recent = mostRecent {
+                if todayEntry.hrvAverage == nil {
+                    todayEntry.hrvAverage = recent.averageHrv.map(Double.init)
+                }
+                if todayEntry.restingHr == nil {
+                    todayEntry.restingHr = recent.lowestHeartRate
+                }
+                merged[todayStr] = todayEntry
+            }
+        }
+
+        #if DEBUG
+        let withHrv = merged.values.filter { $0.hrvAverage != nil }.count
+        let withRhr = merged.values.filter { $0.restingHr != nil }.count
+        print("Oura merged: \(merged.count) days, \(withHrv) with HRV, \(withRhr) with RHR")
+        if withHrv == 0 && withRhr == 0 && !sleepPeriods.isEmpty {
+            print("⚠️ Sleep periods fetched but no HRV/RHR data — user may need to disconnect & reconnect Oura to grant heartrate scope")
+        }
+        #endif
 
         dailyData = merged.values.sorted { $0.date < $1.date }
         lastSyncDate = Date()
@@ -274,23 +318,63 @@ final class OuraService {
     }
 
     private func fetchSleepPeriods(accessToken: String, start: String, end: String) async throws -> [OuraSleepPeriodEntry] {
-        var components = URLComponents(string: "\(Config.ouraBaseURL)/usercollection/sleep")!
-        components.queryItems = [
-            URLQueryItem(name: "start_date", value: start),
-            URLQueryItem(name: "end_date", value: end)
-        ]
+        var allPeriods: [OuraSleepPeriodEntry] = []
+        var nextToken: String? = nil
 
-        var request = URLRequest(url: components.url!)
-        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        repeat {
+            var components = URLComponents(string: "\(Config.ouraBaseURL)/usercollection/sleep")!
+            components.queryItems = [
+                URLQueryItem(name: "start_date", value: start),
+                URLQueryItem(name: "end_date", value: end)
+            ]
+            if let token = nextToken {
+                components.queryItems?.append(URLQueryItem(name: "next_token", value: token))
+            }
 
-        let (data, _) = try await URLSession.shared.data(for: request)
-        let result = try? JSONDecoder().decode(OuraListResponse<OuraSleepPeriodEntry>.self, from: data)
-        guard let periods = result?.data else { return [] }
+            var request = URLRequest(url: components.url!)
+            request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+                let status = (response as? HTTPURLResponse)?.statusCode ?? -1
+                let body = String(data: data, encoding: .utf8) ?? "no body"
+                print("Oura sleep periods fetch failed (\(status)): \(body)")
+                return []
+            }
+
+            #if DEBUG
+            if allPeriods.isEmpty, let raw = String(data: data, encoding: .utf8) {
+                let preview = raw.prefix(1500)
+                print("Oura /usercollection/sleep raw response (\(data.count) bytes): \(preview)")
+            }
+            #endif
+
+            let result: OuraListResponse<OuraSleepPeriodEntry>
+            do {
+                result = try JSONDecoder().decode(OuraListResponse<OuraSleepPeriodEntry>.self, from: data)
+            } catch {
+                print("Oura sleep periods decode error: \(error)")
+                return []
+            }
+
+            allPeriods.append(contentsOf: result.data)
+            nextToken = result.nextToken
+        } while nextToken != nil
+
+        let validTypes: Set<String> = ["long_sleep", "sleep", "late_nap"]
+        let filtered = allPeriods.filter { validTypes.contains($0.type ?? "") }
+
+        #if DEBUG
+        print("Oura sleep periods: \(allPeriods.count) total, \(filtered.count) after type filter")
+        for p in filtered.prefix(5) {
+            print("  \(p.day) [\(p.type ?? "?")] HR=\(p.lowestHeartRate.map(String.init) ?? "nil") HRV=\(p.averageHrv.map(String.init) ?? "nil") dur=\(p.totalSleepDuration.map(String.init) ?? "nil")")
+        }
+        #endif
 
         // Multiple sleep periods can exist per day (main sleep, naps).
         // Keep only the longest period per day for resting HR / HRV.
         var bestByDay: [String: OuraSleepPeriodEntry] = [:]
-        for period in periods {
+        for period in filtered {
             if let existing = bestByDay[period.day] {
                 if (period.totalSleepDuration ?? 0) > (existing.totalSleepDuration ?? 0) {
                     bestByDay[period.day] = period
@@ -339,13 +423,20 @@ final class OuraService {
     // MARK: - Persistence
 
     private func persistDailyData(_ data: [OuraDaily], userId: UUID) async {
+        do {
+            _ = try await supabase.auth.session
+        } catch {
+            print("Oura persist skipped — no valid Supabase session: \(error)")
+            return
+        }
+
         for entry in data {
             do {
                 try await supabase.from("oura_daily")
                     .upsert(entry, onConflict: "user_id,date")
                     .execute()
             } catch {
-                print("Failed to persist Oura data: \(error)")
+                print("Failed to persist Oura data for \(entry.date): \(error)")
             }
         }
     }
@@ -355,6 +446,12 @@ final class OuraService {
 
 private struct OuraListResponse<T: Decodable>: Decodable {
     let data: [T]
+    let nextToken: String?
+
+    enum CodingKeys: String, CodingKey {
+        case data
+        case nextToken = "next_token"
+    }
 }
 
 private struct OuraReadinessEntry: Decodable {
@@ -376,11 +473,12 @@ private struct OuraSleepEntry: Decodable {
 private struct OuraSleepPeriodEntry: Decodable {
     let day: String
     let lowestHeartRate: Int?
-    let averageHrv: Double?
+    let averageHrv: Int?
     let totalSleepDuration: Int?
+    let type: String?
 
     enum CodingKeys: String, CodingKey {
-        case day
+        case day, type
         case lowestHeartRate = "lowest_heart_rate"
         case averageHrv = "average_hrv"
         case totalSleepDuration = "total_sleep_duration"

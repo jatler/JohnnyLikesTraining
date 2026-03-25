@@ -8,6 +8,7 @@ struct TrainingApp: App {
     @State private var ouraService = OuraService()
     @State private var strengthStore = StrengthStore()
     @State private var heatStore = HeatStore()
+    @State private var stretchStore = StretchStore()
 
     var body: some Scene {
         WindowGroup {
@@ -18,6 +19,7 @@ struct TrainingApp: App {
                 .environment(ouraService)
                 .environment(strengthStore)
                 .environment(heatStore)
+                .environment(stretchStore)
         }
     }
 }

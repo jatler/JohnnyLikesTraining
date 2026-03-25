@@ -89,26 +89,26 @@ struct StrengthDayDetailView: View {
 
     private func setRow(session: StrengthSession, setNumber: Int, existingLog: StrengthLog?) -> some View {
         HStack(spacing: 12) {
-            Text("Set \(setNumber)")
+            Text(session.isTimed ? "Hold \(setNumber)" : "Set \(setNumber)")
                 .font(.caption.bold())
                 .foregroundStyle(.secondary)
-                .frame(width: 44, alignment: .leading)
+                .frame(width: 50, alignment: .leading)
 
             if let log = existingLog {
-                completedSetView(log)
+                completedSetView(log, isTimed: session.isTimed)
             } else {
                 editableSetView(session: session, setNumber: setNumber)
             }
         }
     }
 
-    private func completedSetView(_ log: StrengthLog) -> some View {
+    private func completedSetView(_ log: StrengthLog, isTimed: Bool = false) -> some View {
         HStack(spacing: 8) {
             Image(systemName: "checkmark.circle.fill")
                 .foregroundStyle(.green)
                 .font(.caption)
 
-            Text("\(log.actualReps) reps")
+            Text(isTimed ? "\(log.actualReps)s" : "\(log.actualReps) reps")
                 .font(.subheadline)
 
             if let kg = log.actualWeightKg {
@@ -144,7 +144,7 @@ struct StrengthDayDetailView: View {
             let inputIndex = setNumber - 1
 
             if inputIndex < inputs.count {
-                TextField("reps", text: binding(session: session.id, set: inputIndex, keyPath: \.reps))
+                TextField(session.isTimed ? "secs" : "reps", text: binding(session: session.id, set: inputIndex, keyPath: \.reps))
                     .keyboardType(.numberPad)
                     .textFieldStyle(.roundedBorder)
                     .frame(width: 50)
@@ -173,7 +173,8 @@ struct StrengthDayDetailView: View {
     // MARK: - Helpers
 
     private func prescriptionText(_ session: StrengthSession) -> String {
-        var text = "\(session.prescribedSets)×\(session.prescribedReps)"
+        let repsLabel = session.isTimed ? "\(session.prescribedReps)s" : "\(session.prescribedReps)"
+        var text = "\(session.prescribedSets)×\(repsLabel)"
         if let kg = session.prescribedWeightKg {
             text += " @ \(Int(kg * 2.205)) lbs"
         }

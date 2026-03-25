@@ -11,6 +11,14 @@ final class StravaService {
     private(set) var athleteName: String?
 
     private let supabase = SupabaseService.shared.client
+    private var authSession: ASWebAuthenticationSession?
+
+    private static let importableActivityTypes: Set<String> = [
+        "Run", "TrailRun", "VirtualRun",
+        "WeightTraining", "Crossfit", "Yoga",
+        "CrossCountrySkiing", "Elliptical", "Hike", "RockClimbing",
+        "Rowing", "StairStepper", "Swim", "Walk"
+    ]
 
     init() {
         isConnected = KeychainService.get(.stravaAccessToken) != nil
@@ -45,10 +53,11 @@ final class StravaService {
         ]
 
         let code = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
-            let session = ASWebAuthenticationSession(
+            self.authSession = ASWebAuthenticationSession(
                 url: components.url!,
                 callbackURLScheme: "http"
-            ) { callbackURL, error in
+            ) { [weak self] callbackURL, error in
+                self?.authSession = nil
                 if let error {
                     continuation.resume(throwing: error)
                     return
@@ -61,9 +70,9 @@ final class StravaService {
                 }
                 continuation.resume(returning: code)
             }
-            session.prefersEphemeralWebBrowserSession = false
-            session.presentationContextProvider = ASWebAuthPresentationContext.shared
-            session.start()
+            self.authSession?.prefersEphemeralWebBrowserSession = false
+            self.authSession?.presentationContextProvider = ASWebAuthPresentationContext.shared
+            self.authSession?.start()
         }
 
         try await exchangeCodeForToken(code)
@@ -205,8 +214,8 @@ final class StravaService {
             decoder.dateDecodingStrategy = .iso8601
             let batch = try decoder.decode([StravaAPIActivity].self, from: data)
 
-            let runs = batch.filter { $0.type == "Run" || $0.type == "TrailRun" || $0.type == "VirtualRun" }
-            allActivities.append(contentsOf: runs)
+            let importable = batch.filter { Self.importableActivityTypes.contains($0.type) }
+            allActivities.append(contentsOf: importable)
 
             if batch.count < perPage { break }
             page += 1
@@ -225,9 +234,20 @@ final class StravaService {
         for i in activities.indices {
             if activities[i].matchedSessionId != nil { continue }
             let actDate = Calendar.current.startOfDay(for: activities[i].activityDate)
-            if let match = sessions.first(where: {
+            let sameDaySessions = sessions.filter {
                 Calendar.current.isDate($0.scheduledDate, inSameDayAs: actDate)
-            }) {
+            }
+            let match: PlannedSession?
+            if activities[i].isRun {
+                match = sameDaySessions.first { $0.workoutType != .strength && $0.workoutType != .crossTrain }
+                    ?? sameDaySessions.first
+            } else if activities[i].isCrossTraining {
+                match = sameDaySessions.first { $0.workoutType == .crossTrain }
+                    ?? sameDaySessions.first
+            } else {
+                match = sameDaySessions.first
+            }
+            if let match {
                 activities[i].matchedSessionId = match.id
             }
         }
@@ -337,6 +357,7 @@ struct StravaAPIActivity: Decodable {
             averageHr: averageHeartrate.map { Int($0) },
             elevationGainM: totalElevationGain,
             mapPolyline: map?.summaryPolyline,
+            activityType: type,
             matchedSessionId: nil,
             syncedAt: Date()
         )
