@@ -34,11 +34,14 @@ targets:
         CODE_SIGN_ENTITLEMENTS: Training.entitlements
         PRODUCT_BUNDLE_IDENTIFIER: com.jatler.Training
         SWIFT_VERSION: "5.9"
-        MARKETING_VERSION: "1.0.0" # short version / CFBundleShortVersionString
-        CURRENT_PROJECT_VERSION: "1" # build / CFBundleVersion
+        MARKETING_VERSION: "1.0.1" # short version / CFBundleShortVersionString
+        CURRENT_PROJECT_VERSION: "2" # build / CFBundleVersion
         GENERATE_INFOPLIST_FILE: false
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: WHKX4QF56D
+        # Set to YES in Secrets.xcconfig to show “Skip Sign-In (Dev)” on Release/device builds.
+        DEV_SIGNIN_ALLOWED: "NO"
       configs:
         Debug:
           SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
@@ -55,3 +58,11 @@ targets:
       properties:
         com.apple.developer.applesignin:
           - Default
+
+schemes:
+  Training:
+    build:
+      targets:
+        Training: all
+    run:
+      config: Debug

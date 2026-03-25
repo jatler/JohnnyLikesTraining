@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		02D216BE04F5C9BBD631B010 /* SessionOverride.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2CDF8B4AC1F14A2F3AE63B /* SessionOverride.swift */; };
+		0320FED4E3077437515CB210 /* AppleSignInSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E66380AFDA249ADA3BCD91 /* AppleSignInSupport.swift */; };
 		09774BD7EFE32B98FAA923B5 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4032AFBD2C6810AEB4A5C08C /* AuthService.swift */; };
 		0D2EEE071B59721CE1F0030C /* WorkoutType.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC41AACC3D838045702D918B /* WorkoutType.swift */; };
 		1581AFCF71290287044A878A /* StrengthLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D618114C072296876E86FC5B /* StrengthLog.swift */; };
@@ -60,8 +61,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		02C33C9015C1F9FCA1CD7F9C /* Training.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Training.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		02C33C9015C1F9FCA1CD7F9C /* Training.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Training.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		05ED34708B6E8C9B19B9424F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
+		06E66380AFDA249ADA3BCD91 /* AppleSignInSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInSupport.swift; sourceTree = "<group>"; };
 		07D906017FBE990E96F50C52 /* PlanCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCalendarView.swift; sourceTree = "<group>"; };
 		0C5EE7269B2B9B861727DE35 /* StrengthDayDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthDayDetailView.swift; sourceTree = "<group>"; };
 		1312B17F09C9B5D35ACDBBB8 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
@@ -200,6 +202,7 @@
 		66E760F8DE27D63C3D1EE641 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				06E66380AFDA249ADA3BCD91 /* AppleSignInSupport.swift */,
 				4032AFBD2C6810AEB4A5C08C /* AuthService.swift */,
 				871B7FB896DB1306FC3F295A /* HeatStore.swift */,
 				FE119AE0121335DC62EE5944 /* KeychainService.swift */,
@@ -360,6 +363,7 @@
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					18F6C878EF626BA5B3598160 = {
+						DevelopmentTeam = WHKX4QF56D;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -404,6 +408,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0320FED4E3077437515CB210 /* AppleSignInSupport.swift in Sources */,
 				09774BD7EFE32B98FAA923B5 /* AuthService.swift in Sources */,
 				E688C16BC8826DF7E7C0299E /* Config.swift in Sources */,
 				428D482FC220B2EED7ED9E42 /* ContentView.swift in Sources */,
@@ -519,15 +524,16 @@
 				CODE_SIGN_ENTITLEMENTS = Training.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = WHKX4QF56D;
+				DEV_SIGNIN_ALLOWED = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jatler.Training;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
@@ -544,15 +550,16 @@
 				CODE_SIGN_ENTITLEMENTS = Training.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = WHKX4QF56D;
+				DEV_SIGNIN_ALLOWED = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jatler.Training;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;

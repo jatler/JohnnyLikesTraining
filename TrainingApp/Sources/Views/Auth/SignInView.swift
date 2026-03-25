@@ -5,6 +5,7 @@ struct SignInView: View {
     @Environment(AuthService.self) private var auth
 
     @State private var errorMessage: String?
+    @State private var rawNonce: String?
 
     var body: some View {
         VStack(spacing: 32) {
@@ -26,14 +27,20 @@ struct SignInView: View {
             Spacer()
 
             SignInWithAppleButton(.signIn) { request in
+                let nonce = AppleSignInNonce.randomString()
+                rawNonce = nonce
+                request.nonce = AppleSignInNonce.sha256Hex(nonce)
                 request.requestedScopes = [.email, .fullName]
             } onCompletion: { result in
                 Task {
                     do {
                         let authorization = try result.get()
-                        try await auth.signInWithApple(authorization: authorization)
+                        let nonce = rawNonce
+                        rawNonce = nil
+                        try await auth.signInWithApple(authorization: authorization, rawNonce: nonce)
                     } catch {
-                        errorMessage = error.localizedDescription
+                        rawNonce = nil
+                        errorMessage = Self.message(for: error)
                     }
                 }
             }
@@ -42,13 +49,13 @@ struct SignInView: View {
             .cornerRadius(12)
             .padding(.horizontal, 40)
 
-            #if DEBUG
-            Button("Skip Sign-In (Dev)") {
-                auth.devSignIn()
+            if DevSignIn.isAllowed {
+                Button("Skip Sign-In (Dev)") {
+                    auth.devSignIn()
+                }
+                .font(.footnote)
+                .foregroundStyle(.secondary)
             }
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-            #endif
 
             if let errorMessage {
                 Text(errorMessage)
@@ -61,6 +68,13 @@ struct SignInView: View {
             Spacer()
                 .frame(height: 40)
         }
+    }
+
+    private static func message(for error: Error) -> String {
+        if let apple = error as? AppleSignInError {
+            return apple.localizedDescription
+        }
+        return error.localizedDescription
     }
 }
 

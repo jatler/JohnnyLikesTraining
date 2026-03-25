@@ -38,6 +38,8 @@
 	<true/>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>DevSignInAllowed</key>
+	<string>$(DEV_SIGNIN_ALLOWED)</string>
 	<key>SUPABASE_URL</key>
 	<string>$(SUPABASE_URL)</string>
 	<key>SUPABASE_ANON_KEY</key>
