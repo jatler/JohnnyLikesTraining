@@ -136,7 +136,7 @@ struct ProgressDashboardView: View {
                             x: .value("Week", "W\(entry.week)"),
                             y: .value("Distance", entry.plannedMi)
                         )
-                        .foregroundStyle(.blue.opacity(0.3))
+                        .foregroundStyle(Color.swapAccent.opacity(0.25))
                         .position(by: .value("Type", "Planned"))
 
                         if entry.actualMi > 0 {
@@ -144,7 +144,7 @@ struct ProgressDashboardView: View {
                                 x: .value("Week", "W\(entry.week)"),
                                 y: .value("Distance", entry.actualMi)
                             )
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(Color.swapAccent)
                             .position(by: .value("Type", "Actual"))
                         }
                     }
@@ -193,7 +193,7 @@ struct ProgressDashboardView: View {
         return HStack {
             Text("W\(entry.week)")
                 .font(.caption.bold())
-                .foregroundStyle(isCurrent ? .blue : .secondary)
+                .foregroundStyle(isCurrent ? Color.swapAccent : .secondary)
                 .frame(width: 30, alignment: .leading)
 
             ProgressView(value: min(entry.actualMi, entry.plannedMi), total: max(entry.plannedMi, 1)) {
@@ -218,7 +218,7 @@ struct ProgressDashboardView: View {
                 .foregroundStyle(.tertiary)
         }
         .padding(.vertical, 2)
-        .background(isCurrent ? Color.blue.opacity(0.05) : .clear)
+        .background(isCurrent ? Color.swapAccentSubtle : .clear)
         .clipShape(RoundedRectangle(cornerRadius: 4))
     }
 
@@ -307,7 +307,7 @@ struct ProgressDashboardView: View {
 
             Image(systemName: "chart.bar.fill")
                 .font(.system(size: 48))
-                .foregroundStyle(.blue)
+                .foregroundStyle(Color.swapAccent)
 
             Text("No data yet")
                 .font(.title3)
