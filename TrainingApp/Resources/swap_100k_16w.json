@@ -1,0 +1,909 @@
+{
+  "id": "swap_100k_16w",
+  "name": "SWAP 100K Plan (16 weeks)",
+  "author": "David Roche & Megan Roche, MD PhD",
+  "source": "SWAP Running",
+  "description": "Bundled training plan imported from SWAP_Plans PDF templates.",
+  "duration_weeks": 16,
+  "target_distances": [
+    "100K"
+  ],
+  "sessions": [
+    {
+      "week": 1,
+      "day": 1,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal, like hot tub or sauna 20-30 min. Light x-train or a hike is good on any rest day. I like full rest though, with some mobility work and core."
+    },
+    {
+      "week": 1,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 miles easy plus 6 x 20 second hills fast",
+      "notes": "6-12 miles easy plus 6 x 20 second hills fast. On easy running, think smooth, relaxed, and light on feet. Ideally Z1/Z2, but it’s ok for HR to get higher on ups. Do easy runs by effort, and it’s ok to flow when it flows! On the hill strides, do them anytime after halfway, easing into them to avoid a pulled muscle, but you can push as fast as you can go without using sprinting form. Jog down the hill for recovery. If you have a treadmill, you can add 10-15 minutes on the uphill treadmill after any run at 10-15% grade for fatigue resistance! That can be weight vest hiking as well. Do the Core Snack routine 1-2 times every day!"
+    },
+    {
+      "week": 1,
+      "day": 3,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "2-3 miles easy warm-up, 6 x 90 second hills mod/hard (think",
+      "notes": "2-3 miles easy warm-up, 6 x 90 second hills mod/hard (think 5k effort) with run down recovery after each, 6 x 45 second hills faster (think 3k effort), 1-2 miles moderate (think marathon effort), 1-2 miles easy The hills will engage top-end power, the moderate running after will help the body shuttle lactate at higher speeds Optional easy double or x-train. Any double can be the uphill treadmill, or a hike with a weight vest. Doubles are 25-45 min, with 30 min being a sweet spot, and they can be VERY easy. If your race involves lots of hiking, weight vest hiking at 15-20% grade would be idea to work into the plan as you get closer to race dayl, working on muscular endurance. Light Strength (like Mountain Legs). Do the Mountain Legs right after you finish your run on strength days! You can do a different routine that works for you as well on days with Mountain legs (like Ultra Legs), or add squats."
+    },
+    {
+      "week": 1,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "1-2 hours easy x-train with 8 x 30 seconds fast/2 min easy",
+      "notes": "1-2 hours easy x-train with 8 x 30 seconds fast/2 min easy. The x-train days are ideally bike, elliptical, uphill treadmill running or weight vest hiking, stairmill, or some combination of similar activities. Aim to keep easy in Z2, rather than extremely low effort. On fast pushes, do a bigger bike gear or higher elliptical resistance and push! You can sub in a very easy run for any x-train day if you are 100% healthy, or split the day into a double. The usual Tuesday mileage ranges are ideal if running."
+    },
+    {
+      "week": 1,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 11.263,
+      "pace_description": "4-10 miles very easy",
+      "notes": "4-10 miles very easy. Aerobic recovery day! Only advanced athletes should go farther than 6 miles on Friday, since you want to be fully recovered for weekend Heat ideal. Heat can be hot tub, sauna, or similar!"
+    },
+    {
+      "week": 1,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 20.917,
+      "pace_description": "10-16 miles easy/mod, progressing to steady effort",
+      "notes": "10-16 miles easy/mod, progressing to steady effort. On these easy/mod runs, it’s ok to let effort wander up. Practice fueling with plenty of carbs and hydration! Some vert is good, but choose whatever route seems most fun to you Ideally do your long runs on terrain with some climbing and descending! Vert is your friend, and vert is more important than mileage in most cases (even high volume athletes can prioritize shorter runs with vert). Think quick feet on the downhills, using every downhill as an opportunity to work on that skill. Mountain Legs"
+    },
+    {
+      "week": 1,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 16.09,
+      "pace_description": "6-14 miles easy plus 6 x 20 second hills fast or easy/mod",
+      "notes": "6-14 miles easy plus 6 x 20 second hills fast or easy/mod x-train. Sunday is a flex day--you could even go for a long bike or ski or hike! Or mix up a run and uphill treadmill! Mountain legs + squats (on Sundays, add 2 x 10 reps of squats) + back extensions (2 x 20), engaging glutes. You can also continue any strength program that works for you!"
+    },
+    {
+      "week": 2,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal. Very advanced"
+    },
+    {
+      "week": 2,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 16.09,
+      "pace_description": "6-14 miles easy with 5 x 20 seconds fast/2 min easy",
+      "notes": "6-14 miles easy with 5 x 20 seconds fast/2 min easy. On these flatter strides, ease into them even more since injury risk is higher."
+    },
+    {
+      "week": 2,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": 11.263,
+      "pace_description": "2-4 miles easy warm-up, 16 x 1 min fast/1 min easy (think",
+      "notes": "2-4 miles easy warm-up, 16 x 1 min fast/1 min easy (think 5k effort on fasts), 2-3 miles easy/mod to mod (think 50k), 1-2 miles easy. After workouts"
+    },
+    {
+      "week": 2,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "1-2 hours easy x-train with 5 x (4 x 1 min fast/1 min easy)",
+      "notes": "1-2 hours easy x-train with 5 x (4 x 1 min fast/1 min easy) with 2 min easy between sets."
+    },
+    {
+      "week": 2,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 12.872,
+      "pace_description": "4-12 miles very easy Heat ideal",
+      "notes": "4-12 miles very easy Heat ideal. You can add"
+    },
+    {
+      "week": 2,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 24.9395,
+      "pace_description": "13-18 miles easy/mod (20 min mod/hard around 1-hour effort",
+      "notes": "13-18 miles easy/mod (20 min mod/hard around 1-hour effort near the start of the run). On the tempo, think relaxed, with"
+    },
+    {
+      "week": 2,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 16.09,
+      "pace_description": "6-14 miles very easy plus 6 x 30 second hills fast or",
+      "notes": "6-14 miles very easy plus 6 x 30 second hills fast or easy/mod x-train. The stress of the"
+    },
+    {
+      "week": 3,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal"
+    },
+    {
+      "week": 3,
+      "day": 2,
+      "workout_type": "cross_train",
+      "target_distance_km": 7.2405,
+      "pace_description": "2-4 miles easy warm-up, 2-3 x (4 x 2 min fast/1 min easy)",
+      "notes": "2-4 miles easy warm-up, 2-3 x (4 x 2 min fast/1 min easy) with 2 min easy between sets (think 10k to 5k effort), 2 miles moderate (think marathon), 1-2 miles easy. Really big and hard session! For the big workouts, there is a range of sets so that lower volume athletes don’t overdo it. Remember, the goal is not to go as hard or fast as you can, but to run smoothly and finish feeling strong! Always err on the side of less intensity, since health and the daily aerobic work is most important for long-term growth. Optional easy double or x-train Mountain Legs"
+    },
+    {
+      "week": 3,
+      "day": 3,
+      "workout_type": "recovery",
+      "target_distance_km": 16.09,
+      "pace_description": "6-14 miles easy plus 6 x 20 second hills fast",
+      "notes": "6-14 miles easy plus 6 x 20 second hills fast. Keep these miles very easy post-workout"
+    },
+    {
+      "week": 3,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "1-2 hours easy x-train with 3-4 x 3/2/1 min fast with 1 min",
+      "notes": "1-2 hours easy x-train with 3-4 x 3/2/1 min fast with 1 min easy between intervals and 3 min easy between sets The final tougher x-train workout for a bit as the body adapts! Mountain Legs"
+    },
+    {
+      "week": 3,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 12.872,
+      "pace_description": "4-12 miles very easy Heat ideal",
+      "notes": "4-12 miles very easy Heat ideal"
+    },
+    {
+      "week": 3,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "16-20 miles easy with 1 mile harder near the end",
+      "notes": "16-20 miles easy with 1 mile harder near the end. Pure aerobic day, with the faster mile being a fatigue resistance stimulus. Fuel these long runs like the race to work on fatigue resistance. Generally, aim for 75+ grams of carbs per hour on long runs Mountain Legs"
+    },
+    {
+      "week": 3,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 17.698999999999998,
+      "pace_description": "8-14 miles easy or easy/mod x-train",
+      "notes": "8-14 miles easy or easy/mod x-train. Sunday x-train days could always be long adventures or hikes! Mountain legs + squats + back extensions"
+    },
+    {
+      "week": 4,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal"
+    },
+    {
+      "week": 4,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 17.698999999999998,
+      "pace_description": "8-14 miles easy with 5 x 30 seconds fast/2 min easy",
+      "notes": "8-14 miles easy with 5 x 30 seconds fast/2 min easy. Ease into the strides, thinking smooth and strong!"
+    },
+    {
+      "week": 4,
+      "day": 3,
+      "workout_type": "tempo",
+      "target_distance_km": null,
+      "pace_description": "Uphill treadmill at 8-10% ideal, though this workout can",
+      "notes": "Uphill treadmill at 8-10% ideal, though this workout can also be done outside, just cut the total intervals in half given downhill running! 15-20 min easy warm-up, 12-15 x 3 min around 1-hour effort with 90 seconds easy recovery after each, 15-20"
+    },
+    {
+      "week": 4,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "1-2 hours easy x-train",
+      "notes": "1-2 hours easy x-train. Make sure this is quality Z2 if you’re doing a non-impact activity like cycling. Now would be a great time to work on"
+    },
+    {
+      "week": 4,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 16.09,
+      "pace_description": "6-14 miles very easy plus 5 x 20 second hills Heat ideal",
+      "notes": "6-14 miles very easy plus 5 x 20 second hills Heat ideal"
+    },
+    {
+      "week": 4,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 24.134999999999998,
+      "pace_description": "12-18 miles easy/mod with 20 min mod/hard around 1-hour",
+      "notes": "12-18 miles easy/mod with 20 min mod/hard around 1-hour effort, finishing harder (do the tempo near the start of the run after the warm-up), plus 5 min harder near the end. This run will tax"
+    },
+    {
+      "week": 4,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 20.917,
+      "pace_description": "10-16 miles easy, progressing effort to steady as you go,",
+      "notes": "10-16 miles easy, progressing effort to steady as you go, plus 6 x 30 second hills at the end or easy/mod x-train"
+    },
+    {
+      "week": 5,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal"
+    },
+    {
+      "week": 5,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 17.698999999999998,
+      "pace_description": "8-14 miles easy with 5 x 20 seconds fast/2 min easy",
+      "notes": "8-14 miles easy with 5 x 20 seconds fast/2 min easy. Think smooth and quick on strides, with each one being an opportunity to improve speed"
+    },
+    {
+      "week": 5,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": 8.045,
+      "pace_description": "2-3 miles easy warm-up, 3-5 x 800/400/200 fast on the track",
+      "notes": "2-3 miles easy warm-up, 3-5 x 800/400/200 fast on the track with 400 easy after 8s, 200 after 4s, 400 after 2s (think 10k/5k/3k effort on the intervals), 4 x 200 fast/200 slow (push), 2-3 miles easy cool-down. First track workout! If you don’t want to go to the track, do 3-4 x 3/2/1 min fast with 1 min easy between intervals and 3 min easy between sets (think 10k/5k/3k effort), plus 4 x 30 seconds fast/90 seconds easy (push). Track workout helps solidify speed gains! Optional easy double or x-train Mountain Legs"
+    },
+    {
+      "week": 5,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "1",
+      "notes": "1.5-2.5 hours easy x-train Mountain Legs"
+    },
+    {
+      "week": 5,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 16.09,
+      "pace_description": "6-14 miles very easy Heat ideal",
+      "notes": "6-14 miles very easy Heat ideal"
+    },
+    {
+      "week": 5,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "16-20 miles easy/mod (1 hour mod to mod/hard, starting at",
+      "notes": "16-20 miles easy/mod (1 hour mod to mod/hard, starting at marathon effort and progressing as you go). The power hour will be a bit tough, embrace that space since it will have the best translation to race readiness! You can also do training races any week! If you have any trail half marathons or similar events near you, they can replace long runs, just keep the Friday shorter. Mountain Legs"
+    },
+    {
+      "week": 5,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 20.917,
+      "pace_description": "10-16 miles easy, pure recovery style",
+      "notes": "10-16 miles easy, pure recovery style. Think light on feet and relaxed! Mountain Legs + squats + back extensions"
+    },
+    {
+      "week": 6,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal"
+    },
+    {
+      "week": 6,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 miles easy plus 5 x 20 second hills",
+      "notes": "6-12 miles easy plus 5 x 20 second hills. Aerobic down week ahead, dialing back stress a bit!"
+    },
+    {
+      "week": 6,
+      "day": 3,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "10-13 miles easy/mod to mod, progressing effort as you go,",
+      "notes": "10-13 miles easy/mod to mod, progressing effort as you go, 2 miles easy cool-down. Just settling in with steady running, which will be key in longer races! Optional easy double or x-train Mountain Legs"
+    },
+    {
+      "week": 6,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "1",
+      "notes": "1.5-2.5 hours easy x-train Mountain Legs"
+    },
+    {
+      "week": 6,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 12.872,
+      "pace_description": "4-12 miles very easy with 5 x 20 seconds fast/2 min easy",
+      "notes": "4-12 miles very easy with 5 x 20 seconds fast/2 min easy Heat ideal"
+    },
+    {
+      "week": 6,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "10-16 miles easy over hills",
+      "notes": "10-16 miles easy over hills. Pure aerobic day! Let’s have this weekend be nice and relaxed! If your race has a ton of vert, now is a great time to start focusing on vert profiles like the race. Mountain Legs"
+    },
+    {
+      "week": 6,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 17.698999999999998,
+      "pace_description": "8-14 miles easy over hills or easy/mod x-train",
+      "notes": "8-14 miles easy over hills or easy/mod x-train. Pure aerobic day! Mountain Legs + squats + back extensions"
+    },
+    {
+      "week": 7,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest."
+    },
+    {
+      "week": 7,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 17.698999999999998,
+      "pace_description": "8-14 miles easy with 4 x 20",
+      "notes": "8-14 miles easy with 4 x 20"
+    },
+    {
+      "week": 7,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": 4.0225,
+      "pace_description": "2-3 miles easy warm-up, 2-3 x",
+      "notes": "2-3 miles easy warm-up, 2-3 x"
+    },
+    {
+      "week": 7,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": null,
+      "pace_description": "1",
+      "notes": "1.5-2.5 hours"
+    },
+    {
+      "week": 7,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 16.09,
+      "pace_description": "6-14 miles",
+      "notes": "6-14 miles"
+    },
+    {
+      "week": 7,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 28.962,
+      "pace_description": "16-20 miles easy/mod",
+      "notes": "16-20 miles easy/mod"
+    },
+    {
+      "week": 7,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 20.917,
+      "pace_description": "10-16 miles easy",
+      "notes": "10-16 miles easy"
+    },
+    {
+      "week": 8,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal"
+    },
+    {
+      "week": 8,
+      "day": 2,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Uphill treadmill at 8-10% ideal, though this workout can",
+      "notes": "Uphill treadmill at 8-10% ideal, though this workout can also be done outside! 15-20 min easy warm-up, 8-12 x 4 min around 1-hour effort with 90 seconds easy recovery after each, 15-20 min easy cooldown. If you do this hill workout outside, cut the intervals in half, something like 4-6 x 4 min hills Optional easy double or x-train Mountain Legs"
+    },
+    {
+      "week": 8,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": 19.308,
+      "pace_description": "8-16 miles easy plus 6 x 30 second hills",
+      "notes": "8-16 miles easy plus 6 x 30 second hills"
+    },
+    {
+      "week": 8,
+      "day": 4,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "1-2 hours easy x-train",
+      "notes": "1-2 hours easy x-train. Nice recovery before bigger weekend run. Weight vest hiking would be a great option if your race involves lots of hiking!"
+    },
+    {
+      "week": 8,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 16.09,
+      "pace_description": "6-14 miles very easy plus 5 x 20 second hills Heat ideal",
+      "notes": "6-14 miles very easy plus 5 x 20 second hills Heat ideal"
+    },
+    {
+      "week": 8,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 36.2025,
+      "pace_description": "20-25 miles easy/mod with some very fast downhills on steep",
+      "notes": "20-25 miles easy/mod with some very fast downhills on steep terrain, plus 5 min harder near the end on an uphill. Aim to get sore from this one, dialing in eccentric muscle contractions that will be good for durability. If you’re doing major vert, even advanced athletes can be at the low end of the range Mountain Legs"
+    },
+    {
+      "week": 8,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 20.917,
+      "pace_description": "10-16 miles easy/mod flow on flatter/rolling terrain,",
+      "notes": "10-16 miles easy/mod flow on flatter/rolling terrain, practicing settling into a Z2/Z3 rhythm or easy/mod x-train Mountain Legs + squats + back extensions"
+    },
+    {
+      "week": 9,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal"
+    },
+    {
+      "week": 9,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 17.698999999999998,
+      "pace_description": "8-14 miles easy with 5 x 20 seconds fast/2 min easy",
+      "notes": "8-14 miles easy with 5 x 20 seconds fast/2 min easy. Dial back volume this week if you’re feeling beat up at all--we’re trying to have a slight overreach here for adaptation on the down week next week!"
+    },
+    {
+      "week": 9,
+      "day": 3,
+      "workout_type": "tempo",
+      "target_distance_km": 12.872,
+      "pace_description": "2-3 miles easy warm-up, 8-10 x 800 fast with 400 easy",
+      "notes": "2-3 miles easy warm-up, 8-10 x 800 fast with 400 easy recovery after each (think 10k effort to start, pushing a bit as you go and ending harder), 1-2 miles steady, 1-2 miles easy. Quality track session before down week next week! If not on the track, do 2-3 mi"
+    },
+    {
+      "week": 9,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "1",
+      "notes": "1.5-2.5 hours easy/mod x-train Mountain Legs"
+    },
+    {
+      "week": 9,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 16.09,
+      "pace_description": "6-14 miles very easy with 5 x 20 seconds fast/2 min easy",
+      "notes": "6-14 miles very easy with 5 x 20 seconds fast/2 min easy Heat ideal"
+    },
+    {
+      "week": 9,
+      "day": 6,
+      "workout_type": "recovery",
+      "target_distance_km": 25.744,
+      "pace_description": "12-20 miles easy",
+      "notes": "12-20 miles easy. Very easy and relaxed, pure aerobic activation! Mountain Legs"
+    },
+    {
+      "week": 9,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 16.09,
+      "pace_description": "6-14 miles easy plus 6 x 30 second steep hills at the end",
+      "notes": "6-14 miles easy plus 6 x 30 second steep hills at the end or easy/mod x-train Mountain Legs"
+    },
+    {
+      "week": 10,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest or easy jog",
+      "notes": "Rest or easy jog. An easy jog would be good if you want to keep volume higher! Heat ideal"
+    },
+    {
+      "week": 10,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 8.045,
+      "pace_description": "2-3 miles easy warm-up, 3 x 5 min around 1-hour effort with",
+      "notes": "2-3 miles easy warm-up, 3 x 5 min around 1-hour effort with 1 min easy recovery, 5 min easy, 4 x 45 second slight hills fast (think 3k effort) with 75 seconds easy recovery, 2-3 miles easy cool-down. A light tune-up pre weekend effort, practicing the taper and making sure it works for you! Mountain Legs"
+    },
+    {
+      "week": 10,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": 12.067499999999999,
+      "pace_description": "5-10 miles easy No strength the rest of the week!",
+      "notes": "5-10 miles easy No strength the rest of the week!"
+    },
+    {
+      "week": 10,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": null,
+      "pace_description": "Rest and recovery",
+      "notes": "Rest and recovery. Want to go into this big weekend effort feeling recovered and ready! Heat ideal"
+    },
+    {
+      "week": 10,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 8.849499999999999,
+      "pace_description": "3-8 miles easy to steady plus 4 x 30 sec light hills around",
+      "notes": "3-8 miles easy to steady plus 4 x 30 sec light hills around 3k/5k effort."
+    },
+    {
+      "week": 10,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": 80.45,
+      "pace_description": "BIG DAY!!!! This can be a marathon, 50k, or even 50 mile",
+      "notes": "BIG DAY!!!! This can be a marathon, 50k, or even 50 mile race. If no racing, aim for a moderate 50k on terrain like the race, pushing moderately hard and with full fueling approach. You can move this backward to 8-10 weeks pre-race if there’s a race or 100k, just move around weeks accordingly. Goal: get very sore! Weeks 10 and 11 can be moved to accommodate a training race"
+    },
+    {
+      "week": 10,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": null,
+      "pace_description": "CELEBRATION! You should be quite sore from this one in a",
+      "notes": "CELEBRATION! You should be quite sore from this one in a good way. Make sure you eat a lot the next few days"
+    },
+    {
+      "week": 11,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal"
+    },
+    {
+      "week": 11,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. This is a mid-cycle rest block, with a down week ahead to solidify gains Heat ideal"
+    },
+    {
+      "week": 11,
+      "day": 3,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "4-10 miles easy",
+      "notes": "4-10 miles easy. Really ease back in! Now is when to start focused heat suit training if your race might be very hot and you aren’t running in that type of heat consistently. In that case, aim for 2 x 30-60 minutes with a heat suit each week within the context of training, keeping heart rate in Z2 or easier. Don’t fry yourself! Heat suit could be on doubles or replacing some easy running."
+    },
+    {
+      "week": 11,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "1",
+      "notes": "1.5-2.5 hours easy/mod x-train with 10 x 30 seconds fast/2 min easy Mountain Legs"
+    },
+    {
+      "week": 11,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 11.263,
+      "pace_description": "4-10 miles easy Heat ideal",
+      "notes": "4-10 miles easy Heat ideal"
+    },
+    {
+      "week": 11,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 20.917,
+      "pace_description": "10-16 mi easy",
+      "notes": "10-16 mi easy. Pure aerobic day! Mountain Legs"
+    },
+    {
+      "week": 11,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 17.698999999999998,
+      "pace_description": "8-14 mi easy plus 4 x 30 sec hills fast near the end or",
+      "notes": "8-14 mi easy plus 4 x 30 sec hills fast near the end or easy/mod x-train. You want to get to the end of this week feeling fresh! Mountain Legs + squats + back extensions"
+    },
+    {
+      "week": 12,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal"
+    },
+    {
+      "week": 12,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 17.698999999999998,
+      "pace_description": "8-14 miles easy with 5 x 20 seconds fast/2 min easy",
+      "notes": "8-14 miles easy with 5 x 20 seconds fast/2 min easy"
+    },
+    {
+      "week": 12,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": 6.436,
+      "pace_description": "2-3 miles easy warm-up, 3-4 x (4 x 400 fast) with 1 min",
+      "notes": "2-3 miles easy warm-up, 3-4 x (4 x 400 fast) with 1 min between intervals and 2 min between sets (think 5k effort on the intervals), 1-2 miles moderate (think marathon"
+    },
+    {
+      "week": 12,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "1",
+      "notes": "1.5-2.5 hours easy x-train Mountain Legs"
+    },
+    {
+      "week": 12,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 16.09,
+      "pace_description": "6-14 mi easy plus 4 x 30 second hills",
+      "notes": "6-14 mi easy plus 4 x 30 second hills"
+    },
+    {
+      "week": 12,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "16-20 mi easy/mod with 20 min mod/hard, pushing a bit as",
+      "notes": "16-20 mi easy/mod with 20 min mod/hard, pushing a bit as you go. Fuel this just like race day or even more! Let’s start really gut training, particularly with"
+    },
+    {
+      "week": 12,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 22.526,
+      "pace_description": "10-18 mi easy plus 8 x 30 sec steep hills at the end or",
+      "notes": "10-18 mi easy plus 8 x 30 sec steep hills at the end or easy/mod x-train. Fatigue resistance hills!"
+    },
+    {
+      "week": 13,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal"
+    },
+    {
+      "week": 13,
+      "day": 2,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Uphill treadmill at 8-10% ideal, though this workout can",
+      "notes": "Uphill treadmill at 8-10% ideal, though this workout can also be done outside! 15-20 min easy warm-up, 2-4 x 10 min around 1-hour effort with 2 min easy recovery after each, 2-4 x 5 min around 1-hour effort with 2 min easy recovery, 15-20 min easy cooldown. If you do a hill workout outside, the ideal session would be 4-6 x 5 min hills with run down recovery between each Optional easy double or x-train"
+    },
+    {
+      "week": 13,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": 22.526,
+      "pace_description": "10-18 miles easy plus 6 x 20 second slight hills No",
+      "notes": "10-18 miles easy plus 6 x 20 second slight hills No strength mid-week now as running stress gets higher!"
+    },
+    {
+      "week": 13,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "1",
+      "notes": "1.5-2.5 hours easy/mod x-train"
+    },
+    {
+      "week": 13,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 12.872,
+      "pace_description": "4-12 miles easy Heat ideal",
+      "notes": "4-12 miles easy Heat ideal"
+    },
+    {
+      "week": 13,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "20-25 mi easy/mod to mod on steeper terrain with some fast",
+      "notes": "20-25 mi easy/mod to mod on steeper terrain with some fast downhills and 5 min hard near the end on tired legs. These harder downs will help prevent excess muscle damage from derailing race. The steeper the better (within reason), even for flat races Mountain Legs + squats + back extensions"
+    },
+    {
+      "week": 13,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 24.134999999999998,
+      "pace_description": "10-20 mi easy, progressing to steady over rolling terrain",
+      "notes": "10-20 mi easy, progressing to steady over rolling terrain"
+    },
+    {
+      "week": 14,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal"
+    },
+    {
+      "week": 14,
+      "day": 2,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "Uphill treadmill at 8-10% ideal, though this workout can",
+      "notes": "Uphill treadmill at 8-10% ideal, though this workout can also be done outside! 15-20 min easy warm-up, 8-12 x 5 min around 1-hour effort with 1 min easy recovery after each, 15-20 min easy cooldown. This is a big one, embrace the space! If you’re outside, something like 5-8 x 5 min hills would be ideal, stepping up from"
+    },
+    {
+      "week": 14,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": 24.134999999999998,
+      "pace_description": "10-20 miles easy",
+      "notes": "10-20 miles easy. Aerobic endurance day! Ideally Z2 rather than pure Z1. Optional easy double or x-train for high volume athletes"
+    },
+    {
+      "week": 14,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "1-2 hours easy x-train Mountain Legs",
+      "notes": "1-2 hours easy x-train Mountain Legs"
+    },
+    {
+      "week": 14,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 16.09,
+      "pace_description": "6-14 miles easy plus 5 x 20 second hills Heat ideal",
+      "notes": "6-14 miles easy plus 5 x 20 second hills Heat ideal"
+    },
+    {
+      "week": 14,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 25.744,
+      "pace_description": "14-18 mi easy/mod to moderate (60-90 min mod/hard, just a",
+      "notes": "14-18 mi easy/mod to moderate (60-90 min mod/hard, just a nice effort to really open up the nervous system!) Only go beyond 1 hour if you’re high volume, feeling great, and recovering well. However, if you are feeling too tired, now is the time to dial back more"
+    },
+    {
+      "week": 14,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 20.917,
+      "pace_description": "10-16 mi easy or easy/mod x-train",
+      "notes": "10-16 mi easy or easy/mod x-train. Pure recovery mode, thinking light on feet! Mountain Legs + squats + back extensions. Final squats day!"
+    },
+    {
+      "week": 15,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Heat ideal"
+    },
+    {
+      "week": 15,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 12.872,
+      "pace_description": "6-10 mi easy plus 5 x 20 sec hills fast",
+      "notes": "6-10 mi easy plus 5 x 20 sec hills fast. Starting the full taper, keep it nice and relaxed going into Wed workout!"
+    },
+    {
+      "week": 15,
+      "day": 3,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "8-12 mi easy/mod over hills",
+      "notes": "8-12 mi easy/mod over hills. Just a nice flow run, with some serious vert if your race is steep! Optional easy double or x-train Mountain Legs"
+    },
+    {
+      "week": 15,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "46-60 min uphill treadmill easy Z2 or easy x-train 45-60 min",
+      "notes": "46-60 min uphill treadmill easy Z2 or easy x-train 45-60 min. Pure aerobic day!"
+    },
+    {
+      "week": 15,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 7.2405,
+      "pace_description": "3-6 mi easy Heat ideal",
+      "notes": "3-6 mi easy Heat ideal"
+    },
+    {
+      "week": 15,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "10-14 mi easy/mod over hills",
+      "notes": "10-14 mi easy/mod over hills. If your race is steep, this is the final verty run! Really practice GI training here, fueling like the race or more Mountain Legs"
+    },
+    {
+      "week": 15,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 9.654,
+      "pace_description": "4-8 mi easy",
+      "notes": "4-8 mi easy. Pure chill day!"
+    },
+    {
+      "week": 16,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": 11.263,
+      "pace_description": "4-10 mi easy Z2",
+      "notes": "4-10 mi easy Z2"
+    },
+    {
+      "week": 16,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 8.045,
+      "pace_description": "2-3 miles easy warm-up, 3 x 5 min around 1-hour effort with",
+      "notes": "2-3 miles easy warm-up, 3 x 5 min around 1-hour effort with 1 min easy recovery, 5 min easy, 3 x 30 second slight hills fast, 2-3 miles easy cool-down. Repeating the tune-up workout that you used earlier in the cycle! Mountain Legs to stay tuned up"
+    },
+    {
+      "week": 16,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": 9.654,
+      "pace_description": "Uphill treadmill Z2 40-60 min or 4-8 mi easy",
+      "notes": "Uphill treadmill Z2 40-60 min or 4-8 mi easy. Pure aerobic day! You can add an extra rest day here if you feel a lot better off of more rest!"
+    },
+    {
+      "week": 16,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": null,
+      "pace_description": "Rest and recovery",
+      "notes": "Rest and recovery. Some light heat like sauna or hot tub would be good for blood volume!"
+    },
+    {
+      "week": 16,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 7.2405,
+      "pace_description": "3-6 miles easy to steady plus 4 x 30 sec light hills around",
+      "notes": "3-6 miles easy to steady plus 4 x 30 sec light hills around 3k/5k effort. Z2 running ideal for tune-up. HR will be jumpy and that’s ok!"
+    },
+    {
+      "week": 16,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": 100.0,
+      "pace_description": "100 Mile or 100k Race! The big principles: think Z2 effort,",
+      "notes": "100 Mile or 100k Race! The big principles: think Z2 effort, fuel and hydrate plenty, and most of all: BELIEVE! You got this!"
+    },
+    {
+      "week": 16,
+      "day": 7,
+      "workout_type": "race",
+      "target_distance_km": 100.0,
+      "pace_description": "100 Mile or 100k Race! Celebration time!",
+      "notes": "100 Mile or 100k Race! Celebration time!"
+    }
+  ]
+}

@@ -1,0 +1,685 @@
+{
+  "id": "swap_50k_12w",
+  "name": "SWAP 50K Plan (12 weeks)",
+  "author": "David Roche & Megan Roche, MD PhD",
+  "source": "SWAP Running",
+  "description": "Bundled training plan imported from SWAP_Plans PDF templates.",
+  "duration_weeks": 12,
+  "target_distances": [
+    "50K"
+  ],
+  "sessions": [
+    {
+      "week": 1,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 1,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 12.067499999999999,
+      "pace_description": "5-10 miles easy with 5 x 20 sec hills fast",
+      "notes": "5-10 miles easy with 5 x 20 sec hills fast. On easy running, think smooth, with quick strides, and no tension in the body. On days you feel great, easy runs can be quicker as long as it feels easy and doesn’t impact recovery. On hill strides, find a moderate grade around 6-8% and run up as fast as you can go without sprinting, jogging down and around for 1-2 min before the next one"
+    },
+    {
+      "week": 1,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": 8.045,
+      "pace_description": "2-3 miles easy warm-up (can always add a couple light",
+      "notes": "2-3 miles easy warm-up (can always add a couple light strides to the warm-up on workout days), 6 x 2 min hills around 5k effort, 5 x 45 sec hills around 5k effort, 2-3 miles easy cool- down. These hills are a major power and VO2 max stimulus with limited impact Optional easy double. All doubles are 20-40 min easy unless otherwise noted. May substitute a treadmill uphill, 20-30 min at 15% grade hiking and/or running, or x-training"
+    },
+    {
+      "week": 1,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": 12.067499999999999,
+      "pace_description": "5-10 miles easy",
+      "notes": "5-10 miles easy. Post-workout days are very relaxed, nothing is too slow for aerobic development! You can sub in x- training on any Thursday if you feel excessively sore or tired."
+    },
+    {
+      "week": 1,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 7.2405,
+      "pace_description": "3-6 miles very easy or rest/x- train",
+      "notes": "3-6 miles very easy or rest/x- train. The day before the weekly long run, take it extra chill! You can even shuffle at your slowest paces if tired"
+    },
+    {
+      "week": 1,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "8-14 miles easy/mod",
+      "notes": "8-14 miles easy/mod. On easy/mod long runs, you can go on feel, letting your body dictate effort, with the option to push a bit more on uphills. Fuel all long runs well! Long runs ideally on trails like the race when possible, but roads or other terrain work until specific efforts later"
+    },
+    {
+      "week": 1,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 12.872,
+      "pace_description": "6-10 miles easy with 4 x 30 second hills",
+      "notes": "6-10 miles easy with 4 x 30 second hills. Sundays ideally on trails as well, but any fun terrain works! Sundays are adventure flex days when you can add or substitute x- training/hiking"
+    },
+    {
+      "week": 2,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 2,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 12.872,
+      "pace_description": "6-10 miles easy with 5 x 20 sec hills fast",
+      "notes": "6-10 miles easy with 5 x 20 sec hills fast. Think smooth power on the hill strides!"
+    },
+    {
+      "week": 2,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": 8.045,
+      "pace_description": "2-3 miles easy warm-up, 15 x 1 min fast/1 min easy (think",
+      "notes": "2-3 miles easy warm-up, 15 x 1 min fast/1 min easy (think 5k effort), 3 min easy, 5 x 30 sec hills fast, 2-3 miles easy cool-down. On these flat/rolling intervals, maintain high cadence as you fatigue, trying to remove tension from your body as you run fast. On all workouts, err on the side of relaxed and smooth! Optional easy double/treadhill"
+    },
+    {
+      "week": 2,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": 12.872,
+      "pace_description": "6-10 miles easy",
+      "notes": "6-10 miles easy"
+    },
+    {
+      "week": 2,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 7.2405,
+      "pace_description": "3-6 miles very easy or rest/xtrain",
+      "notes": "3-6 miles very easy or rest/xtrain"
+    },
+    {
+      "week": 2,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 20.917,
+      "pace_description": "10-16 miles easy/mod (20 min mod/hard around threshold",
+      "notes": "10-16 miles easy/mod (20 min mod/hard around threshold effort). After the warm-up, do the tempo around an effort you could sustain for 1 hour, a sweet spot for aerobic and power development."
+    },
+    {
+      "week": 2,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 17.698999999999998,
+      "pace_description": "8-14 miles easy, aiming to finish feeling fresh, going as",
+      "notes": "8-14 miles easy, aiming to finish feeling fresh, going as slow as needed. First back-to-back, great for resilience!"
+    },
+    {
+      "week": 3,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 3,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 12.872,
+      "pace_description": "6-10 miles easy with 5 x 20 seconds fast/2 min easy",
+      "notes": "6-10 miles easy with 5 x 20 seconds fast/2 min easy. On these first flat strides, ease into them and work up to the fastest pace you can go without straining, still using long- distance form"
+    },
+    {
+      "week": 3,
+      "day": 3,
+      "workout_type": "tempo",
+      "target_distance_km": 8.045,
+      "pace_description": "2-3 miles easy warm-up, 6 x 2 min fast/1 min easy (think",
+      "notes": "2-3 miles easy warm-up, 6 x 2 min fast/1 min easy (think 10k effort), 3 min easy, 8 x 1 min fast/1 min easy (think 5k effort), 2-3 miles easy cool- down. These first workouts build speed and power, which will make tempo and long runs more efficient later Optional easy double/treadhill"
+    },
+    {
+      "week": 3,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 miles easy Optional easy double/treadhill",
+      "notes": "6-12 miles easy Optional easy double/treadhill"
+    },
+    {
+      "week": 3,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 7.2405,
+      "pace_description": "3-6 miles very easy or rest/xtrain",
+      "notes": "3-6 miles very easy or rest/xtrain"
+    },
+    {
+      "week": 3,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 20.917,
+      "pace_description": "10-16 miles easy/mod (at 20 min and every 5 min after, do 1",
+      "notes": "10-16 miles easy/mod (at 20 min and every 5 min after, do 1 min moderately hard around threshold effort). The run will build up fatigue, but in a fun way for early in a training cycle!"
+    },
+    {
+      "week": 3,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 miles easy with strong downhills around 50k effort or",
+      "notes": "6-12 miles easy with strong downhills around 50k effort or a bit easier. Downhills are a bit tougher on the body and require adaptation"
+    },
+    {
+      "week": 4,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 4,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 10.4585,
+      "pace_description": "5-8 miles easy with 4 x 20 second hills",
+      "notes": "5-8 miles easy with 4 x 20 second hills. Slight down weekdays to let the body adapt!"
+    },
+    {
+      "week": 4,
+      "day": 3,
+      "workout_type": "tempo",
+      "target_distance_km": 16.09,
+      "pace_description": "8-12 miles easy/mod, starting easy and settling in at a",
+      "notes": "8-12 miles easy/mod, starting easy and settling in at a steady effort progressing to marathon/50k. This steady running may feel a bit unnatural at first as the body adjust to the new strain Optional easy double/treadhill"
+    },
+    {
+      "week": 4,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": 10.4585,
+      "pace_description": "5-8 miles easy",
+      "notes": "5-8 miles easy"
+    },
+    {
+      "week": 4,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 7.2405,
+      "pace_description": "3-6 miles very easy or rest/xtrain",
+      "notes": "3-6 miles very easy or rest/xtrain"
+    },
+    {
+      "week": 4,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 24.134999999999998,
+      "pace_description": "12-18 miles easy/mod (30 min mod/hard around threshold",
+      "notes": "12-18 miles easy/mod (30 min mod/hard around threshold effort). The tempo should feel challenging but manageable!"
+    },
+    {
+      "week": 4,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 17.698999999999998,
+      "pace_description": "8-14 miles easy on trails with 6 x 20 second steep hills",
+      "notes": "8-14 miles easy on trails with 6 x 20 second steep hills. Focus on power on the hills!"
+    },
+    {
+      "week": 5,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 5,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 8.045,
+      "pace_description": "2-3 miles easy warm-up, 1/2/3/4/3/2/1 min fast with 1 min",
+      "notes": "2-3 miles easy warm-up, 1/2/3/4/3/2/1 min fast with 1 min easy recovery (think 10k effort), 3 min easy, 5 x 1 min fast/1 min easy (think 5k effort), 2-3 miles easy cool-down. This combo workout builds the aerobic system and speed! Optional easy double/treadhill"
+    },
+    {
+      "week": 5,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": 12.067499999999999,
+      "pace_description": "5-10 miles easy",
+      "notes": "5-10 miles easy"
+    },
+    {
+      "week": 5,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 miles easy/mod, starting easy and settling in at a",
+      "notes": "6-12 miles easy/mod, starting easy and settling in at a steady effort. This should start to feel a bit more natural now. Optional easy double/treadhill"
+    },
+    {
+      "week": 5,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 7.2405,
+      "pace_description": "3-6 miles very easy or rest/xtrain",
+      "notes": "3-6 miles very easy or rest/xtrain"
+    },
+    {
+      "week": 5,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 20.917,
+      "pace_description": "10-16 miles easy/mod (start easy, settle in at steady",
+      "notes": "10-16 miles easy/mod (start easy, settle in at steady effort like 50k or a bit easier). Steady running builds endurance and improves fat oxidation."
+    },
+    {
+      "week": 5,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 miles easy on trails with 5 x 30 second hills",
+      "notes": "6-12 miles easy on trails with 5 x 30 second hills"
+    },
+    {
+      "week": 6,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 6,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 12.872,
+      "pace_description": "6-10 miles easy with 5 x 20 seconds fast/2 min easy",
+      "notes": "6-10 miles easy with 5 x 20 seconds fast/2 min easy. Take this one extra chill before big day on Wed!"
+    },
+    {
+      "week": 6,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": 8.045,
+      "pace_description": "2-3 miles easy warm-up, 5 x 5 min fast (think 10k effort",
+      "notes": "2-3 miles easy warm-up, 5 x 5 min fast (think 10k effort with permission to progress later in workout) with 2 min easy recovery, 4 min easy, 5 x 30 sec hills fast, 2-3 miles easy cool-down. A big one that will bridge to a higher volume of intensity! Optional easy double/treadhill with 2nd half at marathon effort. A double workout, only for very advanced athletes looking for peak performance!"
+    },
+    {
+      "week": 6,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 miles easy Optional easy double/treadhill",
+      "notes": "6-12 miles easy Optional easy double/treadhill"
+    },
+    {
+      "week": 6,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 7.2405,
+      "pace_description": "3-6 miles very easy or rest/xtrain",
+      "notes": "3-6 miles very easy or rest/xtrain"
+    },
+    {
+      "week": 6,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 27.353,
+      "pace_description": "14-20 miles easy/mod on trails (12 miles alternating 1 mile",
+      "notes": "14-20 miles easy/mod on trails (12 miles alternating 1 mile at 1-hour effort and 1 mile float recovery). These alternators will be extend the threshold stress over a longer portion of the run, improving aerobic power"
+    },
+    {
+      "week": 6,
+      "day": 7,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "10-14 miles easy on trails with strong downhills",
+      "notes": "10-14 miles easy on trails with strong downhills. Running well on downhills after a tough long run is especially important for races with more climbing"
+    },
+    {
+      "week": 7,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 7,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 8.045,
+      "pace_description": "2-3 miles easy warm-up, 3 x 8 min fast (think 10k effort)",
+      "notes": "2-3 miles easy warm-up, 3 x 8 min fast (think 10k effort) with 3 min easy recovery, 6 x 1 min slight hills fast with run back recovery (think 5k), 2-3 miles easy. Longer intervals will be tough, and the hills at the end will be a full power stimulus. Optional easy double/treadhill"
+    },
+    {
+      "week": 7,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": 12.872,
+      "pace_description": "6-10 miles easy",
+      "notes": "6-10 miles easy"
+    },
+    {
+      "week": 7,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 miles easy/mod (at 15 min and every 5 min after, do 1",
+      "notes": "6-12 miles easy/mod (at 15 min and every 5 min after, do 1 min mod/hard around threshold effort) Optional easy double/treadhill"
+    },
+    {
+      "week": 7,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 7.2405,
+      "pace_description": "3-6 miles very easy or rest/xtrain",
+      "notes": "3-6 miles very easy or rest/xtrain"
+    },
+    {
+      "week": 7,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 32.18,
+      "pace_description": "16-24 miles easy on trails, aiming to finish feeling good",
+      "notes": "16-24 miles easy on trails, aiming to finish feeling good. Fuel well, relax, and gain some aerobic endurance"
+    },
+    {
+      "week": 7,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 22.526,
+      "pace_description": "12-16 miles easy",
+      "notes": "12-16 miles easy. The aerobic weekend will supercharge endurance heading into final build"
+    },
+    {
+      "week": 8,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 8,
+      "day": 2,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "2-3 miles easy warm-up, 20 min mod/hard around 1-hour",
+      "notes": "2-3 miles easy warm-up, 20 min mod/hard around 1-hour effort, 5 min easy, 6 x 1 min fast/30 seconds easy (think 5k or a bit easier effort), 2-3 miles easy cool- down. Threshold/speed combo before race sim! This serves as a reset week, like the one at week 4 as well Optional easy double/treadhill"
+    },
+    {
+      "week": 8,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": 12.067499999999999,
+      "pace_description": "5-10 miles easy",
+      "notes": "5-10 miles easy. Nice little reset before weekend!"
+    },
+    {
+      "week": 8,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": 9.654,
+      "pace_description": "4-8 miles easy or rest/xtrain",
+      "notes": "4-8 miles easy or rest/xtrain"
+    },
+    {
+      "week": 8,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 6.436,
+      "pace_description": "3-5 miles easy with 4 x 20 second hills",
+      "notes": "3-5 miles easy with 4 x 20 second hills"
+    },
+    {
+      "week": 8,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": 3.218,
+      "pace_description": "1-2 mile easy warm-up, 13",
+      "notes": "1-2 mile easy warm-up, 13.1 miles hard on trails like race, 1-2 mile easy cool-down. This race or race simulation will be a tough stress on every system. You can move this effort to any week between weeks 5 and 10!"
+    },
+    {
+      "week": 8,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 16.09,
+      "pace_description": "Rest or 10 miles easy with strong downhills",
+      "notes": "Rest or 10 miles easy with strong downhills. Rest if any fatigue or niggles. The strong downs improve MSK resilience"
+    },
+    {
+      "week": 9,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 9,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 miles easy with 4 x 20 seconds fast/2 min easy",
+      "notes": "6-12 miles easy with 4 x 20 seconds fast/2 min easy"
+    },
+    {
+      "week": 9,
+      "day": 3,
+      "workout_type": "tempo",
+      "target_distance_km": 8.045,
+      "pace_description": "2-3 miles easy warm-up, 15 min mod/hard around 1-hour",
+      "notes": "2-3 miles easy warm-up, 15 min mod/hard around 1-hour effort, 5 min easy, 4 x 3 min around 1- hour effort with 1 min easy recovery, 2-3 miles easy cool- down. Major threshold focus! Optional double or treadhill with 20 min around 1-hour effort. Double workout option for supercompensation!"
+    },
+    {
+      "week": 9,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 miles easy",
+      "notes": "6-12 miles easy"
+    },
+    {
+      "week": 9,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 7.2405,
+      "pace_description": "3-6 miles very easy or rest/xtrain",
+      "notes": "3-6 miles very easy or rest/xtrain"
+    },
+    {
+      "week": 9,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "20-26",
+      "notes": "20-26.2 miles easy/mod on trails with strong uphills around 50k effort or a bit easier. This will be the largest aerobic strain of the training block, a time to practice fueling like race day."
+    },
+    {
+      "week": 9,
+      "day": 7,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "14-20 miles easy on trails with 6 x 20 second hills",
+      "notes": "14-20 miles easy on trails with 6 x 20 second hills. The big back-to-back will make the 50k feel short, and help you truly race it to potential"
+    },
+    {
+      "week": 10,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 10,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 miles easy plus 4 x 20 second hills",
+      "notes": "6-12 miles easy plus 4 x 20 second hills"
+    },
+    {
+      "week": 10,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": 8.045,
+      "pace_description": "2-3 miles easy warm-up, 2 x (10 x 1 min fast/1 min easy)",
+      "notes": "2-3 miles easy warm-up, 2 x (10 x 1 min fast/1 min easy) with 3 min easy between sets, 2-3 miles easy cool- down. Think 10k effort or so, nice and relaxed as a final speed stimulus! Optional easy double or treadhill"
+    },
+    {
+      "week": 10,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 miles easy Optional easy double or treadhill",
+      "notes": "6-12 miles easy Optional easy double or treadhill"
+    },
+    {
+      "week": 10,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 7.2405,
+      "pace_description": "3-6 miles very easy or rest/xtrain",
+      "notes": "3-6 miles very easy or rest/xtrain"
+    },
+    {
+      "week": 10,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "16-22 miles easy/mod on trails (1 hour moderate around",
+      "notes": "16-22 miles easy/mod on trails (1 hour moderate around marathon effort to start, faster to finish). The extended tempo will prepare the muscular system for the demands of race day"
+    },
+    {
+      "week": 10,
+      "day": 7,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "10-16 miles easy on trails with strong, purposeful downhills",
+      "notes": "10-16 miles easy on trails with strong, purposeful downhills. Practicing owning the downhills will be free speed on race day."
+    },
+    {
+      "week": 11,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 11,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 12.067499999999999,
+      "pace_description": "5-10 miles easy with 4 x 20 second hills",
+      "notes": "5-10 miles easy with 4 x 20 second hills"
+    },
+    {
+      "week": 11,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": 8.045,
+      "pace_description": "2-3 miles easy warm-up, 30 min moderate around half",
+      "notes": "2-3 miles easy warm-up, 30 min moderate around half marathon effort, 5 min easy, 4 x 30 second hills fast, 2-3 miles easy cooldown Optional easy double or treadhill"
+    },
+    {
+      "week": 11,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": 12.067499999999999,
+      "pace_description": "5-10 miles easy",
+      "notes": "5-10 miles easy"
+    },
+    {
+      "week": 11,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 7.2405,
+      "pace_description": "3-6 miles very easy or rest/xtrain",
+      "notes": "3-6 miles very easy or rest/xtrain"
+    },
+    {
+      "week": 11,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "12-16 miles easy to easy/mod on trails",
+      "notes": "12-16 miles easy to easy/mod on trails. A nice aerobic long run a week before the race activates the nervous and aerobic systems for peak performance."
+    },
+    {
+      "week": 11,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 12.872,
+      "pace_description": "6-10 miles easy on trails with 4 x 20 second hills",
+      "notes": "6-10 miles easy on trails with 4 x 20 second hills"
+    },
+    {
+      "week": 12,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest"
+    },
+    {
+      "week": 12,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 3.218,
+      "pace_description": "2 miles easy, 20 min at marathon effort, 2 miles easy",
+      "notes": "2 miles easy, 20 min at marathon effort, 2 miles easy"
+    },
+    {
+      "week": 12,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": 8.045,
+      "pace_description": "4-6 miles easy",
+      "notes": "4-6 miles easy"
+    },
+    {
+      "week": 12,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": null,
+      "pace_description": "Rest and recovery",
+      "notes": "Rest and recovery"
+    },
+    {
+      "week": 12,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 4.827,
+      "pace_description": "2-4 miles easy plus 4 x 20 second hills mod (not hard) in AM",
+      "notes": "2-4 miles easy plus 4 x 20 second hills mod (not hard) in AM"
+    },
+    {
+      "week": 12,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": 50.0,
+      "pace_description": "50k race! Celebration time! Start relaxed, focus on",
+      "notes": "50k race! Celebration time! Start relaxed, focus on fueling, own the downhills, and make sure to smile a ton. You are READY!"
+    },
+    {
+      "week": 12,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": null,
+      "pace_description": "PIZZA! That’s also implied in the whole training plan",
+      "notes": "PIZZA! That’s also implied in the whole training plan"
+    }
+  ]
+}

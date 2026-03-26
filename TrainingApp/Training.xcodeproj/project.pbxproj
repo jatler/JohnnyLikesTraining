@@ -14,21 +14,27 @@
 		1581AFCF71290287044A878A /* StrengthLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D618114C072296876E86FC5B /* StrengthLog.swift */; };
 		16A10EAA3636112CCEFFD4E6 /* ProgressDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 918F92B620FAA4E228B0FEA8 /* ProgressDashboardView.swift */; };
 		1B8213915BFA541F5519E418 /* PlanCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07D906017FBE990E96F50C52 /* PlanCalendarView.swift */; };
+		1B8DC68A1B7238A0CE00CA1B /* swap_200_mile_16w.json in Resources */ = {isa = PBXBuildFile; fileRef = C9E3334CD2A1CADF65CFCBC1 /* swap_200_mile_16w.json */; };
 		1C51CC95D337B05BF3093A96 /* ProgressionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D2D3BC0E8B003565E5025D /* ProgressionEngine.swift */; };
 		275CADF1B33668F5B1D7353F /* StrengthStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5300AFFAABD6197E8F30D8 /* StrengthStore.swift */; };
 		2A2882EF65D9D87E33B384E3 /* StretchLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E80497D9A53018EEB5DDC9 /* StretchLog.swift */; };
+		314A48FC6E46199FB265D062 /* swap_6_week_6w.json in Resources */ = {isa = PBXBuildFile; fileRef = B67572F92E767F702F3E8237 /* swap_6_week_6w.json */; };
 		318F754953A5B84505A9ECBD /* OuraDaily.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38427D1E7D9E72609E2756A6 /* OuraDaily.swift */; };
 		37B726D9F8A5BF41AA7BCC4C /* ExerciseHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8903D44D8C5F1FCC00E5F9DA /* ExerciseHistoryView.swift */; };
 		38E21BCC2AE7689810BC810C /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD128F03DE17FF51C05DD6BB /* TodayView.swift */; };
 		428D482FC220B2EED7ED9E42 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5D0A2D62A393B66AB94F79 /* ContentView.swift */; };
 		45A9B030933515CFFDBBC98B /* TrainingPlanStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F7D70B55AEC2E0E3D0A3F1 /* TrainingPlanStore.swift */; };
+		483FF3781FC9D771695C7652 /* swap_base_building_12w.json in Resources */ = {isa = PBXBuildFile; fileRef = 01084C5E9E5B70C9554F9353 /* swap_base_building_12w.json */; };
 		4FEB95CBCCFD82F3BB85C43E /* SupabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4A6D8A749283F165620F1C8 /* SupabaseService.swift */; };
+		54581A03989F155A85C0F2E6 /* swap_100mile_12w.json in Resources */ = {isa = PBXBuildFile; fileRef = 17A72BB26AE3ECD8E43F6F2F /* swap_100mile_12w.json */; };
 		5A65C86A30E9432549A86497 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 011590607C69E2FCB2E332C7 /* Supabase */; };
 		5C6B00911C4B919BE7AA7B0E /* PlanEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F8ED3535E0F5907E9AE4267 /* PlanEditView.swift */; };
 		6F888519D7D6238904329600 /* SessionDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF23FA6E5F2C1983F9EF2ADA /* SessionDetailSheet.swift */; };
 		73B281FD62E689360910B786 /* champion_plan_100k.json in Resources */ = {isa = PBXBuildFile; fileRef = 2B21B45B9C3E88F085CD54AC /* champion_plan_100k.json */; };
+		74326E628177691CA8E40514 /* swap_50mile_12w.json in Resources */ = {isa = PBXBuildFile; fileRef = 43AD51FDF5F6406D076D2693 /* swap_50mile_12w.json */; };
 		74D59E0E891ACBFAB0FCBDF4 /* StretchStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CF3B44F0D3D1D7DFE4CFDA9 /* StretchStore.swift */; };
 		79D0EFFA1DAAD88DFBA2187E /* StrengthTemplateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A07FB0277BBF278D299540D8 /* StrengthTemplateView.swift */; };
+		7A54B10AA6A5A887477F9FCE /* swap_lower_volume_ultra_12w.json in Resources */ = {isa = PBXBuildFile; fileRef = AA46B6C9B4227B13C53E5123 /* swap_lower_volume_ultra_12w.json */; };
 		7AE26BE9849E3E857DF2C1C8 /* WeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC3467C238F8B38FFA08AC33 /* WeekView.swift */; };
 		7E970DC72D9B0BFC9FEA675C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BF1F9E0F6BDC1529AB3ECEB /* SettingsView.swift */; };
 		810CF6F5EA48DCC27C0AF7F1 /* StretchLogSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69701C26B2F80A2DE7559A2C /* StretchLogSheet.swift */; };
@@ -41,12 +47,15 @@
 		9C2A27A2D2E68576CCD068FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A38A933814A196F882D4075 /* Assets.xcassets */; };
 		A470176531D4E464D5F726D8 /* winter_plan_10w.json in Resources */ = {isa = PBXBuildFile; fileRef = 628F12BE440D321D5582EB09 /* winter_plan_10w.json */; };
 		A49A52EEDFEFF45B719A8233 /* OuraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152863264984F21AC0331C8B /* OuraService.swift */; };
+		A7429EE9101DC8EBF04E41AF /* swap_50k_12w.json in Resources */ = {isa = PBXBuildFile; fileRef = 28888F4CADF007802DC7B327 /* swap_50k_12w.json */; };
 		B83C8C5269A99813573D7A23 /* StrengthSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA7492ED96736503672DE40B /* StrengthSession.swift */; };
 		BE8DE2E89F3AD00D912A8DF4 /* PlanTemplateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCB069788F05CECEBBE77DB1 /* PlanTemplateService.swift */; };
 		BEE049CF6DC32B96C1A1C104 /* HeatLogSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88DF00FE0051C419B60EF69 /* HeatLogSheet.swift */; };
 		C503CA28370AF3D08D1B0B03 /* StrengthTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD51F063639F08594732C4DF /* StrengthTemplate.swift */; };
 		CA291CF1F9930B3639E76625 /* PlannedSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4CD0A46894A328DDC0FE678 /* PlannedSession.swift */; };
+		D12FAE9FF61869CB253BD92E /* swap_marathon_8w.json in Resources */ = {isa = PBXBuildFile; fileRef = 4EC7DE6273E7027C22058745 /* swap_marathon_8w.json */; };
 		D4D65A6A404CF56CDAAB7CCC /* SessionSwap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 886214F674543E3860A250BC /* SessionSwap.swift */; };
+		DD120492B8F1AC178B512745 /* swap_100k_16w.json in Resources */ = {isa = PBXBuildFile; fileRef = A24E9F554D1C8B6CFDDC436A /* swap_100k_16w.json */; };
 		DD964993D6515C7E1B4F6EE1 /* StrengthDayDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C5EE7269B2B9B861727DE35 /* StrengthDayDetailView.swift */; };
 		DF1736FB90575F6A86C69889 /* StravaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13B8AD52D85ACBA9D427AB25 /* StravaService.swift */; };
 		DFC5A13CF9DA55EE44235FD6 /* HeatSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0286457F30EDCC873DAA7BC /* HeatSession.swift */; };
@@ -61,6 +70,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		01084C5E9E5B70C9554F9353 /* swap_base_building_12w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_base_building_12w.json; sourceTree = "<group>"; };
 		02C33C9015C1F9FCA1CD7F9C /* Training.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Training.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		05ED34708B6E8C9B19B9424F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 		06E66380AFDA249ADA3BCD91 /* AppleSignInSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInSupport.swift; sourceTree = "<group>"; };
@@ -69,6 +79,8 @@
 		1312B17F09C9B5D35ACDBBB8 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		13B8AD52D85ACBA9D427AB25 /* StravaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StravaService.swift; sourceTree = "<group>"; };
 		152863264984F21AC0331C8B /* OuraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OuraService.swift; sourceTree = "<group>"; };
+		17A72BB26AE3ECD8E43F6F2F /* swap_100mile_12w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_100mile_12w.json; sourceTree = "<group>"; };
+		28888F4CADF007802DC7B327 /* swap_50k_12w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_50k_12w.json; sourceTree = "<group>"; };
 		2B21B45B9C3E88F085CD54AC /* champion_plan_100k.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = champion_plan_100k.json; sourceTree = "<group>"; };
 		2BF1F9E0F6BDC1529AB3ECEB /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		38427D1E7D9E72609E2756A6 /* OuraDaily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OuraDaily.swift; sourceTree = "<group>"; };
@@ -77,7 +89,9 @@
 		3D5300AFFAABD6197E8F30D8 /* StrengthStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthStore.swift; sourceTree = "<group>"; };
 		3D5D0A2D62A393B66AB94F79 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		4032AFBD2C6810AEB4A5C08C /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		43AD51FDF5F6406D076D2693 /* swap_50mile_12w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_50mile_12w.json; sourceTree = "<group>"; };
 		45B651E1F7E6BF915FDAD19D /* TrainingPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlan.swift; sourceTree = "<group>"; };
+		4EC7DE6273E7027C22058745 /* swap_marathon_8w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_marathon_8w.json; sourceTree = "<group>"; };
 		5A2CDF8B4AC1F14A2F3AE63B /* SessionOverride.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionOverride.swift; sourceTree = "<group>"; };
 		628F12BE440D321D5582EB09 /* winter_plan_10w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = winter_plan_10w.json; sourceTree = "<group>"; };
 		69701C26B2F80A2DE7559A2C /* StretchLogSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StretchLogSheet.swift; sourceTree = "<group>"; };
@@ -94,10 +108,14 @@
 		9A38A933814A196F882D4075 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9F87F3437D6620980FC04F13 /* TrainingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingApp.swift; sourceTree = "<group>"; };
 		A07FB0277BBF278D299540D8 /* StrengthTemplateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthTemplateView.swift; sourceTree = "<group>"; };
+		A24E9F554D1C8B6CFDDC436A /* swap_100k_16w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_100k_16w.json; sourceTree = "<group>"; };
+		AA46B6C9B4227B13C53E5123 /* swap_lower_volume_ultra_12w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_lower_volume_ultra_12w.json; sourceTree = "<group>"; };
 		B4A6D8A749283F165620F1C8 /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
 		B4CD0A46894A328DDC0FE678 /* PlannedSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlannedSession.swift; sourceTree = "<group>"; };
+		B67572F92E767F702F3E8237 /* swap_6_week_6w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_6_week_6w.json; sourceTree = "<group>"; };
 		B9CDAEB606327522B08C1277 /* TrainingPlanTemplate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlanTemplate.swift; sourceTree = "<group>"; };
 		C1E80497D9A53018EEB5DDC9 /* StretchLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StretchLog.swift; sourceTree = "<group>"; };
+		C9E3334CD2A1CADF65CFCBC1 /* swap_200_mile_16w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_200_mile_16w.json; sourceTree = "<group>"; };
 		CC41AACC3D838045702D918B /* WorkoutType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutType.swift; sourceTree = "<group>"; };
 		CCB069788F05CECEBBE77DB1 /* PlanTemplateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanTemplateService.swift; sourceTree = "<group>"; };
 		CD128F03DE17FF51C05DD6BB /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
@@ -160,6 +178,15 @@
 			children = (
 				9A38A933814A196F882D4075 /* Assets.xcassets */,
 				2B21B45B9C3E88F085CD54AC /* champion_plan_100k.json */,
+				B67572F92E767F702F3E8237 /* swap_6_week_6w.json */,
+				28888F4CADF007802DC7B327 /* swap_50k_12w.json */,
+				43AD51FDF5F6406D076D2693 /* swap_50mile_12w.json */,
+				A24E9F554D1C8B6CFDDC436A /* swap_100k_16w.json */,
+				17A72BB26AE3ECD8E43F6F2F /* swap_100mile_12w.json */,
+				C9E3334CD2A1CADF65CFCBC1 /* swap_200_mile_16w.json */,
+				01084C5E9E5B70C9554F9353 /* swap_base_building_12w.json */,
+				AA46B6C9B4227B13C53E5123 /* swap_lower_volume_ultra_12w.json */,
+				4EC7DE6273E7027C22058745 /* swap_marathon_8w.json */,
 				628F12BE440D321D5582EB09 /* winter_plan_10w.json */,
 			);
 			path = Resources;
@@ -397,6 +424,15 @@
 			files = (
 				9C2A27A2D2E68576CCD068FA /* Assets.xcassets in Resources */,
 				73B281FD62E689360910B786 /* champion_plan_100k.json in Resources */,
+				DD120492B8F1AC178B512745 /* swap_100k_16w.json in Resources */,
+				54581A03989F155A85C0F2E6 /* swap_100mile_12w.json in Resources */,
+				1B8DC68A1B7238A0CE00CA1B /* swap_200_mile_16w.json in Resources */,
+				A7429EE9101DC8EBF04E41AF /* swap_50k_12w.json in Resources */,
+				74326E628177691CA8E40514 /* swap_50mile_12w.json in Resources */,
+				314A48FC6E46199FB265D062 /* swap_6_week_6w.json in Resources */,
+				483FF3781FC9D771695C7652 /* swap_base_building_12w.json in Resources */,
+				7A54B10AA6A5A887477F9FCE /* swap_lower_volume_ultra_12w.json in Resources */,
+				D12FAE9FF61869CB253BD92E /* swap_marathon_8w.json in Resources */,
 				A470176531D4E464D5F726D8 /* winter_plan_10w.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

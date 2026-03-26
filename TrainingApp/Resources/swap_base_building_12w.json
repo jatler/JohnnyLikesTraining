@@ -1,0 +1,685 @@
+{
+  "id": "swap_base_building_12w",
+  "name": "SWAP Base Building Plan (12 weeks)",
+  "author": "David Roche & Megan Roche, MD PhD",
+  "source": "SWAP Running",
+  "description": "Bundled training plan imported from SWAP_Plans PDF templates.",
+  "duration_weeks": 12,
+  "target_distances": [
+    "Base building"
+  ],
+  "sessions": [
+    {
+      "week": 1,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. Most sacred day of the week! Can be active, but no impact or stress"
+    },
+    {
+      "week": 1,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 11.263,
+      "pace_description": "4-10 mi easy plus 6 x 30 sec hills fast",
+      "notes": "4-10 mi easy plus 6 x 30 sec hills fast. On easy running, think smooth and relaxed. During base period, on days you feel great, can progress pace a bit, but never force it.On hill strides, think powerful, easing into them and building up speed to emphasize max output development"
+    },
+    {
+      "week": 1,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 mi easy",
+      "notes": "6-12 mi easy. Nice and low level aerobic time Optional easy double or x-train.On doubles, think 20-40 min slow running to build up aerobic volume. X-train can be a key part of base building if you enjoy it. For athletes that ski, for example, the x-train can be the primary activity and the double can be a short run, a la Kilian Jornet"
+    },
+    {
+      "week": 1,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": 11.263,
+      "pace_description": "4-10 mi easy with 6 x 30 sec fast/2 min easy",
+      "notes": "4-10 mi easy with 6 x 30 sec fast/2 min easy. On theseflat strides, you want to ease into the stimulus. Goal early in base is to build up speed so that aerobic building happens with optimal running economy. Optional easy double or x-train Note: any Thursday can be a pure x-train day, especially for athletes that are volume-limited"
+    },
+    {
+      "week": 1,
+      "day": 5,
+      "workout_type": "cross_train",
+      "target_distance_km": 8.849499999999999,
+      "pace_description": "3-8 mi easy or easy x-train",
+      "notes": "3-8 mi easy or easy x-train"
+    },
+    {
+      "week": 1,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 20.917,
+      "pace_description": "10-16 mi easy",
+      "notes": "10-16 mi easy. On this long run, fully activate the aerobic system, staying in Zone 1 or Zone 2. General goal is to get base-building long runs around 2-hour range or a bit longer"
+    },
+    {
+      "week": 1,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 mi easy plus 6 x 20 sec hills fast Optional easy",
+      "notes": "6-12 mi easy plus 6 x 20 sec hills fast Optional easy double or x-train Note:any Sunday can be a pure x-train day, with long skis, bikes, or other activities perfect for aerobic building at lower running volume."
+    },
+    {
+      "week": 2,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 2,
+      "day": 2,
+      "workout_type": "recovery",
+      "target_distance_km": 12.872,
+      "pace_description": "4-12 mi easy with 6 x 20 sec fast/2 min easy",
+      "notes": "4-12 mi easy with 6 x 20 sec fast/2 min easy. Most Tuesdays in build will be about very easy running setting up for more steady running on Wednesday"
+    },
+    {
+      "week": 2,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": 6.436,
+      "pace_description": "2-3 mi easy warm-up, 8 x 90 sec hills mod/hard (think 5k)",
+      "notes": "2-3 mi easy warm-up, 8 x 90 sec hills mod/hard (think 5k) with run down recovery, 2 mi easy/mod to mod (think 50k effort to start, finishing with more effort), 1-2 mi slow. Want to establishpower at VO2 maxprior to aerobic focus Optional easy double or x-train"
+    },
+    {
+      "week": 2,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": 12.872,
+      "pace_description": "4-12 mi easy",
+      "notes": "4-12 mi easy. Keep this very relaxed after hills the day before Optional easy double or x-train"
+    },
+    {
+      "week": 2,
+      "day": 5,
+      "workout_type": "cross_train",
+      "target_distance_km": 8.849499999999999,
+      "pace_description": "3-8 mi easy with 5 x 20 sec fast/2 min easy or easy x-train",
+      "notes": "3-8 mi easy with 5 x 20 sec fast/2 min easy or easy x-train"
+    },
+    {
+      "week": 2,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": null,
+      "pace_description": "10-18 mieasy/mod",
+      "notes": "10-18 mieasy/mod. Start relaxed, and build into effort, with option to progress to 50k-style steady running in the 2nd half"
+    },
+    {
+      "week": 2,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 16.09,
+      "pace_description": "6-14 mi easy with 6 x 30 sec fast/2 min easy in middle",
+      "notes": "6-14 mi easy with 6 x 30 sec fast/2 min easy in middle Optional easy x-train"
+    },
+    {
+      "week": 3,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 3,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 12.067499999999999,
+      "pace_description": "5-10 mi easy plus 5 x 30 sec hills fast",
+      "notes": "5-10 mi easy plus 5 x 30 sec hills fast"
+    },
+    {
+      "week": 3,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": 8.045,
+      "pace_description": "2-3 mi easy warm-up, 16 x 1 min fast/1 min easy (think 10k",
+      "notes": "2-3 mi easy warm-up, 16 x 1 min fast/1 min easy (think 10k effort to start, progressing to faster effort as you go, with the easy recoveries as “floats” where you go slightly above easy), 4 min easy, 4 x 30 sec hills fast, 2-3 mi easy. Quick speed rebuild to start plan, true aerobic building starts now! Optional easy double or x-train"
+    },
+    {
+      "week": 3,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": 12.067499999999999,
+      "pace_description": "5-10 mi easy Optional easy double or x-train",
+      "notes": "5-10 mi easy Optional easy double or x-train"
+    },
+    {
+      "week": 3,
+      "day": 5,
+      "workout_type": "cross_train",
+      "target_distance_km": 11.263,
+      "pace_description": "4-10 mi easy or easy x-train",
+      "notes": "4-10 mi easy or easy x-train"
+    },
+    {
+      "week": 3,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 25.744,
+      "pace_description": "12-20 mi easy",
+      "notes": "12-20 mi easy. Full aerobic long run, keep it relaxed and aim to finish feeling good"
+    },
+    {
+      "week": 3,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 18.5035,
+      "pace_description": "8-15 mi easy",
+      "notes": "8-15 mi easy. Pure aerobic weekend Optional x-train"
+    },
+    {
+      "week": 4,
+      "day": 1,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest. As you build up, can add light x-train on this day in base period"
+    },
+    {
+      "week": 4,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 13.6765,
+      "pace_description": "5-12 mi easy with 6 x 30 sec fast/2 min easy",
+      "notes": "5-12 mi easy with 6 x 30 sec fast/2 min easy"
+    },
+    {
+      "week": 4,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 mi easy/mod to mod, ideally over hills",
+      "notes": "6-12 mi easy/mod to mod, ideally over hills. On this run, start very relaxed, and after 20-30 min, pick up the effort to Zone 2/3 in a 5-Zone model.Don’t go too hard! No double or x-train this week"
+    },
+    {
+      "week": 4,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": 13.6765,
+      "pace_description": "5-12 mi easy No double or x-train",
+      "notes": "5-12 mi easy No double or x-train"
+    },
+    {
+      "week": 4,
+      "day": 5,
+      "workout_type": "cross_train",
+      "target_distance_km": 8.849499999999999,
+      "pace_description": "3-8 mi easy plus 6 x 20 sec hills or easy x-train",
+      "notes": "3-8 mi easy plus 6 x 20 sec hills or easy x-train"
+    },
+    {
+      "week": 4,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 20.917,
+      "pace_description": "10-16 mi easy/mod (30 min in the middle around marathon",
+      "notes": "10-16 mi easy/mod (30 min in the middle around marathon effort with a bit of progression as you go). Keep the M-effort controlled and smooth, building aerobic power and efficiency"
+    },
+    {
+      "week": 4,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 16.09,
+      "pace_description": "6-14 mi easy plus 6 x 20 sec hills fast Optional easy",
+      "notes": "6-14 mi easy plus 6 x 20 sec hills fast Optional easy double or x-train"
+    },
+    {
+      "week": 5,
+      "day": 1,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Rest or easy x-train",
+      "notes": "Rest or easy x-train. Make sure"
+    },
+    {
+      "week": 5,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 mi easy/mod to mod",
+      "notes": "6-12 mi easy/mod to mod. Same deal as last week, just getting comfortable at steady"
+    },
+    {
+      "week": 5,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": 12.067499999999999,
+      "pace_description": "5-10 mi easy plus 6 x 20 sec hills fast Optional easy",
+      "notes": "5-10 mi easy plus 6 x 20 sec hills fast Optional easy double or x-train"
+    },
+    {
+      "week": 5,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 mi easy/mod to mod",
+      "notes": "6-12 mi easy/mod to mod. This should really start feeling more comfortable now, with HR settling in without excessive HR"
+    },
+    {
+      "week": 5,
+      "day": 5,
+      "workout_type": "cross_train",
+      "target_distance_km": 11.263,
+      "pace_description": "4-10 mi easy or easy x-train",
+      "notes": "4-10 mi easy or easy x-train"
+    },
+    {
+      "week": 5,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 25.744,
+      "pace_description": "12-20 mi easy",
+      "notes": "12-20 mi easy. You can progress effort slightly in the 2nd half, especially on uphills, if you feel perfect."
+    },
+    {
+      "week": 5,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 19.308,
+      "pace_description": "8-16 mi easy",
+      "notes": "8-16 mi easy. Can progress effort slightly in 2nd half again, for a higher quality Sunday"
+    },
+    {
+      "week": 6,
+      "day": 1,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Rest or easy x-train",
+      "notes": "Rest or easy x-train"
+    },
+    {
+      "week": 6,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 13.6765,
+      "pace_description": "5-12 mi easy with 6 x 20 seconds fast/2 min easy",
+      "notes": "5-12 mi easy with 6 x 20 seconds fast/2 min easy"
+    },
+    {
+      "week": 6,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": 8.045,
+      "pace_description": "2-3 mi easy, 4-6 x 5 min at half marathon effort with 2 min",
+      "notes": "2-3 mi easy, 4-6 x 5 min at half marathon effort with 2 min easy recovery, 4 x 30 sec hills fast, 2-3 mi easy. Key to avoid “burning” on these intervals, think Zone 3 to lower Zone 4 in 5-Zone model Optional easy double or x-train"
+    },
+    {
+      "week": 6,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": 13.6765,
+      "pace_description": "5-12 mi easy Optional easy double or x-train",
+      "notes": "5-12 mi easy Optional easy double or x-train"
+    },
+    {
+      "week": 6,
+      "day": 5,
+      "workout_type": "cross_train",
+      "target_distance_km": 8.849499999999999,
+      "pace_description": "3-8 mi easy with 5 x 20 sec fast/2 min easy or easy x-train",
+      "notes": "3-8 mi easy with 5 x 20 sec fast/2 min easy or easy x-train"
+    },
+    {
+      "week": 6,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 22.526,
+      "pace_description": "10-18 mi easy",
+      "notes": "10-18 mi easy. Nice and relaxed, ideally over hilly terrain for some mechanical stimulus!"
+    },
+    {
+      "week": 6,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 17.698999999999998,
+      "pace_description": "8-14 mi easy with 6 x 30 seconds fast/2 min easy in middle",
+      "notes": "8-14 mi easy with 6 x 30 seconds fast/2 min easy in middle Optional easy double or x-train"
+    },
+    {
+      "week": 7,
+      "day": 1,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Rest or easy x-train",
+      "notes": "Rest or easy x-train"
+    },
+    {
+      "week": 7,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 12.067499999999999,
+      "pace_description": "5-10 mi easy with 5 x 30 sec fast/2 min easy",
+      "notes": "5-10 mi easy with 5 x 30 sec fast/2 min easy"
+    },
+    {
+      "week": 7,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": 9.654,
+      "pace_description": "2-4 mi easy, 15-20 x 1 min fast/1 min float, 2-4 mi easy",
+      "notes": "2-4 mi easy, 15-20 x 1 min fast/1 min float, 2-4 mi easy. Think 10k effort to start, with light progression as you go! Mini speed stimulus. Optional easy double or x-train"
+    },
+    {
+      "week": 7,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": 13.6765,
+      "pace_description": "5-12 mi easy No double with tougher long run on tap on",
+      "notes": "5-12 mi easy No double with tougher long run on tap on Saturday"
+    },
+    {
+      "week": 7,
+      "day": 5,
+      "workout_type": "cross_train",
+      "target_distance_km": 11.263,
+      "pace_description": "4-10 mi easy with 5 x 20 sec fast/2 min easy or easy x-train",
+      "notes": "4-10 mi easy with 5 x 20 sec fast/2 min easy or easy x-train"
+    },
+    {
+      "week": 7,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 25.744,
+      "pace_description": "12-20 mi easy/mod",
+      "notes": "12-20 mi easy/mod. Start easy and settle in at 90-95% of M effort, just a smooth flow that clicks off the miles fast and works on aerobic metabolism"
+    },
+    {
+      "week": 7,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 16.09,
+      "pace_description": "6-14 mi easy plus 6 x 20 sec hills fast No double or x-train",
+      "notes": "6-14 mi easy plus 6 x 20 sec hills fast No double or x-train"
+    },
+    {
+      "week": 8,
+      "day": 1,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Rest or easy x-train",
+      "notes": "Rest or easy x-train"
+    },
+    {
+      "week": 8,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 13.6765,
+      "pace_description": "5-12 mi easy with 6 x 20 sec fast/2 min easy",
+      "notes": "5-12 mi easy with 6 x 20 sec fast/2 min easy"
+    },
+    {
+      "week": 8,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": 15.285499999999999,
+      "pace_description": "6-13 miles easy/mod to mod",
+      "notes": "6-13 miles easy/mod to mod. Avoid the burning feeling! Optional easy double or x-train"
+    },
+    {
+      "week": 8,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": 13.6765,
+      "pace_description": "5-12 mi easy Optional easy double or x-train",
+      "notes": "5-12 mi easy Optional easy double or x-train"
+    },
+    {
+      "week": 8,
+      "day": 5,
+      "workout_type": "cross_train",
+      "target_distance_km": 8.849499999999999,
+      "pace_description": "3-8 mi easy plus 6 x 20 sec hills or easy x-train",
+      "notes": "3-8 mi easy plus 6 x 20 sec hills or easy x-train"
+    },
+    {
+      "week": 8,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 20.917,
+      "pace_description": "10-16 mi easy/mod (6 x 5 min at M effort or a bit harder",
+      "notes": "10-16 mi easy/mod (6 x 5 min at M effort or a bit harder with 5 min float recovery). Floats just above normal easy. Working on shuttling low levels of lactate at steady efforts"
+    },
+    {
+      "week": 8,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 17.698999999999998,
+      "pace_description": "8-14 mi very easy",
+      "notes": "8-14 mi very easy. Will be a bit more tired from bigger effort on Sat Optional easy double or x-train"
+    },
+    {
+      "week": 9,
+      "day": 1,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Rest or easy x-train",
+      "notes": "Rest or easy x-train"
+    },
+    {
+      "week": 9,
+      "day": 2,
+      "workout_type": "cross_train",
+      "target_distance_km": 13.6765,
+      "pace_description": "5-12 mi easy with 5 x 20 sec fast/2 min easy Optional easy",
+      "notes": "5-12 mi easy with 5 x 20 sec fast/2 min easy Optional easy double or x-train"
+    },
+    {
+      "week": 9,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": 17.698999999999998,
+      "pace_description": "8-14 mi very easy",
+      "notes": "8-14 mi very easy. Ideally mostly in Zone 1 or low Zone 2 Optional easy double or x-train"
+    },
+    {
+      "week": 9,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": 13.6765,
+      "pace_description": "5-12 mi easy with 5 x 20 sec fast/2 min easy Optional easy",
+      "notes": "5-12 mi easy with 5 x 20 sec fast/2 min easy Optional easy double or x-train"
+    },
+    {
+      "week": 9,
+      "day": 5,
+      "workout_type": "cross_train",
+      "target_distance_km": 11.263,
+      "pace_description": "4-10 mi easy or easy x-train",
+      "notes": "4-10 mi easy or easy x-train"
+    },
+    {
+      "week": 9,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 25.744,
+      "pace_description": "12-20 mi easy",
+      "notes": "12-20 mi easy. Keep this one very relaxed the whole time, pure aerobic base run"
+    },
+    {
+      "week": 9,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 19.308,
+      "pace_description": "8-16 mi easy with 6 x 30 sec fast/2 min easy in middle",
+      "notes": "8-16 mi easy with 6 x 30 sec fast/2 min easy in middle Optional x-train"
+    },
+    {
+      "week": 10,
+      "day": 1,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Rest or easy x-train",
+      "notes": "Rest or easy x-train"
+    },
+    {
+      "week": 10,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 12.067499999999999,
+      "pace_description": "5-10 mi easy with 4 x 20 sec fast/2 min easy",
+      "notes": "5-10 mi easy with 4 x 20 sec fast/2 min easy"
+    },
+    {
+      "week": 10,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": 8.045,
+      "pace_description": "2-3 mi easy, 4-8 x 3 min at 1-hour effort with with 3 min",
+      "notes": "2-3 mi easy, 4-8 x 3 min at 1-hour effort with with 3 min float recovery around 50k effort, 2-3 mi easy Optional easy double or x-train"
+    },
+    {
+      "week": 10,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": 12.067499999999999,
+      "pace_description": "5-10 mi easy Optional easy double or x-train",
+      "notes": "5-10 mi easy Optional easy double or x-train"
+    },
+    {
+      "week": 10,
+      "day": 5,
+      "workout_type": "cross_train",
+      "target_distance_km": 8.849499999999999,
+      "pace_description": "3-8 mi easy with 6 x 20 sec fast/2 min easy or easy x-train",
+      "notes": "3-8 mi easy with 6 x 20 sec fast/2 min easy or easy x-train"
+    },
+    {
+      "week": 10,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 22.526,
+      "pace_description": "10-18 mi easy/mod (1 hour at M effort)",
+      "notes": "10-18 mi easy/mod (1 hour at M effort). A bit tougher, but still controlled, aerobic power building"
+    },
+    {
+      "week": 10,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 16.09,
+      "pace_description": "6-14 mi easy plus 6 x 20 sec hills Optional easy double or",
+      "notes": "6-14 mi easy plus 6 x 20 sec hills Optional easy double or x-train"
+    },
+    {
+      "week": 11,
+      "day": 1,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Rest or easy x-train",
+      "notes": "Rest or easy x-train"
+    },
+    {
+      "week": 11,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 mi easy with 5 x 20 sec fast/2 min easy",
+      "notes": "6-12 mi easy with 5 x 20 sec fast/2 min easy"
+    },
+    {
+      "week": 11,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": 16.09,
+      "pace_description": "8-12 mi easy/mod to mod Optional easy double or x-train",
+      "notes": "8-12 mi easy/mod to mod Optional easy double or x-train"
+    },
+    {
+      "week": 11,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 mi easy with 5 x 30 sec fast/2 min easy Optional easy",
+      "notes": "6-12 mi easy with 5 x 30 sec fast/2 min easy Optional easy double or x-train"
+    },
+    {
+      "week": 11,
+      "day": 5,
+      "workout_type": "cross_train",
+      "target_distance_km": 11.263,
+      "pace_description": "4-10 mi easy or easy x-train",
+      "notes": "4-10 mi easy or easy x-train"
+    },
+    {
+      "week": 11,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 25.744,
+      "pace_description": "12-20 mi easy",
+      "notes": "12-20 mi easy. Pure aerobic base run!"
+    },
+    {
+      "week": 11,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 19.308,
+      "pace_description": "8-16 mi easy",
+      "notes": "8-16 mi easy. Pure aerobic weekend No double or x-train"
+    },
+    {
+      "week": 12,
+      "day": 1,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Rest or easy x-train",
+      "notes": "Rest or easy x-train"
+    },
+    {
+      "week": 12,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 mi easy with 5 x 20 sec fast/2 min easy",
+      "notes": "6-12 mi easy with 5 x 20 sec fast/2 min easy"
+    },
+    {
+      "week": 12,
+      "day": 3,
+      "workout_type": "tempo",
+      "target_distance_km": 8.045,
+      "pace_description": "2-3 mi easy, 20 min mod/hard around 1-hour effort, 5 min",
+      "notes": "2-3 mi easy, 20 min mod/hard around 1-hour effort, 5 min easy, 5-10 x 1 min fast/1 min easy (think 10k, with light progression), 2-3 mi easy. Tempo/speed combo to end plan!"
+    },
+    {
+      "week": 12,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": 14.481,
+      "pace_description": "6-12 mi easy No double before tougher long run",
+      "notes": "6-12 mi easy No double before tougher long run"
+    },
+    {
+      "week": 12,
+      "day": 5,
+      "workout_type": "cross_train",
+      "target_distance_km": 8.849499999999999,
+      "pace_description": "3-8 mi easy with 5 x 20 sec fast/2 min easy or easy x-train",
+      "notes": "3-8 mi easy with 5 x 20 sec fast/2 min easy or easy x-train"
+    },
+    {
+      "week": 12,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": 25.744,
+      "pace_description": "12-20 mi easy/mod",
+      "notes": "12-20 mi easy/mod. In the second half of the run, can progress effort into steady Zone 3. You should really see running economy benefits now"
+    },
+    {
+      "week": 12,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": 17.698999999999998,
+      "pace_description": "8-14 mi easy/mod",
+      "notes": "8-14 mi easy/mod. Can progress in the same way as Sat Optional easy x-train"
+    }
+  ]
+}

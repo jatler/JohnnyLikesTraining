@@ -1,0 +1,685 @@
+{
+  "id": "swap_lower_volume_ultra_12w",
+  "name": "SWAP Lower Volume Ultramarathon Plan (12 weeks)",
+  "author": "David Roche & Megan Roche, MD PhD",
+  "source": "SWAP Running",
+  "description": "Bundled training plan imported from SWAP_Plans PDF templates.",
+  "duration_weeks": 12,
+  "target_distances": [
+    "Ultramarathon"
+  ],
+  "sessions": [
+    {
+      "week": 1,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 1,
+      "day": 2,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "4-6mileseasywith5x20sechills fast",
+      "notes": "4-6mileseasywith5x20sechills fast.Oneasyrunning,thinksmooth, withquickstrides,andnotensionin thebody.Ondaysyoufeelgreat,easy runscanbequickeraslongasitfeels easyanddoesn’timpactrecovery.On hillstrides,findamoderategrade around6-8%andrunupasfastas youcangowithoutsprinting,jogging downandaroundfor1-2minbefore thenextone Optional20-45mineasyx-train double.Onx-traindays,wewant aerobicstrainwithoutimpact.Elliptical orbikeareideal,butyoucanalsodo uphillhikingonthetreadmill.While doublesareideallyatleastafew hoursaftertherun,youcanalsodoit rightafterorbeforetherun.Thesecan beupto60-75minutesiffeelinggreat!"
+    },
+    {
+      "week": 1,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": 4.0225,
+      "pace_description": "2mileseasywarm-up,6x 2minhillsaround5k effort,5x40sechills",
+      "notes": "2mileseasywarm-up,6x 2minhillsaround5k effort,5x40sechills around3keffort,2-3miles easycool-down.These hillsareamajorpower andVO2maxstimulus withlimitedimpact Optional20-30min treadmilluphill(20-30min at15%gradehiking and/orrunning)oreasy x-train.Uphilltreadmills aregreatwaysto superchargeclimbingwith lowimpact.Ifyoufeel greatandhavetime,you canlengthenthese doublesallthewayto1 houranyweek. Strength:UltraLegs"
+    },
+    {
+      "week": 1,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "60-90min easy/modx-train with12x1min fast/2mineasy",
+      "notes": "60-90min easy/modx-train with12x1min fast/2mineasy.On x-traindays,aimfor highcadence aroundyour runningcadence. On“fast,”increase theresistanceand elevatethe cadencejustabit, justusingthisone togetusedtoit. Youwilllikelybe sorefromstrength thedaybefore! Strength:Mountain Legs"
+    },
+    {
+      "week": 1,
+      "day": 5,
+      "workout_type": "cross_train",
+      "target_distance_km": 6.436,
+      "pace_description": "3-5miles veryeasyor rest/x-train",
+      "notes": "3-5miles veryeasyor rest/x-train. Theday beforethe weeklylong run,takeit extrachill! Youcan evenshuffle atyour slowest pacesiftired"
+    },
+    {
+      "week": 1,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "8-10mileseasy/mod",
+      "notes": "8-10mileseasy/mod.On easy/modlongruns,you cangoonfeel,lettingyour bodydictateeffort,with theoptiontopushabit moreonuphills.Fuelall longrunswell!Longruns ideallyontrailslikethe racewhenpossible,but roadsorotherterrain worksuntilspecificefforts later OnallSaturdayswithruns under14miles,advanced athletescouldaddcross training. Strength:MountainLegs"
+    },
+    {
+      "week": 1,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "60-90min easy/modx-train withwith15x1min fast/1mineasy",
+      "notes": "60-90min easy/modx-train withwith15x1min fast/1mineasy.On these“fasts,”think aneffortyoucould sustainforaround 20minutes Optionalhike.You canlayerinhikes ontheweekend too,whichare specifictrainingfor mostlongultras. Anyx-traindaycan bealongeractivity thannoted(likea bikeorski),aslong asnoimpact. Strength:Ultra Legs"
+    },
+    {
+      "week": 2,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 2,
+      "day": 2,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "4-6mileseasywith6x30sechills fast",
+      "notes": "4-6mileseasywith6x30sechills fast.30-secondhillstridesaremajor poweratVO2stimuli,andusuallya goodbittougherthan20-second strides Optional20-45mineasyx-train"
+    },
+    {
+      "week": 2,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "2mileseasywarm-up,5x 3minhillsaround5k effort,2mileseasy",
+      "notes": "2mileseasywarm-up,5x 3minhillsaround5k effort,2mileseasy.3-min hillsarea bread-and-buttersession foradaptations! Optional20-30treadhillor easyx-train Strength:UltraLegs"
+    },
+    {
+      "week": 2,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "60-90mineasy x-train",
+      "notes": "60-90mineasy x-train.Lower intensityday,but canmixitupwith somerelaxed intervals Strength:Mountain Legs"
+    },
+    {
+      "week": 2,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 6.436,
+      "pace_description": "3-5miles veryeasyor rest/xtrain",
+      "notes": "3-5miles veryeasyor rest/xtrain"
+    },
+    {
+      "week": 2,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": null,
+      "pace_description": "8-10mileseasy/mod(20 minmod/hardaround thresholdeffortonnet",
+      "notes": "8-10mileseasy/mod(20 minmod/hardaround thresholdeffortonnet uphill).Afterthewarm-up, dothetempoaroundan effortyoucouldsustainfor 1hour,asweetspotfor aerobicandpower development. Strength:MountainLegs"
+    },
+    {
+      "week": 2,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "60-90mineasy x-train Optionalhike Strength:Ultra Legs",
+      "notes": "60-90mineasy x-train Optionalhike Strength:Ultra Legs"
+    },
+    {
+      "week": 3,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 3,
+      "day": 2,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "4-8mileseasywith8x30sechills fast",
+      "notes": "4-8mileseasywith8x30sechills fast.Thesehillsareasneakyworkout! Optional20-45mineasyx-train"
+    },
+    {
+      "week": 3,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "8mileseasy/modtomod",
+      "notes": "8mileseasy/modtomod. Startrelaxed,thensettle intomoderateeffort! Gettingthebodyusedto higher-endaerobicpaces Optional20-30min treadhilloreasyx-train. Onthistreadhill,youcan dothe2ndhalfmoderate tohardtogeta2nd stimulusoftheday! Strength:MountainLegs"
+    },
+    {
+      "week": 3,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "60-90min easy/modx-train with4x3/2/1min fastwith90",
+      "notes": "60-90min easy/modx-train with4x3/2/1min fastwith90 secondsbetween intervalsand3min easybetweensets. Think30-mineffort onintervals! Strength:Ultra Legs"
+    },
+    {
+      "week": 3,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 8.849499999999999,
+      "pace_description": "3-8miles veryeasyor rest/xtrain",
+      "notes": "3-8miles veryeasyor rest/xtrain"
+    },
+    {
+      "week": 3,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": null,
+      "pace_description": "13milesveryeasy",
+      "notes": "13milesveryeasy.Run thedownhillsquicklyand reallybepatientand caringwithbody! Strength:UltraLegs, ideallyaddingheavier weightsnow"
+    },
+    {
+      "week": 3,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "60-90mineasy x-train Optionalhike Strength:Mountain Legs",
+      "notes": "60-90mineasy x-train Optionalhike Strength:Mountain Legs"
+    },
+    {
+      "week": 4,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 4,
+      "day": 2,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "4-8mileseasywith4x20second hills",
+      "notes": "4-8mileseasywith4x20second hills. Optional20-45mineasyx-train"
+    },
+    {
+      "week": 4,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "2mileseasy,3x3/2/1 minhillsmod/hardwith",
+      "notes": "2mileseasy,3x3/2/1 minhillsmod/hardwith rundownrecoveryafter each(think10k/5k/3k effortoneachset),2 mileseasy.Thelegsmay beabitfriedafterthis muchhillvolumeonthe workout! Optional20-30min treadhilloreasyx-train Strength:UltraLegs"
+    },
+    {
+      "week": 4,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "60-90mineasy x-train Strength:Mountain Legs",
+      "notes": "60-90mineasy x-train Strength:Mountain Legs"
+    },
+    {
+      "week": 4,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 7.2405,
+      "pace_description": "3-6miles veryeasyor rest/xtrain",
+      "notes": "3-6miles veryeasyor rest/xtrain"
+    },
+    {
+      "week": 4,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": null,
+      "pace_description": "10mileseasy/modon trails(starteasy,then settleintomoderate",
+      "notes": "10mileseasy/modon trails(starteasy,then settleintomoderate running,thinking50k effortormoretofinish) Strength:MountainLegs"
+    },
+    {
+      "week": 4,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "6-10mileseasyon trails",
+      "notes": "6-10mileseasyon trails.Back-to-back weekendrunsto setthetonefor bigger back-to-backsto come!Ideallyboth withfundownhills Optionalhikeor easyx-train Strength:Ultra Legs"
+    },
+    {
+      "week": 5,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 5,
+      "day": 2,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "4-8mileseasywith8x30second hills",
+      "notes": "4-8mileseasywith8x30second hills.Anotheroneofthosesneaky workouts,embracethesehillsasan opportunitytogetfaster! Optional20-45mineasyx-train"
+    },
+    {
+      "week": 5,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": 3.218,
+      "pace_description": "2mileseasy,6x90 secondhillsfast(think 5k),15minmoderate",
+      "notes": "2mileseasy,6x90 secondhillsfast(think 5k),15minmoderate (think1-houreffortover rollingterrain),2miles easy.Themoderate runningafterthehillswill helpthebodyclear lactatemoreefficiently andrunquicklyontired legs Optional20-30min treadhill(canprogressto mod/hardinthe2ndhalf) oreasyx-train Strength:MountainLegs"
+    },
+    {
+      "week": 5,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "60-90min easy/modx-train with4x6min moderate/2min",
+      "notes": "60-90min easy/modx-train with4x6min moderate/2min easy(think1-hour effortonintervals, niceandcontrolled) Strength:Ultra Legs"
+    },
+    {
+      "week": 5,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 8.849499999999999,
+      "pace_description": "3-8miles veryeasyor rest/xtrain",
+      "notes": "3-8miles veryeasyor rest/xtrain"
+    },
+    {
+      "week": 5,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": null,
+      "pace_description": "16milesveryeasy",
+      "notes": "16milesveryeasy.Take yourtime,norushonthis oneaswebuildup endurance,thoughaimfor strongdownhills,which areoftenalimiterinlong events Strength:UltraLegs"
+    },
+    {
+      "week": 5,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "60-90mineasy x-trainwith4x2 minfast/90 secondseasy,4x",
+      "notes": "60-90mineasy x-trainwith4x2 minfast/90 secondseasy,4x 90secondsfast/90 secondseasy,4x1 minfast/90 secondseasy (think30-mineffort onintervals) Optionalhike Strength:Mountain Legs"
+    },
+    {
+      "week": 6,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 6,
+      "day": 2,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "4-8mileseasywith4x20second hills",
+      "notes": "4-8mileseasywith4x20second hills.Extrachillbeforebigworkouton Wednesday! Optional20-45mineasyx-train"
+    },
+    {
+      "week": 6,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "2mileseasy,5x3min hillsfast(think5k),20min",
+      "notes": "2mileseasy,5x3min hillsfast(think5k),20min moderate(think1-hour effortoverrollingterrain), 2mileseasy.The toughestworkoutofthe cycle! Optional20-30min treadhilloreasyx-train Strength:UltraLegs"
+    },
+    {
+      "week": 6,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "60-90mineasy x-train Strength:Mountain Legs",
+      "notes": "60-90mineasy x-train Strength:Mountain Legs"
+    },
+    {
+      "week": 6,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 8.849499999999999,
+      "pace_description": "3-8miles veryeasyor rest/xtrain",
+      "notes": "3-8miles veryeasyor rest/xtrain"
+    },
+    {
+      "week": 6,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": null,
+      "pace_description": "12-14mileseasy/mod(30 minmod/hardaround thresholdeffort)",
+      "notes": "12-14mileseasy/mod(30 minmod/hardaround thresholdeffort).The temposhouldfeel challengingbut manageable! Strength:MountainLegs"
+    },
+    {
+      "week": 6,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "60-90mineasy x-train Optionalhike Strength:Ultra Legs",
+      "notes": "60-90mineasy x-train Optionalhike Strength:Ultra Legs"
+    },
+    {
+      "week": 7,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 7,
+      "day": 2,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "4-8mileseasywith8x30secondhills Optional20-45mineasyx-train",
+      "notes": "4-8mileseasywith8x30secondhills Optional20-45mineasyx-train"
+    },
+    {
+      "week": 7,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "8-10milesveryeasy",
+      "notes": "8-10milesveryeasy.We areinthe2biggest runningweeksnow,take iteasy! Optional20-30min treadhilloreasyx-train Strength:MountainLegs. Keepingitlowerkeythis week"
+    },
+    {
+      "week": 7,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "60-90min easy/modx-train with7/6/5/4/3/2/1 minfastwith2min",
+      "notes": "60-90min easy/modx-train with7/6/5/4/3/2/1 minfastwith2min easyrecovery (think1-houreffort)"
+    },
+    {
+      "week": 7,
+      "day": 5,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Easyx-train, takingaway runningday beforebigger weekend!",
+      "notes": "Easyx-train, takingaway runningday beforebigger weekend!"
+    },
+    {
+      "week": 7,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": null,
+      "pace_description": "20mileseasy/modwith stronguphills",
+      "notes": "20mileseasy/modwith stronguphills.Focuson eachuphillasasolid effort,fuelingatonand tryingtofinishthisone feelinggood"
+    },
+    {
+      "week": 7,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": null,
+      "pace_description": "10mileseasy",
+      "notes": "10mileseasy.The runningweekend willsupercharge enduranceheading intofinalbuild Strength:Ultra Legs"
+    },
+    {
+      "week": 8,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 8,
+      "day": 2,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "4-8mileseasy Optional20-45mineasyx-train",
+      "notes": "4-8mileseasy Optional20-45mineasyx-train"
+    },
+    {
+      "week": 8,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "2mileseasy,10x45 secondhillsfast(think5k,",
+      "notes": "2mileseasy,10x45 secondhillsfast(think5k, withabitmorepushingas yougo),2mileseasy.A powerstimulusbetween allofthelongerweekend runs! Optional20-30min treadhilloreasyx-train Strength:UltraLegs"
+    },
+    {
+      "week": 8,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "60-90mineasy x-train Strength:Mountain Legs",
+      "notes": "60-90mineasy x-train Strength:Mountain Legs"
+    },
+    {
+      "week": 8,
+      "day": 5,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "Easyx-train orrest,just likelast weekbut withrest option",
+      "notes": "Easyx-train orrest,just likelast weekbut withrest option"
+    },
+    {
+      "week": 8,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "CAMPWEEKEND!4 weeksoutfromtherace, alotoftimeonfeet,all",
+      "notes": "CAMPWEEKEND!4 weeksoutfromtherace, alotoftimeonfeet,all veryeasyideally.Today: 25mileseasy.Takeyour time,fuelaton,andgetin thatultramindset.Runthe downhillswellsincethat canbeextrachallenging inultras.Ifdoinga100 miler,thiscangouptoa 50klongrun. Nostrengthwork"
+    },
+    {
+      "week": 8,
+      "day": 7,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "10-20mileseasy",
+      "notes": "10-20mileseasy. Thisisthe weekendthatgets specificadaptations fortherace!Strong downhillsideal!If anyinjury concerns,usethis daytox-train.Only dothehighendif healthis100%"
+    },
+    {
+      "week": 9,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 9,
+      "day": 2,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "4-8mileseasywith6x20secondhills Optional20-45mineasyx-train",
+      "notes": "4-8mileseasywith6x20secondhills Optional20-45mineasyx-train"
+    },
+    {
+      "week": 9,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "2mileseasy,20min mod/hardoverhillyterrain",
+      "notes": "2mileseasy,20min mod/hardoverhillyterrain (think10keffortwith harderfinish),5mineasy, 5x1minhillsfast(think 5keffort),2mileseasy. Thehardtempointohills combowillreallyworkon outputontiredlegs, bringingallthe adaptationstogether! Optional20-30min treadhillwithmod/hard 2ndhalforeasyx-train Strength:MountainLegs"
+    },
+    {
+      "week": 9,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "60-90min easy/modx-train with3x4/3/2/1min fastwith1mineasy",
+      "notes": "60-90min easy/modx-train with3x4/3/2/1min fastwith1mineasy betweenintervals and3mineasy betweensets(think 1-hourefforton intervals) Strength:Ultra Legs"
+    },
+    {
+      "week": 9,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 8.849499999999999,
+      "pace_description": "3-8miles veryeasyor rest/xtrain",
+      "notes": "3-8miles veryeasyor rest/xtrain"
+    },
+    {
+      "week": 9,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": null,
+      "pace_description": "8mileeasyrunPLUS longerhike!Ideallythisis",
+      "notes": "8mileeasyrunPLUS longerhike!Ideallythisis alongerdayoftimeon feetwiththehike,butwith justabitofimpactviarun atthestartoftheday. Somethinglike6-8hours onfeetwithfullfueling idealfor100milers! Strength:UltraLegs"
+    },
+    {
+      "week": 9,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "60-90mineasy x-train Optionalhike Strength:Ultra Legs",
+      "notes": "60-90mineasy x-train Optionalhike Strength:Ultra Legs.Doublingup!"
+    },
+    {
+      "week": 10,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 10,
+      "day": 2,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "4-8mileseasywith8x30secondhills Optional20-45mineasyx-train",
+      "notes": "4-8mileseasywith8x30secondhills Optional20-45mineasyx-train"
+    },
+    {
+      "week": 10,
+      "day": 3,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "8-10milesveryeasy",
+      "notes": "8-10milesveryeasy. Niceandlowintensity. Optional20-30min treadhilloreasyx-train Strength:MountainLegs. Nomoreultralegs throughraceday!"
+    },
+    {
+      "week": 10,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "60-90mineasy x-train",
+      "notes": "60-90mineasy x-train"
+    },
+    {
+      "week": 10,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 8.849499999999999,
+      "pace_description": "3-8miles veryeasyor rest/xtrain",
+      "notes": "3-8miles veryeasyor rest/xtrain"
+    },
+    {
+      "week": 10,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "14-16mileseasy/modon trails(1hourmoderate",
+      "notes": "14-16mileseasy/modon trails(1hourmoderate aroundmarathoneffortto start,fastertofinish).The extendedtempowill preparethemuscular systemforthedemands ofraceday Strength:MountainLegs"
+    },
+    {
+      "week": 10,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "60-90min easy/modx-train with10/8/6/4/2min fastwith2mineasy",
+      "notes": "60-90min easy/modx-train with10/8/6/4/2min fastwith2mineasy aftereach(think 1-houreffort) Optionalhike"
+    },
+    {
+      "week": 11,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "rest"
+    },
+    {
+      "week": 11,
+      "day": 2,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "4-8mileseasywith4x20secondhills Optional20-45mineasyx-train",
+      "notes": "4-8mileseasywith4x20secondhills Optional20-45mineasyx-train"
+    },
+    {
+      "week": 11,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "2mileseasy,2x10min moderate(think10k effort)with3mineasy",
+      "notes": "2mileseasy,2x10min moderate(think10k effort)with3mineasy recovery,2mileseasy. Finalintensitystimulusto tunethingsup! Optional20-30min treadhilloreasyx-train"
+    },
+    {
+      "week": 11,
+      "day": 4,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "40mineasyx-train Strength:Mountain legs",
+      "notes": "40mineasyx-train Strength:Mountain legs"
+    },
+    {
+      "week": 11,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": null,
+      "pace_description": "Restand recovery",
+      "notes": "Restand recovery. Really leaninginto thetaper now!"
+    },
+    {
+      "week": 11,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": null,
+      "pace_description": "10-12mileseasyontrails",
+      "notes": "10-12mileseasyontrails. Aniceaerobiclongruna weekbeforetherace activatesthenervousand aerobicsystemsforpeak performance"
+    },
+    {
+      "week": 11,
+      "day": 7,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "60-75mineasy x-trainwith15 minutesmoderate",
+      "notes": "60-75mineasy x-trainwith15 minutesmoderate"
+    },
+    {
+      "week": 12,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "Rest",
+      "notes": "Rest"
+    },
+    {
+      "week": 12,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": null,
+      "pace_description": "6mileseasyontrails",
+      "notes": "6mileseasyontrails"
+    },
+    {
+      "week": 12,
+      "day": 3,
+      "workout_type": "cross_train",
+      "target_distance_km": null,
+      "pace_description": "40mineasyx-train",
+      "notes": "40mineasyx-train"
+    },
+    {
+      "week": 12,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": null,
+      "pace_description": "Restandrecovery",
+      "notes": "Restandrecovery"
+    },
+    {
+      "week": 12,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 4.827,
+      "pace_description": "2-4miles easyplus4x 20second hillsmod (nothard)in AM",
+      "notes": "2-4miles easyplus4x 20second hillsmod (nothard)in AM"
+    },
+    {
+      "week": 12,
+      "day": 6,
+      "workout_type": "long_run",
+      "target_distance_km": null,
+      "pace_description": "ULTRA!!!!!!Celebration time!Startrelaxed,focus",
+      "notes": "ULTRA!!!!!!Celebration time!Startrelaxed,focus onfueling,ownthe downhills,andmakesure tosmileaton.Youare READY!"
+    },
+    {
+      "week": 12,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": null,
+      "pace_description": "PIZZA!That’salso impliedinthewhole trainingplan",
+      "notes": "PIZZA!That’salso impliedinthewhole trainingplan.No matterwhat,you areincredible! Celebrateyourself sohard."
+    }
+  ]
+}

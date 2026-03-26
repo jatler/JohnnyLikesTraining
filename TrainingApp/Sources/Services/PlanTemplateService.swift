@@ -9,15 +9,34 @@ final class PlanTemplateService {
     // MARK: - Available Templates
 
     /// All bundled plan templates the user can choose from.
-    var availableTemplates: [TrainingPlanTemplate] {
-        var templates: [TrainingPlanTemplate] = []
-        if let champion = loadBundledTemplate(named: "champion_plan_100k") {
-            templates.append(champion)
+    var availableTemplates: [TrainingPlanTemplate] { bundledTemplates }
+
+    private lazy var bundledTemplates: [TrainingPlanTemplate] = loadBundledTemplates()
+
+    private func loadBundledTemplates() -> [TrainingPlanTemplate] {
+        let paths = Bundle.main.paths(forResourcesOfType: "json", inDirectory: nil)
+        var result: [TrainingPlanTemplate] = []
+        var seenIDs: Set<String> = []
+
+        for path in paths {
+            let url = URL(fileURLWithPath: path)
+            do {
+                let data = try Data(contentsOf: url)
+                let template = try JSONDecoder().decode(TrainingPlanTemplate.self, from: data)
+
+                // Keep bundled plan templates only.
+                guard template.source == "SWAP Running" else { continue }
+                guard !seenIDs.contains(template.id) else { continue }
+
+                seenIDs.insert(template.id)
+                result.append(template)
+            } catch {
+                // Ignore unrelated JSON resources or decode failures.
+                continue
+            }
         }
-        if let winter = loadBundledTemplate(named: "winter_plan_10w") {
-            templates.append(winter)
-        }
-        return templates
+
+        return result.sorted { $0.name < $1.name }
     }
 
     // MARK: - Load from Bundle
