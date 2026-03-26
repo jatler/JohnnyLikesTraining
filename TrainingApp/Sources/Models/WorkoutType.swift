@@ -66,7 +66,7 @@ enum WorkoutType: String, Codable, CaseIterable, Identifiable {
         case .rest: .gray
         case .race: .purple
         case .crossTrain: .yellow
-        case .strength: .indigo
+        case .strength: Color.swapAccent
         }
     }
 }

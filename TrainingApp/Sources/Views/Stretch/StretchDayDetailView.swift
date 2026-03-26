@@ -46,14 +46,14 @@ struct StretchDayDetailView: View {
         HStack(spacing: 12) {
             Image(systemName: "figure.flexibility")
                 .font(.title3)
-                .foregroundStyle(.teal)
+                .foregroundStyle(Color.swapAccent)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(completed)/\(total) stretches done")
                     .font(.subheadline.bold())
 
                 ProgressView(value: Double(completed), total: Double(total))
-                    .tint(.teal)
+                    .tint(Color.swapAccent)
             }
 
             if completed == total {
@@ -63,7 +63,7 @@ struct StretchDayDetailView: View {
             }
         }
         .padding()
-        .background(.teal.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
+        .background(Color.swapAccent.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
     }
 
     private func stretchCard(_ session: StretchSession) -> some View {
@@ -121,7 +121,7 @@ struct StretchDayDetailView: View {
                 .font(.subheadline.bold())
             }
             .buttonStyle(.bordered)
-            .tint(complete ? .secondary : .teal)
+            .tint(complete ? .secondary : Color.swapAccent)
             .controlSize(.small)
         }
         .padding()

@@ -170,7 +170,7 @@ struct StrengthTemplateView: View {
                     showingAddExercise = true
                 } label: {
                     Image(systemName: "plus.circle.fill")
-                        .foregroundStyle(.indigo)
+                        .foregroundStyle(Color.swapAccent)
                 }
 
                 if let week = planStore.currentWeekNumber {
@@ -182,7 +182,7 @@ struct StrengthTemplateView: View {
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
-                    .tint(.indigo)
+                    .tint(Color.swapAccent)
                 }
             }
 
@@ -198,7 +198,7 @@ struct StrengthTemplateView: View {
     private func exerciseRow(_ exercise: StrengthTemplateExercise) -> some View {
         HStack(spacing: 12) {
             Image(systemName: "dumbbell.fill")
-                .foregroundStyle(.indigo)
+                .foregroundStyle(Color.swapAccent)
                 .frame(width: 28)
 
             VStack(alignment: .leading, spacing: 2) {
@@ -265,7 +265,7 @@ struct StrengthTemplateView: View {
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(.bordered)
-        .tint(.indigo)
+        .tint(Color.swapAccent)
         .disabled(strengthStore.daysWithExercises.count >= 7)
     }
 
@@ -275,7 +275,7 @@ struct StrengthTemplateView: View {
         VStack(alignment: .leading, spacing: 12) {
             Label("Stretches", systemImage: "figure.flexibility")
                 .font(.headline)
-                .foregroundStyle(.teal)
+                .foregroundStyle(Color.swapAccent)
 
             if stretchStore.hasTemplate {
                 ForEach(stretchStore.daysWithExercises, id: \.self) { day in
@@ -290,10 +290,10 @@ struct StrengthTemplateView: View {
             }
         }
         .padding()
-        .background(.teal.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
+        .background(Color.swapAccent.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(.teal.opacity(0.15), lineWidth: 1)
+                .strokeBorder(Color.swapAccent.opacity(0.15), lineWidth: 1)
         )
     }
 
@@ -311,7 +311,7 @@ struct StrengthTemplateView: View {
                 } label: {
                     Image(systemName: "plus.circle.fill")
                         .font(.caption)
-                        .foregroundStyle(.teal)
+                        .foregroundStyle(Color.swapAccent)
                 }
 
                 if let week = planStore.currentWeekNumber {
@@ -323,7 +323,7 @@ struct StrengthTemplateView: View {
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.mini)
-                    .tint(.teal)
+                    .tint(Color.swapAccent)
                 }
             }
 
@@ -338,7 +338,7 @@ struct StrengthTemplateView: View {
     private func stretchExerciseRow(_ exercise: StretchTemplateExercise) -> some View {
         HStack(spacing: 10) {
             Image(systemName: "figure.flexibility")
-                .foregroundStyle(.teal)
+                .foregroundStyle(Color.swapAccent)
                 .frame(width: 24)
                 .font(.caption)
 
@@ -393,7 +393,7 @@ struct StrengthTemplateView: View {
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(.bordered)
-        .tint(.teal)
+        .tint(Color.swapAccent)
         .controlSize(.small)
         .disabled(stretchStore.daysWithExercises.count >= 7)
     }

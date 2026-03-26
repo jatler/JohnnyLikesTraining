@@ -54,15 +54,27 @@ bordered prominent buttons) automatically use SWAP green.
 
 System font stack only (SF Pro) — no custom fonts. SwiftUI `.font()` modifiers throughout.
 
-| Role               | SwiftUI style              | Notes                              |
-|--------------------|----------------------------|------------------------------------|
-| App wordmark       | `.system(size: 52, weight: .black)` | "SWAP" in sign-in screen    |
-| Section heading    | `.headline`                | Bold, primary text color           |
-| Body               | `.body`                    | Default reading size               |
-| Subheadline        | `.subheadline`             | Supporting text                    |
-| Caption            | `.caption`                 | Tertiary information               |
-| Caption 2          | `.caption2`                | Badges, compact labels             |
-| Monospace numbers  | `.title3.bold()` (tabular) | Stats, distance, progress counts   |
+### Scale
+
+| Role               | SwiftUI style                           | Weight        | Notes                              |
+|--------------------|-----------------------------------------|---------------|------------------------------------|
+| App wordmark       | `.system(size: 52, weight: .black)`     | Black (900)   | "SWAP" in sign-in screen           |
+| Screen title       | `.largeTitle` / `.title`                | Bold (700)    | NavigationStack titles             |
+| Card heading       | `.title2.bold()`                        | Bold (700)    | Primary card labels                |
+| Section heading    | `.headline`                             | Semibold (600)| Bold, primary text color           |
+| Body               | `.body`                                 | Regular (400) | Default reading size               |
+| Subheadline        | `.subheadline`                          | Regular (400) | Supporting/secondary text          |
+| Caption            | `.caption`                              | Regular (400) | Tertiary information               |
+| Caption 2          | `.caption2`                             | Regular (400) | Badges, compact labels             |
+| Monospace stats    | `.title3.bold().monospacedDigit()`      | Bold (700)    | Distance, pace, progress counts    |
+
+### Rules
+
+- **Weight contrast is hierarchy.** Headings must be visibly heavier than body text. Never use `.regular` for a heading or `.bold` for supporting text.
+- **Two weights per card maximum.** Each card-level component uses at most two distinct weights — one for the label, one for the value or body.
+- **Stats always monospaced.** Any numeric display (miles, pace, heart rate, set counts) uses `.monospacedDigit()` to prevent layout shift as numbers change.
+- **Secondary text uses `.secondary` foreground color**, not a lighter weight. Weight changes meaning; color changes hierarchy.
+- **Never use `.caption` weight for interactive labels.** Buttons and tappable text must be at minimum `.subheadline` size.
 
 ---
 
@@ -102,19 +114,21 @@ Paywall (`PatreonGateView`) and confirmation sheets use `.medium` detent with `.
 
 Use SF Symbols throughout. Icon selections per context:
 
-| Context               | Symbol                          |
-|-----------------------|---------------------------------|
-| App / sign-in hero    | `figure.run.circle.fill`        |
-| SWAP plan badge       | `checkmark.seal.fill`           |
-| Patreon connected     | `star.circle.fill` (swapAccent) |
-| Patreon not-patron    | `star.circle` (secondary)       |
-| Network error         | `wifi.exclamationmark`          |
-| Override indicator    | `pencil.circle.fill` (orange)   |
-| Strength              | `dumbbell.fill` (indigo)        |
-| Heat                  | `flame.fill` (orange)           |
-| Stretch               | `figure.flexibility` (teal)     |
-| Completed             | `checkmark.circle.fill` (green) |
-| Chevron navigation    | `chevron.left` / `chevron.right` |
+| Context               | Symbol                          | Color          |
+|-----------------------|---------------------------------|----------------|
+| App / sign-in hero    | `figure.run.circle.fill`        | `swapAccent`   |
+| SWAP plan badge       | `checkmark.seal.fill`           | `swapAccent`   |
+| Patreon connected     | `star.circle.fill`              | `swapAccent`   |
+| Patreon not-patron    | `star.circle`                   | `.secondary`   |
+| Network error         | `wifi.exclamationmark`          | `.secondary`   |
+| Override indicator    | `pencil.circle.fill`            | `.orange`      |
+| Strength              | `dumbbell.fill`                 | `swapAccent`   |
+| Heat                  | `flame.fill`                    | `.orange`      |
+| Stretch               | `figure.flexibility`            | `swapAccent`   |
+| Completed             | `checkmark.circle.fill`         | `.green`       |
+| Chevron navigation    | `chevron.left` / `chevron.right` | `.secondary`  |
+
+**Color rule:** SWAP green (`Color.swapAccent`) is used for all activity-type icons (running, strength, stretch). `.orange` is reserved for heat (fire semantics) and override indicators. `.green` is reserved for completion states only. Never use `.indigo`, `.teal`, `.blue`, or `.purple` for icons.
 
 ---
 
@@ -163,3 +177,6 @@ Membership is re-verified at most once per 7 days (cached in Keychain as `patreo
 | 2026-03-25 | `.medium` sheet for PaywallGateView                             | Lightweight — doesn't replace root navigation; dismisses automatically on verify |
 | 2026-03-25 | System font (SF Pro) only — no custom fonts                     | iOS native feel; no font loading overhead; excellent legibility at all weights  |
 | 2026-03-25 | `BrandKit.swift` for all brand strings and color tokens         | Single source of truth; avoids hardcoded strings scattered across view files   |
+| 2026-03-26 | Collapsed icon palette to swapAccent + orange + green only      | Removed `.indigo` (strength) and `.teal` (stretch) — too many accent colors created visual noise; green unifies all activity types |
+| 2026-03-26 | Pull-to-refresh on TodayView triggers Oura + Strava reload      | Users need a manual way to force-sync integrations; SwiftUI `.refreshable` on the main `ScrollView` is the native iOS pattern |
+| 2026-03-26 | Typography weight contrast rules added                          | SF Pro has 9 weights; using only 2-3 per screen creates clear hierarchy without custom fonts |

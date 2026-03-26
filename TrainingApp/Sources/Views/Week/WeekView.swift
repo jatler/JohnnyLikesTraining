@@ -206,7 +206,7 @@ struct WeekView: View {
                     if !daySessions.isEmpty {
                         Label("Strength", systemImage: "dumbbell.fill")
                             .font(.caption2)
-                            .foregroundStyle(.indigo)
+                            .foregroundStyle(Color.swapAccent)
                     }
 
                     if let heat = dayHeat.first {
@@ -241,7 +241,7 @@ struct WeekView: View {
                                 Image(systemName: allDone ? "checkmark.circle.fill" : "figure.flexibility")
                             }
                             .font(.caption2)
-                            .foregroundStyle(allDone ? .green : .teal)
+                            .foregroundStyle(allDone ? .green : Color.swapAccent)
                         }
                         .buttonStyle(.plain)
                     }
@@ -312,11 +312,11 @@ struct WeekView: View {
             if completed > 0 {
                 Text("\(completed)/\(total)")
                     .font(.caption2)
-                    .foregroundStyle(.indigo)
+                    .foregroundStyle(Color.swapAccent)
             } else {
                 Text("\(total) exercises")
                     .font(.caption2)
-                    .foregroundStyle(.indigo.opacity(0.6))
+                    .foregroundStyle(Color.swapAccent.opacity(0.6))
             }
         }
     }

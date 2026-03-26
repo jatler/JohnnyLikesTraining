@@ -52,13 +52,13 @@ struct ExerciseHistoryView: View {
                         x: .value("Date", log.completedAt),
                         y: .value("Weight (lbs)", (log.actualWeightKg ?? 0) * 2.205)
                     )
-                    .foregroundStyle(.indigo)
+                    .foregroundStyle(Color.swapAccent)
 
                     PointMark(
                         x: .value("Date", log.completedAt),
                         y: .value("Weight (lbs)", (log.actualWeightKg ?? 0) * 2.205)
                     )
-                    .foregroundStyle(.indigo)
+                    .foregroundStyle(Color.swapAccent)
                 }
                 .frame(height: 180)
                 .chartYAxisLabel("lbs")
@@ -81,7 +81,7 @@ struct ExerciseHistoryView: View {
                     x: .value("Date", log.completedAt),
                     y: .value("Reps", log.actualReps)
                 )
-                .foregroundStyle(.indigo.opacity(0.6))
+                .foregroundStyle(Color.swapAccent.opacity(0.6))
             }
             .frame(height: 140)
         }
@@ -147,7 +147,7 @@ struct ExerciseHistoryView: View {
 
             Image(systemName: "chart.line.uptrend.xyaxis")
                 .font(.system(size: 40))
-                .foregroundStyle(.indigo.opacity(0.5))
+                .foregroundStyle(Color.swapAccent.opacity(0.5))
 
             Text("No history yet")
                 .font(.title3)

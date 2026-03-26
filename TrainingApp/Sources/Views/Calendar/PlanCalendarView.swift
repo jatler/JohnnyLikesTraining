@@ -220,7 +220,7 @@ struct PlanCalendarView: View {
                 if hasStrength {
                     Image(systemName: "dumbbell.fill")
                         .font(.system(size: 6))
-                        .foregroundStyle(.indigo)
+                        .foregroundStyle(Color.swapAccent)
                         .offset(x: -8, y: -6)
                 }
 

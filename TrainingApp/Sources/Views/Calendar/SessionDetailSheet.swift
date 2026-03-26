@@ -363,7 +363,7 @@ struct SessionDetailSheet: View {
                 HStack {
                     Label("Strength", systemImage: "dumbbell.fill")
                         .font(.subheadline.bold())
-                        .foregroundStyle(.indigo)
+                        .foregroundStyle(Color.swapAccent)
 
                     Spacer()
 
@@ -378,7 +378,7 @@ struct SessionDetailSheet: View {
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
-                    .tint(.indigo)
+                    .tint(Color.swapAccent)
                 }
 
                 ForEach(daySessions) { s in
@@ -409,7 +409,7 @@ struct SessionDetailSheet: View {
             }
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.indigo.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+            .background(Color.swapAccent.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
             .opacity(isSkipped ? 0.5 : 1)
         }
     }
@@ -628,7 +628,7 @@ struct SessionDetailSheet: View {
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(.bordered)
-        .tint(.indigo)
+        .tint(Color.swapAccent)
     }
 
     private var swapTargetsSection: some View {

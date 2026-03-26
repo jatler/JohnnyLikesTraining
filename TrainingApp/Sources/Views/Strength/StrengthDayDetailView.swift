@@ -51,7 +51,7 @@ struct StrengthDayDetailView: View {
         return VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: "dumbbell.fill")
-                    .foregroundStyle(.indigo)
+                    .foregroundStyle(Color.swapAccent)
 
                 Text(session.exerciseName)
                     .font(.headline)
@@ -162,7 +162,7 @@ struct StrengthDayDetailView: View {
                     logSetFromInput(session: session, setNumber: setNumber)
                 } label: {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.indigo)
+                        .foregroundStyle(Color.swapAccent)
                 }
                 .disabled(inputs[inputIndex].reps.isEmpty)
             }

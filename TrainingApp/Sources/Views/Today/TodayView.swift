@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct TodayView: View {
+    @Environment(AuthService.self) private var auth
     @Environment(TrainingPlanStore.self) private var planStore
     @Environment(StravaService.self) private var strava
     @Environment(OuraService.self) private var oura
@@ -75,6 +76,16 @@ struct TodayView: View {
                 }
             }
             .padding()
+        }
+        .refreshable {
+            guard let userId = auth.currentUserId else { return }
+            if strava.isConnected {
+                await strava.loadActivities(userId: userId)
+                strava.autoMatchActivities(sessions: planStore.sessions)
+            }
+            if oura.isConnected {
+                await oura.loadDailyData(userId: userId)
+            }
         }
         .sheet(item: $selectedHeatSession) { session in
             HeatLogSheet(session: session)
@@ -419,13 +430,13 @@ struct TodayView: View {
             if let strength, let strengthNotes = strength.notes, !strengthNotes.isEmpty {
                 HStack(spacing: 8) {
                     Image(systemName: "dumbbell.fill")
-                        .foregroundStyle(.indigo)
+                        .foregroundStyle(Color.swapAccent)
                     Text(strengthNotes)
                         .font(.subheadline)
                 }
                 .padding(10)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(.indigo.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+                .background(Color.swapAccent.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
                 .opacity(skipped ? 0.5 : 1)
             }
         }
@@ -571,7 +582,7 @@ struct TodayView: View {
                 HStack {
                     Label("Strength", systemImage: "dumbbell.fill")
                         .font(.headline)
-                        .foregroundStyle(.indigo)
+                        .foregroundStyle(Color.swapAccent)
 
                     Spacer()
 
@@ -592,7 +603,7 @@ struct TodayView: View {
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
-                    .tint(.indigo)
+                    .tint(Color.swapAccent)
                 }
 
                 ForEach(daySessions) { session in
@@ -628,10 +639,10 @@ struct TodayView: View {
                 }
             }
             .padding()
-            .background(.indigo.opacity(0.06), in: RoundedRectangle(cornerRadius: 16))
+            .background(Color.swapAccent.opacity(0.06), in: RoundedRectangle(cornerRadius: 16))
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .strokeBorder(.indigo.opacity(0.15), lineWidth: 1)
+                    .strokeBorder(Color.swapAccent.opacity(0.15), lineWidth: 1)
             )
         }
     }
@@ -657,7 +668,7 @@ struct TodayView: View {
                 HStack {
                     Label("Stretches", systemImage: "figure.flexibility")
                         .font(.headline)
-                        .foregroundStyle(.teal)
+                        .foregroundStyle(Color.swapAccent)
 
                     Spacer()
 
@@ -678,7 +689,7 @@ struct TodayView: View {
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
-                    .tint(.teal)
+                    .tint(Color.swapAccent)
                 }
 
                 ForEach(daySessions) { session in
@@ -714,10 +725,10 @@ struct TodayView: View {
                 }
             }
             .padding()
-            .background(.teal.opacity(0.06), in: RoundedRectangle(cornerRadius: 16))
+            .background(Color.swapAccent.opacity(0.06), in: RoundedRectangle(cornerRadius: 16))
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
-                    .strokeBorder(.teal.opacity(0.15), lineWidth: 1)
+                    .strokeBorder(Color.swapAccent.opacity(0.15), lineWidth: 1)
             )
         }
     }
