@@ -53,6 +53,7 @@ struct MainTabView: View {
                     Label("Settings", systemImage: "gearshape")
                 }
         }
+        .tint(Color.swapAccent)
         .task {
             guard let userId = auth.currentUserId else { return }
             if !planStore.hasPlan {
