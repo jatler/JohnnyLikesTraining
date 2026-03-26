@@ -38,6 +38,7 @@ targets:
         CURRENT_PROJECT_VERSION: "2" # build / CFBundleVersion
         GENERATE_INFOPLIST_FILE: false
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        INFOPLIST_KEY_CFBundleDisplayName: "SWAP Training"
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: WHKX4QF56D
         # Set to YES in Secrets.xcconfig to show “Skip Sign-In (Dev)” on Release/device builds.
