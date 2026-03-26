@@ -43,6 +43,8 @@ struct TodayView: View {
     private var todayContent: some View {
         ScrollView {
             VStack(spacing: 24) {
+                tuesdayBanner
+
                 recoveryCard
 
                 let todaySessions = planStore.todaySessions
@@ -89,6 +91,34 @@ struct TodayView: View {
                 let dayOfWeek = Calendar.current.component(.weekday, from: Date())
                 let adjustedDay = dayOfWeek == 1 ? 7 : dayOfWeek - 1
                 StrengthDayDetailView(weekNumber: week, dayOfWeek: adjustedDay)
+            }
+        }
+    }
+
+    // MARK: - Tuesday Banner
+
+    @ViewBuilder
+    private var tuesdayBanner: some View {
+        if Calendar.current.component(.weekday, from: Date()) == 3 {
+            Link(destination: URL(string: "https://open.spotify.com/show/3AaJYZngimocFf8aztKTcO")!) {
+                HStack(spacing: 12) {
+                    Image(systemName: "headphones")
+                        .font(.title2)
+                        .foregroundStyle(Color.swapAccent)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Happy Tuesday! It's Tuesday!!!")
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                        Text("Listen to the latest SWAP podcast ↗")
+                            .font(.subheadline)
+                            .foregroundStyle(Color.swapAccent)
+                    }
+
+                    Spacer()
+                }
+                .padding(12)
+                .background(Color.swapAccentLight, in: RoundedRectangle(cornerRadius: 12))
             }
         }
     }
