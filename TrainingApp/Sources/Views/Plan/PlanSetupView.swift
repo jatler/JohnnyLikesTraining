@@ -56,15 +56,8 @@ struct PlanSetupView: View {
                     Picker("Training Plan", selection: $selectedTemplate) {
                         Text("Select a plan").tag(nil as TrainingPlanTemplate?)
                         ForEach(templates) { template in
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(template.name)
-                                if template.source == "SWAP Running" {
-                                    Label("SWAP Running", systemImage: "checkmark.seal.fill")
-                                        .font(.caption2)
-                                        .foregroundStyle(Color.swapAccent)
-                                }
-                            }
-                            .tag(template as TrainingPlanTemplate?)
+                            Text(template.name)
+                                .tag(template as TrainingPlanTemplate?)
                         }
                     }
                 } footer: {

@@ -419,8 +419,6 @@ struct TodayView: View {
                 .buttonStyle(.bordered)
                 .tint(.blue)
             } else {
-                quickSwapButton(for: session)
-
                 HStack(spacing: 10) {
                     Button {
                         showingSkipOptions = true

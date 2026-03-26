@@ -38,14 +38,14 @@ struct MainTabView: View {
                     Label("Week", systemImage: "calendar")
                 }
 
-            StrengthTemplateView()
-                .tabItem {
-                    Label("Strength", systemImage: "dumbbell.fill")
-                }
-
             ProgressDashboardView()
                 .tabItem {
                     Label("Progress", systemImage: "chart.bar.fill")
+                }
+
+            StrengthTemplateView()
+                .tabItem {
+                    Label("Strength", systemImage: "dumbbell.fill")
                 }
 
             SettingsView()
