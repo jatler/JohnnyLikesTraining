@@ -12,6 +12,10 @@ enum KeychainService {
         case ouraAccessToken = "oura_access_token"
         case ouraRefreshToken = "oura_refresh_token"
         case ouraExpiresAt = "oura_expires_at"
+        case patreonAccessToken = "patreon_access_token"
+        case patreonRefreshToken = "patreon_refresh_token"
+        case patreonLastVerifiedAt = "patreon_last_verified_at"
+        case patreonGracePeriodStart = "patreon_grace_period_start"
     }
 
     static func save(_ value: String, for key: Key) {
@@ -65,10 +69,15 @@ enum KeychainService {
             delete(.ouraAccessToken)
             delete(.ouraRefreshToken)
             delete(.ouraExpiresAt)
+        case .patreon:
+            delete(.patreonAccessToken)
+            delete(.patreonRefreshToken)
+            delete(.patreonLastVerifiedAt)
+            delete(.patreonGracePeriodStart)
         }
     }
 }
 
 enum OAuthProvider: String, Codable {
-    case strava, oura
+    case strava, oura, patreon
 }

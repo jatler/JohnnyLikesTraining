@@ -5,10 +5,12 @@ struct SettingsView: View {
     @Environment(TrainingPlanStore.self) private var planStore
     @Environment(StravaService.self) private var strava
     @Environment(OuraService.self) private var oura
+    @Environment(PatreonService.self) private var patreon
 
     @State private var showingSignOutAlert = false
     @State private var showingDisconnectStrava = false
     @State private var showingDisconnectOura = false
+    @State private var showingDisconnectPatreon = false
     @State private var showingDeletePlan = false
     @State private var errorMessage: String?
     @State private var showingError = false
@@ -16,6 +18,8 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             List {
+                gracePeriodBanner
+                patreonSection
                 stravaSection
                 ouraSection
                 planSection
@@ -27,6 +31,83 @@ struct SettingsView: View {
                 Button("OK") {}
             } message: {
                 Text(errorMessage ?? "An unexpected error occurred.")
+            }
+        }
+    }
+
+    // MARK: - Grace Period Banner
+
+    @ViewBuilder
+    private var gracePeriodBanner: some View {
+        if let daysLeft = patreon.gracePeriodDaysRemaining {
+            Section {
+                HStack(spacing: 12) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.yellow)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Your access expires in \(daysLeft) day\(daysLeft == 1 ? "" : "s")")
+                            .font(.subheadline.bold())
+                        Link("Resubscribe on Patreon ↗", destination: BrandKit.patreonURL)
+                            .font(.caption)
+                            .foregroundStyle(.yellow)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+        }
+    }
+
+    // MARK: - Patreon
+
+    private var patreonSection: some View {
+        Section {
+            if patreon.isConnected {
+                HStack {
+                    Label("SWAP Patreon", systemImage: "star.circle.fill")
+                        .foregroundStyle(Color.swapAccent)
+                    Spacer()
+                    Text("Connected")
+                        .font(.subheadline)
+                        .foregroundStyle(.green)
+                }
+
+                if let lastVerified = patreon.lastVerifiedAt {
+                    HStack {
+                        Text("Last verified")
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Text(lastVerified.formatted(.relative(presentation: .named)))
+                    }
+                    .font(.subheadline)
+                }
+
+                Button("Disconnect Patreon", role: .destructive) {
+                    showingDisconnectPatreon = true
+                }
+                .alert("Disconnect Patreon?", isPresented: $showingDisconnectPatreon) {
+                    Button("Cancel", role: .cancel) {}
+                    Button("Disconnect", role: .destructive) { patreon.disconnect() }
+                } message: {
+                    Text("You'll lose access to SWAP training plans.")
+                }
+            } else {
+                Button {
+                    connectPatreon()
+                } label: {
+                    HStack {
+                        Label("Connect Patreon", systemImage: "star.circle.fill")
+                            .foregroundStyle(Color.swapAccent)
+                        Spacer()
+                        Image(systemName: "arrow.up.right.square")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        } header: {
+            Text("Patreon")
+        } footer: {
+            if !patreon.isConnected {
+                Text("Connect your SWAP Patreon account to unlock all training plans.")
             }
         }
     }
@@ -257,6 +338,17 @@ struct SettingsView: View {
 
     // MARK: - Actions
 
+    private func connectPatreon() {
+        Task {
+            do {
+                try await patreon.authorize()
+            } catch {
+                errorMessage = error.localizedDescription
+                showingError = true
+            }
+        }
+    }
+
     private func connectStrava() {
         Task {
             do {
@@ -318,4 +410,5 @@ struct SettingsView: View {
         .environment(TrainingPlanStore())
         .environment(StravaService())
         .environment(OuraService())
+        .environment(PatreonService())
 }
