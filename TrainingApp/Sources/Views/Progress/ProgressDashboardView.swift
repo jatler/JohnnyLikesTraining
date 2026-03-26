@@ -14,7 +14,7 @@ struct ProgressDashboardView: View {
                 if planStore.hasPlan {
                     ScrollView {
                         VStack(spacing: 24) {
-                            complianceCard
+                            completionCard
                             weeklyMileageChart
                             weeklyDetailList
                             raceReadinessCard
@@ -30,13 +30,13 @@ struct ProgressDashboardView: View {
         }
     }
 
-    // MARK: - Compliance Card
+    // MARK: - Completion Card
 
-    private var complianceCard: some View {
-        let stats = computeComplianceStats()
+    private var completionCard: some View {
+        let stats = computeCompletionStats()
 
         return VStack(spacing: 16) {
-            Text("Plan Compliance")
+            Text("Plan Completion")
                 .font(.headline)
 
             HStack(spacing: 20) {
@@ -233,7 +233,7 @@ struct ProgressDashboardView: View {
     // MARK: - Race Readiness
 
     private var raceReadinessCard: some View {
-        let stats = computeComplianceStats()
+        let stats = computeCompletionStats()
         let readiness = computeRaceReadiness(stats: stats)
 
         return VStack(spacing: 16) {
@@ -264,7 +264,7 @@ struct ProgressDashboardView: View {
                         Text(String(format: "%.0f%%", stats.completionRate * 100))
                             .font(.title.bold())
                             .foregroundStyle(stats.completionRate >= 0.8 ? .green : .orange)
-                        Text("Compliance")
+                        Text("Completion")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
                     }
@@ -333,7 +333,7 @@ struct ProgressDashboardView: View {
 
     // MARK: - Computation Helpers
 
-    private func computeComplianceStats() -> ComplianceStats {
+    private func computeCompletionStats() -> CompletionStats {
         let today = Calendar.current.startOfDay(for: Date())
         let trackable: (PlannedSession) -> Bool = { $0.workoutType != .rest && $0.workoutType != .strength }
         let pastSessions = planStore.sessions.filter {
@@ -353,7 +353,7 @@ struct ProgressDashboardView: View {
         let remaining = totalNonRest - completedCount - skippedCount
         let remainingRate: Double = totalNonRest > 0 ? Double(max(remaining, 0)) / Double(totalNonRest) : 1
 
-        return ComplianceStats(
+        return CompletionStats(
             totalSessions: totalNonRest,
             completedSessions: completedCount,
             skippedSessions: skippedCount,
@@ -388,7 +388,7 @@ struct ProgressDashboardView: View {
         }
     }
 
-    private func computeRaceReadiness(stats: ComplianceStats) -> RaceReadiness {
+    private func computeRaceReadiness(stats: CompletionStats) -> RaceReadiness {
         let rate = stats.completionRate
 
         if stats.completedSessions == 0 && stats.skippedSessions == 0 {
@@ -419,7 +419,7 @@ struct ProgressDashboardView: View {
 
 // MARK: - Supporting Types
 
-private struct ComplianceStats {
+private struct CompletionStats {
     let totalSessions: Int
     let completedSessions: Int
     let skippedSessions: Int
