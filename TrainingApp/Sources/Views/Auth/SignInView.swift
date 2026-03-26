@@ -11,17 +11,23 @@ struct SignInView: View {
         VStack(spacing: 32) {
             Spacer()
 
-            VStack(spacing: 12) {
-                Image(systemName: "figure.run")
-                    .font(.system(size: 64))
-                    .foregroundStyle(.blue)
+            VStack(spacing: 8) {
+                HStack(alignment: .lastTextBaseline, spacing: 2) {
+                    Text("SWAP")
+                        .font(.system(size: 52, weight: .black))
+                        .foregroundStyle(Color.swapAccent)
+                    Text("Training")
+                        .font(.title2)
+                        .fontWeight(.regular)
+                }
 
-                Text("Training")
-                    .font(.largeTitle.bold())
-
-                Text("Your running plan, daily.")
+                Text(BrandKit.tagline)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+
+                Text("Exclusive to SWAP Patreon subscribers")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
             }
 
             Spacer()
