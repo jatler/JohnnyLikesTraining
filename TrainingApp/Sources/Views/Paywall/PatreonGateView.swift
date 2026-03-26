@@ -94,6 +94,15 @@ struct PatreonGateView: View {
                         .foregroundStyle(Color.swapAccent)
                 }
                 .accessibilityLabel("Subscribe to SWAP on Patreon - opens in browser")
+
+                if DevSignIn.isAllowed {
+                    Button("Skip Patreon (Dev)") {
+                        onPatronVerified?()
+                        dismiss()
+                    }
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                }
             }
         }
     }
