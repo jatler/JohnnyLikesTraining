@@ -122,7 +122,7 @@ python3 scripts/sync_champion_plan_from_pdf.py "/path/to/The Champion Plan for 1
 
 ### 6. Dashboard & Progress Tracking
 
-- Weekly summary: planned vs. actual mileage, number of sessions completed, compliance percentage.
+- Weekly summary: planned vs. actual mileage, number of sessions completed, completion percentage.
 - Long run progression chart.
 - Race readiness view as race day approaches: are you on track?
 
@@ -329,7 +329,7 @@ python3 scripts/sync_champion_plan_from_pdf.py "/path/to/The Champion Plan for 1
 4. **Calendar** — Full plan calendar, color-coded by workout type. Tap any day to open a workout detail sheet.
 5. **Session Detail** — Planned workout details; if completed, plan vs. actual comparison with Strava data.
 6. **Mileage Chart** — Bar chart of weekly mileage (actual from Strava vs. planned) plotted across the entire training block. Highlights the current week, shows a target mileage line, and makes it easy to spot ramp-up, taper, and any weeks where you fell short.
-7. **Progress** — Compliance stats, readiness trends, race readiness summary.
+7. **Progress** — Completion stats, readiness trends, race readiness summary.
 8. **Plan Management** — View/edit active plan: change race name, race date, or plan template. Editing race date re-maps sessions; switching template replaces the plan (with confirmation).
 9. **Strength & More** (tab) — Weekly strength template editor. Shows exercises grouped by day of week. Inline editing for sets, reps, weight. "Apply to all future weeks" toggle. Progression suggestions shown as badges on exercises ready to progress. Stretch section for managing prescribed stretch/mobility days (add/remove days, choose routine type and duration). Heat section at the bottom for managing prescribed heat days (add/remove days, view type and duration).
 10. **Strength Day Detail** — Logging view for a single day's strength work. Shows prescribed exercises with target sets/reps/weight. User taps each set to log actual reps and weight. Completion state tracked per set.
@@ -453,7 +453,7 @@ Track passive heat acclimation sessions (sauna, hot tub, heat suit) prescribed b
 
 1. **Strava webhook vs polling**: Currently the app polls for activities on manual sync or app launch. Strava supports webhooks (push-based) via a Supabase Edge Function, which would auto-import activities without opening the app. Worth implementing now, or leave as a future enhancement?
 2. ~~**Strava activity types**: Currently filtering for `Run`, `TrailRun`, and `VirtualRun`. Should we also import `Hike`, `Walk`, or other activity types that might count as cross-training?~~ **Resolved**: Now importing runs (Run, TrailRun, VirtualRun), cross-training (CrossCountrySkiing, Elliptical, Hike, RockClimbing, Rowing, StairStepper, Swim, Walk), strength (WeightTraining, Crossfit), and yoga (Yoga). Each activity stores its `activity_type`.
-3. **Compliance calculation**: The "completed" count in the progress dashboard currently relies on Strava-matched sessions. If Strava is not connected, all past non-rest sessions show as "remaining." Should we add a manual "mark as done" option for users without Strava?
+3. **Completion calculation**: The "completed" count in the progress dashboard currently relies on Strava-matched sessions. If Strava is not connected, all past non-rest sessions show as "remaining." Should we add a manual "mark as done" option for users without Strava?
 4. **Token storage strategy**: OAuth tokens are currently stored locally in Keychain only. The Supabase `oauth_tokens` table exists in the schema but tokens are not synced to it yet. Should we persist tokens server-side as well (for multi-device support), or is Keychain-only sufficient?
 
 ## Resolved Decisions
@@ -521,10 +521,10 @@ Track passive heat acclimation sessions (sauna, hot tub, heat suit) prescribed b
 
 ### M6 — Progress & Polish ✅
 - [x] `ProgressDashboardView` — full progress tracking with three sections:
-  - **Compliance card**: circular progress indicators for completed/skipped/remaining percentages, session counts.
+  - **Completion card**: circular progress indicators for completed/skipped/remaining percentages, session counts.
   - **Weekly mileage chart** (Swift Charts): grouped bar chart showing planned vs actual km per week across the full training block. Current week highlighted with orange rule mark. Chart legend for Planned/Actual.
   - **Week-by-week detail list**: progress bars per week showing actual/planned km and session counts.
-  - **Race readiness card**: days until race, compliance percentage, weeks completed, readiness level badge (On Track / Fair / Behind / Starting) with contextual message.
+  - **Race readiness card**: days until race, completion percentage, weeks completed, readiness level badge (On Track / Fair / Behind / Starting) with contextual message.
 - [x] Week summary bar on `WeekView` — shows total planned km, actual km done, sessions completed, and skipped count for the selected week.
 - [x] Scroll fixes — `WeekView` and `PlanCalendarView` now properly scroll all content with bottom padding to prevent tab bar clipping. `WeekView` uses `LazyVStack` for efficient rendering.
 - [x] All new services (`StravaService`, `OuraService`) injected as `@Observable` environment objects from `TrainingApp.swift` through the full view hierarchy.
@@ -650,7 +650,7 @@ TrainingApp/
         ├── Strength/StrengthTemplateView.swift  # Strength tab — weekly template editor
         ├── Strength/StrengthDayDetailView.swift # Log sets/reps/weight for a day
         ├── Strength/ExerciseHistoryView.swift   # Per-exercise progression chart
-        ├── Progress/ProgressDashboardView.swift # Charts, compliance, readiness
+        ├── Progress/ProgressDashboardView.swift # Charts, completion, readiness
         └── Settings/SettingsView.swift    # Strava/Oura connect/disconnect
 
 docs/                                    # Static site for GitHub Pages
