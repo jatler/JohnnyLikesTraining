@@ -56,13 +56,26 @@ struct PlanSetupView: View {
                     Picker("Training Plan", selection: $selectedTemplate) {
                         Text("Select a plan").tag(nil as TrainingPlanTemplate?)
                         ForEach(templates) { template in
-                            Text(template.name).tag(template as TrainingPlanTemplate?)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(template.name)
+                                if template.source == "SWAP Running" {
+                                    Label("SWAP Running", systemImage: "checkmark.seal.fill")
+                                        .font(.caption2)
+                                        .foregroundStyle(Color.swapAccent)
+                                }
+                            }
+                            .tag(template as TrainingPlanTemplate?)
                         }
                     }
                 } footer: {
                     if let template = selectedTemplate {
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("\(template.durationWeeks) weeks \u{2022} \(template.author)")
+                            if template.source == "SWAP Running" {
+                                Text("By \(BrandKit.coachCredit) • \(template.durationWeeks) weeks")
+                                    .foregroundStyle(Color.swapAccent)
+                            } else {
+                                Text("\(template.durationWeeks) weeks \u{2022} \(template.author)")
+                            }
                             Text(template.description)
                         }
                     }
