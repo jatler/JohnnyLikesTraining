@@ -31,6 +31,12 @@ struct PatreonGateView: View {
         .padding(.bottom, 32)
         .presentationDetents([.medium])
         .presentationDragIndicator(.visible)
+        .onAppear {
+            if patreon.isPatron {
+                onPatronVerified?()
+                dismiss()
+            }
+        }
         .onChange(of: patreon.isPatron) { _, isPatron in
             if isPatron {
                 onPatronVerified?()
