@@ -860,7 +860,7 @@ struct TodayView: View {
 
             Image(systemName: "figure.run")
                 .font(.system(size: 48))
-                .foregroundStyle(.blue)
+                .foregroundStyle(Color.swapAccent)
 
             Text("No training plan yet")
                 .font(.title3)

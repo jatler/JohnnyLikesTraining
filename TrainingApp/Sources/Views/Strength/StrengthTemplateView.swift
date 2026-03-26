@@ -484,7 +484,7 @@ struct StrengthTemplateView: View {
             VStack(spacing: 24) {
                 Image(systemName: "dumbbell.fill")
                     .font(.system(size: 48))
-                    .foregroundStyle(.indigo)
+                    .foregroundStyle(Color.swapAccent)
 
                 Text("No strength program yet")
                     .font(.title3)
