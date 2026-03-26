@@ -875,7 +875,7 @@ struct TodayView: View {
             Button {
                 showingPlanSetup = true
             } label: {
-                Label("Create Training Plan", systemImage: "plus.circle.fill")
+                Label("Add Training Plan", systemImage: "plus.circle.fill")
                     .fontWeight(.semibold)
             }
             .buttonStyle(.borderedProminent)

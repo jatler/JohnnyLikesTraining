@@ -92,7 +92,7 @@ struct PlanSetupView: View {
                             if planStore.isLoading {
                                 ProgressView()
                             } else {
-                                Text("Create Training Plan")
+                                Text("Add Training Plan")
                                     .fontWeight(.semibold)
                             }
                             Spacer()
