@@ -19,6 +19,7 @@ final class PatreonService {
 
     init() {
         isConnected = KeychainService.get(.patreonAccessToken) != nil
+        isPatron = KeychainService.get(.patreonIsPatron) == "true"
         if let raw = KeychainService.get(.patreonLastVerifiedAt),
            let ts = Double(raw) {
             lastVerifiedAt = Date(timeIntervalSince1970: ts)
@@ -165,6 +166,7 @@ final class PatreonService {
 
         if activePatron {
             isPatron = true
+            KeychainService.save("true", for: .patreonIsPatron)
             // Clear grace period if they've reactivated
             KeychainService.delete(.patreonGracePeriodStart)
             gracePeriodDaysRemaining = nil
@@ -177,6 +179,7 @@ final class PatreonService {
                 }
             }
             isPatron = false
+            KeychainService.save("false", for: .patreonIsPatron)
             updateGracePeriod()
         }
     }
