@@ -100,7 +100,7 @@ struct WeekView: View {
                 if planStore.currentWeekNumber == selectedWeek {
                     Text("Current Week")
                         .font(.caption)
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(Color.swapAccent)
                         .fontWeight(.semibold)
                 }
             }
@@ -329,7 +329,7 @@ struct WeekView: View {
 
             Image(systemName: "calendar")
                 .font(.system(size: 48))
-                .foregroundStyle(.blue)
+                .foregroundStyle(Color.swapAccent)
 
             Text("No plan loaded yet")
                 .font(.title3)
