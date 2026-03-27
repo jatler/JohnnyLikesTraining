@@ -14,6 +14,7 @@ final class PatreonService {
     private(set) var gracePeriodDaysRemaining: Int?
 
     private var authSession: ASWebAuthenticationSession?
+    private var pendingOAuthState: String?
 
     // MARK: - Init
 
@@ -30,13 +31,16 @@ final class PatreonService {
     // MARK: - OAuth2 Authorize
 
     func authorize() async throws {
+        let state = UUID().uuidString
+        pendingOAuthState = state
+
         var components = URLComponents(string: Config.patreonAuthorizeURL)!
         components.queryItems = [
             URLQueryItem(name: "response_type", value: "code"),
             URLQueryItem(name: "client_id", value: Config.patreonClientId),
             URLQueryItem(name: "redirect_uri", value: Config.patreonRedirectURI),
             URLQueryItem(name: "scope", value: Config.patreonScope),
-            URLQueryItem(name: "state", value: UUID().uuidString)
+            URLQueryItem(name: "state", value: state)
         ]
 
         let code = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
@@ -49,9 +53,17 @@ final class PatreonService {
                     continuation.resume(throwing: error)
                     return
                 }
-                guard let url = callbackURL,
-                      let code = URLComponents(url: url, resolvingAgainstBaseURL: false)?
-                        .queryItems?.first(where: { $0.name == "code" })?.value else {
+                guard let url = callbackURL else {
+                    continuation.resume(throwing: PatreonError.noAuthCode)
+                    return
+                }
+                let params = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems
+                let returnedState = params?.first(where: { $0.name == "state" })?.value
+                guard returnedState == self?.pendingOAuthState else {
+                    continuation.resume(throwing: PatreonError.stateMismatch)
+                    return
+                }
+                guard let code = params?.first(where: { $0.name == "code" })?.value else {
                     continuation.resume(throwing: PatreonError.noAuthCode)
                     return
                 }
@@ -62,6 +74,7 @@ final class PatreonService {
             self.authSession?.start()
         }
 
+        pendingOAuthState = nil
         try await exchangeCodeForToken(code)
         try await verifyMembership()
     }
@@ -312,6 +325,7 @@ enum PatreonError: LocalizedError {
     case tokenExchangeFailed
     case tokenRefreshFailed
     case apiFailed
+    case stateMismatch
     case decodeFailed(String)
 
     var errorDescription: String? {
@@ -321,6 +335,7 @@ enum PatreonError: LocalizedError {
         case .tokenExchangeFailed: "Failed to exchange authorization code for tokens."
         case .tokenRefreshFailed: "Failed to refresh Patreon access token."
         case .apiFailed: "Patreon API request failed."
+        case .stateMismatch: "OAuth state parameter mismatch — possible CSRF attack."
         case .decodeFailed(let detail): "Failed to decode Patreon response: \(detail)"
         }
     }
