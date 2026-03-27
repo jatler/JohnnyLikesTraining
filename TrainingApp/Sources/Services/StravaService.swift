@@ -55,10 +55,15 @@ final class StravaService {
         let code = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
             self.authSession = ASWebAuthenticationSession(
                 url: components.url!,
-                callbackURLScheme: "training"
+                callbackURLScheme: "http"
             ) { [weak self] callbackURL, error in
                 self?.authSession = nil
                 if let error {
+                    let nsError = error as NSError
+                    print("[Strava OAuth] Error domain: \(nsError.domain), code: \(nsError.code), description: \(nsError.localizedDescription)")
+                    if let underlying = nsError.userInfo[NSUnderlyingErrorKey] as? NSError {
+                        print("[Strava OAuth] Underlying: domain=\(underlying.domain), code=\(underlying.code)")
+                    }
                     continuation.resume(throwing: error)
                     return
                 }
