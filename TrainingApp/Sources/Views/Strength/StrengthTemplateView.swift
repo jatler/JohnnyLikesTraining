@@ -16,8 +16,15 @@ struct StrengthTemplateView: View {
     @State private var addStretchDay: Int = 1
     @State private var editingStretch: StretchTemplateExercise?
     @State private var selectedStretchDay: StretchDaySelection?
+    @State private var selectedSegment: StrengthTabSegment = .strength
 
     private let dayNames = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+    enum StrengthTabSegment: String, CaseIterable {
+        case strength = "Strength"
+        case stretch = "Stretch"
+        case heat = "Heat"
+    }
 
     var body: some View {
         NavigationStack {
@@ -64,22 +71,53 @@ struct StrengthTemplateView: View {
     // MARK: - Template Content
 
     private var templateContent: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                suggestionsSection
+        VStack(spacing: 0) {
+            Picker("Section", selection: $selectedSegment) {
+                ForEach(StrengthTabSegment.allCases, id: \.self) { segment in
+                    Text(segment.rawValue).tag(segment)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding()
 
-                ForEach(strengthStore.daysWithExercises, id: \.self) { day in
-                    daySection(day)
+            ScrollView {
+                VStack(spacing: 20) {
+                    switch selectedSegment {
+                    case .strength:
+                        suggestionsSection
+
+                        ForEach(strengthStore.daysWithExercises, id: \.self) { day in
+                            daySection(day)
+                        }
+
+                        addDayButton
+
+                    case .stretch:
+                        stretchSegmentContent
+
+                    case .heat:
+                        heatTemplateSection
+                    }
+                }
+                .padding()
+                .padding(.bottom, 20)
+            }
+        }
+    }
+
+    private var stretchSegmentContent: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            if stretchStore.hasTemplate {
+                ForEach(stretchStore.daysWithExercises, id: \.self) { day in
+                    stretchDaySection(day)
                 }
 
-                addDayButton
-
-                stretchTemplateSection
-
-                heatTemplateSection
+                stretchAddDayButton
+            } else {
+                Text("No stretches yet — create a plan or add stretches manually.")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
             }
-            .padding()
-            .padding(.bottom, 20)
         }
     }
 
@@ -488,28 +526,43 @@ struct StrengthTemplateView: View {
     // MARK: - Empty State
 
     private var emptyState: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                Image(systemName: "dumbbell.fill")
-                    .font(.system(size: 48))
-                    .foregroundStyle(Color.swapAccent)
-
-                Text("No strength program yet")
-                    .font(.title3)
-                    .foregroundStyle(.secondary)
-
-                Text("Create a training plan to automatically load your strength program.")
-                    .font(.subheadline)
-                    .foregroundStyle(.tertiary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
-
-                stretchTemplateSection
-
-                heatTemplateSection
+        VStack(spacing: 0) {
+            Picker("Section", selection: $selectedSegment) {
+                ForEach(StrengthTabSegment.allCases, id: \.self) { segment in
+                    Text(segment.rawValue).tag(segment)
+                }
             }
+            .pickerStyle(.segmented)
             .padding()
-            .padding(.top, 40)
+
+            ScrollView {
+                VStack(spacing: 24) {
+                    switch selectedSegment {
+                    case .strength:
+                        Image(systemName: "dumbbell.fill")
+                            .font(.system(size: 48))
+                            .foregroundStyle(Color.swapAccent)
+
+                        Text("No strength program yet")
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+
+                        Text("Create a training plan to automatically load your strength program.")
+                            .font(.subheadline)
+                            .foregroundStyle(.tertiary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 40)
+
+                    case .stretch:
+                        stretchSegmentContent
+
+                    case .heat:
+                        heatTemplateSection
+                    }
+                }
+                .padding()
+                .padding(.top, 40)
+            }
         }
     }
 
