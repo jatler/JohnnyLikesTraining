@@ -135,7 +135,7 @@ final class PatreonService {
             }
             request.setValue("Bearer \(newToken)", forHTTPHeaderField: "Authorization")
             let (data2, _) = try await URLSession.shared.data(for: request)
-            processIdentityResponse(data2)
+            try processIdentityResponse(data2)
             return
         }
 
@@ -143,14 +143,19 @@ final class PatreonService {
             throw PatreonError.apiFailed
         }
 
-        processIdentityResponse(data)
+        try processIdentityResponse(data)
     }
 
-    private func processIdentityResponse(_ data: Data) {
+    private func processIdentityResponse(_ data: Data) throws {
         let campaignId = Config.patreonSwapCampaignId
-        let response = try? JSONDecoder().decode(PatreonIdentityResponse.self, from: data)
+        let response: PatreonIdentityResponse
+        do {
+            response = try JSONDecoder().decode(PatreonIdentityResponse.self, from: data)
+        } catch {
+            throw PatreonError.decodeFailed(error.localizedDescription)
+        }
 
-        let member = response?.included?
+        let member = response.included?
             .filter { $0.type == "member" }
             .first { member in
                 member.relationships?.campaign?.data?.id == campaignId
@@ -307,6 +312,7 @@ enum PatreonError: LocalizedError {
     case tokenExchangeFailed
     case tokenRefreshFailed
     case apiFailed
+    case decodeFailed(String)
 
     var errorDescription: String? {
         switch self {
@@ -315,6 +321,7 @@ enum PatreonError: LocalizedError {
         case .tokenExchangeFailed: "Failed to exchange authorization code for tokens."
         case .tokenRefreshFailed: "Failed to refresh Patreon access token."
         case .apiFailed: "Patreon API request failed."
+        case .decodeFailed(let detail): "Failed to decode Patreon response: \(detail)"
         }
     }
 }
