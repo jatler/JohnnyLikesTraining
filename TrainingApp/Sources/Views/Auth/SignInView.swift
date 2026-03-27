@@ -21,13 +21,9 @@ struct SignInView: View {
                         .fontWeight(.regular)
                 }
 
-                Text(BrandKit.tagline)
+                Text("Huzzah!")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
-
-                Text("Exclusive to SWAP Patreon subscribers")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
             }
 
             Spacer()
