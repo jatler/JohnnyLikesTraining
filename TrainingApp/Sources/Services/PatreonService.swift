@@ -222,6 +222,12 @@ final class PatreonService {
     // MARK: - Token Refresh
 
     private func refreshTokenIfNeeded() async throws {
+        if let expiresStr = KeychainService.get(.patreonExpiresAt),
+           let expiresAt = Double(expiresStr),
+           Date().timeIntervalSince1970 < expiresAt {
+            return // token still valid
+        }
+
         guard let refreshToken = KeychainService.get(.patreonRefreshToken) else {
             throw PatreonError.notConnected
         }
@@ -254,6 +260,8 @@ final class PatreonService {
         if let refresh = token.refreshToken {
             KeychainService.save(refresh, for: .patreonRefreshToken)
         }
+        let expiresAt = Date().addingTimeInterval(24 * 3600).timeIntervalSince1970
+        KeychainService.save(String(expiresAt), for: .patreonExpiresAt)
     }
 
     // MARK: - Disconnect

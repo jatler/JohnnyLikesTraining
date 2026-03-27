@@ -14,6 +14,7 @@ enum KeychainService {
         case ouraExpiresAt = "oura_expires_at"
         case patreonAccessToken = "patreon_access_token"
         case patreonRefreshToken = "patreon_refresh_token"
+        case patreonExpiresAt = "patreon_expires_at"
         case patreonIsPatron = "patreon_is_patron"
         case patreonLastVerifiedAt = "patreon_last_verified_at"
         case patreonGracePeriodStart = "patreon_grace_period_start"
@@ -73,6 +74,7 @@ enum KeychainService {
         case .patreon:
             delete(.patreonAccessToken)
             delete(.patreonRefreshToken)
+            delete(.patreonExpiresAt)
             delete(.patreonIsPatron)
             delete(.patreonLastVerifiedAt)
             delete(.patreonGracePeriodStart)
