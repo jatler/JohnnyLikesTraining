@@ -208,7 +208,7 @@ struct PlanCalendarView: View {
             ZStack {
                 Image(systemName: session.workoutType.iconName)
                     .font(.system(size: 10))
-                    .foregroundStyle(session.workoutType.swiftUIColor)
+                    .foregroundStyle(calendarIconColor(session.workoutType))
 
                 if hasActivity {
                     Image(systemName: "checkmark.circle.fill")
@@ -243,13 +243,50 @@ struct PlanCalendarView: View {
         .frame(height: 40)
         .background(
             RoundedRectangle(cornerRadius: 6)
-                .fill(session.workoutType.swiftUIColor.opacity(skipped ? 0.08 : 0.15))
+                .fill(calendarCellBackground(session.workoutType, skipped: skipped))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 6)
-                .strokeBorder(isToday ? Color.primary : .clear, lineWidth: 1.5)
+                .strokeBorder(calendarCellBorder(session.workoutType, isToday: isToday), lineWidth: 1.5)
         )
         .opacity(skipped ? 0.5 : 1.0)
+    }
+
+    private func calendarIconColor(_ type: WorkoutType) -> Color {
+        switch type {
+        case .intervals, .longRun, .race:
+            return .white
+        default:
+            return type.swiftUIColor
+        }
+    }
+
+    // MARK: - Calendar Cell Color Mapping
+
+    private func calendarCellBackground(_ type: WorkoutType, skipped: Bool) -> Color {
+        if skipped { return Color.swapAccent.opacity(0.04) }
+        switch type {
+        case .easy, .recovery:
+            return Color.swapAccent.opacity(0.15)
+        case .tempo:
+            return Color.swapAccent.opacity(0.4)
+        case .intervals:
+            return Color.swapAccent.opacity(0.7)
+        case .longRun, .race:
+            return Color.swapAccent
+        case .rest:
+            return .clear
+        case .crossTrain:
+            return .clear
+        case .strength:
+            return Color.swapAccent.opacity(0.15)
+        }
+    }
+
+    private func calendarCellBorder(_ type: WorkoutType, isToday: Bool) -> Color {
+        if isToday { return .primary }
+        if type == .crossTrain { return Color.swapAccent.opacity(0.4) }
+        return .clear
     }
 
     // MARK: - Empty State
