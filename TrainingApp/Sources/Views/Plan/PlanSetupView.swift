@@ -109,7 +109,13 @@ struct PlanSetupView: View {
             }
             .onAppear {
                 if selectedTemplate == nil {
+                    #if DEBUG
+                    raceName = "MJ"
+                    raceDate = Calendar.current.date(from: DateComponents(year: 2026, month: 5, day: 9))!
+                    selectedTemplate = templates.first(where: { $0.name.localizedCaseInsensitiveContains("champion") }) ?? templates.first
+                    #else
                     selectedTemplate = templates.first
+                    #endif
                 }
             }
         }

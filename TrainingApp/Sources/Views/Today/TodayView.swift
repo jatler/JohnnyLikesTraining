@@ -84,7 +84,7 @@ struct TodayView: View {
                 strava.autoMatchActivities(sessions: planStore.sessions)
             }
             if oura.isConnected {
-                await oura.loadDailyData(userId: userId)
+                try? await oura.syncDaily(userId: userId)
             }
         }
         .sheet(item: $selectedHeatSession) { session in
@@ -269,6 +269,7 @@ struct TodayView: View {
     // MARK: - Strava Comparison Banner
 
     private func stravaComparisonBanner(session: PlannedSession, activity: StravaActivity) -> some View {
+        return Link(destination: URL(string: "https://www.strava.com/activities/\(activity.stravaId)")!) {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: "checkmark.circle.fill")
@@ -285,6 +286,9 @@ struct TodayView: View {
                         .background(.blue, in: Capsule())
                 }
                 Text(activity.name)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Image(systemName: "arrow.up.right.square")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -352,6 +356,7 @@ struct TodayView: View {
             RoundedRectangle(cornerRadius: 12)
                 .strokeBorder(.green.opacity(0.2), lineWidth: 1)
         )
+        }
     }
 
     @ViewBuilder

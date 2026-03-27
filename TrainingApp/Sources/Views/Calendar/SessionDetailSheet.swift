@@ -478,14 +478,15 @@ struct SessionDetailSheet: View {
     // MARK: - Plan vs Actual
 
     private func planVsActualSection(_ activity: StravaActivity) -> some View {
+        return Link(destination: URL(string: "https://www.strava.com/activities/\(activity.stravaId)")!) {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundStyle(.green)
                 Text("Completed: \(activity.name)")
                     .font(.subheadline.bold())
+                Spacer()
                 if !activity.isRun {
-                    Spacer()
                     Text(activity.activityTypeDisplay)
                         .font(.caption2.bold())
                         .foregroundStyle(.white)
@@ -493,6 +494,9 @@ struct SessionDetailSheet: View {
                         .padding(.vertical, 2)
                         .background(.blue, in: Capsule())
                 }
+                Image(systemName: "arrow.up.right.square")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
 
             LazyVGrid(columns: [
@@ -542,6 +546,7 @@ struct SessionDetailSheet: View {
         }
         .padding()
         .background(.green.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
+        }
     }
 
     private func comparisonCell(title: String, actual: String, planned: String?, delta: Double?) -> some View {
