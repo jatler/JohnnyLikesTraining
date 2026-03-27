@@ -52,10 +52,7 @@ struct TodayView: View {
     private var todayContent: some View {
         ScrollView {
             VStack(spacing: 24) {
-                tuesdayBanner
-
-                recoveryCard
-
+                // Run session card first — must be above the fold
                 let todaySessions = planStore.todaySessions
                     .filter { $0.workoutType != .strength }
                 if todaySessions.isEmpty {
@@ -73,6 +70,13 @@ struct TodayView: View {
                     }
                 }
 
+                // Recovery inline
+                recoveryCard
+
+                // Conditional banners
+                tuesdayBanner
+
+                // Strength, stretch, heat at bottom
                 todayStrengthSection
 
                 todayStretchSection
