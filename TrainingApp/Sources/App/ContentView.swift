@@ -26,12 +26,20 @@ struct MainTabView: View {
     @Environment(HeatStore.self) private var heatStore
     @Environment(StretchStore.self) private var stretchStore
 
+    @State private var dataLoaded = false
+
     var body: some View {
         TabView {
-            TodayView()
-                .tabItem {
-                    Label("Today", systemImage: "sun.max.fill")
+            Group {
+                if dataLoaded || planStore.hasPlan {
+                    TodayView()
+                } else {
+                    SkeletonLoadingView()
                 }
+            }
+            .tabItem {
+                Label("Today", systemImage: "sun.max.fill")
+            }
 
             WeekView()
                 .tabItem {
@@ -59,6 +67,7 @@ struct MainTabView: View {
             if !planStore.hasPlan {
                 await planStore.loadPlan(userId: userId)
             }
+            dataLoaded = true
             if let plan = planStore.activePlan {
                 if !strengthStore.hasTemplate {
                     await strengthStore.loadData(planId: plan.id)
@@ -85,6 +94,42 @@ struct MainTabView: View {
                 await oura.loadDailyData(userId: userId)
             }
         }
+    }
+}
+
+private struct SkeletonLoadingView: View {
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Session card skeleton
+                    skeletonCard(height: 160)
+
+                    // Recovery card skeleton
+                    skeletonCard(height: 80)
+
+                    // Strength section skeleton
+                    skeletonCard(height: 100)
+                }
+                .padding()
+            }
+            .navigationTitle("Today")
+        }
+    }
+
+    private func skeletonCard(height: CGFloat) -> some View {
+        RoundedRectangle(cornerRadius: 16)
+            .fill(Color(.systemGray5))
+            .frame(height: height)
+            .shimmering()
+    }
+}
+
+private extension View {
+    func shimmering() -> some View {
+        self
+            .redacted(reason: .placeholder)
+            .opacity(0.6)
     }
 }
 
