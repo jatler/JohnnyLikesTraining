@@ -72,12 +72,12 @@ struct StravaActivity: Codable, Identifiable {
     }
 
     var distanceMi: Double {
-        distanceKm / 1.609
+        DistanceFormatter.miles(from: distanceKm)
     }
 
     var formattedPace: String {
         guard let pace = averagePacePerKm else { return "—" }
-        let pacePerMi = pace * 1.609
+        let pacePerMi = pace / 0.621371
         let minutes = Int(pacePerMi)
         let seconds = Int((pacePerMi - Double(minutes)) * 60)
         return String(format: "%d:%02d /mi", minutes, seconds)

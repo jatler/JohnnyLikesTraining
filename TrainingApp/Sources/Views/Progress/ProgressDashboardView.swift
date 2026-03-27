@@ -438,8 +438,8 @@ struct WeekMileageEntry: Identifiable {
 
     var id: Int { week }
 
-    var plannedMi: Double { plannedKm / 1.609 }
-    var actualMi: Double { actualKm / 1.609 }
+    var plannedMi: Double { DistanceFormatter.miles(from: plannedKm) }
+    var actualMi: Double { DistanceFormatter.miles(from: actualKm) }
 }
 
 private struct RaceReadiness {

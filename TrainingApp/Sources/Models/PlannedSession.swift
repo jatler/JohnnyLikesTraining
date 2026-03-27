@@ -13,7 +13,7 @@ struct PlannedSession: Codable, Identifiable {
     var sortOrder: Int
 
     var targetDistanceMi: Double? {
-        targetDistanceKm.map { $0 / 1.609 }
+        targetDistanceKm.map { DistanceFormatter.miles(from: $0) }
     }
 
     /// Full coaching text for display: session `notes` plus `targetPaceDescription` when that line is not already contained in the notes (templates often split them across JSON fields).

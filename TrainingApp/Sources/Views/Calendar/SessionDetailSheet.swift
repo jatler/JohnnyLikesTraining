@@ -323,7 +323,7 @@ struct SessionDetailSheet: View {
     }
 
     private func distanceRow(_ km: Double) -> some View {
-        let mi = km / 1.609
+        let mi = DistanceFormatter.miles(from: km)
         return HStack(spacing: 6) {
             Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
                 .foregroundStyle(.secondary)
@@ -695,7 +695,7 @@ struct SessionDetailSheet: View {
     }
 
     private func saveOverride() {
-        let distanceKm = Double(editDistanceMi).map { $0 * 1.609 }
+        let distanceKm = Double(editDistanceMi).map { $0 / 0.621371 }
 
         planStore.overrideSession(
             session.id,

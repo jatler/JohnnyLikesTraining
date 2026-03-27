@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		02D216BE04F5C9BBD631B010 /* SessionOverride.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A2CDF8B4AC1F14A2F3AE63B /* SessionOverride.swift */; };
 		0320FED4E3077437515CB210 /* AppleSignInSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E66380AFDA249ADA3BCD91 /* AppleSignInSupport.swift */; };
+		0370DD343DBEEE8B5631A2B2 /* DistanceFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F993B088CB2456C7010C691 /* DistanceFormatter.swift */; };
 		09774BD7EFE32B98FAA923B5 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4032AFBD2C6810AEB4A5C08C /* AuthService.swift */; };
 		0D2EEE071B59721CE1F0030C /* WorkoutType.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC41AACC3D838045702D918B /* WorkoutType.swift */; };
 		1581AFCF71290287044A878A /* StrengthLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D618114C072296876E86FC5B /* StrengthLog.swift */; };
@@ -108,6 +109,7 @@
 		886214F674543E3860A250BC /* SessionSwap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionSwap.swift; sourceTree = "<group>"; };
 		8903D44D8C5F1FCC00E5F9DA /* ExerciseHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseHistoryView.swift; sourceTree = "<group>"; };
 		8F8ED3535E0F5907E9AE4267 /* PlanEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanEditView.swift; sourceTree = "<group>"; };
+		8F993B088CB2456C7010C691 /* DistanceFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceFormatter.swift; sourceTree = "<group>"; };
 		918F92B620FAA4E228B0FEA8 /* ProgressDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressDashboardView.swift; sourceTree = "<group>"; };
 		9A38A933814A196F882D4075 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9F87F3437D6620980FC04F13 /* TrainingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingApp.swift; sourceTree = "<group>"; };
@@ -238,6 +240,7 @@
 			children = (
 				06E66380AFDA249ADA3BCD91 /* AppleSignInSupport.swift */,
 				4032AFBD2C6810AEB4A5C08C /* AuthService.swift */,
+				8F993B088CB2456C7010C691 /* DistanceFormatter.swift */,
 				871B7FB896DB1306FC3F295A /* HeatStore.swift */,
 				FE119AE0121335DC62EE5944 /* KeychainService.swift */,
 				152863264984F21AC0331C8B /* OuraService.swift */,
@@ -474,6 +477,7 @@
 				8219FFB2F7BB6FAEBC38FE8A /* BrandKit.swift in Sources */,
 				E688C16BC8826DF7E7C0299E /* Config.swift in Sources */,
 				428D482FC220B2EED7ED9E42 /* ContentView.swift in Sources */,
+				0370DD343DBEEE8B5631A2B2 /* DistanceFormatter.swift in Sources */,
 				37B726D9F8A5BF41AA7BCC4C /* ExerciseHistoryView.swift in Sources */,
 				F4CEAA6920AD02C52D1BB794 /* HeatLog.swift in Sources */,
 				BEE049CF6DC32B96C1A1C104 /* HeatLogSheet.swift in Sources */,
