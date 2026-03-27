@@ -60,10 +60,27 @@ targets:
         com.apple.developer.applesignin:
           - Default
 
+  TrainingTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    settings:
+      base:
+        SWIFT_VERSION: "5.9"
+        GENERATE_INFOPLIST_FILE: true
+    dependencies:
+      - target: Training
+
 schemes:
   Training:
     build:
       targets:
         Training: all
+        TrainingTests: [test]
     run:
       config: Debug
+    test:
+      config: Debug
+      targets:
+        - TrainingTests
