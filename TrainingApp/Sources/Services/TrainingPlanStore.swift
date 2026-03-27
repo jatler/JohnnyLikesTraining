@@ -347,6 +347,13 @@ final class TrainingPlanStore {
         isLoading = true
         defer { isLoading = false }
 
+        // Load from local cache first for instant display
+        if activePlan == nil, let cached = PlanCacheService.loadCached() {
+            activePlan = cached.plan
+            sessions = cached.sessions
+        }
+
+        // Then sync from Supabase in foreground
         do {
             let plans: [TrainingPlan] = try await supabase
                 .from("training_plans")
@@ -394,8 +401,14 @@ final class TrainingPlanStore {
             }
 
             reconcileNotesFromBundledTemplateIfNeeded()
+
+            // Cache for offline access
+            PlanCacheService.save(plan: plan, sessions: sessions)
         } catch {
-            lastError = "Failed to load plan."
+            // If Supabase fails but we have cached data, that's OK
+            if activePlan == nil {
+                lastError = "Failed to load plan."
+            }
         }
     }
 
@@ -445,6 +458,7 @@ final class TrainingPlanStore {
         skips = []
         swaps = []
         overrides = []
+        PlanCacheService.clear()
 
         if let oldId = oldPlanId {
             Task {
