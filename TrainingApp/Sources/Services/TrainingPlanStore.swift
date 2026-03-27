@@ -10,6 +10,7 @@ final class TrainingPlanStore {
     private(set) var swaps: [SessionSwap] = []
     private(set) var overrides: [SessionOverride] = []
     private(set) var isLoading = false
+    var lastError: String?
 
     private let supabase = SupabaseService.shared.client
 
@@ -131,7 +132,7 @@ final class TrainingPlanStore {
                     .eq("id", value: plan.id)
                     .execute()
             } catch {
-                print("Failed to update race name: \(error)")
+                lastError = "Failed to save race name."
             }
         }
     }
@@ -172,7 +173,7 @@ final class TrainingPlanStore {
                         .eq("id", value: oldId)
                         .execute()
                 } catch {
-                    print("Failed to delete old plan: \(error)")
+                    lastError = "Failed to delete old plan."
                 }
             }
         }
@@ -236,7 +237,7 @@ final class TrainingPlanStore {
                     .eq("id", value: skip.id)
                     .execute()
             } catch {
-                print("Failed to delete skip: \(error)")
+                lastError = "Failed to delete skip."
             }
         }
     }
@@ -335,7 +336,7 @@ final class TrainingPlanStore {
                     .eq("id", value: overrideId)
                     .execute()
             } catch {
-                print("Failed to delete override: \(error)")
+                lastError = "Failed to delete override."
             }
         }
     }
@@ -394,7 +395,7 @@ final class TrainingPlanStore {
 
             reconcileNotesFromBundledTemplateIfNeeded()
         } catch {
-            print("Failed to load plan: \(error)")
+            lastError = "Failed to load plan."
         }
     }
 
@@ -453,7 +454,7 @@ final class TrainingPlanStore {
                         .eq("id", value: oldId)
                         .execute()
                 } catch {
-                    print("Failed to delete plan: \(error)")
+                    lastError = "Failed to delete plan."
                 }
             }
         }
@@ -467,7 +468,7 @@ final class TrainingPlanStore {
             try await supabase.from("training_plans").insert(plan).execute()
             try await supabase.from("planned_sessions").insert(sessions).execute()
         } catch {
-            print("Failed to persist new plan: \(error)")
+            lastError = "Failed to save new plan."
         }
     }
 
@@ -486,7 +487,7 @@ final class TrainingPlanStore {
                     .execute()
             }
         } catch {
-            print("Failed to persist date update: \(error)")
+            lastError = "Failed to save date update."
         }
     }
 
@@ -504,7 +505,7 @@ final class TrainingPlanStore {
                 .eq("id", value: sessionB.id)
                 .execute()
         } catch {
-            print("Failed to persist swap: \(error)")
+            lastError = "Failed to save swap."
         }
     }
 
@@ -512,7 +513,7 @@ final class TrainingPlanStore {
         do {
             try await supabase.from("session_skips").insert(skip).execute()
         } catch {
-            print("Failed to persist skip: \(error)")
+            lastError = "Failed to save skip."
         }
     }
 
@@ -520,7 +521,7 @@ final class TrainingPlanStore {
         do {
             try await supabase.from("session_overrides").insert(override).execute()
         } catch {
-            print("Failed to persist override: \(error)")
+            lastError = "Failed to save override."
         }
     }
 
@@ -536,7 +537,7 @@ final class TrainingPlanStore {
                 .eq("id", value: session.id)
                 .execute()
         } catch {
-            print("Failed to persist session field update: \(error)")
+            lastError = "Failed to save session update."
         }
     }
 }

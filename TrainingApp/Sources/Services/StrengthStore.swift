@@ -10,6 +10,7 @@ final class StrengthStore {
     private(set) var logs: [StrengthLog] = []
     private(set) var suggestions: [ProgressionSuggestion] = []
     private(set) var isLoading = false
+    var lastError: String?
 
     private let supabase = SupabaseService.shared.client
 
@@ -273,7 +274,7 @@ final class StrengthStore {
                     .eq("id", value: logId)
                     .execute()
             } catch {
-                print("Failed to delete log: \(error)")
+                lastError = "Failed to delete log."
             }
         }
     }
@@ -457,7 +458,7 @@ final class StrengthStore {
                     .value
             }
         } catch {
-            print("Failed to load strength data: \(error)")
+            lastError = "Failed to load strength data."
         }
     }
 
@@ -484,7 +485,7 @@ final class StrengthStore {
                 try await supabase.from("strength_sessions").insert(sessions).execute()
             }
         } catch {
-            print("Failed to persist strength template: \(error)")
+            lastError = "Failed to save strength template."
         }
     }
 
@@ -495,7 +496,7 @@ final class StrengthStore {
                 .eq("id", value: exercise.id)
                 .execute()
         } catch {
-            print("Failed to update exercise: \(error)")
+            lastError = "Failed to save exercise update."
         }
     }
 
@@ -504,7 +505,7 @@ final class StrengthStore {
             try await supabase.from("strength_template_exercises").insert(exercise).execute()
             await persistAllSessions()
         } catch {
-            print("Failed to persist new exercise: \(error)")
+            lastError = "Failed to save new exercise."
         }
     }
 
@@ -520,7 +521,7 @@ final class StrengthStore {
                 .eq("template_exercise_id", value: exercise.id)
                 .execute()
         } catch {
-            print("Failed to delete exercise: \(error)")
+            lastError = "Failed to delete exercise."
         }
     }
 
@@ -531,7 +532,7 @@ final class StrengthStore {
                 .eq("id", value: session.id)
                 .execute()
         } catch {
-            print("Failed to update session: \(error)")
+            lastError = "Failed to save session update."
         }
     }
 
@@ -547,7 +548,7 @@ final class StrengthStore {
                 try await supabase.from("strength_sessions").insert(sessions).execute()
             }
         } catch {
-            print("Failed to persist sessions: \(error)")
+            lastError = "Failed to save sessions."
         }
     }
 
@@ -555,7 +556,7 @@ final class StrengthStore {
         do {
             try await supabase.from("strength_logs").insert(log).execute()
         } catch {
-            print("Failed to persist log: \(error)")
+            lastError = "Failed to save log."
         }
     }
 }

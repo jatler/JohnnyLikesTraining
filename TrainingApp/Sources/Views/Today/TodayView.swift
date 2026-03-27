@@ -28,6 +28,14 @@ struct TodayView: View {
                 }
             }
             .navigationTitle("Today")
+            .alert("Error", isPresented: Binding(
+                get: { planStore.lastError != nil },
+                set: { if !$0 { planStore.lastError = nil } }
+            )) {
+                Button("OK") { planStore.lastError = nil }
+            } message: {
+                Text(planStore.lastError ?? "")
+            }
             .sheet(isPresented: $showingPlanSetup) {
                 PlanSetupView()
             }

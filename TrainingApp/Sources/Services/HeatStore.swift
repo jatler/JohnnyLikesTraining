@@ -7,6 +7,7 @@ final class HeatStore {
     private(set) var sessions: [HeatSession] = []
     private(set) var logs: [HeatLog] = []
     private(set) var isLoading = false
+    var lastError: String?
 
     private let supabase = SupabaseService.shared.client
 
@@ -143,7 +144,7 @@ final class HeatStore {
                             .eq("id", value: id)
                             .execute()
                     } catch {
-                        print("Failed to delete heat session: \(error)")
+                        lastError = "Failed to delete heat session."
                     }
                 }
             }
@@ -160,7 +161,7 @@ final class HeatStore {
                     .eq("id", value: log.id)
                     .execute()
             } catch {
-                print("Failed to delete heat log: \(error)")
+                lastError = "Failed to delete heat log."
             }
         }
     }
@@ -191,7 +192,7 @@ final class HeatStore {
                     .value
             }
         } catch {
-            print("Failed to load heat data: \(error)")
+            lastError = "Failed to load heat data."
         }
     }
 
@@ -215,7 +216,7 @@ final class HeatStore {
                 try await supabase.from("heat_sessions").insert(sessions).execute()
             }
         } catch {
-            print("Failed to persist heat sessions: \(error)")
+            lastError = "Failed to save heat sessions."
         }
     }
 
@@ -223,7 +224,7 @@ final class HeatStore {
         do {
             try await supabase.from("heat_logs").insert(log).execute()
         } catch {
-            print("Failed to persist heat log: \(error)")
+            lastError = "Failed to save heat log."
         }
     }
 }

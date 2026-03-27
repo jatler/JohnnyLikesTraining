@@ -9,6 +9,7 @@ final class StretchStore {
     private(set) var sessions: [StretchSession] = []
     private(set) var logs: [StretchLog] = []
     private(set) var isLoading = false
+    var lastError: String?
 
     private let supabase = SupabaseService.shared.client
 
@@ -218,7 +219,7 @@ final class StretchStore {
                     .eq("id", value: log.id)
                     .execute()
             } catch {
-                print("Failed to delete stretch log: \(error)")
+                lastError = "Failed to delete stretch log."
             }
         }
     }
@@ -319,7 +320,7 @@ final class StretchStore {
                     .value
             }
         } catch {
-            print("Failed to load stretch data: \(error)")
+            lastError = "Failed to load stretch data."
         }
     }
 
@@ -345,7 +346,7 @@ final class StretchStore {
                 try await supabase.from("stretch_sessions").insert(sessions).execute()
             }
         } catch {
-            print("Failed to persist stretch template: \(error)")
+            lastError = "Failed to save stretch template."
         }
     }
 
@@ -356,7 +357,7 @@ final class StretchStore {
                 .eq("id", value: exercise.id)
                 .execute()
         } catch {
-            print("Failed to update stretch exercise: \(error)")
+            lastError = "Failed to save stretch exercise update."
         }
     }
 
@@ -365,7 +366,7 @@ final class StretchStore {
             try await supabase.from("stretch_template_exercises").insert(exercise).execute()
             await persistAllSessions()
         } catch {
-            print("Failed to persist new stretch exercise: \(error)")
+            lastError = "Failed to save new stretch exercise."
         }
     }
 
@@ -381,7 +382,7 @@ final class StretchStore {
                 .eq("template_exercise_id", value: exercise.id)
                 .execute()
         } catch {
-            print("Failed to delete stretch exercise: \(error)")
+            lastError = "Failed to delete stretch exercise."
         }
     }
 
@@ -397,7 +398,7 @@ final class StretchStore {
                 try await supabase.from("stretch_sessions").insert(sessions).execute()
             }
         } catch {
-            print("Failed to persist stretch sessions: \(error)")
+            lastError = "Failed to save stretch sessions."
         }
     }
 
@@ -405,7 +406,7 @@ final class StretchStore {
         do {
             try await supabase.from("stretch_logs").insert(log).execute()
         } catch {
-            print("Failed to persist stretch log: \(error)")
+            lastError = "Failed to save stretch log."
         }
     }
 }

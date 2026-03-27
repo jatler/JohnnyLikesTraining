@@ -29,6 +29,14 @@ struct StrengthTemplateView: View {
                 }
             }
             .navigationTitle("Strength & More")
+            .alert("Error", isPresented: Binding(
+                get: { strengthStore.lastError != nil },
+                set: { if !$0 { strengthStore.lastError = nil } }
+            )) {
+                Button("OK") { strengthStore.lastError = nil }
+            } message: {
+                Text(strengthStore.lastError ?? "")
+            }
             .sheet(item: $selectedSession) { selection in
                 StrengthDayDetailView(weekNumber: selection.weekNumber, dayOfWeek: selection.dayOfWeek)
             }
