@@ -69,14 +69,36 @@ struct MainTabView: View {
             }
             dataLoaded = true
             if let plan = planStore.activePlan {
-                if !strengthStore.hasTemplate {
-                    await strengthStore.loadData(planId: plan.id)
-                }
-                if !heatStore.hasSessions {
-                    await heatStore.loadData(planId: plan.id)
-                }
-                if !stretchStore.hasTemplate {
-                    await stretchStore.loadData(planId: plan.id)
+                async let strengthLoad: () = {
+                    if !strengthStore.hasTemplate {
+                        await strengthStore.loadData(planId: plan.id)
+                    }
+                }()
+                async let heatLoad: () = {
+                    if !heatStore.hasSessions {
+                        await heatStore.loadData(planId: plan.id)
+                    }
+                }()
+                async let stretchLoad: () = {
+                    if !stretchStore.hasTemplate {
+                        await stretchStore.loadData(planId: plan.id)
+                    }
+                }()
+                async let stravaLoad: () = {
+                    if strava.isConnected {
+                        await strava.loadActivities(userId: userId)
+                    }
+                }()
+                async let ouraLoad: () = {
+                    if oura.isConnected {
+                        await oura.loadDailyData(userId: userId)
+                    }
+                }()
+
+                _ = await (strengthLoad, heatLoad, stretchLoad, stravaLoad, ouraLoad)
+
+                if strava.isConnected {
+                    strava.autoMatchActivities(sessions: planStore.sessions)
                 }
                 if let week = planStore.currentWeekNumber {
                     strengthStore.computeSuggestions(
@@ -85,13 +107,14 @@ struct MainTabView: View {
                         currentWeek: week
                     )
                 }
-            }
-            if strava.isConnected {
-                await strava.loadActivities(userId: userId)
-                strava.autoMatchActivities(sessions: planStore.sessions)
-            }
-            if oura.isConnected {
-                await oura.loadDailyData(userId: userId)
+            } else {
+                if strava.isConnected {
+                    await strava.loadActivities(userId: userId)
+                    strava.autoMatchActivities(sessions: planStore.sessions)
+                }
+                if oura.isConnected {
+                    await oura.loadDailyData(userId: userId)
+                }
             }
         }
     }
