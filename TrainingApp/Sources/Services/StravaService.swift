@@ -55,7 +55,7 @@ final class StravaService {
         let code = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
             self.authSession = ASWebAuthenticationSession(
                 url: components.url!,
-                callbackURLScheme: "http"
+                callbackURLScheme: "training"
             ) { [weak self] callbackURL, error in
                 self?.authSession = nil
                 if let error {
