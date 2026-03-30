@@ -97,7 +97,7 @@ struct TodayView: View {
         .refreshable {
             guard let userId = auth.currentUserId else { return }
             if strava.isConnected {
-                await strava.loadActivities(userId: userId)
+                try? await strava.syncActivities(userId: userId)
                 strava.autoMatchActivities(sessions: planStore.sessions)
             }
             if oura.isConnected {
