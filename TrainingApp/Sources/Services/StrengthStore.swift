@@ -13,6 +13,7 @@ final class StrengthStore {
     var lastError: String?
 
     private let supabase = SupabaseService.shared.client
+    private var isOffline: Bool { SupabaseService.shared.isOffline }
 
     var hasTemplate: Bool { template != nil }
 
@@ -68,6 +69,15 @@ final class StrengthStore {
 
     func totalExerciseCount(for date: Date) -> Int {
         sessions(for: date).count
+    }
+
+    func isDayComplete(on date: Date, stravaActivities: [StravaActivity]) -> Bool {
+        let daySessions = sessions(for: date)
+        guard !daySessions.isEmpty else { return false }
+        if daySessions.allSatisfy({ isSessionComplete($0.id) }) { return true }
+        return stravaActivities.contains {
+            $0.isStrength && Calendar.current.isDate($0.activityDate, inSameDayAs: date)
+        }
     }
 
     // MARK: - Initialize from Template
@@ -266,6 +276,7 @@ final class StrengthStore {
 
     func deleteLog(_ logId: UUID) {
         logs.removeAll { $0.id == logId }
+        guard !isOffline else { return }
 
         Task {
             do {
@@ -274,8 +285,9 @@ final class StrengthStore {
                     .eq("id", value: logId)
                     .execute()
             } catch {
-                lastError = "Failed to delete log."
-            }
+                print("Failed to delete strength log from Supabase: \(error)")
+                lastError = "Failed to delete strength log."
+}
         }
     }
 
@@ -418,6 +430,7 @@ final class StrengthStore {
     func loadData(planId: UUID) async {
         isLoading = true
         defer { isLoading = false }
+        guard !isOffline else { return }
 
         do {
             let templates: [StrengthTemplate] = try await supabase
@@ -475,7 +488,7 @@ final class StrengthStore {
     // MARK: - Persistence
 
     private func persistTemplate() async {
-        guard let template else { return }
+        guard !isOffline, let template else { return }
         do {
             try await supabase.from("strength_templates").insert(template).execute()
             if !exercises.isEmpty {
@@ -485,31 +498,37 @@ final class StrengthStore {
                 try await supabase.from("strength_sessions").insert(sessions).execute()
             }
         } catch {
+            print("Failed to persist strength template to Supabase: \(error)")
             lastError = "Failed to save strength template."
-        }
+}
     }
 
     private func persistExerciseUpdate(_ exercise: StrengthTemplateExercise) async {
+        guard !isOffline else { return }
         do {
             try await supabase.from("strength_template_exercises")
                 .update(exercise)
                 .eq("id", value: exercise.id)
                 .execute()
         } catch {
+            print("Failed to persist exercise update to Supabase: \(error)")
             lastError = "Failed to save exercise update."
-        }
+}
     }
 
     private func persistNewExercise(_ exercise: StrengthTemplateExercise) async {
+        guard !isOffline else { return }
         do {
             try await supabase.from("strength_template_exercises").insert(exercise).execute()
             await persistAllSessions()
         } catch {
+            print("Failed to persist new exercise to Supabase: \(error)")
             lastError = "Failed to save new exercise."
-        }
+}
     }
 
     private func persistExerciseDelete(_ exercise: StrengthTemplateExercise) async {
+        guard !isOffline else { return }
         do {
             try await supabase.from("strength_template_exercises")
                 .delete()
@@ -521,23 +540,26 @@ final class StrengthStore {
                 .eq("template_exercise_id", value: exercise.id)
                 .execute()
         } catch {
+            print("Failed to delete exercise from Supabase: \(error)")
             lastError = "Failed to delete exercise."
-        }
+}
     }
 
     private func persistSessionUpdate(_ session: StrengthSession) async {
+        guard !isOffline else { return }
         do {
             try await supabase.from("strength_sessions")
                 .update(session)
                 .eq("id", value: session.id)
                 .execute()
         } catch {
+            print("Failed to persist session update to Supabase: \(error)")
             lastError = "Failed to save session update."
-        }
+}
     }
 
     private func persistAllSessions() async {
-        guard let planId = template?.planId else { return }
+        guard !isOffline, let planId = template?.planId else { return }
         do {
             try await supabase.from("strength_sessions")
                 .delete()
@@ -548,15 +570,18 @@ final class StrengthStore {
                 try await supabase.from("strength_sessions").insert(sessions).execute()
             }
         } catch {
+            print("Failed to persist sessions to Supabase: \(error)")
             lastError = "Failed to save sessions."
-        }
+}
     }
 
     private func persistLog(_ log: StrengthLog) async {
+        guard !isOffline else { return }
         do {
             try await supabase.from("strength_logs").insert(log).execute()
         } catch {
+            print("Failed to persist strength log to Supabase: \(error)")
             lastError = "Failed to save log."
-        }
+}
     }
 }

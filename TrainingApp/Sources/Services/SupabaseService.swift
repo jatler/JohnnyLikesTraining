@@ -7,6 +7,9 @@ final class SupabaseService {
 
     let client: SupabaseClient
 
+    /// When true, all stores skip Supabase reads/writes (dev bypass mode with no real auth session).
+    var isOffline = false
+
     private init() {
         client = SupabaseClient(
             supabaseURL: Config.supabaseURL,

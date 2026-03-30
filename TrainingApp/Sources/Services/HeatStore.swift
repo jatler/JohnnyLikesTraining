@@ -10,6 +10,7 @@ final class HeatStore {
     var lastError: String?
 
     private let supabase = SupabaseService.shared.client
+    private var isOffline: Bool { SupabaseService.shared.isOffline }
 
     var hasSessions: Bool { !sessions.isEmpty }
 
@@ -132,6 +133,7 @@ final class HeatStore {
         let removedIds = Set(sessions.filter { $0.dayOfWeek == dayOfWeek }.map(\.id))
         sessions.removeAll { $0.dayOfWeek == dayOfWeek }
         logs.removeAll { removedIds.contains($0.sessionId) }
+        guard !isOffline else { return }
 
         if let planId = sessions.first?.planId {
             Task { await persistAllSessions(planId: planId) }
@@ -144,6 +146,7 @@ final class HeatStore {
                             .eq("id", value: id)
                             .execute()
                     } catch {
+                        print("Failed to delete heat session from Supabase: \(error)")
                         lastError = "Failed to delete heat session."
                     }
                 }
@@ -154,6 +157,8 @@ final class HeatStore {
     func deleteLog(_ sessionId: UUID) {
         guard let log = logs.first(where: { $0.sessionId == sessionId }) else { return }
         logs.removeAll { $0.sessionId == sessionId }
+        guard !isOffline else { return }
+
         Task {
             do {
                 try await supabase.from("heat_logs")
@@ -161,6 +166,7 @@ final class HeatStore {
                     .eq("id", value: log.id)
                     .execute()
             } catch {
+                print("Failed to delete heat log from Supabase: \(error)")
                 lastError = "Failed to delete heat log."
             }
         }
@@ -171,6 +177,7 @@ final class HeatStore {
     func loadData(planId: UUID) async {
         isLoading = true
         defer { isLoading = false }
+        guard !isOffline else { return }
 
         do {
             sessions = try await supabase
@@ -206,6 +213,7 @@ final class HeatStore {
     // MARK: - Persistence
 
     private func persistAllSessions(planId: UUID) async {
+        guard !isOffline else { return }
         do {
             try await supabase.from("heat_sessions")
                 .delete()
@@ -216,14 +224,17 @@ final class HeatStore {
                 try await supabase.from("heat_sessions").insert(sessions).execute()
             }
         } catch {
+            print("Failed to persist heat sessions to Supabase: \(error)")
             lastError = "Failed to save heat sessions."
         }
     }
 
     private func persistLog(_ log: HeatLog) async {
+        guard !isOffline else { return }
         do {
             try await supabase.from("heat_logs").insert(log).execute()
         } catch {
+            print("Failed to persist heat log to Supabase: \(error)")
             lastError = "Failed to save heat log."
         }
     }

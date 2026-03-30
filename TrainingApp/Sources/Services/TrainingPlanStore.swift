@@ -116,6 +116,7 @@ final class TrainingPlanStore {
         skips = []
         swaps = []
 
+        PlanCacheService.save(plan: result.plan, sessions: result.sessions)
         Task { await persistNewPlan() }
     }
 
@@ -124,6 +125,7 @@ final class TrainingPlanStore {
     func updateRaceName(_ name: String) {
         guard let plan = activePlan else { return }
         activePlan?.name = name
+        guard !isOffline else { return }
 
         Task {
             do {
@@ -132,8 +134,9 @@ final class TrainingPlanStore {
                     .eq("id", value: plan.id)
                     .execute()
             } catch {
+                print("Failed to persist race name to Supabase: \(error)")
                 lastError = "Failed to save race name."
-            }
+}
         }
     }
 
@@ -165,6 +168,7 @@ final class TrainingPlanStore {
 
         createPlan(raceName: raceName, raceDate: raceDate, template: template, userId: userId)
 
+        guard !isOffline else { return }
         if let oldId = oldPlanId {
             Task {
                 do {
@@ -173,8 +177,9 @@ final class TrainingPlanStore {
                         .eq("id", value: oldId)
                         .execute()
                 } catch {
+                    print("Failed to delete old plan from Supabase: \(error)")
                     lastError = "Failed to delete old plan."
-                }
+}
             }
         }
     }
@@ -229,6 +234,7 @@ final class TrainingPlanStore {
     func unskipSession(_ sessionId: UUID) {
         guard let index = skips.firstIndex(where: { $0.sessionId == sessionId }) else { return }
         let skip = skips.remove(at: index)
+        guard !isOffline else { return }
 
         Task {
             do {
@@ -237,8 +243,9 @@ final class TrainingPlanStore {
                     .eq("id", value: skip.id)
                     .execute()
             } catch {
+                print("Failed to delete skip from Supabase: \(error)")
                 lastError = "Failed to delete skip."
-            }
+}
         }
     }
 
@@ -327,6 +334,7 @@ final class TrainingPlanStore {
 
         let overrideId = overrides[overrideIndex].id
         overrides.remove(at: overrideIndex)
+        guard !isOffline else { return }
 
         Task {
             await persistSessionFieldUpdate(sessions[sessionIndex])
@@ -336,8 +344,9 @@ final class TrainingPlanStore {
                     .eq("id", value: overrideId)
                     .execute()
             } catch {
+                print("Failed to delete override from Supabase: \(error)")
                 lastError = "Failed to delete override."
-            }
+}
         }
     }
 
@@ -352,6 +361,8 @@ final class TrainingPlanStore {
             activePlan = cached.plan
             sessions = cached.sessions
         }
+
+        guard !isOffline else { return }
 
         // Then sync from Supabase in foreground
         do {
@@ -460,6 +471,7 @@ final class TrainingPlanStore {
         overrides = []
         PlanCacheService.clear()
 
+        guard !isOffline else { return }
         if let oldId = oldPlanId {
             Task {
                 do {
@@ -468,26 +480,30 @@ final class TrainingPlanStore {
                         .eq("id", value: oldId)
                         .execute()
                 } catch {
+                    print("Failed to delete plan from Supabase: \(error)")
                     lastError = "Failed to delete plan."
-                }
+}
             }
         }
     }
 
     // MARK: - Supabase Persistence Helpers
 
+    private var isOffline: Bool { SupabaseService.shared.isOffline }
+
     private func persistNewPlan() async {
-        guard let plan = activePlan else { return }
+        guard !isOffline, let plan = activePlan else { return }
         do {
             try await supabase.from("training_plans").insert(plan).execute()
             try await supabase.from("planned_sessions").insert(sessions).execute()
         } catch {
+            print("Failed to persist new plan to Supabase: \(error)")
             lastError = "Failed to save new plan."
-        }
+}
     }
 
     private func persistDateUpdate() async {
-        guard let plan = activePlan else { return }
+        guard !isOffline, let plan = activePlan else { return }
         do {
             try await supabase.from("training_plans")
                 .update(PlanDateUpdate(raceDate: plan.raceDate, planStartDate: plan.planStartDate))
@@ -501,11 +517,13 @@ final class TrainingPlanStore {
                     .execute()
             }
         } catch {
+            print("Failed to persist date update to Supabase: \(error)")
             lastError = "Failed to save date update."
-        }
+}
     }
 
     private func persistSwap(_ swap: SessionSwap, sessionA: PlannedSession, sessionB: PlannedSession) async {
+        guard !isOffline else { return }
         do {
             try await supabase.from("session_swaps").insert(swap).execute()
 
@@ -519,27 +537,33 @@ final class TrainingPlanStore {
                 .eq("id", value: sessionB.id)
                 .execute()
         } catch {
+            print("Failed to persist swap to Supabase: \(error)")
             lastError = "Failed to save swap."
-        }
+}
     }
 
     private func persistSkip(_ skip: SessionSkip) async {
+        guard !isOffline else { return }
         do {
             try await supabase.from("session_skips").insert(skip).execute()
         } catch {
+            print("Failed to persist skip to Supabase: \(error)")
             lastError = "Failed to save skip."
-        }
+}
     }
 
     private func persistOverride(_ override: SessionOverride) async {
+        guard !isOffline else { return }
         do {
             try await supabase.from("session_overrides").insert(override).execute()
         } catch {
+            print("Failed to persist override to Supabase: \(error)")
             lastError = "Failed to save override."
-        }
+}
     }
 
     private func persistSessionFieldUpdate(_ session: PlannedSession) async {
+        guard !isOffline else { return }
         do {
             try await supabase.from("planned_sessions")
                 .update(SessionFieldUpdate(
@@ -551,8 +575,9 @@ final class TrainingPlanStore {
                 .eq("id", value: session.id)
                 .execute()
         } catch {
+            print("Failed to persist session update to Supabase: \(error)")
             lastError = "Failed to save session update."
-        }
+}
     }
 }
 

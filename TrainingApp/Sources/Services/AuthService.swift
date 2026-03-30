@@ -39,6 +39,7 @@ final class AuthService {
         currentUserId = UUID()
         isAuthenticated = true
         isDevBypass = true
+        SupabaseService.shared.isOffline = true
     }
 
     func signInWithApple(authorization: ASAuthorization, rawNonce: String?) async throws {
@@ -73,6 +74,7 @@ final class AuthService {
             isDevBypass = false
             isAuthenticated = false
             currentUserId = nil
+            SupabaseService.shared.isOffline = false
             return
         }
         try await supabase.auth.signOut()

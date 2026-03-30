@@ -12,6 +12,7 @@ final class StretchStore {
     var lastError: String?
 
     private let supabase = SupabaseService.shared.client
+    private var isOffline: Bool { SupabaseService.shared.isOffline }
 
     var hasTemplate: Bool { template != nil }
 
@@ -212,6 +213,8 @@ final class StretchStore {
     func removeLog(sessionId: UUID) {
         guard let log = logs.first(where: { $0.sessionId == sessionId }) else { return }
         logs.removeAll { $0.sessionId == sessionId }
+        guard !isOffline else { return }
+
         Task {
             do {
                 try await supabase.from("stretch_logs")
@@ -219,8 +222,9 @@ final class StretchStore {
                     .eq("id", value: log.id)
                     .execute()
             } catch {
-                lastError = "Failed to delete stretch log."
-            }
+                print("Failed to delete stretch log from Supabase: \(error)")
+            lastError = "Failed to delete stretch log."
+}
         }
     }
 
@@ -280,6 +284,7 @@ final class StretchStore {
     func loadData(planId: UUID) async {
         isLoading = true
         defer { isLoading = false }
+        guard !isOffline else { return }
 
         do {
             let templates: [StretchTemplate] = try await supabase
@@ -336,7 +341,7 @@ final class StretchStore {
     // MARK: - Persistence
 
     private func persistTemplate() async {
-        guard let template else { return }
+        guard !isOffline, let template else { return }
         do {
             try await supabase.from("stretch_templates").insert(template).execute()
             if !exercises.isEmpty {
@@ -346,31 +351,37 @@ final class StretchStore {
                 try await supabase.from("stretch_sessions").insert(sessions).execute()
             }
         } catch {
+            print("Failed to persist stretch template to Supabase: \(error)")
             lastError = "Failed to save stretch template."
-        }
+}
     }
 
     private func persistExerciseUpdate(_ exercise: StretchTemplateExercise) async {
+        guard !isOffline else { return }
         do {
             try await supabase.from("stretch_template_exercises")
                 .update(exercise)
                 .eq("id", value: exercise.id)
                 .execute()
         } catch {
+            print("Failed to persist stretch exercise update to Supabase: \(error)")
             lastError = "Failed to save stretch exercise update."
-        }
+}
     }
 
     private func persistNewExercise(_ exercise: StretchTemplateExercise) async {
+        guard !isOffline else { return }
         do {
             try await supabase.from("stretch_template_exercises").insert(exercise).execute()
             await persistAllSessions()
         } catch {
+            print("Failed to persist new stretch exercise to Supabase: \(error)")
             lastError = "Failed to save new stretch exercise."
-        }
+}
     }
 
     private func persistExerciseDelete(_ exercise: StretchTemplateExercise) async {
+        guard !isOffline else { return }
         do {
             try await supabase.from("stretch_template_exercises")
                 .delete()
@@ -382,12 +393,13 @@ final class StretchStore {
                 .eq("template_exercise_id", value: exercise.id)
                 .execute()
         } catch {
+            print("Failed to delete stretch exercise from Supabase: \(error)")
             lastError = "Failed to delete stretch exercise."
-        }
+}
     }
 
     private func persistAllSessions() async {
-        guard let planId = template?.planId else { return }
+        guard !isOffline, let planId = template?.planId else { return }
         do {
             try await supabase.from("stretch_sessions")
                 .delete()
@@ -398,15 +410,18 @@ final class StretchStore {
                 try await supabase.from("stretch_sessions").insert(sessions).execute()
             }
         } catch {
+            print("Failed to persist stretch sessions to Supabase: \(error)")
             lastError = "Failed to save stretch sessions."
-        }
+}
     }
 
     private func persistLog(_ log: StretchLog) async {
+        guard !isOffline else { return }
         do {
             try await supabase.from("stretch_logs").insert(log).execute()
         } catch {
+            print("Failed to persist stretch log to Supabase: \(error)")
             lastError = "Failed to save stretch log."
-        }
+}
     }
 }
