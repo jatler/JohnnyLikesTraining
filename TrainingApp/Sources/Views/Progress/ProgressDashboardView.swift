@@ -34,10 +34,31 @@ struct ProgressDashboardView: View {
 
     private var complianceCard: some View {
         let stats = computeComplianceStats()
+        let weeklyData = computeWeeklyMileage()
+        let currentWeekMileage = planStore.currentWeekNumber.flatMap { week in
+            weeklyData.first { $0.week == week }
+        }
 
         return VStack(spacing: 16) {
             Text("Plan Compliance")
                 .font(.headline)
+
+            if let entry = currentWeekMileage {
+                VStack(spacing: 8) {
+                    HStack {
+                        Text("Week \(entry.week) Mileage")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Spacer()
+                        Text(String(format: "%.1f / %.0f mi", entry.actualMi, entry.plannedMi))
+                            .font(.subheadline.bold())
+                    }
+
+                    ProgressView(value: min(entry.actualMi, entry.plannedMi), total: max(entry.plannedMi, 1))
+                        .tint(progressColor(actual: entry.actualMi, planned: entry.plannedMi))
+                }
+                .padding(.horizontal, 4)
+            }
 
             HStack(spacing: 20) {
                 statCircle(

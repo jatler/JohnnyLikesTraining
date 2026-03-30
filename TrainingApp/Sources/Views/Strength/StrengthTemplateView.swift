@@ -283,8 +283,18 @@ struct StrengthTemplateView: View {
                 }
 
                 stretchAddDayButton
+            } else if planStore.hasPlan, let plan = planStore.activePlan {
+                Button {
+                    stretchStore.createEmptyTemplate(planId: plan.id)
+                } label: {
+                    Label("Create Stretch Program", systemImage: "plus.circle.fill")
+                        .font(.subheadline)
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .tint(.teal)
             } else {
-                Text("No stretches yet — create a plan or add stretches manually.")
+                Text("Create a training plan to get started with stretching.")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
             }
@@ -490,11 +500,28 @@ struct StrengthTemplateView: View {
                     .font(.title3)
                     .foregroundStyle(.secondary)
 
-                Text("Create a training plan to automatically load your strength program.")
-                    .font(.subheadline)
-                    .foregroundStyle(.tertiary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 40)
+                if planStore.hasPlan, let plan = planStore.activePlan {
+                    Text("Start a strength program to complement your training plan.")
+                        .font(.subheadline)
+                        .foregroundStyle(.tertiary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 40)
+
+                    Button {
+                        strengthStore.createEmptyTemplate(planId: plan.id)
+                    } label: {
+                        Label("Create Strength Program", systemImage: "plus.circle.fill")
+                            .fontWeight(.semibold)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.indigo)
+                } else {
+                    Text("Create a training plan to get started with strength training.")
+                        .font(.subheadline)
+                        .foregroundStyle(.tertiary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 40)
+                }
 
                 stretchTemplateSection
 

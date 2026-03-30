@@ -69,6 +69,26 @@ final class StrengthStore {
         sessions(for: date).count
     }
 
+    // MARK: - Create Empty Template
+
+    func createEmptyTemplate(planId: UUID) {
+        let now = Date()
+        let templateId = UUID()
+
+        let newTemplate = StrengthTemplate(
+            id: templateId,
+            planId: planId,
+            createdAt: now,
+            updatedAt: now
+        )
+
+        template = newTemplate
+        exercises = []
+        sessions = []
+
+        Task { await persistTemplate() }
+    }
+
     // MARK: - Initialize from Template
 
     func initializeFromTemplate(

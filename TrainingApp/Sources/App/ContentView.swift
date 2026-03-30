@@ -68,6 +68,42 @@ struct MainTabView: View {
                 if !stretchStore.hasTemplate {
                     await stretchStore.loadData(planId: plan.id)
                 }
+
+                // Reconcile: if stores are still empty but the bundled template has data, re-initialize
+                if let template = planStore.currentTemplate {
+                    let totalWeeks = planStore.totalWeeks
+
+                    if !strengthStore.hasTemplate,
+                       let strengthExercises = template.strengthExercises, !strengthExercises.isEmpty {
+                        strengthStore.initializeFromTemplate(
+                            strengthExercises,
+                            planId: plan.id,
+                            planStartDate: plan.planStartDate,
+                            totalWeeks: totalWeeks
+                        )
+                    }
+
+                    if !heatStore.hasSessions,
+                       let heatTemplates = template.heatSessions, !heatTemplates.isEmpty {
+                        heatStore.initializeFromTemplate(
+                            heatTemplates,
+                            planId: plan.id,
+                            planStartDate: plan.planStartDate,
+                            totalWeeks: totalWeeks
+                        )
+                    }
+
+                    if !stretchStore.hasTemplate,
+                       let stretchExercises = template.stretchExercises, !stretchExercises.isEmpty {
+                        stretchStore.initializeFromTemplate(
+                            stretchExercises,
+                            planId: plan.id,
+                            planStartDate: plan.planStartDate,
+                            totalWeeks: totalWeeks
+                        )
+                    }
+                }
+
                 if let week = planStore.currentWeekNumber {
                     strengthStore.computeSuggestions(
                         runningSessions: planStore.sessions,

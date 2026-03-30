@@ -43,8 +43,6 @@ struct TodayView: View {
     private var todayContent: some View {
         ScrollView {
             VStack(spacing: 24) {
-                recoveryCard
-
                 let todaySessions = planStore.todaySessions
                     .filter { $0.workoutType != .strength }
                 if todaySessions.isEmpty {
@@ -62,11 +60,15 @@ struct TodayView: View {
                     }
                 }
 
+                todayHeatSection
+
                 todayStrengthSection
 
                 todayStretchSection
 
-                todayHeatSection
+                Divider()
+
+                recoveryCard
 
                 if let plan = planStore.activePlan {
                     planInfoBar(plan)
