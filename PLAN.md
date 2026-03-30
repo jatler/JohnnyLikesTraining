@@ -454,7 +454,7 @@ Track passive heat acclimation sessions (sauna, hot tub, heat suit) prescribed b
 
 1. **Strava webhook vs polling**: Currently the app polls for activities on manual sync or app launch. Strava supports webhooks (push-based) via a Supabase Edge Function, which would auto-import activities without opening the app. Worth implementing now, or leave as a future enhancement?
 2. ~~**Strava activity types**: Currently filtering for `Run`, `TrailRun`, and `VirtualRun`. Should we also import `Hike`, `Walk`, or other activity types that might count as cross-training?~~ **Resolved**: Now importing runs (Run, TrailRun, VirtualRun), cross-training (CrossCountrySkiing, Elliptical, Hike, RockClimbing, Rowing, StairStepper, Swim, Walk), strength (WeightTraining, Crossfit), and yoga (Yoga). Each activity stores its `activity_type`.
-3. **Completion calculation**: The "completed" count in the progress dashboard currently relies on Strava-matched sessions. If Strava is not connected, all past non-rest sessions show as "remaining." Should we add a manual "mark as done" option for users without Strava?
+3. ~~**Completion calculation**: The "completed" count in the progress dashboard currently relies on Strava-matched sessions. If Strava is not connected, all past non-rest sessions show as "remaining." Should we add a manual "mark as done" option for users without Strava?~~ **Resolved**: Completion is now auto-calculated across all domains: running/cross-training (Strava auto-match), strength (Strava WeightTraining/Crossfit activity OR manual logs), stretch (manual logs), heat (manual logs). The Progress Dashboard and Week View summary reflect unified completion across all prescribed work.
 4. **Token storage strategy**: OAuth tokens are currently stored locally in Keychain only. The Supabase `oauth_tokens` table exists in the schema but tokens are not synced to it yet. Should we persist tokens server-side as well (for multi-device support), or is Keychain-only sufficient?
 
 ## Resolved Decisions
@@ -684,11 +684,34 @@ To deploy via GitHub Pages: go to your repo's **Settings → Pages**, set Source
 
 | Review | Trigger | Why | Runs | Status | Findings |
 |--------|---------|-----|------|--------|----------|
-| CEO Review | `/plan-ceo-review` | Scope & strategy | 0 | — | — |
+| CEO Review | `/plan-ceo-review` | Scope & strategy | 1 | ISSUES (via /autoplan) | mode: SELECTIVE_EXPANSION, 2 critical gaps |
 | Codex Review | `/codex review` | Independent 2nd opinion | 0 | — | — |
-| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | ISSUES (PLAN) | 10 issues, 2 critical gaps |
-| Design Review | `/plan-design-review` | UI/UX gaps | 1 | ISSUES (FULL) | score: 6/10 -> 7/10, 5 decisions |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 2 | ISSUES (PLAN via /autoplan) | 14 issues, 2 critical gaps |
+| Design Review | `/plan-design-review` | UI/UX gaps | 2 | ISSUES (FULL via /autoplan) | score: 6/10, 5 deferred decisions |
 
-- **OUTSIDE VOICE:** Claude subagent ran (eng + design). Eng: 12 findings, 1 incorrect. Design: 16 findings, 2 critical.
-- **UNRESOLVED:** 4 deferred design decisions (terminal states, partial completion indicators, Strava match correction, dark mode spec).
-- **VERDICT:** ENG + DESIGN REVIEWED. Fix pre-demo TODOS (12 items), then re-run eng review for CLEARED status.
+- **OUTSIDE VOICE:** Claude subagent ran (CEO + eng + design). Codex unavailable.
+- CEO: 10 strategic findings, all accepted/noted for TODOS.
+- Eng: 14 findings (1 critical: delete-then-reinsert data loss, plus OAuth state, test gaps).
+- Design: 16 findings (3 critical: loading states, onboarding, coach notes layout).
+- **UNRESOLVED:** 5 deferred design decisions, 15 test gaps, 2 critical data-loss risks.
+- **VERDICT:** CEO + ENG + DESIGN REVIEWED via /autoplan. Fix critical items (delete-reinsert, OAuth state, Strava token logging), then re-run eng review for CLEARED.
+
+<!-- AUTONOMOUS DECISION LOG -->
+## Decision Audit Trail
+
+| # | Phase | Decision | Principle | Classification | Rationale |
+|---|-------|----------|-----------|----------------|-----------|
+| 1 | CEO | Mode: SELECTIVE EXPANSION | P2 boil lakes | Mechanical | Feature enhancement branch, hold + surface expansions |
+| 2 | CEO | Approach A (current plan) | P6 action | Mechanical | 47 commits already shipped, splitting is pure overhead |
+| 3 | CEO | Accept all 5 premises | P6 action | Mechanical | User confirmed at premise gate |
+| 4 | CEO | Strava 429 → TODOS | P1 completeness | Mechanical | Rate limiting unhandled but not demo-blocking |
+| 5 | CEO | OAuth state incomplete → TODOS | P1 completeness | Mechanical | 2 of 3 services missing validation |
+| 6 | CEO | Debug secret logging → TODOS | P1 completeness | Mechanical | OuraService prints client secret |
+| 7 | Design | Skip mockup generation | P6 action | Mechanical | App already built, mockups are backwards |
+| 8 | Design | All 7 dimensions reviewed | P1 completeness | Mechanical | Full design review coverage |
+| 9 | Design | Onboarding → post-demo | P3 pragmatic | Taste | Demo user is developer, not cold user |
+| 10 | Eng | Delete-reinsert → critical TODO | P1 completeness | Mechanical | Confirmed data-loss race condition |
+| 11 | Eng | Token logging → pre-demo fix | P1 completeness | Mechanical | Security: refresh token in console |
+| 12 | Eng | Patreon expiry hardcode → TODO | P3 pragmatic | Mechanical | Medium severity, 24h default works for now |
+| 13 | Eng | Test gaps → pre-demo TODOS | P2 boil lakes | Mechanical | 15 untested paths, tests are cheap with CC |
+| 14 | Eng | Cache swaps/skips → TODO | P1 completeness | Mechanical | Offline shows wrong swap state |
