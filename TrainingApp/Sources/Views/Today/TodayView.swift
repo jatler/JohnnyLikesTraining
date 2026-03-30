@@ -52,13 +52,18 @@ struct TodayView: View {
     private var todayContent: some View {
         ScrollView {
             VStack(spacing: 24) {
-                // Run session card first — must be above the fold
+                // Recovery first
+                recoveryCard
+
+                // Planned workout sessions
                 let todaySessions = planStore.todaySessions
                     .filter { $0.workoutType != .strength }
                 if todaySessions.isEmpty {
                     noSessionToday
                 } else {
                     ForEach(todaySessions) { session in
+                        let hasStravaMatch = strava.activity(for: session.id) != nil
+
                         sessionCard(session)
 
                         if let activity = strava.activity(for: session.id) {
@@ -66,12 +71,12 @@ struct TodayView: View {
                         }
 
                         readinessSwapSuggestion(for: session)
-                        sessionActions(session)
+
+                        if !hasStravaMatch {
+                            sessionActions(session)
+                        }
                     }
                 }
-
-                // Recovery inline
-                recoveryCard
 
                 // Conditional banners
                 tuesdayBanner
@@ -286,6 +291,8 @@ struct TodayView: View {
             HStack {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundStyle(.orange.opacity(0.7))
+                Image(systemName: stravaActivityIcon(activity))
+                    .foregroundStyle(.orange.opacity(0.7))
                 Text("Completed")
                     .font(.subheadline.bold())
                     .foregroundStyle(.orange.opacity(0.8))
@@ -296,7 +303,7 @@ struct TodayView: View {
                         .foregroundStyle(.white)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
-                        .background(.blue, in: Capsule())
+                        .background(.orange.opacity(0.5), in: Capsule())
                 }
                 Text(activity.name)
                     .font(.caption)
@@ -380,6 +387,24 @@ struct TodayView: View {
             Text(String(format: "%+.0f%%", pct))
                 .font(.caption2.bold())
                 .foregroundStyle(delta >= 0 ? .green : .orange)
+        }
+    }
+
+    private func stravaActivityIcon(_ activity: StravaActivity) -> String {
+        switch activity.activityType {
+        case "Run", "TrailRun", "VirtualRun": return "figure.run"
+        case "Ride", "GravelRide", "MountainBikeRide", "EBikeRide", "VirtualRide": return "figure.outdoor.cycle"
+        case "Swim": return "figure.pool.swim"
+        case "Hike", "Walk": return "figure.hiking"
+        case "CrossCountrySkiing", "NordicSki", "BackcountrySki": return "figure.skiing.crosscountry"
+        case "AlpineSki": return "figure.skiing.downhill"
+        case "Snowboard": return "figure.snowboarding"
+        case "Rowing": return "figure.rowing"
+        case "RockClimbing": return "figure.climbing"
+        case "Elliptical", "StairStepper": return "figure.elliptical"
+        case "WeightTraining", "Crossfit": return "dumbbell.fill"
+        case "Yoga": return "figure.yoga"
+        default: return "figure.mixed.cardio"
         }
     }
 
