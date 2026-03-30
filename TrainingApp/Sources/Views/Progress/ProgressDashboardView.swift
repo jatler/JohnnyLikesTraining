@@ -177,25 +177,26 @@ struct ProgressDashboardView: View {
 
     private var weeklyDetailList: some View {
         let data = computeWeeklyMileage()
+        let globalMaxMi = data.map(\.plannedMi).max() ?? 1
 
         return VStack(alignment: .leading, spacing: 12) {
             Text("Week-by-Week")
                 .font(.headline)
 
             ForEach(data) { entry in
-                weekDetailRow(entry)
+                weekDetailRow(entry, globalMaxMi: globalMaxMi)
             }
         }
         .padding()
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
     }
 
-    private func weekDetailRow(_ entry: WeekMileageEntry) -> some View {
+    private func weekDetailRow(_ entry: WeekMileageEntry, globalMaxMi: Double) -> some View {
         let isCurrent = planStore.currentWeekNumber == entry.week
-        let maxMi = computeWeeklyMileage().map(\.plannedMi).max() ?? 1
-        let maxHours = computeWeeklyMileage().compactMap { $0.crossTrainHours > 0 ? $0.crossTrainHours : nil }.max() ?? 1
-        // Scale cross-training bar relative to mileage bar using the same visual width
-        let ctBarFraction = maxMi > 0 ? (entry.crossTrainHours / maxHours) : 0
+        let scale = globalMaxMi > 0 ? globalMaxMi : 1
+        let plannedFraction = entry.plannedMi / scale
+        let actualFraction = min(entry.actualMi, entry.plannedMi) / scale
+        let ctFraction = entry.crossTrainHours / scale
 
         return VStack(spacing: 4) {
             HStack {
@@ -204,9 +205,19 @@ struct ProgressDashboardView: View {
                     .foregroundStyle(isCurrent ? Color.swapAccent : .secondary)
                     .frame(width: 30, alignment: .leading)
 
-                ProgressView(value: min(entry.actualMi, entry.plannedMi), total: max(entry.plannedMi, 1)) {
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        // Planned (background)
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(Color.swapAccent.opacity(0.15))
+                            .frame(width: geo.size.width * plannedFraction)
+                        // Actual (foreground)
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(Color.swapAccent)
+                            .frame(width: geo.size.width * actualFraction)
+                    }
                 }
-                .tint(Color.swapAccent)
+                .frame(height: 8)
 
                 Text(String(format: "%.0f", entry.actualMi))
                     .font(.caption.bold())
@@ -228,13 +239,13 @@ struct ProgressDashboardView: View {
 
             if entry.crossTrainHours > 0 {
                 HStack {
-                    Text("")
-                        .frame(width: 30, alignment: .leading)
+                    Spacer()
+                        .frame(width: 30)
 
                     GeometryReader { geo in
                         RoundedRectangle(cornerRadius: 3)
                             .fill(Color.orange.opacity(0.4))
-                            .frame(width: geo.size.width * ctBarFraction)
+                            .frame(width: geo.size.width * ctFraction)
                     }
                     .frame(height: 6)
 
@@ -248,8 +259,7 @@ struct ProgressDashboardView: View {
                         .foregroundStyle(.orange.opacity(0.7))
                         .frame(width: 50, alignment: .leading)
 
-                    Text("")
-                        .font(.caption2)
+                    Spacer()
                         .frame(width: 30)
                 }
             }
