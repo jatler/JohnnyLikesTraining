@@ -42,12 +42,19 @@
 <body>
     <header>
         <h1>Privacy Policy</h1>
-        <p>Last updated: March 23, 2026</p>
+        <p>Last updated: March 29, 2026</p>
     </header>
 
     <div class="content">
         <h2>Introduction</h2>
         <p>JohnnyLikesTraining ("the App") is a personal iOS application for managing ultrarunning training. This Privacy Policy explains what data the App collects, how it is used, and your rights regarding that data.</p>
+
+        <h2>Data Collection Disclosure</h2>
+        <p>Before you connect any third-party service, we want you to understand exactly what data will be collected, how it is collected, how to withdraw consent, and how to request deletion:</p>
+        <ul>
+            <li><strong>Strava:</strong> When you tap "Connect Strava," you will be directed to Strava's website to authorize the App. We request <code>activity:read_all</code> scope, which allows us to read your activity data (runs, rides, hikes, etc.). Data is collected via the Strava API after you grant authorization. You can withdraw consent at any time by disconnecting Strava in the App's Settings screen, which also deletes your imported Strava data. You may also revoke access from <a href="https://www.strava.com/settings/apps">your Strava settings</a>.</li>
+            <li><strong>Oura:</strong> When you tap "Connect Oura," you will be directed to Oura's website to authorize the App. We request <code>daily</code> and <code>heartrate</code> scopes. You can withdraw consent at any time by disconnecting Oura in Settings.</li>
+        </ul>
 
         <h2>Data We Collect</h2>
         <p>The App collects and processes the following categories of data:</p>
@@ -55,8 +62,8 @@
             <li><strong>Account information:</strong> Your email address and authentication credentials when you sign in with Apple.</li>
             <li><strong>Training plan data:</strong> The training plan you configure, including race name, race date, workout schedules, swaps, skips, and manual adjustments.</li>
             <li><strong>Oura data:</strong> If you connect your Oura account, the App imports daily readiness scores, sleep scores, heart rate variability (HRV), resting heart rate, and body temperature deviation via the Oura API.</li>
-            <li><strong>Strava data:</strong> If you connect your Strava account, the App imports completed running activities including distance, pace, duration, heart rate, elevation, and GPS route data via the Strava API.</li>
-            <li><strong>Strength and heat training logs:</strong> Exercise sets, reps, weights, and heat acclimation session durations that you manually log.</li>
+            <li><strong>Strava data:</strong> If you connect your Strava account, the App imports completed activities including distance, pace, duration, heart rate, elevation, and activity type via the Strava API. We do not store GPS route data or map polylines.</li>
+            <li><strong>Strength, heat, and stretch training logs:</strong> Exercise sets, reps, weights, and session durations that you manually log.</li>
         </ul>
 
         <h2>How We Use Your Data</h2>
@@ -68,7 +75,7 @@
             <li>Tracking strength and heat training progress.</li>
             <li>Generating progress dashboards and compliance statistics.</li>
         </ul>
-        <p>We do not use your data for advertising, marketing, profiling, or any purpose unrelated to the App's core training functionality.</p>
+        <p>We do not use your data for advertising, marketing, profiling, analytics, AI/ML training, or any purpose unrelated to the App's core training functionality. We do not sell, license, or share your data with third parties, data brokers, or advertisers.</p>
 
         <h2>Data Storage</h2>
         <p>Your training data is stored in a Supabase-hosted PostgreSQL database secured with row-level security policies, meaning you can only access your own data. OAuth tokens for Oura and Strava are stored locally on your device in the iOS Keychain and are not transmitted to any third party.</p>
@@ -81,31 +88,40 @@
             <li><strong>Supabase</strong> (<a href="https://supabase.com/privacy">Supabase Privacy Policy</a>) — for authentication and data storage.</li>
             <li><strong>Apple Sign-In</strong> — for account authentication.</li>
         </ul>
-        <p>Data shared with these services is limited to what is necessary for authentication and data retrieval. We do not sell or share your data with any other third parties.</p>
+        <p>Data shared with these services is limited to what is necessary for authentication and data retrieval. We do not sell or share your data with any other third parties. Please note that Strava may monitor and collect data related to your use of the Strava API as described in the <a href="https://www.strava.com/legal/privacy">Strava Privacy Policy</a>.</p>
 
-        <h2>Data Retention</h2>
-        <p>Your data is retained as long as you have an active account. If you wish to delete your data, contact us at the email address below and we will remove all associated records from our database.</p>
+        <h2>Data Retention and Caching</h2>
+        <p>Your training plan data, strength logs, heat logs, and stretch logs are retained as long as you have an active account.</p>
+        <p>Strava activity data is synced periodically and cached locally. In accordance with Strava's API Agreement, cached Strava data is refreshed regularly and not retained beyond what is necessary to provide the App's functionality. If you delete an activity on Strava, it will be removed from the App within 48 hours of the next sync.</p>
+        <p>If you wish to delete all your data, contact us at the email address below and we will remove all associated records from our database.</p>
 
         <h2>Disconnecting Services</h2>
-        <p>You can disconnect your Oura or Strava account at any time from the App's Settings screen. Disconnecting removes the stored OAuth tokens from your device and stops further data syncing. Previously imported data remains in the database unless you request deletion.</p>
+        <p>You can disconnect your Oura or Strava account at any time from the App's Settings screen. Disconnecting Strava removes your stored OAuth tokens from your device, stops further data syncing, and deletes all imported Strava activity data from our database. Disconnecting Oura removes OAuth tokens and stops syncing; previously imported recovery data remains unless you request deletion. You may also revoke access from within <a href="https://www.strava.com/settings/apps">Strava's settings</a> or <a href="https://cloud.ouraring.com/user/authorize">Oura's settings</a>.</p>
 
         <h2>Your Rights</h2>
-        <p>You have the right to:</p>
+        <p>Under applicable data protection laws, including GDPR and UK GDPR where applicable, you have the right to:</p>
         <ul>
             <li>Access the personal data the App holds about you.</li>
             <li>Request correction of inaccurate data.</li>
-            <li>Request deletion of your data.</li>
-            <li>Disconnect third-party integrations at any time.</li>
+            <li>Request deletion of your data (right to erasure).</li>
+            <li>Withdraw consent for data collection at any time by disconnecting third-party services or deleting your account.</li>
+            <li>Request a copy of your data in a portable format.</li>
+            <li>Object to processing of your personal data.</li>
+            <li>Disconnect third-party integrations at any time from the App's Settings screen.</li>
         </ul>
+        <p>To exercise any of these rights, contact us at the email address below.</p>
+
+        <h2>Legal Basis for Processing (GDPR)</h2>
+        <p>We process your personal data based on your explicit consent, which you provide when you sign in, connect third-party services, and use the App. You may withdraw consent at any time as described above.</p>
 
         <h2>Children's Privacy</h2>
-        <p>The App is not directed at children under 13 and we do not knowingly collect personal information from children under 13.</p>
+        <p>The App is not directed at children under 16 (or the applicable age of digital consent in your jurisdiction) and we do not knowingly collect personal information from children.</p>
 
         <h2>Changes to This Policy</h2>
-        <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated revision date.</p>
+        <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated revision date. If changes are significant, we will notify you through the App.</p>
 
         <h2>Contact</h2>
-        <p>For questions or data requests, contact: <a href="mailto:atler.j@gmail.com">atler.j@gmail.com</a></p>
+        <p>For questions, data requests, support, or to express contact preferences, reach out to: <a href="mailto:atler.j@gmail.com">atler.j@gmail.com</a></p>
     </div>
 
     <footer>
