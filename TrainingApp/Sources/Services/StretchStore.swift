@@ -401,18 +401,13 @@ final class StretchStore {
     private func persistAllSessions() async {
         guard !isOffline, let planId = template?.planId else { return }
         do {
-            try await supabase.from("stretch_sessions")
-                .delete()
-                .eq("plan_id", value: planId)
-                .execute()
-
             if !sessions.isEmpty {
-                try await supabase.from("stretch_sessions").insert(sessions).execute()
+                try await supabase.from("stretch_sessions").upsert(sessions).execute()
             }
         } catch {
             print("Failed to persist stretch sessions to Supabase: \(error)")
             lastError = "Failed to save stretch sessions."
-}
+        }
     }
 
     private func persistLog(_ log: StretchLog) async {

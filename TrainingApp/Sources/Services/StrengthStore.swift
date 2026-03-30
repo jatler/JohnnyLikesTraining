@@ -561,18 +561,13 @@ final class StrengthStore {
     private func persistAllSessions() async {
         guard !isOffline, let planId = template?.planId else { return }
         do {
-            try await supabase.from("strength_sessions")
-                .delete()
-                .eq("plan_id", value: planId)
-                .execute()
-
             if !sessions.isEmpty {
-                try await supabase.from("strength_sessions").insert(sessions).execute()
+                try await supabase.from("strength_sessions").upsert(sessions).execute()
             }
         } catch {
             print("Failed to persist sessions to Supabase: \(error)")
             lastError = "Failed to save sessions."
-}
+        }
     }
 
     private func persistLog(_ log: StrengthLog) async {

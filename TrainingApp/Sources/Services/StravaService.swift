@@ -12,6 +12,7 @@ final class StravaService {
 
     private let supabase = SupabaseService.shared.client
     private var authSession: ASWebAuthenticationSession?
+    private var pendingOAuthState: String?
 
     private static let importableActivityTypes: Set<String> = [
         "Run", "TrailRun", "VirtualRun",
@@ -45,13 +46,17 @@ final class StravaService {
             throw StravaError.missingCredentials
         }
 
+        let state = UUID().uuidString
+        pendingOAuthState = state
+
         var components = URLComponents(string: Config.stravaAuthorizeURL)!
         components.queryItems = [
             URLQueryItem(name: "client_id", value: Config.stravaClientId),
             URLQueryItem(name: "redirect_uri", value: Config.stravaRedirectURI),
             URLQueryItem(name: "response_type", value: "code"),
             URLQueryItem(name: "scope", value: Config.stravaScope),
-            URLQueryItem(name: "approval_prompt", value: "auto")
+            URLQueryItem(name: "approval_prompt", value: "auto"),
+            URLQueryItem(name: "state", value: state)
         ]
 
         print("[Strava OAuth] Authorize URL: \(components.url!)")
@@ -72,9 +77,17 @@ final class StravaService {
                     continuation.resume(throwing: error)
                     return
                 }
-                guard let url = callbackURL,
-                      let code = URLComponents(url: url, resolvingAgainstBaseURL: false)?
-                        .queryItems?.first(where: { $0.name == "code" })?.value else {
+                guard let url = callbackURL else {
+                    continuation.resume(throwing: StravaError.noAuthCode)
+                    return
+                }
+                let params = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems
+                let returnedState = params?.first(where: { $0.name == "state" })?.value
+                guard returnedState == self?.pendingOAuthState else {
+                    continuation.resume(throwing: StravaError.stateMismatch)
+                    return
+                }
+                guard let code = params?.first(where: { $0.name == "code" })?.value else {
                     continuation.resume(throwing: StravaError.noAuthCode)
                     return
                 }
@@ -86,6 +99,7 @@ final class StravaService {
             print("[Strava OAuth] Session started: \(started)")
         }
 
+        pendingOAuthState = nil
         try await exchangeCodeForToken(code)
     }
 
@@ -154,7 +168,7 @@ final class StravaService {
 
     private func saveTokens(_ token: StravaTokenResponse) {
         #if DEBUG
-        print("🔑 Strava refresh token: \(token.refreshToken)")
+        print("🔑 Strava tokens saved")
         #endif
         KeychainService.save(token.accessToken, for: .stravaAccessToken)
         KeychainService.save(token.refreshToken, for: .stravaRefreshToken)
@@ -392,6 +406,7 @@ enum StravaError: LocalizedError {
     case tokenExchangeFailed
     case tokenRefreshFailed
     case apiFailed
+    case stateMismatch
 
     var errorDescription: String? {
         switch self {
@@ -401,6 +416,7 @@ enum StravaError: LocalizedError {
         case .tokenExchangeFailed: "Failed to exchange authorization code for tokens."
         case .tokenRefreshFailed: "Failed to refresh Strava access token."
         case .apiFailed: "Strava API request failed."
+        case .stateMismatch: "OAuth state parameter mismatch — possible CSRF attack."
         }
     }
 }

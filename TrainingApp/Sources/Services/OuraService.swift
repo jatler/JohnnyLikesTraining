@@ -11,6 +11,7 @@ final class OuraService {
 
     private let supabase = SupabaseService.shared.client
     private var authSession: ASWebAuthenticationSession?
+    private var pendingOAuthState: String?
 
     init() {
         isConnected = KeychainService.get(.ouraAccessToken) != nil
@@ -24,13 +25,16 @@ final class OuraService {
             throw OuraError.missingCredentials
         }
 
+        let state = UUID().uuidString
+        pendingOAuthState = state
+
         var components = URLComponents(string: Config.ouraAuthorizeURL)!
         components.queryItems = [
             URLQueryItem(name: "client_id", value: Config.ouraClientId),
             URLQueryItem(name: "redirect_uri", value: Config.ouraRedirectURI),
             URLQueryItem(name: "response_type", value: "code"),
             URLQueryItem(name: "scope", value: Config.ouraScope),
-            URLQueryItem(name: "state", value: UUID().uuidString)
+            URLQueryItem(name: "state", value: state)
         ]
 
         let code = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
@@ -43,9 +47,17 @@ final class OuraService {
                     continuation.resume(throwing: error)
                     return
                 }
-                guard let url = callbackURL,
-                      let code = URLComponents(url: url, resolvingAgainstBaseURL: false)?
-                        .queryItems?.first(where: { $0.name == "code" })?.value else {
+                guard let url = callbackURL else {
+                    continuation.resume(throwing: OuraError.noAuthCode)
+                    return
+                }
+                let params = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems
+                let returnedState = params?.first(where: { $0.name == "state" })?.value
+                guard returnedState == self?.pendingOAuthState else {
+                    continuation.resume(throwing: OuraError.stateMismatch)
+                    return
+                }
+                guard let code = params?.first(where: { $0.name == "code" })?.value else {
                     continuation.resume(throwing: OuraError.noAuthCode)
                     return
                 }
@@ -56,6 +68,7 @@ final class OuraService {
             self.authSession?.start()
         }
 
+        pendingOAuthState = nil
         try await exchangeCodeForToken(code)
     }
 
@@ -66,9 +79,7 @@ final class OuraService {
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
 
         #if DEBUG
-        print("Oura client_id: [\(Config.ouraClientId)]")
-        print("Oura client_secret: [\(Config.ouraClientSecret)]")
-        print("Oura redirect_uri: [\(Config.ouraRedirectURI)]")
+        print("Oura OAuth: starting authorization")
         #endif
 
         var components = URLComponents()
@@ -161,9 +172,12 @@ final class OuraService {
 
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone.current
 
-        let endDate = Date()
-        let startDate = Calendar.current.date(byAdding: .day, value: -days, to: endDate)!
+        // Oura API end_date is exclusive, so add 1 day to include today's data
+        let today = Date()
+        let endDate = Calendar.current.date(byAdding: .day, value: 1, to: today)!
+        let startDate = Calendar.current.date(byAdding: .day, value: -days, to: today)!
 
         let readinessData = try await fetchReadiness(
             accessToken: accessToken,
@@ -221,44 +235,43 @@ final class OuraService {
             }
         }
 
+        // Merge sleep period HRV/RHR into matching days by date.
         for entry in sleepPeriods {
             let dateStr = entry.day
             let hrv = entry.averageHrv.map(Double.init)
             if merged[dateStr] != nil {
-                merged[dateStr]?.restingHr = entry.lowestHeartRate
-                merged[dateStr]?.hrvAverage = hrv
-            } else {
-                let date = formatter.date(from: dateStr) ?? Date()
-                merged[dateStr] = OuraDaily(
-                    id: UUID(),
-                    userId: userId,
-                    date: date,
-                    readinessScore: nil,
-                    sleepScore: nil,
-                    hrvAverage: hrv,
-                    restingHr: entry.lowestHeartRate,
-                    temperatureDeviation: nil,
-                    syncedAt: Date()
-                )
+                if merged[dateStr]?.restingHr == nil { merged[dateStr]?.restingHr = entry.lowestHeartRate }
+                if merged[dateStr]?.hrvAverage == nil { merged[dateStr]?.hrvAverage = hrv }
             }
         }
 
-        // When today has readiness/sleep scores but no HRV/RHR (sleep period
-        // not processed yet), fill forward from the most recent sleep period.
+        // For today specifically, always show the most recent HRV/RHR from sleep
+        // even if the sleep period date doesn't match today exactly.
         let todayStr = formatter.string(from: Date())
-        if var todayEntry = merged[todayStr],
-           todayEntry.hrvAverage == nil || todayEntry.restingHr == nil {
-            let mostRecent = sleepPeriods
-                .sorted(by: { $0.day > $1.day })
-                .first
-            if let recent = mostRecent {
-                if todayEntry.hrvAverage == nil {
-                    todayEntry.hrvAverage = recent.averageHrv.map(Double.init)
-                }
-                if todayEntry.restingHr == nil {
-                    todayEntry.restingHr = recent.lowestHeartRate
-                }
+        let mostRecentPeriod = sleepPeriods
+            .sorted(by: { $0.day > $1.day })
+            .first(where: { $0.lowestHeartRate != nil || $0.averageHrv != nil })
+
+        if let recent = mostRecentPeriod {
+            let latestHrv = recent.averageHrv.map(Double.init)
+            let latestRhr = recent.lowestHeartRate
+
+            if var todayEntry = merged[todayStr] {
+                if todayEntry.hrvAverage == nil { todayEntry.hrvAverage = latestHrv }
+                if todayEntry.restingHr == nil { todayEntry.restingHr = latestRhr }
                 merged[todayStr] = todayEntry
+            } else {
+                merged[todayStr] = OuraDaily(
+                    id: UUID(),
+                    userId: userId,
+                    date: Date(),
+                    readinessScore: nil,
+                    sleepScore: nil,
+                    hrvAverage: latestHrv,
+                    restingHr: latestRhr,
+                    temperatureDeviation: nil,
+                    syncedAt: Date()
+                )
             }
         }
 
@@ -266,6 +279,14 @@ final class OuraService {
         let withHrv = merged.values.filter { $0.hrvAverage != nil }.count
         let withRhr = merged.values.filter { $0.restingHr != nil }.count
         print("Oura merged: \(merged.count) days, \(withHrv) with HRV, \(withRhr) with RHR")
+        if let todayData = merged[todayStr] {
+            print("Oura today (\(todayStr)): readiness=\(todayData.readinessScore.map(String.init) ?? "nil") sleep=\(todayData.sleepScore.map(String.init) ?? "nil") HRV=\(todayData.hrvAverage.map { String(format: "%.0f", $0) } ?? "nil") RHR=\(todayData.restingHr.map(String.init) ?? "nil")")
+        } else {
+            print("Oura today (\(todayStr)): NO DATA")
+        }
+        // Show sleep period dates to debug day alignment
+        let periodDays = sleepPeriods.map(\.day).sorted().suffix(3)
+        print("Oura recent sleep period days: \(periodDays.joined(separator: ", "))")
         if withHrv == 0 && withRhr == 0 && !sleepPeriods.isEmpty {
             print("⚠️ Sleep periods fetched but no HRV/RHR data — user may need to disconnect & reconnect Oura to grant heartrate scope")
         }
@@ -389,7 +410,11 @@ final class OuraService {
     // MARK: - Query Helpers
 
     func todayReadiness() -> OuraDaily? {
-        dailyData.first { Calendar.current.isDateInToday($0.date) }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone.current
+        let todayStr = formatter.string(from: Date())
+        return dailyData.first { formatter.string(from: $0.date) == todayStr }
     }
 
     func data(for date: Date) -> OuraDaily? {
@@ -506,6 +531,7 @@ enum OuraError: LocalizedError {
     case tokenExchangeFailed
     case tokenRefreshFailed
     case apiFailed
+    case stateMismatch
 
     var errorDescription: String? {
         switch self {
@@ -515,6 +541,7 @@ enum OuraError: LocalizedError {
         case .tokenExchangeFailed: "Failed to exchange authorization code for tokens."
         case .tokenRefreshFailed: "Failed to refresh Oura access token."
         case .apiFailed: "Oura API request failed."
+        case .stateMismatch: "OAuth state parameter mismatch — possible CSRF attack."
         }
     }
 }

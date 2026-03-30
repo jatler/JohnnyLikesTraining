@@ -215,13 +215,8 @@ final class HeatStore {
     private func persistAllSessions(planId: UUID) async {
         guard !isOffline else { return }
         do {
-            try await supabase.from("heat_sessions")
-                .delete()
-                .eq("plan_id", value: planId)
-                .execute()
-
             if !sessions.isEmpty {
-                try await supabase.from("heat_sessions").insert(sessions).execute()
+                try await supabase.from("heat_sessions").upsert(sessions).execute()
             }
         } catch {
             print("Failed to persist heat sessions to Supabase: \(error)")

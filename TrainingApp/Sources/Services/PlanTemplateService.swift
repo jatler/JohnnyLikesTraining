@@ -6,6 +6,11 @@ final class PlanTemplateService {
 
     private init() {}
 
+    private let enabledTemplateIDs: Set<String> = [
+        "champion_100k",
+        "winter_plan_10w"
+    ]
+
     // MARK: - Available Templates
 
     /// All bundled plan templates the user can choose from.
@@ -24,8 +29,8 @@ final class PlanTemplateService {
                 let data = try Data(contentsOf: url)
                 let template = try JSONDecoder().decode(TrainingPlanTemplate.self, from: data)
 
-                // Keep bundled plan templates only.
-                guard template.source == "SWAP Running" else { continue }
+                // Keep only reviewed/approved plan templates.
+                guard enabledTemplateIDs.contains(template.id) else { continue }
                 guard !seenIDs.contains(template.id) else { continue }
 
                 seenIDs.insert(template.id)

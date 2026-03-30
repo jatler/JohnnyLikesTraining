@@ -7,6 +7,7 @@ struct SessionDetailSheet: View {
     @Environment(OuraService.self) private var oura
     @Environment(StrengthStore.self) private var strengthStore
     @Environment(HeatStore.self) private var heatStore
+    @Environment(StretchStore.self) private var stretchStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var showingSwapTargets = false
@@ -84,10 +85,6 @@ struct SessionDetailSheet: View {
         VStack(alignment: .leading, spacing: 20) {
             workoutHeader
 
-            if let recovery = dayRecovery {
-                recoveryRow(recovery)
-            }
-
             if let distance = session.targetDistanceKm {
                 distanceRow(distance)
             }
@@ -106,17 +103,23 @@ struct SessionDetailSheet: View {
 
             strengthSection
 
+            stretchSection
+
             heatSection
+
+            if let recovery = dayRecovery {
+                Divider()
+                SessionComponents.recoveryRow(recovery)
+            }
 
             if let activity = matchedActivity {
                 Divider()
-                planVsActualSection(activity)
+                SessionComponents.planVsActualSection(session: session, activity: activity)
             }
 
             Divider()
 
             actionsSection
-            editButton
 
             if showingSwapTargets {
                 swapTargetsSection
@@ -256,72 +259,6 @@ struct SessionDetailSheet: View {
         }
     }
 
-    private func recoveryRow(_ recovery: OuraDaily) -> some View {
-        HStack(spacing: 16) {
-            if let score = recovery.readinessScore {
-                HStack(spacing: 4) {
-                    if score >= 85 {
-                        Image(systemName: "crown.fill")
-                            .font(.caption2)
-                            .foregroundStyle(.yellow)
-                    } else {
-                        Circle()
-                            .fill(readinessColor(recovery.readinessLevel))
-                            .frame(width: 8, height: 8)
-                    }
-                    Text("Readiness \(score)")
-                        .font(.caption)
-                }
-            }
-            if let sleep = recovery.sleepScore {
-                HStack(spacing: 4) {
-                    if sleep >= 85 {
-                        Image(systemName: "crown.fill")
-                            .font(.caption2)
-                            .foregroundStyle(.yellow)
-                    } else {
-                        Image(systemName: "moon.fill")
-                            .font(.caption2)
-                            .foregroundStyle(.blue)
-                    }
-                    Text("Sleep \(sleep)")
-                        .font(.caption)
-                }
-            }
-            if let hrv = recovery.hrvAverage {
-                HStack(spacing: 4) {
-                    Image(systemName: "waveform.path.ecg")
-                        .font(.caption2)
-                        .foregroundStyle(.purple)
-                    Text(String(format: "HRV %.0f", hrv))
-                        .font(.caption)
-                }
-            }
-            if let rhr = recovery.restingHr {
-                HStack(spacing: 4) {
-                    Image(systemName: "heart.fill")
-                        .font(.caption2)
-                        .foregroundStyle(.red)
-                    Text("RHR \(rhr)")
-                        .font(.caption)
-                }
-            }
-            Spacer()
-        }
-        .foregroundStyle(.secondary)
-        .padding(10)
-        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 8))
-    }
-
-    private func readinessColor(_ level: ReadinessLevel) -> Color {
-        switch level {
-        case .good: .green
-        case .moderate: .orange
-        case .low: .red
-        case .unknown: .gray
-        }
-    }
-
     private func distanceRow(_ km: Double) -> some View {
         let mi = DistanceFormatter.miles(from: km)
         return HStack(spacing: 6) {
@@ -424,6 +361,65 @@ struct SessionDetailSheet: View {
     }
 
     @ViewBuilder
+    private var stretchSection: some View {
+        let daySessions = stretchStore.sessions(for: session.scheduledDate)
+
+        if !daySessions.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Label("Stretches", systemImage: "figure.flexibility")
+                        .font(.subheadline.bold())
+                        .foregroundStyle(Color.swapAccent)
+
+                    Spacer()
+
+                    let completed = stretchStore.completedCount(for: session.scheduledDate)
+                    let total = daySessions.count
+
+                    if completed > 0 {
+                        Text("\(completed)/\(total) done")
+                            .font(.caption)
+                            .foregroundStyle(.green)
+                    }
+                }
+
+                ForEach(daySessions) { s in
+                    HStack(spacing: 8) {
+                        let complete = stretchStore.isComplete(s.id)
+
+                        Image(systemName: complete ? "checkmark.circle.fill" : "circle")
+                            .font(.caption)
+                            .foregroundStyle(complete ? .green : Color.secondary.opacity(0.3))
+
+                        Text(s.stretchName)
+                            .font(.caption)
+                            .foregroundStyle(complete ? .secondary : .primary)
+
+                        Spacer()
+
+                        if s.isBilateral {
+                            Text("L+R")
+                                .font(.caption2.bold())
+                                .foregroundStyle(.secondary)
+                                .padding(.horizontal, 5)
+                                .padding(.vertical, 1)
+                                .background(Color.secondary.opacity(0.15), in: Capsule())
+                        }
+
+                        Text("\(s.prescribedSets)×\(s.prescribedHoldSeconds)s")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.swapAccent.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+            .opacity(isSkipped ? 0.5 : 1)
+        }
+    }
+
+    @ViewBuilder
     private var heatSection: some View {
         let heatSessions = heatStore.sessions(for: session.scheduledDate)
 
@@ -475,106 +471,6 @@ struct SessionDetailSheet: View {
         }
     }
 
-    // MARK: - Plan vs Actual
-
-    private func planVsActualSection(_ activity: StravaActivity) -> some View {
-        return Link(destination: URL(string: "https://www.strava.com/activities/\(activity.stravaId)")!) {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
-                Text("Completed: \(activity.name)")
-                    .font(.subheadline.bold())
-                Spacer()
-                if !activity.isRun {
-                    Text(activity.activityTypeDisplay)
-                        .font(.caption2.bold())
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(.blue, in: Capsule())
-                }
-                Image(systemName: "arrow.up.right.square")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            LazyVGrid(columns: [
-                GridItem(.flexible()),
-                GridItem(.flexible()),
-                GridItem(.flexible())
-            ], spacing: 12) {
-                if activity.isRun || activity.distanceKm > 0.1 {
-                    comparisonCell(
-                        title: "Distance",
-                        actual: String(format: "%.1f mi", activity.distanceMi),
-                        planned: session.targetDistanceMi.map { String(format: "%.1f mi", $0) },
-                        delta: session.targetDistanceMi.map { ((activity.distanceMi - $0) / $0) * 100 }
-                    )
-                }
-
-                if activity.isRun {
-                    comparisonCell(
-                        title: "Pace",
-                        actual: activity.formattedPace,
-                        planned: nil,
-                        delta: nil
-                    )
-                }
-
-                comparisonCell(
-                    title: "Duration",
-                    actual: activity.formattedDuration,
-                    planned: nil,
-                    delta: nil
-                )
-            }
-
-            HStack(spacing: 16) {
-                if let hr = activity.averageHr {
-                    Label("\(hr) bpm", systemImage: "heart.fill")
-                        .font(.caption)
-                        .foregroundStyle(.red)
-                }
-
-                if let elev = activity.elevationGainM, activity.isRun {
-                    Label(String(format: "%.0f ft", elev * 3.281), systemImage: "mountain.2.fill")
-                        .font(.caption)
-                        .foregroundStyle(.green)
-                }
-            }
-        }
-        .padding()
-        .background(.green.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
-        }
-    }
-
-    private func comparisonCell(title: String, actual: String, planned: String?, delta: Double?) -> some View {
-        VStack(spacing: 4) {
-            Text(title)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-
-            Text(actual)
-                .font(.subheadline.bold())
-
-            if let planned {
-                Text("Plan: \(planned)")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-            }
-
-            if let delta, abs(delta) >= 1 {
-                Text(String(format: "%+.0f%%", delta))
-                    .font(.caption2.bold())
-                    .foregroundStyle(delta >= 0 ? .green : .orange)
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 8)
-        .background(.background, in: RoundedRectangle(cornerRadius: 8))
-    }
-
     // MARK: - Actions
 
     private var actionsSection: some View {
@@ -583,57 +479,54 @@ struct SessionDetailSheet: View {
                 Button {
                     planStore.unskipSession(session.id)
                 } label: {
-                    Label("Restore Session", systemImage: "arrow.uturn.backward.circle")
+                    Label("Restore", systemImage: "arrow.uturn.backward.circle")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
-                .tint(.blue)
+                .tint(.gray)
             } else {
-                Button {
-                    showingSkipOptions = true
-                } label: {
-                    Label("Skip This Session", systemImage: "xmark.circle")
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .tint(.red)
-                .confirmationDialog("Skip this workout?", isPresented: $showingSkipOptions) {
-                    Button("Injury") { skipWithReason("Injury") }
-                    Button("Illness") { skipWithReason("Illness") }
-                    Button("Life / Schedule") { skipWithReason("Life") }
-                    Button("Skip (no reason)") { skipWithReason(nil) }
-                    Button("Cancel", role: .cancel) {}
-                }
+                HStack(spacing: 8) {
+                    Button {
+                        showingSkipOptions = true
+                    } label: {
+                        Label("Skip", systemImage: "xmark.circle")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.gray)
+                    .confirmationDialog("Skip this workout?", isPresented: $showingSkipOptions) {
+                        Button("Injury") { skipWithReason("Injury") }
+                        Button("Illness") { skipWithReason("Illness") }
+                        Button("Life / Schedule") { skipWithReason("Life") }
+                        Button("Skip (no reason)") { skipWithReason(nil) }
+                        Button("Cancel", role: .cancel) {}
+                    }
 
-                Button {
-                    withAnimation { showingSwapTargets.toggle() }
-                } label: {
-                    Label(
-                        showingSwapTargets ? "Cancel Swap" : "Swap With Another Day",
-                        systemImage: showingSwapTargets ? "xmark" : "arrow.left.arrow.right"
-                    )
-                    .frame(maxWidth: .infinity)
+                    Button {
+                        withAnimation { showingSwapTargets.toggle() }
+                    } label: {
+                        Label("Swap", systemImage: "arrow.left.arrow.right")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.gray)
+
+                    Button {
+                        editWorkoutType = session.workoutType
+                        editDistanceMi = session.targetDistanceMi.map { String(format: "%.1f", $0) } ?? ""
+                        editPace = session.targetPaceDescription ?? ""
+                        editNotes = session.notes ?? ""
+                        propagateToSameDay = false
+                        isEditing = true
+                    } label: {
+                        Label("Edit", systemImage: "pencil")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.gray)
                 }
-                .buttonStyle(.bordered)
-                .tint(.orange)
             }
         }
-    }
-
-    private var editButton: some View {
-        Button {
-            editWorkoutType = session.workoutType
-            editDistanceMi = session.targetDistanceMi.map { String(format: "%.1f", $0) } ?? ""
-            editPace = session.targetPaceDescription ?? ""
-            editNotes = session.notes ?? ""
-            propagateToSameDay = false
-            isEditing = true
-        } label: {
-            Label("Edit Workout", systemImage: "pencil")
-                .frame(maxWidth: .infinity)
-        }
-        .buttonStyle(.bordered)
-        .tint(Color.swapAccent)
     }
 
     private var swapTargetsSection: some View {

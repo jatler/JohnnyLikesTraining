@@ -48,6 +48,8 @@
 		8219FFB2F7BB6FAEBC38FE8A /* BrandKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEDB45B76A4FF654A550A7B1 /* BrandKit.swift */; };
 		82789C46467BC97AF87E0EF2 /* StravaActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3895561C0376F954DE01A693 /* StravaActivity.swift */; };
 		8878823BC2582FB11DCE301D /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1312B17F09C9B5D35ACDBBB8 /* SignInView.swift */; };
+		8CBBB4192F87FE7DA620AAFF /* DistanceFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01E3A62ED721DEA19C5D3E93 /* DistanceFormatterTests.swift */; };
+		8E5EBD9AA2DCDF5E7FE811FF /* PlanCacheServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3B804FFEB9BCC2927068518 /* PlanCacheServiceTests.swift */; };
 		91F73DDAD65FB6A7B8DAB572 /* StretchSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84A8563FB47BFB14F6BC6B82 /* StretchSession.swift */; };
 		921A51DCF553D7FC53574F9F /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 0F711C2ADA26F108C95B0FE4 /* Auth */; };
 		954A34C6625409E4D3FD985C /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE119AE0121335DC62EE5944 /* KeychainService.swift */; };
@@ -59,6 +61,7 @@
 		BE8DE2E89F3AD00D912A8DF4 /* PlanTemplateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCB069788F05CECEBBE77DB1 /* PlanTemplateService.swift */; };
 		BEE049CF6DC32B96C1A1C104 /* HeatLogSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88DF00FE0051C419B60EF69 /* HeatLogSheet.swift */; };
 		C503CA28370AF3D08D1B0B03 /* StrengthTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD51F063639F08594732C4DF /* StrengthTemplate.swift */; };
+		C7AA1F1A42F32DAF733B142F /* SessionComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 554A6B40A55811F72EED9EB3 /* SessionComponents.swift */; };
 		CA291CF1F9930B3639E76625 /* PlannedSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4CD0A46894A328DDC0FE678 /* PlannedSession.swift */; };
 		D12FAE9FF61869CB253BD92E /* swap_marathon_8w.json in Resources */ = {isa = PBXBuildFile; fileRef = 4EC7DE6273E7027C22058745 /* swap_marathon_8w.json */; };
 		D4D65A6A404CF56CDAAB7CCC /* SessionSwap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 886214F674543E3860A250BC /* SessionSwap.swift */; };
@@ -89,9 +92,10 @@
 
 /* Begin PBXFileReference section */
 		01084C5E9E5B70C9554F9353 /* swap_base_building_12w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_base_building_12w.json; sourceTree = "<group>"; };
-		02C33C9015C1F9FCA1CD7F9C /* Training.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Training.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		01E3A62ED721DEA19C5D3E93 /* DistanceFormatterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceFormatterTests.swift; sourceTree = "<group>"; };
+		02C33C9015C1F9FCA1CD7F9C /* Training.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Training.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		05ED34708B6E8C9B19B9424F /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
-		06D72E3E3CB8A152A28F3971 /* TrainingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TrainingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		06D72E3E3CB8A152A28F3971 /* TrainingTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TrainingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		06DF4619920374FFA75D53AE /* PlanCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCacheService.swift; sourceTree = "<group>"; };
 		06E66380AFDA249ADA3BCD91 /* AppleSignInSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInSupport.swift; sourceTree = "<group>"; };
 		07D906017FBE990E96F50C52 /* PlanCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCalendarView.swift; sourceTree = "<group>"; };
@@ -112,6 +116,7 @@
 		43AD51FDF5F6406D076D2693 /* swap_50mile_12w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_50mile_12w.json; sourceTree = "<group>"; };
 		45B651E1F7E6BF915FDAD19D /* TrainingPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlan.swift; sourceTree = "<group>"; };
 		4EC7DE6273E7027C22058745 /* swap_marathon_8w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_marathon_8w.json; sourceTree = "<group>"; };
+		554A6B40A55811F72EED9EB3 /* SessionComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionComponents.swift; sourceTree = "<group>"; };
 		5A2CDF8B4AC1F14A2F3AE63B /* SessionOverride.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionOverride.swift; sourceTree = "<group>"; };
 		628F12BE440D321D5582EB09 /* winter_plan_10w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = winter_plan_10w.json; sourceTree = "<group>"; };
 		6395FB77D8158EC94B32CC70 /* PlanTemplateDateMathTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanTemplateDateMathTests.swift; sourceTree = "<group>"; };
@@ -146,6 +151,7 @@
 		CCB069788F05CECEBBE77DB1 /* PlanTemplateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanTemplateService.swift; sourceTree = "<group>"; };
 		CD128F03DE17FF51C05DD6BB /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		D1D2D3BC0E8B003565E5025D /* ProgressionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionEngine.swift; sourceTree = "<group>"; };
+		D3B804FFEB9BCC2927068518 /* PlanCacheServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCacheServiceTests.swift; sourceTree = "<group>"; };
 		D530D92A8022C6A3EDAAF7FC /* StretchDayDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StretchDayDetailView.swift; sourceTree = "<group>"; };
 		D618114C072296876E86FC5B /* StrengthLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthLog.swift; sourceTree = "<group>"; };
 		DC3467C238F8B38FFA08AC33 /* WeekView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekView.swift; sourceTree = "<group>"; };
@@ -229,6 +235,14 @@
 			path = Plan;
 			sourceTree = "<group>";
 		};
+		44242B1A981CF5EC988BBB73 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				554A6B40A55811F72EED9EB3 /* SessionComponents.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		510BB2D4CDD4CCC5591335D9 /* Today */ = {
 			isa = PBXGroup;
 			children = (
@@ -247,6 +261,7 @@
 				43D61DA79F66CFF81438133C /* Plan */,
 				F0E53572223BE6C4FEAECD4E /* Progress */,
 				D64D17B3A4A4E3A81AFAC975 /* Settings */,
+				44242B1A981CF5EC988BBB73 /* Shared */,
 				32CAB2D0659553250CDC6DB1 /* Strength */,
 				F03EDEBBBE5D286F7A2B225F /* Stretch */,
 				510BB2D4CDD4CCC5591335D9 /* Today */,
@@ -280,7 +295,9 @@
 		6F9C9D347A986A243AFE3345 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				01E3A62ED721DEA19C5D3E93 /* DistanceFormatterTests.swift */,
 				9337955CF90D612D318CF4D3 /* PatreonVerificationTests.swift */,
+				D3B804FFEB9BCC2927068518 /* PlanCacheServiceTests.swift */,
 				6395FB77D8158EC94B32CC70 /* PlanTemplateDateMathTests.swift */,
 				6C01F97738C00E24FC785ED9 /* ProgressionEngineTests.swift */,
 			);
@@ -465,7 +482,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2630;
+				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					18F6C878EF626BA5B3598160 = {
 						DevelopmentTeam = WHKX4QF56D;
@@ -523,7 +540,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8CBBB4192F87FE7DA620AAFF /* DistanceFormatterTests.swift in Sources */,
 				7A5C5F0B8380C1DD3264FCB5 /* PatreonVerificationTests.swift in Sources */,
+				8E5EBD9AA2DCDF5E7FE811FF /* PlanCacheServiceTests.swift in Sources */,
 				E040DE78B92E745857C15194 /* PlanTemplateDateMathTests.swift in Sources */,
 				340974BD8F3C6D08E7B5BFAC /* ProgressionEngineTests.swift in Sources */,
 			);
@@ -557,6 +576,7 @@
 				CA291CF1F9930B3639E76625 /* PlannedSession.swift in Sources */,
 				16A10EAA3636112CCEFFD4E6 /* ProgressDashboardView.swift in Sources */,
 				1C51CC95D337B05BF3093A96 /* ProgressionEngine.swift in Sources */,
+				C7AA1F1A42F32DAF733B142F /* SessionComponents.swift in Sources */,
 				6F888519D7D6238904329600 /* SessionDetailSheet.swift in Sources */,
 				02D216BE04F5C9BBD631B010 /* SessionOverride.swift in Sources */,
 				E1963A5737DE23227CF28C39 /* SessionSkip.swift in Sources */,
@@ -636,7 +656,6 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -650,7 +669,6 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
@@ -682,7 +700,7 @@
 				CODE_SIGN_ENTITLEMENTS = Training.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = WHKX4QF56D;
 				DEV_SIGNIN_ALLOWED = NO;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -692,7 +710,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jatler.Training;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
@@ -727,7 +745,7 @@
 				CODE_SIGN_ENTITLEMENTS = Training.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = WHKX4QF56D;
 				DEV_SIGNIN_ALLOWED = NO;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -737,7 +755,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jatler.Training;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -784,7 +802,6 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -805,7 +822,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;

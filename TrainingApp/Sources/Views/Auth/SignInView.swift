@@ -12,16 +12,11 @@ struct SignInView: View {
             Spacer()
 
             VStack(spacing: 8) {
-                HStack(alignment: .lastTextBaseline, spacing: 2) {
-                    Text("SWAP")
-                        .font(.system(size: 52, weight: .black))
-                        .foregroundStyle(Color.swapAccent)
-                    Text("Training")
-                        .font(.title2)
-                        .fontWeight(.regular)
-                }
+                Text("JohnnyLikesTraining")
+                    .font(.system(size: 36, weight: .black))
+                    .foregroundStyle(Color.swapAccent)
 
-                Text("Huzzah!")
+                Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }

@@ -118,8 +118,10 @@ struct SettingsView: View {
         Section {
             if strava.isConnected {
                 HStack {
-                    Label("Strava", systemImage: "figure.run")
-                        .foregroundStyle(.orange)
+                    Image("PoweredByStrava")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 16)
                     Spacer()
                     Text("Connected")
                         .font(.subheadline)
@@ -172,25 +174,19 @@ struct SettingsView: View {
                 Button {
                     connectStrava()
                 } label: {
-                    HStack {
-                        Label("Connect Strava", systemImage: "figure.run")
-                            .foregroundStyle(.orange)
-                        Spacer()
-                        Image(systemName: "arrow.up.right.square")
-                            .foregroundStyle(.secondary)
-                    }
+                    Image("ConnectWithStrava")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 40)
+                        .frame(maxWidth: .infinity, alignment: .center)
                 }
+                .listRowBackground(Color.clear)
             }
         } header: {
             Text("Strava")
         } footer: {
-            VStack(alignment: .leading, spacing: 4) {
-                if !strava.isConnected {
-                    Text("Connect Strava to automatically import your runs and compare plan vs. actual.")
-                }
-                Link("Powered by Strava", destination: URL(string: "https://www.strava.com")!)
-                    .font(.caption2)
-                    .foregroundStyle(.orange)
+            if !strava.isConnected {
+                Text("Connect Strava to automatically import your runs and compare plan vs. actual.")
             }
         }
     }
@@ -201,8 +197,11 @@ struct SettingsView: View {
         Section {
             if oura.isConnected {
                 HStack {
-                    Label("Oura Ring", systemImage: "heart.circle")
-                        .foregroundStyle(.purple)
+                    Image("OuraLogo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 14)
+                        .foregroundStyle(.primary)
                     Spacer()
                     Text("Connected")
                         .font(.subheadline)
@@ -246,8 +245,13 @@ struct SettingsView: View {
                     connectOura()
                 } label: {
                     HStack {
-                        Label("Connect Oura Ring", systemImage: "heart.circle")
-                            .foregroundStyle(.purple)
+                        Image("OuraLogo")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(height: 14)
+                            .foregroundStyle(.primary)
+                        Text("Connect")
+                            .foregroundStyle(.secondary)
                         Spacer()
                         Image(systemName: "arrow.up.right.square")
                             .foregroundStyle(.secondary)

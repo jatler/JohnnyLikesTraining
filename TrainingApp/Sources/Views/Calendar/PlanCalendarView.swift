@@ -30,15 +30,11 @@ struct PlanCalendarView: View {
                         planHeader(plan)
                     }
 
-                    colorLegend
-                        .padding(.bottom, 8)
-
-                    dayHeaderRow
-                        .padding(.bottom, 4)
-
                     ForEach(planStore.allWeekNumbers, id: \.self) { week in
                         if shouldShowMonthHeader(for: week) {
                             monthHeader(for: week)
+                            dayHeaderRow
+                                .padding(.bottom, 4)
                         }
                         weekRow(week)
                             .id(week)
@@ -81,34 +77,6 @@ struct PlanCalendarView: View {
         .padding(.vertical, 10)
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
         .padding(.bottom, 8)
-    }
-
-    // MARK: - Color Legend
-
-    private var colorLegend: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-                ForEach(WorkoutType.allCases) { type in
-                    HStack(spacing: 4) {
-                        Circle()
-                            .fill(type.swiftUIColor)
-                            .frame(width: 8, height: 8)
-                        Text(type.displayName)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-
-                HStack(spacing: 4) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 8))
-                        .foregroundStyle(.green)
-                    Text("Done")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                }
-            }
-        }
     }
 
     // MARK: - Day Header

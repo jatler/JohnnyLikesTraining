@@ -7,6 +7,9 @@ enum PlanCacheService {
 
     private static var planURL: URL { cacheDirectory.appendingPathComponent("cached_plan.json") }
     private static var sessionsURL: URL { cacheDirectory.appendingPathComponent("cached_sessions.json") }
+    private static var skipsURL: URL { cacheDirectory.appendingPathComponent("cached_skips.json") }
+    private static var swapsURL: URL { cacheDirectory.appendingPathComponent("cached_swaps.json") }
+    private static var overridesURL: URL { cacheDirectory.appendingPathComponent("cached_overrides.json") }
 
     private static let encoder: JSONEncoder = {
         let e = JSONEncoder()
@@ -20,29 +23,35 @@ enum PlanCacheService {
         return d
     }()
 
-    static func save(plan: TrainingPlan, sessions: [PlannedSession]) {
+    static func save(
+        plan: TrainingPlan,
+        sessions: [PlannedSession],
+        skips: [SessionSkip] = [],
+        swaps: [SessionSwap] = [],
+        overrides: [SessionOverride] = []
+    ) {
         do {
-            let planData = try encoder.encode(plan)
-            try planData.write(to: planURL, options: .atomic)
-
-            let sessionsData = try encoder.encode(sessions)
-            try sessionsData.write(to: sessionsURL, options: .atomic)
+            try encoder.encode(plan).write(to: planURL, options: .atomic)
+            try encoder.encode(sessions).write(to: sessionsURL, options: .atomic)
+            try encoder.encode(skips).write(to: skipsURL, options: .atomic)
+            try encoder.encode(swaps).write(to: swapsURL, options: .atomic)
+            try encoder.encode(overrides).write(to: overridesURL, options: .atomic)
         } catch {
             // Cache write failure is non-critical
         }
     }
 
-    static func loadCached() -> (plan: TrainingPlan, sessions: [PlannedSession])? {
+    static func loadCached() -> (plan: TrainingPlan, sessions: [PlannedSession], skips: [SessionSkip], swaps: [SessionSwap], overrides: [SessionOverride])? {
         guard FileManager.default.fileExists(atPath: planURL.path) else { return nil }
 
         do {
-            let planData = try Data(contentsOf: planURL)
-            let plan = try decoder.decode(TrainingPlan.self, from: planData)
+            let plan = try decoder.decode(TrainingPlan.self, from: Data(contentsOf: planURL))
+            let sessions = try decoder.decode([PlannedSession].self, from: Data(contentsOf: sessionsURL))
+            let skips = (try? decoder.decode([SessionSkip].self, from: Data(contentsOf: skipsURL))) ?? []
+            let swaps = (try? decoder.decode([SessionSwap].self, from: Data(contentsOf: swapsURL))) ?? []
+            let overrides = (try? decoder.decode([SessionOverride].self, from: Data(contentsOf: overridesURL))) ?? []
 
-            let sessionsData = try Data(contentsOf: sessionsURL)
-            let sessions = try decoder.decode([PlannedSession].self, from: sessionsData)
-
-            return (plan, sessions)
+            return (plan, sessions, skips, swaps, overrides)
         } catch {
             return nil
         }
@@ -51,5 +60,8 @@ enum PlanCacheService {
     static func clear() {
         try? FileManager.default.removeItem(at: planURL)
         try? FileManager.default.removeItem(at: sessionsURL)
+        try? FileManager.default.removeItem(at: skipsURL)
+        try? FileManager.default.removeItem(at: swapsURL)
+        try? FileManager.default.removeItem(at: overridesURL)
     }
 }

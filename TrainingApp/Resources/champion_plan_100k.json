@@ -32,7 +32,7 @@
       "workout_type": "intervals",
       "target_distance_km": 14.5,
       "pace_description": "5K effort on 90s hills, 3K effort on 45s hills, marathon effort on moderate section",
-      "notes": "2-3 miles easy warm-up, 6 x 90 second hills mod/hard (think 5k effort) with run down recovery after each, 6 x 45 second hills faster (think 3k effort), 1-2 miles moderate (think marathon effort), 1-2 miles easy The hills will engage top-end power, the moderate running after will help the body shuttle lactate at higher speeds Optional easy double or x-train. Any double can be the uphill treadmill, or a hike with a weight vest. Doubles are 25-45 min, with 30 min being a sweet spot, and they can be VERY easy. If your race involves lots of hiking, weight vest hiking at 15-20% grade would be ideal to work into the plan as you get closer to race day, working on muscular endurance."
+      "notes": "2-3 miles easy warm-up, 6 x 90 second hills mod/hard (think 5k effort) with run down recovery after each, 6 x 45 second hills faster (think 3k effort), 1-2 miles moderate (think marathon effort), 1-2 miles easy. The hills will engage top-end power, the moderate running after will help the body shuttle lactate at higher speeds. Optional easy double or x-train. Any double can be the uphill treadmill, or a hike with a weight vest. Doubles are 25-45 min, with 30 min being a sweet spot, and they can be VERY easy. If your race involves lots of hiking, weight vest hiking at 15-20% grade would be ideal to work into the plan as you get closer to race day, working on muscular endurance."
     },
     {
       "week": 1,
@@ -56,7 +56,7 @@
       "workout_type": "recovery",
       "target_distance_km": 11.0,
       "pace_description": "Very easy, aerobic recovery",
-      "notes": "4-10 miles very easy. Aerobic recovery day! Only advanced athletes should go farther than 6 miles on Friday, since you want to be fully recovered for weekend Heat ideal. Heat can be hot tub, sauna, or similar!"
+      "notes": "4-10 miles very easy. Aerobic recovery day! Only advanced athletes should go farther than 6 miles on Friday, since you want to be fully recovered for weekend. Heat ideal. Heat can be hot tub, sauna, or similar!"
     },
     {
       "week": 1,
@@ -64,7 +64,7 @@
       "workout_type": "long_run",
       "target_distance_km": 21.0,
       "pace_description": "Easy/mod, progressing to steady effort",
-      "notes": "10-16 miles easy/mod, progressing to steady effort. On these easy/mod runs, it’s ok to let effort wander up. Practice fueling with plenty of carbs and hydration! Some vert is good, but choose whatever route seems most fun to you Ideally do your long runs on terrain with some climbing and descending! Vert is your friend, and vert is more important than mileage in most cases (even high volume athletes can prioritize shorter runs with vert). Think quick feet on the downhills, using every downhill as an opportunity to work on that skill"
+      "notes": "10-16 miles easy/mod, progressing to steady effort. On these easy/mod runs, it’s ok to let effort wander up. Practice fueling with plenty of carbs and hydration! Some vert is good, but choose whatever route seems most fun to you. Ideally do your long runs on terrain with some climbing and descending! Vert is your friend, and vert is more important than mileage in most cases (even high volume athletes can prioritize shorter runs with vert). Think quick feet on the downhills, using every downhill as an opportunity to work on that skill"
     },
     {
       "week": 1,
@@ -112,7 +112,7 @@
       "workout_type": "intervals",
       "target_distance_km": 18.5,
       "pace_description": "5K effort on fast intervals, 50K effort on easy/mod section",
-      "notes": "2-4 miles easy warm-up, 16 x 1 min fast/1 min easy (think 5k effort on fasts), 2-3 miles easy/mod to mod (think 50k), 1-2 miles easy. After workouts is the most ideal time for 10-15 min post-run uphill treadmill. Speed workout classic! Just building up speed stimulus Optional easy double or x-train"
+      "notes": "2-4 miles easy warm-up, 16 x 1 min fast/1 min easy (think 5k effort on fasts), 2-3 miles easy/mod to mod (think 50k), 1-2 miles easy. After workouts is the most ideal time for 10-15 min post-run uphill treadmill. Speed workout classic! Just building up speed stimulus. Optional easy double or x-train"
     },
     {
       "week": 2,
@@ -144,7 +144,7 @@
       "workout_type": "recovery",
       "target_distance_km": 13.0,
       "pace_description": "Very easy",
-      "notes": "4-12 miles very easy Heat ideal. You can add passive heat on other days as well. Passive heat is low stress, so add it freely, but not on double days"
+      "notes": "4-12 miles very easy. Heat ideal. You can add passive heat on other days as well. Passive heat is low stress, so add it freely, but not on double days"
     },
     {
       "week": 2,
@@ -192,7 +192,7 @@
       "workout_type": "easy",
       "target_distance_km": 16.0,
       "pace_description": "Easy effort with fast hill strides",
-      "notes": "2-4 miles easy warm-up, 2-3 x (4 x 2 min fast/1 min easy) with 2 min easy between sets (think 10k to 5k effort), 2 miles moderate (think marathon), 1-2 miles easy. Really big and hard session! For the big workouts, there is a range of sets so that lower volume athletes don’t overdo it. Remember, the goal is not to go as hard or fast as you can, but to run smoothly and finish feeling strong! Always err on the side of less intensity, since health and the daily aerobic work is most important for long-term growth. Optional easy double or x-train Mountain Legs"
+      "notes": "2-4 miles easy warm-up, 2-3 x (4 x 2 min fast/1 min easy) with 2 min easy between sets (think 10k to 5k effort), 2 miles moderate (think marathon), 1-2 miles easy. Really big and hard session! For the big workouts, there is a range of sets so that lower volume athletes don’t overdo it. Remember, the goal is not to go as hard or fast as you can, but to run smoothly and finish feeling strong! Always err on the side of less intensity, since health and the daily aerobic work is most important for long-term growth. Optional easy double or x-train. Mountain Legs"
     },
     {
       "week": 3,
@@ -216,7 +216,7 @@
       "workout_type": "cross_train",
       "target_distance_km": null,
       "pace_description": "Easy effort with pyramid intervals",
-      "notes": "1-2 hours easy x-train with 3-4 x 3/2/1 min fast with 1 min easy between intervals and 3 min easy between sets The final tougher x-train workout for a bit as the body adapts!"
+      "notes": "1-2 hours easy x-train with 3-4 x 3/2/1 min fast with 1 min easy between intervals and 3 min easy between sets. The final tougher x-train workout for a bit as the body adapts!"
     },
     {
       "week": 3,
@@ -232,7 +232,7 @@
       "workout_type": "recovery",
       "target_distance_km": 13.0,
       "pace_description": "Very easy",
-      "notes": "4-12 miles very easy Heat ideal"
+      "notes": "4-12 miles very easy. Heat ideal"
     },
     {
       "week": 3,
@@ -320,7 +320,7 @@
       "workout_type": "recovery",
       "target_distance_km": 16.0,
       "pace_description": "Very easy with short hill strides",
-      "notes": "6-14 miles very easy plus 5 x 20 second hills Heat ideal"
+      "notes": "6-14 miles very easy plus 5 x 20 second hills. Heat ideal"
     },
     {
       "week": 4,
@@ -408,7 +408,7 @@
       "workout_type": "recovery",
       "target_distance_km": 16.0,
       "pace_description": "Very easy",
-      "notes": "6-14 miles very easy Heat ideal"
+      "notes": "6-14 miles very easy. Heat ideal"
     },
     {
       "week": 5,
@@ -496,7 +496,7 @@
       "workout_type": "recovery",
       "target_distance_km": 13.0,
       "pace_description": "Very easy with strides",
-      "notes": "4-12 miles very easy with 5 x 20 seconds fast/2 min easy Heat ideal"
+      "notes": "4-12 miles very easy with 5 x 20 seconds fast/2 min easy. Heat ideal"
     },
     {
       "week": 6,
@@ -552,7 +552,7 @@
       "workout_type": "intervals",
       "target_distance_km": 14.5,
       "pace_description": "10K effort progressing on 600m intervals",
-      "notes": "2-3 miles easy warm-up, 2-3 x (4 x 600 fast with 200 easy between each) and 600 easy between sets. Think 10k effort to start on the intervals, progressing the effort as you go! Finish with 4 x 200 fast/200 slow, pushing a bit, and 2-3 mile easy cooldown. If you aren’t on the track, do 2-4 miles easy warm-up, 8-10 x 2 min fast (think 10k) with 90 seconds float recovery (just above normal easy), 2 miles steady (think 50k), 1-2 miles easy Optional easy double or x-train"
+      "notes": "2-3 miles easy warm-up, 2-3 x (4 x 600 fast with 200 easy between each) and 600 easy between sets. Think 10k effort to start on the intervals, progressing the effort as you go! Finish with 4 x 200 fast/200 slow, pushing a bit, and 2-3 mile easy cooldown. If you aren’t on the track, do 2-4 miles easy warm-up, 8-10 x 2 min fast (think 10k) with 90 seconds float recovery (just above normal easy), 2 miles steady (think 50k), 1-2 miles easy. Optional easy double or x-train"
     },
     {
       "week": 7,
@@ -584,7 +584,7 @@
       "workout_type": "recovery",
       "target_distance_km": 16.0,
       "pace_description": "Very easy",
-      "notes": "6-14 miles very easy Heat ideal"
+      "notes": "6-14 miles very easy. Heat ideal"
     },
     {
       "week": 7,
@@ -624,7 +624,7 @@
       "workout_type": "intervals",
       "target_distance_km": 14.5,
       "pace_description": "1-hour effort on uphill threshold intervals",
-      "notes": "Uphill treadmill at 8-10% ideal, though this workout can also be done outside! 15-20 min easy warm-up, 8-12 x 4 min around 1-hour effort with 90 seconds easy recovery after each, 15-20 min easy cooldown. If you do this hill workout outside, cut the intervals in half, something like 4-6 x 4 min hills Optional easy double or x-train"
+      "notes": "Uphill treadmill at 8-10% ideal, though this workout can also be done outside! 15-20 min easy warm-up, 8-12 x 4 min around 1-hour effort with 90 seconds easy recovery after each, 15-20 min easy cooldown. If you do this hill workout outside, cut the intervals in half, something like 4-6 x 4 min hills. Optional easy double or x-train"
     },
     {
       "week": 8,
@@ -656,7 +656,7 @@
       "workout_type": "recovery",
       "target_distance_km": 16.0,
       "pace_description": "Very easy with hill strides",
-      "notes": "6-14 miles very easy plus 5 x 20 second hills Heat ideal"
+      "notes": "6-14 miles very easy plus 5 x 20 second hills. Heat ideal"
     },
     {
       "week": 8,
@@ -744,7 +744,7 @@
       "workout_type": "recovery",
       "target_distance_km": 16.0,
       "pace_description": "Very easy with strides",
-      "notes": "6-14 miles very easy with 5 x 20 seconds fast/2 min easy Heat ideal"
+      "notes": "6-14 miles very easy with 5 x 20 seconds fast/2 min easy. Heat ideal"
     },
     {
       "week": 9,
@@ -808,7 +808,7 @@
       "workout_type": "easy",
       "target_distance_km": 12.0,
       "pace_description": "Easy",
-      "notes": "5-10 miles easy No strength the rest of the week!"
+      "notes": "5-10 miles easy. No strength the rest of the week!"
     },
     {
       "week": 10,
@@ -856,7 +856,7 @@
       "workout_type": "rest",
       "target_distance_km": null,
       "pace_description": "Full rest",
-      "notes": "Rest. This is a mid-cycle rest block, with a down week ahead to solidify gains Heat ideal"
+      "notes": "Rest. This is a mid-cycle rest block, with a down week ahead to solidify gains. Heat ideal"
     },
     {
       "week": 11,
@@ -888,7 +888,7 @@
       "workout_type": "recovery",
       "target_distance_km": 11.0,
       "pace_description": "Easy",
-      "notes": "4-10 miles easy Heat ideal"
+      "notes": "4-10 miles easy. Heat ideal"
     },
     {
       "week": 11,
@@ -1024,7 +1024,7 @@
       "workout_type": "intervals",
       "target_distance_km": 14.5,
       "pace_description": "1-hour effort on uphill threshold intervals",
-      "notes": "Uphill treadmill at 8-10% ideal, though this workout can also be done outside! 15-20 min easy warm-up, 2-4 x 10 min around 1-hour effort with 2 min easy recovery after each, 2-4 x 5 min around 1-hour effort with 2 min easy recovery, 15-20 min easy cooldown. If you do a hill workout outside, the ideal session would be 4-6 x 5 min hills with run down recovery between each Optional easy double or x-train"
+      "notes": "Uphill treadmill at 8-10% ideal, though this workout can also be done outside! 15-20 min easy warm-up, 2-4 x 10 min around 1-hour effort with 2 min easy recovery after each, 2-4 x 5 min around 1-hour effort with 2 min easy recovery, 15-20 min easy cooldown. If you do a hill workout outside, the ideal session would be 4-6 x 5 min hills with run down recovery between each. Optional easy double or x-train"
     },
     {
       "week": 13,
@@ -1032,7 +1032,7 @@
       "workout_type": "easy",
       "target_distance_km": 22.5,
       "pace_description": "Easy with slight hill strides",
-      "notes": "10-18 miles easy plus 6 x 20 second slight hills No strength mid-week now as running stress gets higher!"
+      "notes": "10-18 miles easy plus 6 x 20 second slight hills. No strength mid-week now as running stress gets higher!"
     },
     {
       "week": 13,
@@ -1048,7 +1048,7 @@
       "workout_type": "recovery",
       "target_distance_km": 13.0,
       "pace_description": "Easy",
-      "notes": "4-12 miles easy Heat ideal"
+      "notes": "4-12 miles easy. Heat ideal"
     },
     {
       "week": 13,
@@ -1128,7 +1128,7 @@
       "workout_type": "recovery",
       "target_distance_km": 16.0,
       "pace_description": "Easy with hill strides",
-      "notes": "6-14 miles easy plus 5 x 20 second hills Heat ideal"
+      "notes": "6-14 miles easy plus 5 x 20 second hills. Heat ideal"
     },
     {
       "week": 14,
@@ -1208,7 +1208,7 @@
       "workout_type": "recovery",
       "target_distance_km": 7.0,
       "pace_description": "Easy",
-      "notes": "3-6 mi easy Heat ideal"
+      "notes": "3-6 mi easy. Heat ideal"
     },
     {
       "week": 15,

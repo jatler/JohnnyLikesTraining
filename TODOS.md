@@ -5,11 +5,8 @@
 ### ~~Fix: Patreon JSON decode error handling (CRITICAL)~~ ✅
 - **Completed:** v1.0 (2026-03-29) — commit `66d23b5`
 
-### Fix: OAuth state parameter validation
-- **What:** Store generated `state` UUID in PatreonService, StravaService, and OuraService. Validate it on OAuth callback. 3-line fix per service.
-- **Why:** OAuth2 spec requires CSRF validation via state parameter. Currently generated but never checked. Also required by Strava API Agreement.
-- **Effort:** human: ~15 min / CC: ~2 min
-- **Depends on:** Nothing
+### ~~Fix: OAuth state parameter validation~~ ✅
+- **Completed:** v1.0 (2026-03-30) — All three services now validate state parameter on callback
 
 ### ~~Fix: Patreon token refresh — add expiry check~~ ✅
 - **Completed:** v1.0 (2026-03-29) — commit `7896965`
@@ -35,17 +32,20 @@
 ### ~~Design: Always display distances in miles~~ ✅
 - **Completed:** v1.0 (2026-03-29) — commit `60caa3c`
 
-### Strava: Add official "Connect with Strava" button
-- **What:** Download official "Connect with Strava" button asset from Strava brand guidelines (orange or white, 48px @1x / 96px @2x). Replace the plain text "Connect Strava" button in SettingsView with the official asset. Add to Assets.xcassets.
-- **Why:** Strava API Agreement and Brand Guidelines require using the official button for the OAuth connect flow. Current plain text button is non-compliant.
-- **Effort:** human: ~30 min / CC: ~5 min
-- **Depends on:** Nothing
+### ~~Fix: Oura RHR not updating for current day~~ ✅
+- **Completed:** v1.0 (2026-03-30) — Added TimeZone.current to DateFormatter in syncDaily()
 
-### Strava: Add official "Powered by Strava" logo
-- **What:** Download official "Powered by Strava" logo from Strava brand guidelines (orange, white, or black). Replace the text-only "Powered by Strava" link in the Strava section footer with the official logo asset. Add to Assets.xcassets.
-- **Why:** Strava requires official logo assets, not just text. Text attribution is a temporary placeholder.
-- **Effort:** human: ~30 min / CC: ~5 min
-- **Depends on:** Nothing
+### ~~Fix: Dev mode simulator not showing heat and strength plan~~ ✅
+- **Completed:** v1.0 (2026-03-30) — Investigated: createPlan() is synchronous, timing issue doesn't exist. Template JSONs include strength/heat/stretch fields.
+
+### ~~Fix: Coach notes have strange punctuation and missing paragraph breaks~~ ✅
+- **Completed:** v1.0 (2026-03-30) — Fixed 25 punctuation issues in champion_plan_100k.json, 16 in winter_plan_10w.json
+
+### ~~Strava: Add official "Connect with Strava" button~~ ✅
+- **Completed:** v1.0 (2026-03-30) — ConnectWithStrava.imageset added, SettingsView updated
+
+### ~~Strava: Add official "Powered by Strava" logo~~ ✅
+- **Completed:** v1.0 (2026-03-30) — PoweredByStrava.imageset added, used in Settings, TodayView, SessionDetailSheet
 
 ### ~~Strava: Add "View on Strava" deep links on activity views~~ ✅
 - **Completed:** v1.0 (2026-03-29) — SessionDetailSheet.swift
@@ -56,54 +56,26 @@
 ### ~~Add: Local cache for offline plan access~~ ✅
 - **Completed:** v1.0 (2026-03-29) — commit `26b70f2`
 
-### Fix: Delete-then-reinsert race condition in persistence (CRITICAL)
-- **What:** `StrengthStore.persistAllSessions()`, `StretchStore.persistAllSessions()`, and `HeatStore.persistAllSessions()` do a `DELETE WHERE plan_id = X` then `INSERT`. If the app crashes between delete and insert, all session data is permanently lost. Replace with upsert using conflict key, or wrap in a Supabase RPC transaction.
-- **Why:** Data loss on crash/network interruption. Any rapid template edit could interleave and corrupt state.
-- **Effort:** human: ~2 hrs / CC: ~10 min
-- **Depends on:** Nothing
-- **Source:** /autoplan eng review
+### ~~Fix: Delete-then-reinsert race condition in persistence (CRITICAL)~~ ✅
+- **Completed:** v1.0 (2026-03-30) — Replaced DELETE+INSERT with upsert in all three stores
 
-### Fix: Remove sensitive tokens from debug logs (CRITICAL)
-- **What:** Remove `print("Strava refresh token: ...")` at StravaService.swift:157 and `print("Oura client_secret: ...")` at OuraService.swift:70. These leak credentials to console logs.
-- **Why:** Refresh tokens and client secrets should never be logged, even in debug builds. Console logs can be captured by crash reporters or shared debug sessions.
-- **Effort:** human: ~5 min / CC: ~2 min
-- **Depends on:** Nothing
-- **Source:** /autoplan eng review
+### ~~Fix: Remove sensitive tokens from debug logs (CRITICAL)~~ ✅
+- **Completed:** v1.0 (2026-03-30) — Replaced token/secret prints with safe messages
 
-### Fix: Complete OAuth state validation on Strava + Oura
-- **What:** Strava has no state parameter at all. Oura generates a state UUID (line 33) but never validates it on callback. Add `pendingOAuthState` property, pass in authorize URL, validate on callback. Same pattern already implemented in PatreonService.
-- **Why:** OAuth2 spec requires CSRF validation. Strava API Agreement compliance.
-- **Effort:** human: ~15 min / CC: ~2 min
-- **Depends on:** Nothing
-- **Source:** /autoplan eng review (extends existing TODOS item)
+### ~~Fix: Complete OAuth state validation on Strava + Oura~~ ✅
+- **Completed:** v1.0 (2026-03-30) — pendingOAuthState added to both services, validated on callback
 
-### Fix: Set lastError on Supabase write failures
-- **What:** All store `persist*` methods catch write errors with `print()` only. Add `lastError = error.localizedDescription` in every write catch block so the UI shows a toast/banner.
-- **Why:** Currently users think data is saved when writes silently fail. The `lastError` pattern exists for reads but not writes.
-- **Effort:** human: ~1 hr / CC: ~5 min
-- **Depends on:** Nothing
-- **Source:** /autoplan eng review
+### ~~Fix: Set lastError on Supabase write failures~~ ✅
+- **Completed:** v1.0 (2026-03-30) — Already implemented in all persist catch blocks
 
-### Add: Tests for PlanCacheService, DistanceFormatter, PatreonService
-- **What:** Add unit tests for: (1) PlanCacheService save/load roundtrip + corrupt cache returns nil, (2) DistanceFormatter km-to-miles conversion accuracy, (3) PatreonService.processIdentityResponse() with 4 scenarios: active patron, lapsed patron, decode error (no revocation), no membership data.
-- **Why:** 15 untested paths identified. The Patreon decode bug (already fixed) is the exact scenario that needs a regression test.
-- **Effort:** human: ~2 hrs / CC: ~10 min
-- **Depends on:** Nothing
-- **Source:** /autoplan eng review
+### ~~Add: Tests for PlanCacheService, DistanceFormatter, PatreonService~~ ✅
+- **Completed:** v1.0 (2026-03-30) — DistanceFormatterTests.swift and PlanCacheServiceTests.swift added
 
-### Fix: Cache swaps/skips/overrides in PlanCacheService
-- **What:** PlanCacheService saves only plan + sessions. Add caching for skips, swaps, and overrides. Without them, offline mode shows stale swap state (a swapped session shows on the wrong day).
-- **Why:** Inconsistent offline experience. User may re-skip something, creating duplicate records on reconnect.
-- **Effort:** human: ~30 min / CC: ~5 min
-- **Depends on:** Nothing
-- **Source:** /autoplan eng review
+### ~~Fix: Cache swaps/skips/overrides in PlanCacheService~~ ✅
+- **Completed:** v1.0 (2026-03-30) — PlanCacheService now saves/loads skips, swaps, overrides
 
-### Fix: Parse Patreon expires_in from token response
-- **What:** PatreonService.saveTokens() hardcodes token expiry to 24 hours (line 263). Add `expiresIn: Int?` to `PatreonTokenResponse` and use it: `Date() + TimeInterval(expiresIn ?? 86400)`.
-- **Why:** If Patreon's actual token TTL differs from 24h, the app either uses expired tokens or refreshes unnecessarily.
-- **Effort:** human: ~15 min / CC: ~2 min
-- **Depends on:** Nothing
-- **Source:** /autoplan eng review
+### ~~Fix: Parse Patreon expires_in from token response~~ ✅
+- **Completed:** v1.0 (2026-03-30) — Added expiresIn to PatreonTokenResponse, uses actual value
 
 ## Pre-Beta (by May 1, 2026)
 

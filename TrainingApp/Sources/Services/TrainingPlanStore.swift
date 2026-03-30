@@ -360,6 +360,9 @@ final class TrainingPlanStore {
         if activePlan == nil, let cached = PlanCacheService.loadCached() {
             activePlan = cached.plan
             sessions = cached.sessions
+            skips = cached.skips
+            swaps = cached.swaps
+            overrides = cached.overrides
         }
 
         guard !isOffline else { return }
@@ -414,7 +417,7 @@ final class TrainingPlanStore {
             reconcileNotesFromBundledTemplateIfNeeded()
 
             // Cache for offline access
-            PlanCacheService.save(plan: plan, sessions: sessions)
+            PlanCacheService.save(plan: plan, sessions: sessions, skips: skips, swaps: swaps, overrides: overrides)
         } catch {
             // If Supabase fails but we have cached data, that's OK
             if activePlan == nil {

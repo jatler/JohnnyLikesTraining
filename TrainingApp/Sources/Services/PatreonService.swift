@@ -260,7 +260,7 @@ final class PatreonService {
         if let refresh = token.refreshToken {
             KeychainService.save(refresh, for: .patreonRefreshToken)
         }
-        let expiresAt = Date().addingTimeInterval(24 * 3600).timeIntervalSince1970
+        let expiresAt = (Date() + TimeInterval(token.expiresIn ?? 86400)).timeIntervalSince1970
         KeychainService.save(String(expiresAt), for: .patreonExpiresAt)
     }
 
@@ -280,10 +280,12 @@ final class PatreonService {
 private struct PatreonTokenResponse: Decodable {
     let accessToken: String
     let refreshToken: String?
+    let expiresIn: Int?
 
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"
         case refreshToken = "refresh_token"
+        case expiresIn = "expires_in"
     }
 }
 
