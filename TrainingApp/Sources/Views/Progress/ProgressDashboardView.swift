@@ -179,100 +179,87 @@ struct ProgressDashboardView: View {
     private var weeklyDetailList: some View {
         let data = computeWeeklyMileage()
         let globalMaxMi = data.map(\.plannedMi).max() ?? 1
-        let globalMaxRunHours = max(data.map(\.runHours).max() ?? 1, data.map(\.crossTrainHours).max() ?? 1)
 
         return VStack(alignment: .leading, spacing: 12) {
             Text("Week-by-Week")
                 .font(.headline)
 
             ForEach(data) { entry in
-                weekDetailRow(entry, globalMaxMi: globalMaxMi, globalMaxRunHours: globalMaxRunHours)
+                weekDetailRow(entry, globalMaxMi: globalMaxMi)
             }
         }
         .padding()
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
     }
 
-    private func weekDetailRow(_ entry: WeekMileageEntry, globalMaxMi: Double, globalMaxRunHours: Double) -> some View {
+    private func weekDetailRow(_ entry: WeekMileageEntry, globalMaxMi: Double) -> some View {
         let isCurrent = planStore.currentWeekNumber == entry.week
-        let miScale = globalMaxMi > 0 ? globalMaxMi : 1
-        let hourScale = globalMaxRunHours > 0 ? globalMaxRunHours : 1
-        let plannedFraction = entry.plannedMi / miScale
-        let actualFraction = min(entry.actualMi, entry.plannedMi) / miScale
-        let runHoursFraction = entry.runHours / hourScale
-        let ctFraction = entry.crossTrainHours / hourScale
+        let scale = globalMaxMi > 0 ? globalMaxMi : 1
+        let plannedFraction = entry.plannedMi / scale
+        let actualFraction = entry.actualMi / scale
+        // XT bar width proportional to actual run hours
+        let ctBarFraction = entry.runHours > 0
+            ? (entry.crossTrainHours / entry.runHours) * actualFraction
+            : 0
 
-        return VStack(alignment: .leading, spacing: 4) {
-            // Mileage bar
-            HStack {
+        return VStack(alignment: .leading, spacing: 3) {
+            // Mileage bar: planned (light) with actual (dark) on top
+            HStack(spacing: 6) {
                 Text("W\(entry.week)")
                     .font(.caption.bold())
                     .foregroundStyle(isCurrent ? Color.swapAccent : .secondary)
-                    .frame(width: 30, alignment: .leading)
+                    .frame(width: 28, alignment: .leading)
 
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
                         RoundedRectangle(cornerRadius: 3)
                             .fill(Color.swapAccent.opacity(0.15))
                             .frame(width: geo.size.width * plannedFraction)
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(Color.swapAccent)
-                            .frame(width: geo.size.width * actualFraction)
+                        if entry.actualMi > 0 {
+                            RoundedRectangle(cornerRadius: 3)
+                                .fill(Color.swapAccent)
+                                .frame(width: geo.size.width * actualFraction)
+                        }
                     }
                 }
-                .frame(height: 8)
+                .frame(height: 10)
 
-                Text(String(format: "%.0f/%.0f mi", entry.actualMi, entry.plannedMi))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .frame(width: 75, alignment: .trailing)
-            }
-
-            // Run hours bar
-            if entry.runHours > 0 {
-                HStack {
-                    Spacer().frame(width: 30)
-
-                    GeometryReader { geo in
-                        RoundedRectangle(cornerRadius: 3)
-                            .fill(Color.swapAccent.opacity(0.35))
-                            .frame(width: geo.size.width * runHoursFraction)
-                    }
-                    .frame(height: 6)
-
-                    Text(String(format: "%.1fh run", entry.runHours))
+                // Stats to the right
+                VStack(alignment: .trailing, spacing: 1) {
+                    Text(String(format: "%.0f/%.0f mi", entry.actualMi, entry.plannedMi))
+                        .font(.caption2.bold())
+                    if entry.runHours > 0 || entry.elevationGainFt > 0 {
+                        HStack(spacing: 4) {
+                            if entry.runHours > 0 {
+                                Text(String(format: "%.1fh", entry.runHours))
+                            }
+                            if entry.elevationGainFt > 0 {
+                                Text(String(format: "%.0f'", entry.elevationGainFt))
+                            }
+                        }
                         .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .frame(width: 75, alignment: .trailing)
+                        .foregroundStyle(.tertiary)
+                    }
                 }
+                .frame(width: 70, alignment: .trailing)
             }
 
-            // Cross-training hours bar (scaled to run hours)
+            // Cross-training bar: proportional to actual run hours
             if entry.crossTrainHours > 0 {
-                HStack {
-                    Spacer().frame(width: 30)
+                HStack(spacing: 6) {
+                    Spacer().frame(width: 28)
 
                     GeometryReader { geo in
                         RoundedRectangle(cornerRadius: 3)
                             .fill(Color.orange.opacity(0.4))
-                            .frame(width: geo.size.width * ctFraction)
+                            .frame(width: max(geo.size.width * ctBarFraction, 4))
                     }
                     .frame(height: 6)
 
                     Text(String(format: "%.1fh XT", entry.crossTrainHours))
                         .font(.caption2)
                         .foregroundStyle(.orange)
-                        .frame(width: 75, alignment: .trailing)
-                }
-            }
-
-            // Vert
-            if entry.elevationGainFt > 0 {
-                HStack {
-                    Spacer().frame(width: 30)
-                    Text(String(format: "%.0f ft vert", entry.elevationGainFt))
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                        .frame(width: 70, alignment: .trailing)
                 }
             }
         }
