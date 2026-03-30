@@ -137,12 +137,47 @@ struct WeekView: View {
     // MARK: - Week Summary Bar
 
     private var weekSummaryBar: some View {
+        let calendar = Calendar.current
         let sessions = planStore.sessions(for: selectedWeek)
             .filter { $0.workoutType != .strength }
-        let plannedMi = sessions.compactMap(\.targetDistanceMi).reduce(0, +)
-        let completed = sessions.filter { strava.activity(for: $0.id) != nil }.count
-        let skipped = sessions.filter { planStore.isSkipped($0.id) }.count
-        let actualMi = sessions.compactMap { strava.activity(for: $0.id)?.distanceMi }.reduce(0, +)
+        let trackableRuns = sessions.filter { $0.workoutType != .rest }
+        let plannedMi = trackableRuns.compactMap(\.targetDistanceMi).reduce(0, +)
+        let runsDone = trackableRuns.filter { strava.activity(for: $0.id) != nil }.count
+        let skipped = trackableRuns.filter { planStore.isSkipped($0.id) }.count
+        // Only count running activities for mileage
+        let actualMi = trackableRuns.compactMap { session -> Double? in
+            guard let activity = strava.activity(for: session.id), activity.isRun else { return nil }
+            return activity.distanceMi
+        }.reduce(0, +)
+
+        // Cross-training hours
+        let crossTrainSeconds = sessions.compactMap { session -> Int? in
+            guard let activity = strava.activity(for: session.id), activity.isCrossTraining else { return nil }
+            return activity.movingTimeSeconds
+        }.reduce(0, +)
+        let crossTrainHours = Double(crossTrainSeconds) / 3600.0
+
+        let weekStrengthDates = Set(
+            strengthStore.sessions
+                .filter { $0.weekNumber == selectedWeek }
+                .map { calendar.startOfDay(for: $0.scheduledDate) }
+        )
+        let strengthDone = weekStrengthDates.filter { date in
+            strengthStore.isDayComplete(on: date, stravaActivities: strava.activities)
+        }.count
+
+        let weekStretchDates = Set(
+            stretchStore.sessions
+                .filter { $0.weekNumber == selectedWeek }
+                .map { calendar.startOfDay(for: $0.scheduledDate) }
+        )
+        let stretchDone = weekStretchDates.filter { stretchStore.isAllComplete(on: $0) }.count
+
+        let weekHeat = heatStore.sessions(for: selectedWeek)
+        let heatDone = weekHeat.filter { heatStore.isComplete($0.id) }.count
+
+        let totalItems = trackableRuns.count + weekStrengthDates.count + weekStretchDates.count + weekHeat.count
+        let totalDone = runsDone + strengthDone + stretchDone + heatDone
 
         return HStack(spacing: 16) {
             Label(String(format: "%.0f mi planned", plannedMi), systemImage: "target")
@@ -154,10 +189,16 @@ struct WeekView: View {
                     .foregroundStyle(.green)
             }
 
+            if crossTrainHours > 0 {
+                Label(String(format: "%.1fh XT", crossTrainHours), systemImage: "figure.mixed.cardio")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+            }
+
             Spacer()
 
-            if completed > 0 {
-                Text("\(completed) done")
+            if totalDone > 0 {
+                Text("\(totalDone)/\(totalItems) done")
                     .font(.caption)
                     .foregroundStyle(.green)
             }

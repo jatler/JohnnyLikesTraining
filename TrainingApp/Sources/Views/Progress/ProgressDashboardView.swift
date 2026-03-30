@@ -5,6 +5,9 @@ struct ProgressDashboardView: View {
     @Environment(TrainingPlanStore.self) private var planStore
     @Environment(StravaService.self) private var strava
     @Environment(OuraService.self) private var oura
+    @Environment(StrengthStore.self) private var strengthStore
+    @Environment(StretchStore.self) private var stretchStore
+    @Environment(HeatStore.self) private var heatStore
 
     @State private var showingPlanSetup = false
 
@@ -14,7 +17,6 @@ struct ProgressDashboardView: View {
                 if planStore.hasPlan {
                     ScrollView {
                         VStack(spacing: 24) {
-                            completionCard
                             weeklyMileageChart
                             weeklyDetailList
                             raceReadinessCard
@@ -46,18 +48,18 @@ struct ProgressDashboardView: View {
                     color: .swapAccent
                 )
                 statCircle(
-                    value: stats.skipRate,
-                    label: "Skipped",
-                    color: .swapAccent.opacity(0.4)
+                    value: stats.missedRate,
+                    label: "Missed",
+                    color: .red.opacity(0.7)
                 )
                 statCircle(
-                    value: stats.remainingRate,
-                    label: "Remaining",
-                    color: .swapAccent.opacity(0.2)
+                    value: stats.skipRate,
+                    label: "Skipped",
+                    color: .orange.opacity(0.7)
                 )
             }
 
-            HStack(spacing: 24) {
+            HStack(spacing: 16) {
                 VStack(spacing: 2) {
                     Text("\(stats.completedSessions)")
                         .font(.title3.bold())
@@ -67,26 +69,26 @@ struct ProgressDashboardView: View {
                         .foregroundStyle(.secondary)
                 }
                 VStack(spacing: 2) {
+                    Text("\(stats.missedSessions)")
+                        .font(.title3.bold())
+                        .foregroundStyle(.red.opacity(0.7))
+                    Text("Missed")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                VStack(spacing: 2) {
                     Text("\(stats.skippedSessions)")
                         .font(.title3.bold())
-                        .foregroundStyle(Color.swapAccent.opacity(0.4))
+                        .foregroundStyle(.orange.opacity(0.7))
                     Text("Skipped")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
                 VStack(spacing: 2) {
-                    Text("\(stats.remainingSessions)")
-                        .font(.title3.bold())
-                        .foregroundStyle(Color.swapAccent.opacity(0.2))
-                    Text("Left")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                }
-                VStack(spacing: 2) {
-                    Text("\(stats.totalSessions)")
+                    Text("\(stats.upcomingSessions)")
                         .font(.title3.bold())
                         .foregroundStyle(.secondary)
-                    Text("Total")
+                    Text("Upcoming")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
@@ -190,33 +192,67 @@ struct ProgressDashboardView: View {
 
     private func weekDetailRow(_ entry: WeekMileageEntry) -> some View {
         let isCurrent = planStore.currentWeekNumber == entry.week
+        let maxMi = computeWeeklyMileage().map(\.plannedMi).max() ?? 1
+        let maxHours = computeWeeklyMileage().compactMap { $0.crossTrainHours > 0 ? $0.crossTrainHours : nil }.max() ?? 1
+        // Scale cross-training bar relative to mileage bar using the same visual width
+        let ctBarFraction = maxMi > 0 ? (entry.crossTrainHours / maxHours) : 0
 
-        return HStack {
-            Text("W\(entry.week)")
-                .font(.caption.bold())
-                .foregroundStyle(isCurrent ? Color.swapAccent : .secondary)
-                .frame(width: 30, alignment: .leading)
+        return VStack(spacing: 4) {
+            HStack {
+                Text("W\(entry.week)")
+                    .font(.caption.bold())
+                    .foregroundStyle(isCurrent ? Color.swapAccent : .secondary)
+                    .frame(width: 30, alignment: .leading)
 
-            ProgressView(value: min(entry.actualMi, entry.plannedMi), total: max(entry.plannedMi, 1)) {
+                ProgressView(value: min(entry.actualMi, entry.plannedMi), total: max(entry.plannedMi, 1)) {
+                }
+                .tint(Color.swapAccent)
+
+                Text(String(format: "%.0f", entry.actualMi))
+                    .font(.caption.bold())
+                    .frame(width: 35, alignment: .trailing)
+
+                Text("/")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Text(String(format: "%.0f mi", entry.plannedMi))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(width: 50, alignment: .leading)
+
+                Text("\(entry.sessionsCompleted)/\(entry.totalSessions)")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
             }
-            .tint(Color.swapAccent)
 
-            Text(String(format: "%.0f", entry.actualMi))
-                .font(.caption.bold())
-                .frame(width: 35, alignment: .trailing)
+            if entry.crossTrainHours > 0 {
+                HStack {
+                    Text("")
+                        .frame(width: 30, alignment: .leading)
 
-            Text("/")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                    GeometryReader { geo in
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(Color.orange.opacity(0.4))
+                            .frame(width: geo.size.width * ctBarFraction)
+                    }
+                    .frame(height: 6)
 
-            Text(String(format: "%.0f mi", entry.plannedMi))
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .frame(width: 50, alignment: .leading)
+                    Text(String(format: "%.1fh", entry.crossTrainHours))
+                        .font(.caption2)
+                        .foregroundStyle(.orange)
+                        .frame(width: 35, alignment: .trailing)
 
-            Text("\(entry.sessionsCompleted)/\(entry.totalSessions)")
-                .font(.caption2)
-                .foregroundStyle(.tertiary)
+                    Text("XT")
+                        .font(.caption2)
+                        .foregroundStyle(.orange.opacity(0.7))
+                        .frame(width: 50, alignment: .leading)
+
+                    Text("")
+                        .font(.caption2)
+                        .frame(width: 30)
+                }
+            }
         }
         .padding(.vertical, 2)
         .background(isCurrent ? Color.swapAccentSubtle : .clear)
@@ -327,64 +363,121 @@ struct ProgressDashboardView: View {
     // MARK: - Computation Helpers
 
     private func computeCompletionStats() -> CompletionStats {
-        let today = Calendar.current.startOfDay(for: Date())
-        let trackable: (PlannedSession) -> Bool = { $0.workoutType != .rest && $0.workoutType != .strength }
-        let pastSessions = planStore.sessions.filter {
-            $0.scheduledDate <= today && trackable($0)
-        }
-
-        let totalNonRest = planStore.sessions.filter { trackable($0) }.count
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
         let skippedIds = Set(planStore.skips.map(\.sessionId))
-        let skippedCount = pastSessions.filter { skippedIds.contains($0.id) }.count
 
+        // --- Running / cross-train ---
+        let trackableRuns = planStore.sessions.filter { $0.workoutType != .rest && $0.workoutType != .strength }
+        let pastRuns = trackableRuns.filter { $0.scheduledDate <= today }
         let matchedIds = Set(strava.activities.compactMap(\.matchedSessionId))
-        let completedCount = pastSessions.filter { matchedIds.contains($0.id) && !skippedIds.contains($0.id) }.count
+        let completedRuns = pastRuns.filter { matchedIds.contains($0.id) && !skippedIds.contains($0.id) }.count
+        let skippedCount = pastRuns.filter { skippedIds.contains($0.id) }.count
 
-        let pastTotal = pastSessions.count
-        let completionRate: Double = pastTotal > 0 ? Double(completedCount) / Double(pastTotal) : 0
-        let skipRate: Double = pastTotal > 0 ? Double(skippedCount) / Double(pastTotal) : 0
-        let remaining = totalNonRest - completedCount - skippedCount
-        let remainingRate: Double = totalNonRest > 0 ? Double(max(remaining, 0)) / Double(totalNonRest) : 1
+        // --- Strength days ---
+        let allStrengthDates = Set(strengthStore.sessions.map { calendar.startOfDay(for: $0.scheduledDate) })
+        let pastStrengthDates = allStrengthDates.filter { $0 <= today }
+        let completedStrengthDays = pastStrengthDates.filter { date in
+            strengthStore.isDayComplete(on: date, stravaActivities: strava.activities)
+        }.count
+
+        // --- Stretch days ---
+        let allStretchDates = Set(stretchStore.sessions.map { calendar.startOfDay(for: $0.scheduledDate) })
+        let pastStretchDates = allStretchDates.filter { $0 <= today }
+        let completedStretchDays = pastStretchDates.filter { stretchStore.isAllComplete(on: $0) }.count
+
+        // --- Heat sessions ---
+        let allHeatSessions = heatStore.sessions
+        let pastHeatSessions = allHeatSessions.filter { calendar.startOfDay(for: $0.scheduledDate) <= today }
+        let completedHeatSessions = pastHeatSessions.filter { heatStore.isComplete($0.id) }.count
+
+        // --- Unified totals ---
+        let totalTrackable = trackableRuns.count + allStrengthDates.count + allStretchDates.count + allHeatSessions.count
+        let totalPast = pastRuns.count + pastStrengthDates.count + pastStretchDates.count + pastHeatSessions.count
+        let totalCompleted = completedRuns + completedStrengthDays + completedStretchDays + completedHeatSessions
+        let missedCount = max(totalPast - totalCompleted - skippedCount, 0)
+        let upcomingCount = totalTrackable - totalPast
+
+        let completionRate: Double = totalPast > 0 ? Double(totalCompleted) / Double(totalPast) : 0
+        let missedRate: Double = totalPast > 0 ? Double(missedCount) / Double(totalPast) : 0
+        let skipRate: Double = totalPast > 0 ? Double(skippedCount) / Double(totalPast) : 0
 
         return CompletionStats(
-            totalSessions: totalNonRest,
-            completedSessions: completedCount,
+            totalSessions: totalTrackable,
+            completedSessions: totalCompleted,
+            missedSessions: missedCount,
             skippedSessions: skippedCount,
-            remainingSessions: max(remaining, 0),
+            upcomingSessions: upcomingCount,
             completionRate: completionRate,
-            skipRate: skipRate,
-            remainingRate: remainingRate
+            missedRate: missedRate,
+            skipRate: skipRate
         )
     }
 
     private func computeWeeklyMileage() -> [WeekMileageEntry] {
-        planStore.allWeekNumbers.map { weekNum in
-            let weekSessions = planStore.sessions(for: weekNum)
-            let plannedKm = weekSessions.compactMap(\.targetDistanceKm).reduce(0, +)
+        let calendar = Calendar.current
 
+        return planStore.allWeekNumbers.map { weekNum in
+            let weekSessions = planStore.sessions(for: weekNum)
+            let trackableRuns = weekSessions.filter { $0.workoutType != .rest && $0.workoutType != .strength }
+            let plannedKm = trackableRuns.compactMap(\.targetDistanceKm).reduce(0, +)
+
+            // Only count running activities for mileage
             var actualKm: Double = 0
-            var sessionsCompleted = 0
-            for session in weekSessions {
-                if let activity = strava.activity(for: session.id) {
+            var runsDone = 0
+            for session in trackableRuns {
+                if let activity = strava.activity(for: session.id), activity.isRun {
                     actualKm += activity.distanceKm
-                    sessionsCompleted += 1
+                    runsDone += 1
                 }
             }
+
+            // Cross-training hours from Strava activities matched this week
+            var crossTrainSeconds = 0
+            for session in weekSessions {
+                if let activity = strava.activity(for: session.id), activity.isCrossTraining {
+                    crossTrainSeconds += activity.movingTimeSeconds
+                }
+            }
+
+            let weekStrengthDates = Set(
+                strengthStore.sessions
+                    .filter { $0.weekNumber == weekNum }
+                    .map { calendar.startOfDay(for: $0.scheduledDate) }
+            )
+            let strengthDone = weekStrengthDates.filter { date in
+                strengthStore.isDayComplete(on: date, stravaActivities: strava.activities)
+            }.count
+
+            let weekStretchDates = Set(
+                stretchStore.sessions
+                    .filter { $0.weekNumber == weekNum }
+                    .map { calendar.startOfDay(for: $0.scheduledDate) }
+            )
+            let stretchDone = weekStretchDates.filter { stretchStore.isAllComplete(on: $0) }.count
+
+            let weekHeat = heatStore.sessions(for: weekNum)
+            let heatDone = weekHeat.filter { heatStore.isComplete($0.id) }.count
+
+            let totalItems = trackableRuns.count + weekStrengthDates.count + weekStretchDates.count + weekHeat.count
+            let completedItems = runsDone + strengthDone + stretchDone + heatDone
 
             return WeekMileageEntry(
                 week: weekNum,
                 plannedKm: plannedKm,
                 actualKm: actualKm,
-                sessionsCompleted: sessionsCompleted,
-                totalSessions: weekSessions.filter { $0.workoutType != .rest && $0.workoutType != .strength }.count
+                crossTrainSeconds: crossTrainSeconds,
+                sessionsCompleted: completedItems,
+                totalSessions: totalItems
             )
         }
     }
 
     private func computeRaceReadiness(stats: CompletionStats) -> RaceReadiness {
         let rate = stats.completionRate
+        let hasPastSessions = stats.completedSessions + stats.missedSessions + stats.skippedSessions > 0
 
-        if stats.completedSessions == 0 && stats.skippedSessions == 0 {
+        if !hasPastSessions {
             return RaceReadiness(
                 level: .tooEarly,
                 message: "Your plan is just starting. Keep at it!"
@@ -415,17 +508,19 @@ struct ProgressDashboardView: View {
 private struct CompletionStats {
     let totalSessions: Int
     let completedSessions: Int
+    let missedSessions: Int
     let skippedSessions: Int
-    let remainingSessions: Int
+    let upcomingSessions: Int
     let completionRate: Double
+    let missedRate: Double
     let skipRate: Double
-    let remainingRate: Double
 }
 
 struct WeekMileageEntry: Identifiable {
     let week: Int
     let plannedKm: Double
     let actualKm: Double
+    let crossTrainSeconds: Int
     let sessionsCompleted: Int
     let totalSessions: Int
 
@@ -433,6 +528,7 @@ struct WeekMileageEntry: Identifiable {
 
     var plannedMi: Double { DistanceFormatter.miles(from: plannedKm) }
     var actualMi: Double { DistanceFormatter.miles(from: actualKm) }
+    var crossTrainHours: Double { Double(crossTrainSeconds) / 3600.0 }
 }
 
 private struct RaceReadiness {
@@ -467,4 +563,7 @@ enum RaceReadinessLevel {
         .environment(TrainingPlanStore())
         .environment(StravaService())
         .environment(OuraService())
+        .environment(StrengthStore())
+        .environment(StretchStore())
+        .environment(HeatStore())
 }
