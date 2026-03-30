@@ -164,6 +164,7 @@ struct ProgressDashboardView: View {
                             }
                     }
                 }
+                .chartYScale(domain: 0...(data.map(\.plannedMi).max().map { $0 + 10 } ?? 10))
                 .chartYAxisLabel("mi")
                 .chartLegend(position: .bottom)
                 .frame(height: 220)
@@ -178,27 +179,31 @@ struct ProgressDashboardView: View {
     private var weeklyDetailList: some View {
         let data = computeWeeklyMileage()
         let globalMaxMi = data.map(\.plannedMi).max() ?? 1
+        let globalMaxRunHours = max(data.map(\.runHours).max() ?? 1, data.map(\.crossTrainHours).max() ?? 1)
 
         return VStack(alignment: .leading, spacing: 12) {
             Text("Week-by-Week")
                 .font(.headline)
 
             ForEach(data) { entry in
-                weekDetailRow(entry, globalMaxMi: globalMaxMi)
+                weekDetailRow(entry, globalMaxMi: globalMaxMi, globalMaxRunHours: globalMaxRunHours)
             }
         }
         .padding()
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
     }
 
-    private func weekDetailRow(_ entry: WeekMileageEntry, globalMaxMi: Double) -> some View {
+    private func weekDetailRow(_ entry: WeekMileageEntry, globalMaxMi: Double, globalMaxRunHours: Double) -> some View {
         let isCurrent = planStore.currentWeekNumber == entry.week
-        let scale = globalMaxMi > 0 ? globalMaxMi : 1
-        let plannedFraction = entry.plannedMi / scale
-        let actualFraction = min(entry.actualMi, entry.plannedMi) / scale
-        let ctFraction = entry.crossTrainHours / scale
+        let miScale = globalMaxMi > 0 ? globalMaxMi : 1
+        let hourScale = globalMaxRunHours > 0 ? globalMaxRunHours : 1
+        let plannedFraction = entry.plannedMi / miScale
+        let actualFraction = min(entry.actualMi, entry.plannedMi) / miScale
+        let runHoursFraction = entry.runHours / hourScale
+        let ctFraction = entry.crossTrainHours / hourScale
 
-        return VStack(spacing: 4) {
+        return VStack(alignment: .leading, spacing: 4) {
+            // Mileage bar
             HStack {
                 Text("W\(entry.week)")
                     .font(.caption.bold())
@@ -207,11 +212,9 @@ struct ProgressDashboardView: View {
 
                 GeometryReader { geo in
                     ZStack(alignment: .leading) {
-                        // Planned (background)
                         RoundedRectangle(cornerRadius: 3)
                             .fill(Color.swapAccent.opacity(0.15))
                             .frame(width: geo.size.width * plannedFraction)
-                        // Actual (foreground)
                         RoundedRectangle(cornerRadius: 3)
                             .fill(Color.swapAccent)
                             .frame(width: geo.size.width * actualFraction)
@@ -219,28 +222,35 @@ struct ProgressDashboardView: View {
                 }
                 .frame(height: 8)
 
-                Text(String(format: "%.0f", entry.actualMi))
-                    .font(.caption.bold())
-                    .frame(width: 35, alignment: .trailing)
-
-                Text("/")
+                Text(String(format: "%.0f/%.0f mi", entry.actualMi, entry.plannedMi))
                     .font(.caption)
                     .foregroundStyle(.secondary)
-
-                Text(String(format: "%.0f mi", entry.plannedMi))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .frame(width: 50, alignment: .leading)
-
-                Text("\(entry.sessionsCompleted)/\(entry.totalSessions)")
-                    .font(.caption2)
-                    .foregroundStyle(.tertiary)
+                    .frame(width: 75, alignment: .trailing)
             }
 
+            // Run hours bar
+            if entry.runHours > 0 {
+                HStack {
+                    Spacer().frame(width: 30)
+
+                    GeometryReader { geo in
+                        RoundedRectangle(cornerRadius: 3)
+                            .fill(Color.swapAccent.opacity(0.35))
+                            .frame(width: geo.size.width * runHoursFraction)
+                    }
+                    .frame(height: 6)
+
+                    Text(String(format: "%.1fh run", entry.runHours))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .frame(width: 75, alignment: .trailing)
+                }
+            }
+
+            // Cross-training hours bar (scaled to run hours)
             if entry.crossTrainHours > 0 {
                 HStack {
-                    Spacer()
-                        .frame(width: 30)
+                    Spacer().frame(width: 30)
 
                     GeometryReader { geo in
                         RoundedRectangle(cornerRadius: 3)
@@ -249,22 +259,24 @@ struct ProgressDashboardView: View {
                     }
                     .frame(height: 6)
 
-                    Text(String(format: "%.1fh", entry.crossTrainHours))
+                    Text(String(format: "%.1fh XT", entry.crossTrainHours))
                         .font(.caption2)
                         .foregroundStyle(.orange)
-                        .frame(width: 35, alignment: .trailing)
+                        .frame(width: 75, alignment: .trailing)
+                }
+            }
 
-                    Text("XT")
+            // Vert
+            if entry.elevationGainFt > 0 {
+                HStack {
+                    Spacer().frame(width: 30)
+                    Text(String(format: "%.0f ft vert", entry.elevationGainFt))
                         .font(.caption2)
-                        .foregroundStyle(.orange.opacity(0.7))
-                        .frame(width: 50, alignment: .leading)
-
-                    Spacer()
-                        .frame(width: 30)
+                        .foregroundStyle(.tertiary)
                 }
             }
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 4)
         .background(isCurrent ? Color.swapAccentSubtle : .clear)
         .clipShape(RoundedRectangle(cornerRadius: 4))
     }
@@ -432,12 +444,16 @@ struct ProgressDashboardView: View {
             let trackableRuns = weekSessions.filter { $0.workoutType != .rest && $0.workoutType != .strength }
             let plannedKm = trackableRuns.compactMap(\.targetDistanceKm).reduce(0, +)
 
-            // Only count running activities for mileage
+            // Only count running activities for mileage, hours, and vert
             var actualKm: Double = 0
             var runsDone = 0
+            var runSeconds = 0
+            var elevationM: Double = 0
             for session in trackableRuns {
                 if let activity = strava.activity(for: session.id), activity.isRun {
                     actualKm += activity.distanceKm
+                    runSeconds += activity.movingTimeSeconds
+                    elevationM += activity.elevationGainM ?? 0
                     runsDone += 1
                 }
             }
@@ -477,6 +493,8 @@ struct ProgressDashboardView: View {
                 plannedKm: plannedKm,
                 actualKm: actualKm,
                 crossTrainSeconds: crossTrainSeconds,
+                runSeconds: runSeconds,
+                elevationGainM: elevationM,
                 sessionsCompleted: completedItems,
                 totalSessions: totalItems
             )
@@ -531,6 +549,8 @@ struct WeekMileageEntry: Identifiable {
     let plannedKm: Double
     let actualKm: Double
     let crossTrainSeconds: Int
+    let runSeconds: Int
+    let elevationGainM: Double
     let sessionsCompleted: Int
     let totalSessions: Int
 
@@ -539,6 +559,8 @@ struct WeekMileageEntry: Identifiable {
     var plannedMi: Double { DistanceFormatter.miles(from: plannedKm) }
     var actualMi: Double { DistanceFormatter.miles(from: actualKm) }
     var crossTrainHours: Double { Double(crossTrainSeconds) / 3600.0 }
+    var runHours: Double { Double(runSeconds) / 3600.0 }
+    var elevationGainFt: Double { elevationGainM * 3.28084 }
 }
 
 private struct RaceReadiness {
