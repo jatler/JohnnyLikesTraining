@@ -24,7 +24,7 @@ final class StravaService {
         isConnected = KeychainService.get(.stravaAccessToken) != nil
 
         #if DEBUG && targetEnvironment(simulator)
-        if !Config.stravaDevRefreshToken.isEmpty {
+        if false && !Config.stravaDevRefreshToken.isEmpty { // TODO: re-enable after getting fresh token
             if KeychainService.get(.stravaRefreshToken) != Config.stravaDevRefreshToken {
                 KeychainService.deleteAll(for: .strava)
                 KeychainService.save(Config.stravaDevRefreshToken, for: .stravaRefreshToken)
@@ -52,6 +52,9 @@ final class StravaService {
             URLQueryItem(name: "approval_prompt", value: "auto")
         ]
 
+        print("[Strava OAuth] Authorize URL: \(components.url!)")
+        print("[Strava OAuth] Client ID: \(Config.stravaClientId.prefix(4))***")
+
         let code = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
             self.authSession = ASWebAuthenticationSession(
                 url: components.url!,
@@ -75,9 +78,10 @@ final class StravaService {
                 }
                 continuation.resume(returning: code)
             }
-            self.authSession?.prefersEphemeralWebBrowserSession = false
+            self.authSession?.prefersEphemeralWebBrowserSession = true
             self.authSession?.presentationContextProvider = ASWebAuthPresentationContext.shared
-            self.authSession?.start()
+            let started = self.authSession?.start() ?? false
+            print("[Strava OAuth] Session started: \(started)")
         }
 
         try await exchangeCodeForToken(code)
@@ -137,6 +141,8 @@ final class StravaService {
             let status = (response as? HTTPURLResponse)?.statusCode ?? -1
             let body = String(data: data, encoding: .utf8) ?? "(no body)"
             print("❌ Strava token refresh failed — HTTP \(status): \(body)")
+            KeychainService.deleteAll(for: .strava)
+            isConnected = false
             throw StravaError.tokenRefreshFailed
         }
 

@@ -678,3 +678,16 @@ The `docs/` folder contains a static website suitable for GitHub Pages (or any s
 - **Terms of service** (`terms.html`) — acceptable use, health disclaimer, liability limitations.
 
 To deploy via GitHub Pages: go to your repo's **Settings → Pages**, set Source to "Deploy from a branch", branch `main`, folder `/docs`. The site will be at `https://<username>.github.io/<repo>/`. Use these URLs when registering OAuth apps with Oura and Strava.
+
+## GSTACK REVIEW REPORT
+
+| Review | Trigger | Why | Runs | Status | Findings |
+|--------|---------|-----|------|--------|----------|
+| CEO Review | `/plan-ceo-review` | Scope & strategy | 0 | — | — |
+| Codex Review | `/codex review` | Independent 2nd opinion | 0 | — | — |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 1 | ISSUES (PLAN) | 10 issues, 2 critical gaps |
+| Design Review | `/plan-design-review` | UI/UX gaps | 1 | ISSUES (FULL) | score: 6/10 -> 7/10, 5 decisions |
+
+- **OUTSIDE VOICE:** Claude subagent ran (eng + design). Eng: 12 findings, 1 incorrect. Design: 16 findings, 2 critical.
+- **UNRESOLVED:** 4 deferred design decisions (terminal states, partial completion indicators, Strava match correction, dark mode spec).
+- **VERDICT:** ENG + DESIGN REVIEWED. Fix pre-demo TODOS (12 items), then re-run eng review for CLEARED status.
