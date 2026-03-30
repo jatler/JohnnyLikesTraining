@@ -285,9 +285,10 @@ struct TodayView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
+                    .foregroundStyle(.orange.opacity(0.7))
                 Text("Completed")
                     .font(.subheadline.bold())
+                    .foregroundStyle(.orange.opacity(0.8))
                 Spacer()
                 if !activity.isRun {
                     Text(activity.activityTypeDisplay)
@@ -363,10 +364,10 @@ struct TodayView: View {
             }
         }
         .padding()
-        .background(.green.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
+        .background(.orange.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(.green.opacity(0.2), lineWidth: 1)
+                .strokeBorder(.orange.opacity(0.2), lineWidth: 1)
         )
         }
     }
@@ -485,7 +486,7 @@ struct TodayView: View {
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.bordered)
-                    .tint(.red)
+                    .tint(.gray)
                     .confirmationDialog("Skip this workout?", isPresented: $showingSkipOptions) {
                         Button("Injury") { planStore.skipSession(session.id, reason: "Injury") }
                         Button("Illness") { planStore.skipSession(session.id, reason: "Illness") }
@@ -501,7 +502,7 @@ struct TodayView: View {
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.bordered)
-                    .tint(.blue)
+                    .tint(.gray)
                     .sheet(isPresented: $showingSwapPicker) {
                         swapPickerSheet(for: session)
                     }
@@ -713,9 +714,20 @@ struct TodayView: View {
                     HStack(spacing: 10) {
                         let complete = stretchStore.isComplete(session.id)
 
-                        Image(systemName: complete ? "checkmark.circle.fill" : "circle")
-                            .font(.subheadline)
-                            .foregroundStyle(complete ? .green : .secondary.opacity(0.5))
+                        Button {
+                            let impact = UIImpactFeedbackGenerator(style: .light)
+                            impact.impactOccurred()
+                            if complete {
+                                stretchStore.removeLog(sessionId: session.id)
+                            } else {
+                                stretchStore.logCompletion(sessionId: session.id)
+                            }
+                        } label: {
+                            Image(systemName: complete ? "checkmark.circle.fill" : "circle")
+                                .font(.subheadline)
+                                .foregroundStyle(complete ? .green : .secondary.opacity(0.5))
+                        }
+                        .buttonStyle(.plain)
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(session.stretchName)
