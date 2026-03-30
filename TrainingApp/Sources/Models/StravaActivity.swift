@@ -40,7 +40,11 @@ struct StravaActivity: Codable, Identifiable {
     }
 
     var isCrossTraining: Bool {
-        ["CrossCountrySkiing", "Elliptical", "Hike", "RockClimbing", "Rowing", "StairStepper", "Swim", "Walk"].contains(activityType)
+        [
+            "Ride", "MountainBikeRide", "GravelRide", "EBikeRide", "VirtualRide",
+            "CrossCountrySkiing", "BackcountrySki", "NordicSki", "AlpineSki", "Snowboard",
+            "Elliptical", "Hike", "RockClimbing", "Rowing", "StairStepper", "Swim", "Walk"
+        ].contains(activityType)
     }
 
     var isStrength: Bool {
@@ -59,7 +63,16 @@ struct StravaActivity: Codable, Identifiable {
         case "WeightTraining": return "Strength"
         case "Crossfit": return "CrossFit"
         case "Yoga": return "Yoga"
+        case "Ride": return "Ride"
+        case "MountainBikeRide": return "MTB"
+        case "GravelRide": return "Gravel"
+        case "EBikeRide": return "E-Bike"
+        case "VirtualRide": return "Virtual Ride"
         case "CrossCountrySkiing": return "XC Ski"
+        case "BackcountrySki": return "Backcountry Ski"
+        case "NordicSki": return "Nordic Ski"
+        case "AlpineSki": return "Alpine Ski"
+        case "Snowboard": return "Snowboard"
         case "Elliptical": return "Elliptical"
         case "Hike": return "Hike"
         case "RockClimbing": return "Climbing"

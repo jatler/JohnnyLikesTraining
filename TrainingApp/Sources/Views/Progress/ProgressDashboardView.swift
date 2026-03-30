@@ -43,17 +43,17 @@ struct ProgressDashboardView: View {
                 statCircle(
                     value: stats.completionRate,
                     label: "Completed",
-                    color: .green
+                    color: .swapAccent
                 )
                 statCircle(
                     value: stats.skipRate,
                     label: "Skipped",
-                    color: .red
+                    color: .swapAccent.opacity(0.4)
                 )
                 statCircle(
                     value: stats.remainingRate,
                     label: "Remaining",
-                    color: .blue
+                    color: .swapAccent.opacity(0.2)
                 )
             }
 
@@ -61,6 +61,7 @@ struct ProgressDashboardView: View {
                 VStack(spacing: 2) {
                     Text("\(stats.completedSessions)")
                         .font(.title3.bold())
+                        .foregroundStyle(Color.swapAccent)
                     Text("Done")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
@@ -68,7 +69,7 @@ struct ProgressDashboardView: View {
                 VStack(spacing: 2) {
                     Text("\(stats.skippedSessions)")
                         .font(.title3.bold())
-                        .foregroundStyle(.red)
+                        .foregroundStyle(Color.swapAccent.opacity(0.4))
                     Text("Skipped")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
@@ -76,7 +77,7 @@ struct ProgressDashboardView: View {
                 VStack(spacing: 2) {
                     Text("\(stats.remainingSessions)")
                         .font(.title3.bold())
-                        .foregroundStyle(.blue)
+                        .foregroundStyle(Color.swapAccent.opacity(0.2))
                     Text("Left")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
@@ -198,7 +199,7 @@ struct ProgressDashboardView: View {
 
             ProgressView(value: min(entry.actualMi, entry.plannedMi), total: max(entry.plannedMi, 1)) {
             }
-            .tint(progressColor(actual: entry.actualMi, planned: entry.plannedMi))
+            .tint(Color.swapAccent)
 
             Text(String(format: "%.0f", entry.actualMi))
                 .font(.caption.bold())
@@ -220,14 +221,6 @@ struct ProgressDashboardView: View {
         .padding(.vertical, 2)
         .background(isCurrent ? Color.swapAccentSubtle : .clear)
         .clipShape(RoundedRectangle(cornerRadius: 4))
-    }
-
-    private func progressColor(actual: Double, planned: Double) -> Color {
-        guard planned > 0 else { return .gray }
-        let ratio = actual / planned
-        if ratio >= 0.9 { return .green }
-        if ratio >= 0.7 { return .orange }
-        return .red
     }
 
     // MARK: - Race Readiness
@@ -263,7 +256,7 @@ struct ProgressDashboardView: View {
                     VStack(spacing: 2) {
                         Text(String(format: "%.0f%%", stats.completionRate * 100))
                             .font(.title.bold())
-                            .foregroundStyle(stats.completionRate >= 0.8 ? .green : .orange)
+                            .foregroundStyle(Color.swapAccent)
                         Text("Completion")
                             .font(.caption2)
                             .foregroundStyle(.secondary)

@@ -16,7 +16,9 @@ final class StravaService {
     private static let importableActivityTypes: Set<String> = [
         "Run", "TrailRun", "VirtualRun",
         "WeightTraining", "Crossfit", "Yoga",
-        "CrossCountrySkiing", "Elliptical", "Hike", "RockClimbing",
+        "Ride", "MountainBikeRide", "GravelRide", "EBikeRide", "VirtualRide",
+        "CrossCountrySkiing", "BackcountrySki", "NordicSki", "AlpineSki", "Snowboard",
+        "Elliptical", "Hike", "RockClimbing",
         "Rowing", "StairStepper", "Swim", "Walk"
     ]
 

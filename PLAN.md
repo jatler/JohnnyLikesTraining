@@ -1,3 +1,4 @@
+t gonewild
 # Training App — Plan
 
 ## Overview
@@ -115,7 +116,7 @@ python3 scripts/sync_champion_plan_from_pdf.py "/path/to/The Champion Plan for 1
 ### 5. Strava Integration
 
 - OAuth2 flow to connect Strava account.
-- Auto-import completed activities: **runs** (Run, TrailRun, VirtualRun), **cross-training** (CrossCountrySkiing, Elliptical, Hike, RockClimbing, Rowing, StairStepper, Swim, Walk), **strength training** (WeightTraining, Crossfit), and **yoga** (Yoga). Each activity stores its Strava `activity_type` for filtering and display.
+- Auto-import completed activities: **runs** (Run, TrailRun, VirtualRun), **cycling** (Ride, MountainBikeRide, GravelRide, EBikeRide, VirtualRide), **skiing** (CrossCountrySkiing, BackcountrySki, NordicSki, AlpineSki, Snowboard), **other cross-training** (Elliptical, Hike, RockClimbing, Rowing, StairStepper, Swim, Walk), **strength training** (WeightTraining, Crossfit), and **yoga** (Yoga). All cycling and skiing activities are labeled as cross-training. Each activity stores its Strava `activity_type` for filtering and display.
 - Match each imported Strava activity to the corresponding planned session for that day. Runs match run sessions; cross-training matches `cross_train` sessions; strength/yoga activities appear as supplementary on any day.
 - Show a **plan vs. actual** comparison: did you hit the target distance? Was your pace in the right zone?
 - **Training block mileage chart**: a bar chart (Swift Charts) showing weekly mileage across the entire training block — planned mileage as a lighter/outline bar, actual (from Strava) as a filled bar. Highlights the current week, and overlays a target mileage trend line so you can see ramp-up and taper at a glance.
