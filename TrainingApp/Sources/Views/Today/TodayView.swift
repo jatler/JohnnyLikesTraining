@@ -164,24 +164,24 @@ struct TodayView: View {
                     recoveryMetric(
                         title: "Readiness",
                         value: today.readinessScore.map { "\($0)" } ?? "—",
-                        color: readinessColor(today.readinessLevel),
+                        color: .primary,
                         showCrown: (today.readinessScore ?? 0) >= 85
                     )
                     recoveryMetric(
                         title: "Sleep",
                         value: today.sleepScore.map { "\($0)" } ?? "—",
-                        color: .blue,
+                        color: .primary,
                         showCrown: (today.sleepScore ?? 0) >= 85
                     )
                     recoveryMetric(
                         title: "HRV",
                         value: today.hrvAverage.map { String(format: "%.0f", $0) } ?? "—",
-                        color: .purple
+                        color: .primary
                     )
                     recoveryMetric(
                         title: "RHR",
                         value: today.restingHr.map { "\($0)" } ?? "—",
-                        color: .red
+                        color: .primary
                     )
                 }
             }
