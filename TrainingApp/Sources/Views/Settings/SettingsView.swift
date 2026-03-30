@@ -184,8 +184,13 @@ struct SettingsView: View {
         } header: {
             Text("Strava")
         } footer: {
-            if !strava.isConnected {
-                Text("Connect Strava to automatically import your runs and compare plan vs. actual.")
+            VStack(alignment: .leading, spacing: 4) {
+                if !strava.isConnected {
+                    Text("Connect Strava to automatically import your runs and compare plan vs. actual.")
+                }
+                Link("Powered by Strava", destination: URL(string: "https://www.strava.com")!)
+                    .font(.caption2)
+                    .foregroundStyle(.orange)
             }
         }
     }
@@ -332,6 +337,33 @@ struct SettingsView: View {
                 Spacer()
                 Text("1.0.0")
                     .foregroundStyle(.secondary)
+            }
+
+            Link(destination: URL(string: "https://johnnylikestraining.com/privacy.html")!) {
+                HStack {
+                    Text("Privacy Policy")
+                    Spacer()
+                    Image(systemName: "arrow.up.right.square")
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Link(destination: URL(string: "https://johnnylikestraining.com/terms.html")!) {
+                HStack {
+                    Text("Terms of Service")
+                    Spacer()
+                    Image(systemName: "arrow.up.right.square")
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Link(destination: URL(string: "mailto:atler.j@gmail.com")!) {
+                HStack {
+                    Text("Support")
+                    Spacer()
+                    Image(systemName: "envelope")
+                        .foregroundStyle(.secondary)
+                }
             }
         }
     }
