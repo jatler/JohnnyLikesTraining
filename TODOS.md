@@ -92,6 +92,9 @@
 ### ~~Fix: App version incorrect in Settings~~ ✅
 - **Completed:** v1.0.2 (2026-03-30) — Already reading from CFBundleShortVersionString, project.yml at 1.0.2. Needs fresh build.
 
+### ~~Fix: Heat session edit UI rendering issues~~ ✅
+- **Completed:** v1.0.2 (2026-03-31) — Fixed 3 issues: (1) heat tab showed empty-state layout when no strength/stretch existed, (2) HeatLogSheet content clipped under `.medium` detent (added ScrollView + `.large` detent), (3) segmented type picker didn't show icons (replaced with custom capsule buttons)
+
 ## Pre-Beta (by May 1, 2026)
 
 ### Strava: Delete imported data from Supabase on disconnect

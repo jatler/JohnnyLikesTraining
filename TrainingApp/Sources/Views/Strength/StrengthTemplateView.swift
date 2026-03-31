@@ -29,7 +29,7 @@ struct StrengthTemplateView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if strengthStore.hasTemplate || stretchStore.hasTemplate {
+                if strengthStore.hasTemplate || stretchStore.hasTemplate || heatStore.hasSessions {
                     templateContent
                 } else {
                     emptyState

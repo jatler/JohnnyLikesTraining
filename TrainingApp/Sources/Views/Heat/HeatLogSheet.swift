@@ -21,26 +21,26 @@ struct HeatLogSheet: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
-                headerSection
+            ScrollView {
+                VStack(spacing: 24) {
+                    headerSection
 
-                typePickerSection
+                    typePickerSection
 
-                durationSection
+                    durationSection
 
-                if let notes = session.notes, !notes.isEmpty {
-                    notesDisplay(notes)
+                    if let notes = session.notes, !notes.isEmpty {
+                        notesDisplay(notes)
+                    }
+
+                    TextField("Notes (optional)", text: $notes, axis: .vertical)
+                        .textFieldStyle(.roundedBorder)
+                        .lineLimit(2...3)
+
+                    actionButtons
                 }
-
-                TextField("Notes (optional)", text: $notes, axis: .vertical)
-                    .textFieldStyle(.roundedBorder)
-                    .lineLimit(2...3)
-
-                Spacer()
-
-                actionButtons
+                .padding()
             }
-            .padding()
             .navigationTitle("Heat Session")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -56,7 +56,7 @@ struct HeatLogSheet: View {
                 }
             }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.medium, .large])
     }
 
     // MARK: - Sections
@@ -94,13 +94,29 @@ struct HeatLogSheet: View {
                 .font(.subheadline.bold())
                 .foregroundStyle(.secondary)
 
-            Picker("Type", selection: $selectedType) {
+            HStack(spacing: 8) {
                 ForEach(HeatType.allCases) { type in
-                    Label(type.displayName, systemImage: type.iconName)
-                        .tag(type)
+                    let isSelected = selectedType == type
+                    Button {
+                        selectedType = type
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: type.iconName)
+                                .font(.caption)
+                            Text(type.displayName)
+                                .font(.subheadline.weight(.medium))
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 8)
+                        .background(
+                            isSelected ? type.color.opacity(0.15) : Color.clear,
+                            in: RoundedRectangle(cornerRadius: 8)
+                        )
+                        .foregroundStyle(isSelected ? type.color : .secondary)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
-            .pickerStyle(.segmented)
         }
     }
 
