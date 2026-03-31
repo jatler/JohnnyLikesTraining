@@ -63,6 +63,20 @@ final class StretchStore {
         return daySessions.allSatisfy { isComplete($0.id) }
     }
 
+    func createBlankTemplate(planId: UUID) {
+        let now = Date()
+        let templateId = UUID()
+        template = StretchTemplate(
+            id: templateId,
+            planId: planId,
+            createdAt: now,
+            updatedAt: now
+        )
+        exercises = []
+        sessions = []
+        Task { await persistTemplate() }
+    }
+
     // MARK: - Initialize from Template
 
     func initializeFromTemplate(

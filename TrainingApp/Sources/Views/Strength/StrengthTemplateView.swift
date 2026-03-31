@@ -29,7 +29,7 @@ struct StrengthTemplateView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if strengthStore.hasTemplate {
+                if strengthStore.hasTemplate || stretchStore.hasTemplate {
                     templateContent
                 } else {
                     emptyState
@@ -114,9 +114,22 @@ struct StrengthTemplateView: View {
 
                 stretchAddDayButton
             } else {
-                Text("No stretches yet — create a plan or add stretches manually.")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
+                VStack(spacing: 16) {
+                    Text("No stretches yet.")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+
+                    if let plan = planStore.activePlan {
+                        Button {
+                            stretchStore.createBlankTemplate(planId: plan.id)
+                        } label: {
+                            Label("Create Stretch Program", systemImage: "plus.circle.fill")
+                                .font(.caption)
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(Color.swapAccent)
+                    }
+                }
             }
         }
     }
@@ -330,9 +343,22 @@ struct StrengthTemplateView: View {
 
                 stretchAddDayButton
             } else {
-                Text("No stretches yet — create a plan or add stretches manually.")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
+                VStack(spacing: 12) {
+                    Text("No stretches yet.")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+
+                    if let plan = planStore.activePlan {
+                        Button {
+                            stretchStore.createBlankTemplate(planId: plan.id)
+                        } label: {
+                            Label("Create Stretch Program", systemImage: "plus.circle.fill")
+                                .font(.caption)
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(Color.swapAccent)
+                    }
+                }
             }
         }
         .padding()
@@ -547,11 +573,21 @@ struct StrengthTemplateView: View {
                             .font(.title3)
                             .foregroundStyle(.secondary)
 
-                        Text("Create a training plan to automatically load your strength program.")
+                        Text("Start a strength program to track exercises alongside your runs.")
                             .font(.subheadline)
                             .foregroundStyle(.tertiary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 40)
+
+                        if let plan = planStore.activePlan {
+                            Button {
+                                strengthStore.createBlankTemplate(planId: plan.id)
+                            } label: {
+                                Label("Create Strength Program", systemImage: "plus.circle.fill")
+                                    .fontWeight(.semibold)
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
 
                     case .stretch:
                         stretchSegmentContent

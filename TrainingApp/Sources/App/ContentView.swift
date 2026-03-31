@@ -97,6 +97,39 @@ struct MainTabView: View {
 
                 _ = await (strengthLoad, heatLoad, stretchLoad, stravaLoad, ouraLoad)
 
+                // If stores are still empty after loading from Supabase,
+                // re-initialize from the bundled template (handles plans created
+                // before strength/heat/stretch were added to the template).
+                if let template = planStore.currentTemplate {
+                    if !strengthStore.hasTemplate,
+                       let exercises = template.strengthExercises, !exercises.isEmpty {
+                        strengthStore.initializeFromTemplate(
+                            exercises,
+                            planId: plan.id,
+                            planStartDate: plan.planStartDate,
+                            totalWeeks: template.durationWeeks
+                        )
+                    }
+                    if !heatStore.hasSessions,
+                       let heatTemplates = template.heatSessions, !heatTemplates.isEmpty {
+                        heatStore.initializeFromTemplate(
+                            heatTemplates,
+                            planId: plan.id,
+                            planStartDate: plan.planStartDate,
+                            totalWeeks: template.durationWeeks
+                        )
+                    }
+                    if !stretchStore.hasTemplate,
+                       let stretchExercises = template.stretchExercises, !stretchExercises.isEmpty {
+                        stretchStore.initializeFromTemplate(
+                            stretchExercises,
+                            planId: plan.id,
+                            planStartDate: plan.planStartDate,
+                            totalWeeks: template.durationWeeks
+                        )
+                    }
+                }
+
                 if strava.isConnected {
                     strava.autoMatchActivities(sessions: planStore.sessions)
                 }
