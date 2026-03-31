@@ -9,6 +9,7 @@ final class StravaService {
     private(set) var activities: [StravaActivity] = []
     private(set) var lastSyncDate: Date?
     private(set) var athleteName: String?
+    private(set) var lastSyncedAt: Date?
 
     private let supabase = SupabaseService.shared.client
     private var authSession: ASWebAuthenticationSession?
@@ -25,6 +26,10 @@ final class StravaService {
 
     init() {
         isConnected = KeychainService.get(.stravaAccessToken) != nil
+        if let syncDateStr = KeychainService.get(.stravaLastSyncedAt),
+           let timeInterval = Double(syncDateStr) {
+            lastSyncedAt = Date(timeIntervalSince1970: timeInterval)
+        }
 
         #if DEBUG && targetEnvironment(simulator)
         if false && !Config.stravaDevRefreshToken.isEmpty { // TODO: re-enable after getting fresh token
@@ -182,15 +187,35 @@ final class StravaService {
         }
     }
 
+    // MARK: - Sync Freshness
+
+    func isSyncStale() -> Bool {
+        guard let lastSyncedAt else { return true }
+        let sevenDaysAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
+        return lastSyncedAt < sevenDaysAgo
+    }
+
     // MARK: - Disconnect
 
-    func disconnect() async {
+    func disconnect(userId: UUID) async {
         if let accessToken = KeychainService.get(.stravaAccessToken) {
             var request = URLRequest(url: URL(string: "https://www.strava.com/oauth/deauthorize")!)
             request.httpMethod = "POST"
             request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             _ = try? await URLSession.shared.data(for: request)
         }
+
+        // Delete imported activities from Supabase
+        do {
+            try await supabase
+                .from("strava_activities")
+                .delete()
+                .eq("user_id", value: userId)
+                .execute()
+        } catch {
+            print("Failed to delete Strava activities from Supabase: \(error)")
+        }
+
         KeychainService.deleteAll(for: .strava)
         isConnected = false
         activities = []
@@ -250,7 +275,10 @@ final class StravaService {
 
         let mapped = allActivities.map { $0.toStravaActivity(userId: userId) }
         activities = mapped
-        lastSyncDate = Date()
+        let now = Date()
+        lastSyncDate = now
+        lastSyncedAt = now
+        KeychainService.save(String(now.timeIntervalSince1970), for: .stravaLastSyncedAt)
 
         await persistActivities(mapped, userId: userId)
     }

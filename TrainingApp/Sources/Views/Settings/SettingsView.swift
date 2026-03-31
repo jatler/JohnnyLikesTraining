@@ -166,7 +166,10 @@ struct SettingsView: View {
                 }
                 .alert("Disconnect Strava?", isPresented: $showingDisconnectStrava) {
                     Button("Cancel", role: .cancel) {}
-                    Button("Disconnect", role: .destructive) { Task { await strava.disconnect() } }
+                    Button("Disconnect", role: .destructive) {
+                        guard let userId = auth.currentUserId else { return }
+                        Task { await strava.disconnect(userId: userId) }
+                    }
                 } message: {
                     Text("Your synced activities will be removed from the app.")
                 }

@@ -132,6 +132,10 @@ struct MainTabView: View {
 
                 if strava.isConnected {
                     strava.autoMatchActivities(sessions: planStore.sessions)
+                    if strava.isSyncStale() {
+                        try? await strava.syncActivities(userId: userId)
+                        strava.autoMatchActivities(sessions: planStore.sessions)
+                    }
                 }
                 if let week = planStore.currentWeekNumber {
                     strengthStore.computeSuggestions(
@@ -143,6 +147,9 @@ struct MainTabView: View {
             } else {
                 if strava.isConnected {
                     await strava.loadActivities(userId: userId)
+                    if strava.isSyncStale() {
+                        try? await strava.syncActivities(userId: userId)
+                    }
                     strava.autoMatchActivities(sessions: planStore.sessions)
                 }
                 if oura.isConnected {

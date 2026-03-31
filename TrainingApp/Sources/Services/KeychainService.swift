@@ -9,6 +9,7 @@ enum KeychainService {
         case stravaRefreshToken = "strava_refresh_token"
         case stravaExpiresAt = "strava_expires_at"
         case stravaAthleteId = "strava_athlete_id"
+        case stravaLastSyncedAt = "strava_last_synced_at"
         case ouraAccessToken = "oura_access_token"
         case ouraRefreshToken = "oura_refresh_token"
         case ouraExpiresAt = "oura_expires_at"
@@ -67,6 +68,7 @@ enum KeychainService {
             delete(.stravaRefreshToken)
             delete(.stravaExpiresAt)
             delete(.stravaAthleteId)
+            delete(.stravaLastSyncedAt)
         case .oura:
             delete(.ouraAccessToken)
             delete(.ouraRefreshToken)
