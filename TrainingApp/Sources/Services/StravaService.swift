@@ -109,14 +109,12 @@ final class StravaService {
     }
 
     private func exchangeCodeForToken(_ code: String) async throws {
-        let url = URL(string: Config.stravaTokenURL)!
+        let url = URL(string: "\(SupabaseService.edgeFunctionBaseURL)/strava-token")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let body: [String: String] = [
-            "client_id": Config.stravaClientId,
-            "client_secret": Config.stravaClientSecret,
             "code": code,
             "grant_type": "authorization_code"
         ]
@@ -144,14 +142,12 @@ final class StravaService {
 
         if Date().timeIntervalSince1970 < expiresAt - 300 { return }
 
-        let url = URL(string: Config.stravaTokenURL)!
+        let url = URL(string: "\(SupabaseService.edgeFunctionBaseURL)/strava-token")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let body: [String: String] = [
-            "client_id": Config.stravaClientId,
-            "client_secret": Config.stravaClientSecret,
             "refresh_token": refreshToken,
             "grant_type": "refresh_token"
         ]
@@ -161,7 +157,7 @@ final class StravaService {
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             let status = (response as? HTTPURLResponse)?.statusCode ?? -1
             let body = String(data: data, encoding: .utf8) ?? "(no body)"
-            print("❌ Strava token refresh failed — HTTP \(status): \(body)")
+            print("[Strava] Token refresh failed — HTTP \(status): \(body). Clearing credentials and disconnecting.")
             KeychainService.deleteAll(for: .strava)
             isConnected = false
             throw StravaError.tokenRefreshFailed
@@ -254,11 +250,33 @@ final class StravaService {
             var request = URLRequest(url: components.url!)
             request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
-            let (data, response) = try await URLSession.shared.data(for: request)
-            guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
-                let status = (response as? HTTPURLResponse)?.statusCode ?? -1
+            var (data, fetchResponse) = try await URLSession.shared.data(for: request)
+            var httpStatus = (fetchResponse as? HTTPURLResponse)?.statusCode ?? -1
+
+            // Handle 401 — token expired or revoked: refresh and retry once
+            if httpStatus == 401 {
+                print("[Strava] 401 on activities fetch — attempting token refresh and retry")
+                do {
+                    try await refreshTokenIfNeeded()
+                    guard let newToken = KeychainService.get(.stravaAccessToken) else {
+                        throw StravaError.notConnected
+                    }
+                    request.setValue("Bearer \(newToken)", forHTTPHeaderField: "Authorization")
+                    let retryResult = try await URLSession.shared.data(for: request)
+                    data = retryResult.0
+                    fetchResponse = retryResult.1
+                    httpStatus = (fetchResponse as? HTTPURLResponse)?.statusCode ?? -1
+                } catch {
+                    print("[Strava] Token refresh failed after 401 — disconnecting: \(error)")
+                    KeychainService.deleteAll(for: .strava)
+                    isConnected = false
+                    throw StravaError.tokenExpiredOrRevoked
+                }
+            }
+
+            guard let http = fetchResponse as? HTTPURLResponse, http.statusCode == 200 else {
                 let body = String(data: data, encoding: .utf8) ?? "(no body)"
-                print("❌ Strava activities fetch failed — HTTP \(status): \(body)")
+                print("[Strava] Activities fetch failed — HTTP \(httpStatus): \(body)")
                 throw StravaError.apiFailed
             }
 
@@ -435,6 +453,7 @@ enum StravaError: LocalizedError {
     case tokenRefreshFailed
     case apiFailed
     case stateMismatch
+    case tokenExpiredOrRevoked
 
     var errorDescription: String? {
         switch self {
@@ -445,6 +464,7 @@ enum StravaError: LocalizedError {
         case .tokenRefreshFailed: "Failed to refresh Strava access token."
         case .apiFailed: "Strava API request failed."
         case .stateMismatch: "OAuth state parameter mismatch — possible CSRF attack."
+        case .tokenExpiredOrRevoked: "Strava access was revoked or expired. Please reconnect."
         }
     }
 }

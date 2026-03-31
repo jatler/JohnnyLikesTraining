@@ -76,6 +76,7 @@
 		F01A1E8C6E3FCF41A197A9B2 /* TrainingPlanTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9CDAEB606327522B08C1277 /* TrainingPlanTemplate.swift */; };
 		F4CEAA6920AD02C52D1BB794 /* HeatLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCB459B05BE989CD56A6A76 /* HeatLog.swift */; };
 		F4FFC0062D790C1D4126144D /* PlanSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3922D09D3B1CE07E2DC0618A /* PlanSetupView.swift */; };
+		A1B2C3D4E5F60718192A3B4C /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7E8F9A0B1C2D3E4F5061728 /* OnboardingView.swift */; };
 		F5DDF64BD9B194AB773714B0 /* StretchDayDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D530D92A8022C6A3EDAAF7FC /* StretchDayDetailView.swift */; };
 		F777CA23AFA5E72C92F490FD /* HeatStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 871B7FB896DB1306FC3F295A /* HeatStore.swift */; };
 /* End PBXBuildFile section */
@@ -108,6 +109,7 @@
 		2B21B45B9C3E88F085CD54AC /* champion_plan_100k.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = champion_plan_100k.json; sourceTree = "<group>"; };
 		2BF1F9E0F6BDC1529AB3ECEB /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		38427D1E7D9E72609E2756A6 /* OuraDaily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OuraDaily.swift; sourceTree = "<group>"; };
+		D7E8F9A0B1C2D3E4F5061728 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		3895561C0376F954DE01A693 /* StravaActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StravaActivity.swift; sourceTree = "<group>"; };
 		3922D09D3B1CE07E2DC0618A /* PlanSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanSetupView.swift; sourceTree = "<group>"; };
 		3D5300AFFAABD6197E8F30D8 /* StrengthStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthStore.swift; sourceTree = "<group>"; };
@@ -257,6 +259,7 @@
 				FCC05996813178FEA4350200 /* Auth */,
 				889602FE3371F5BECC36EAAF /* Calendar */,
 				F87DDA28EA3D98CF2F30D666 /* Heat */,
+				C4D5E6F708192A3B4C5D6E7F /* Onboarding */,
 				7662D0B0BA66D0046981B7DF /* Paywall */,
 				43D61DA79F66CFF81438133C /* Plan */,
 				F0E53572223BE6C4FEAECD4E /* Progress */,
@@ -302,6 +305,14 @@
 				6C01F97738C00E24FC785ED9 /* ProgressionEngineTests.swift */,
 			);
 			path = Tests;
+			sourceTree = "<group>";
+		};
+		C4D5E6F708192A3B4C5D6E7F /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				D7E8F9A0B1C2D3E4F5061728 /* OnboardingView.swift */,
+			);
+			path = Onboarding;
 			sourceTree = "<group>";
 		};
 		7662D0B0BA66D0046981B7DF /* Paywall */ = {
@@ -565,6 +576,7 @@
 				F777CA23AFA5E72C92F490FD /* HeatStore.swift in Sources */,
 				954A34C6625409E4D3FD985C /* KeychainService.swift in Sources */,
 				318F754953A5B84505A9ECBD /* OuraDaily.swift in Sources */,
+				A1B2C3D4E5F60718192A3B4C /* OnboardingView.swift in Sources */,
 				A49A52EEDFEFF45B719A8233 /* OuraService.swift in Sources */,
 				5F862E196FF0910C46CC6F36 /* PatreonGateView.swift in Sources */,
 				35359EE4B2B5913A17135A3B /* PatreonService.swift in Sources */,

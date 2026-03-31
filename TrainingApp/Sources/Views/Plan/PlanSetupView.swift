@@ -6,6 +6,7 @@ struct PlanSetupView: View {
     @Environment(StrengthStore.self) private var strengthStore
     @Environment(HeatStore.self) private var heatStore
     @Environment(StretchStore.self) private var stretchStore
+    @Environment(PatreonService.self) private var patreon
     @Environment(\.dismiss) private var dismiss
 
     @State private var raceName = ""
@@ -15,6 +16,7 @@ struct PlanSetupView: View {
     @State private var selectedTemplate: TrainingPlanTemplate?
     @State private var showingError = false
     @State private var errorMessage = ""
+    @State private var showingPatreonGate = false
 
     private let templates = PlanTemplateService.shared.availableTemplates
 
@@ -26,6 +28,13 @@ struct PlanSetupView: View {
 
     private var canCreate: Bool {
         !raceName.trimmingCharacters(in: .whitespaces).isEmpty && selectedTemplate != nil
+    }
+
+    /// Only SWAP Running plans require patron status; non-SWAP plans are ungated.
+    private var requiresPatreonGate: Bool {
+        guard let template = selectedTemplate else { return false }
+        guard template.source == "SWAP Running" else { return false }
+        return !patreon.isPatron && !DevSignIn.isAllowed
     }
 
     var body: some View {
@@ -85,7 +94,11 @@ struct PlanSetupView: View {
 
                 Section {
                     Button {
-                        createPlan()
+                        if requiresPatreonGate {
+                            showingPatreonGate = true
+                        } else {
+                            createPlan()
+                        }
                     } label: {
                         HStack {
                             Spacer()
@@ -106,6 +119,11 @@ struct PlanSetupView: View {
                 Button("OK") {}
             } message: {
                 Text(errorMessage)
+            }
+            .sheet(isPresented: $showingPatreonGate) {
+                PatreonGateView(onPatronVerified: {
+                    createPlan()
+                })
             }
             .onAppear {
                 if selectedTemplate == nil {
@@ -191,4 +209,5 @@ extension TrainingPlanTemplate: Hashable {
         .environment(StrengthStore())
         .environment(HeatStore())
         .environment(StretchStore())
+        .environment(PatreonService())
 }

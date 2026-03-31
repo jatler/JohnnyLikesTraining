@@ -2,13 +2,18 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AuthService.self) private var auth
+    @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
 
     var body: some View {
         Group {
             if auth.isLoading {
                 ProgressView("Loading\u{2026}")
             } else if auth.isAuthenticated {
-                MainTabView()
+                if hasCompletedOnboarding {
+                    MainTabView()
+                } else {
+                    OnboardingView(onComplete: { hasCompletedOnboarding = true })
+                }
             } else {
                 SignInView()
             }

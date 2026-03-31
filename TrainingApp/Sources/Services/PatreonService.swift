@@ -82,20 +82,17 @@ final class PatreonService {
     // MARK: - Token Exchange
 
     private func exchangeCodeForToken(_ code: String) async throws {
-        let url = URL(string: Config.patreonTokenURL)!
+        let url = URL(string: "\(SupabaseService.edgeFunctionBaseURL)/patreon-token")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        var components = URLComponents()
-        components.queryItems = [
-            URLQueryItem(name: "code", value: code),
-            URLQueryItem(name: "grant_type", value: "authorization_code"),
-            URLQueryItem(name: "client_id", value: Config.patreonClientId),
-            URLQueryItem(name: "client_secret", value: Config.patreonClientSecret),
-            URLQueryItem(name: "redirect_uri", value: Config.patreonRedirectURI)
+        let body: [String: String] = [
+            "code": code,
+            "grant_type": "authorization_code",
+            "redirect_uri": Config.patreonRedirectURI
         ]
-        request.httpBody = components.percentEncodedQuery?.data(using: .utf8)
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
@@ -232,19 +229,16 @@ final class PatreonService {
             throw PatreonError.notConnected
         }
 
-        let url = URL(string: Config.patreonTokenURL)!
+        let url = URL(string: "\(SupabaseService.edgeFunctionBaseURL)/patreon-token")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        var components = URLComponents()
-        components.queryItems = [
-            URLQueryItem(name: "grant_type", value: "refresh_token"),
-            URLQueryItem(name: "refresh_token", value: refreshToken),
-            URLQueryItem(name: "client_id", value: Config.patreonClientId),
-            URLQueryItem(name: "client_secret", value: Config.patreonClientSecret)
+        let body: [String: String] = [
+            "grant_type": "refresh_token",
+            "refresh_token": refreshToken
         ]
-        request.httpBody = components.percentEncodedQuery?.data(using: .utf8)
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {

@@ -73,24 +73,21 @@ final class OuraService {
     }
 
     private func exchangeCodeForToken(_ code: String) async throws {
-        let url = URL(string: Config.ouraTokenURL)!
+        let url = URL(string: "\(SupabaseService.edgeFunctionBaseURL)/oura-token")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         #if DEBUG
         print("Oura OAuth: starting authorization")
         #endif
 
-        var components = URLComponents()
-        components.queryItems = [
-            URLQueryItem(name: "client_id", value: Config.ouraClientId),
-            URLQueryItem(name: "client_secret", value: Config.ouraClientSecret),
-            URLQueryItem(name: "code", value: code),
-            URLQueryItem(name: "grant_type", value: "authorization_code"),
-            URLQueryItem(name: "redirect_uri", value: Config.ouraRedirectURI)
+        let body: [String: String] = [
+            "code": code,
+            "grant_type": "authorization_code",
+            "redirect_uri": Config.ouraRedirectURI
         ]
-        request.httpBody = components.percentEncodedQuery?.data(using: .utf8)
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
@@ -114,24 +111,24 @@ final class OuraService {
 
         if Date().timeIntervalSince1970 < expiresAt - 300 { return }
 
-        let url = URL(string: Config.ouraTokenURL)!
+        let url = URL(string: "\(SupabaseService.edgeFunctionBaseURL)/oura-token")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        var components = URLComponents()
-        components.queryItems = [
-            URLQueryItem(name: "client_id", value: Config.ouraClientId),
-            URLQueryItem(name: "client_secret", value: Config.ouraClientSecret),
-            URLQueryItem(name: "refresh_token", value: refreshToken),
-            URLQueryItem(name: "grant_type", value: "refresh_token")
+        let body: [String: String] = [
+            "refresh_token": refreshToken,
+            "grant_type": "refresh_token"
         ]
-        request.httpBody = components.percentEncodedQuery?.data(using: .utf8)
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+            let status = (response as? HTTPURLResponse)?.statusCode ?? -1
             let body = String(data: data, encoding: .utf8) ?? "no body"
-            print("Oura token refresh failed: \(body)")
+            print("[Oura] Token refresh failed — HTTP \(status): \(body). Clearing credentials and disconnecting.")
+            KeychainService.deleteAll(for: .oura)
+            isConnected = false
             throw OuraError.tokenRefreshFailed
         }
 
@@ -164,6 +161,25 @@ final class OuraService {
         isSyncing = true
         defer { isSyncing = false }
 
+        do {
+            try await syncDailyInner(userId: userId, days: days)
+        } catch OuraError.unauthorized {
+            // Token expired/revoked — try refresh and retry once
+            print("[Oura] 401 received — attempting token refresh and retry")
+            do {
+                // Force refresh by clearing expires_at so refreshTokenIfNeeded actually refreshes
+                KeychainService.save("0", for: .ouraExpiresAt)
+                try await refreshTokenIfNeeded()
+                try await syncDailyInner(userId: userId, days: days)
+            } catch {
+                print("[Oura] Retry after refresh failed — disconnecting: \(error)")
+                disconnect()
+                throw OuraError.tokenExpiredOrRevoked
+            }
+        }
+    }
+
+    private func syncDailyInner(userId: UUID, days: Int) async throws {
         try await refreshTokenIfNeeded()
 
         guard let accessToken = KeychainService.get(.ouraAccessToken) else {
@@ -311,6 +327,9 @@ final class OuraService {
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
         let (data, response) = try await URLSession.shared.data(for: request)
+        if let http = response as? HTTPURLResponse, http.statusCode == 401 {
+            throw OuraError.unauthorized
+        }
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             throw OuraError.apiFailed
         }
@@ -330,6 +349,9 @@ final class OuraService {
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
         let (data, response) = try await URLSession.shared.data(for: request)
+        if let http = response as? HTTPURLResponse, http.statusCode == 401 {
+            throw OuraError.unauthorized
+        }
         guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             throw OuraError.apiFailed
         }
@@ -356,6 +378,9 @@ final class OuraService {
             request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
             let (data, response) = try await URLSession.shared.data(for: request)
+            if let http = response as? HTTPURLResponse, http.statusCode == 401 {
+                throw OuraError.unauthorized
+            }
             guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
                 let status = (response as? HTTPURLResponse)?.statusCode ?? -1
                 let body = String(data: data, encoding: .utf8) ?? "no body"
@@ -532,6 +557,8 @@ enum OuraError: LocalizedError {
     case tokenRefreshFailed
     case apiFailed
     case stateMismatch
+    case unauthorized
+    case tokenExpiredOrRevoked
 
     var errorDescription: String? {
         switch self {
@@ -542,6 +569,8 @@ enum OuraError: LocalizedError {
         case .tokenRefreshFailed: "Failed to refresh Oura access token."
         case .apiFailed: "Oura API request failed."
         case .stateMismatch: "OAuth state parameter mismatch — possible CSRF attack."
+        case .unauthorized: "Oura API returned 401 — token may be expired or revoked."
+        case .tokenExpiredOrRevoked: "Oura access was revoked or expired. Please reconnect."
         }
     }
 }

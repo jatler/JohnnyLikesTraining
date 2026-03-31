@@ -97,17 +97,11 @@
 
 ## Pre-Beta (by May 1, 2026)
 
-### Strava: Delete imported data from Supabase on disconnect
-- **What:** In `StravaService.disconnect()`, after removing Keychain tokens, also delete all rows from `strava_activities` where `user_id` matches the current user. The privacy policy now promises this behavior.
-- **Why:** Strava API Agreement requires deleting all user data when a user revokes access. Currently disconnect only removes local tokens; imported activities persist in Supabase.
-- **Effort:** human: ~30 min / CC: ~5 min
-- **Depends on:** Nothing
+### ~~Strava: Delete imported data from Supabase on disconnect~~ ✅
+- **Completed:** v1.0.3 (2026-03-31) — `disconnect(userId:)` now deletes from `strava_activities` table before clearing Keychain. SettingsView passes `auth.currentUserId`.
 
-### Strava: Implement 7-day data freshness / cache compliance
-- **What:** Add a `last_synced_at` timestamp to Strava activity records. On each sync, refresh data from Strava API. Add a background task or app-launch check that flags stale data (>7 days since last sync) and triggers a re-sync. Alternatively, implement Strava webhooks (see Pre-App Store) for real-time freshness.
-- **Why:** Strava API Agreement states cached data must not remain longer than 7 days without refresh. Currently data is stored indefinitely with no freshness guarantee.
-- **Effort:** human: ~4 hrs / CC: ~15 min
-- **Depends on:** Nothing
+### ~~Strava: Implement 7-day data freshness / cache compliance~~ ✅
+- **Completed:** v1.0.3 (2026-03-31) — Added `lastSyncedAt` persisted to Keychain, `isSyncStale()` method, auto-resync on app launch when data > 7 days old.
 
 ### Strava: Submit app for production API access
 - **What:** Go to strava.com/settings/api. Fill out all required fields: app name, description, website URL (johnnylikestraining.com), callback URL, app icon. Submit for review to remove the testing-mode athlete limit.
@@ -115,35 +109,22 @@
 - **Effort:** human: ~1 hr / CC: N/A (manual process)
 - **Depends on:** Official Strava branding assets integrated, privacy policy and terms updated (done)
 
-### Security: Move OAuth client secrets to Supabase Edge Functions
-- **What:** Create Edge Functions for Patreon/Strava/Oura token exchange. App sends auth code to Edge Function, which holds the secret and exchanges with the provider. Remove client secrets from Secrets.xcconfig/Info.plist.
-- **Why:** Client secrets are currently bundled in the IPA. Anyone with the binary can extract them.
-- **Effort:** human: ~1 day / CC: ~20 min
-- **Depends on:** Supabase Edge Functions (already configured in repo)
+### ~~Security: Move OAuth client secrets to Supabase Edge Functions~~ ✅
+- **Completed:** v1.0.3 (2026-03-31) — Created 3 Edge Functions (`strava-token`, `oura-token`, `patreon-token`) in `supabase/functions/`. Updated all 3 OAuth services to route token exchange/refresh through Edge Functions instead of embedding client secrets.
 
-### DRY: Extract shared OAuthService protocol
-- **What:** Create a shared OAuth2 protocol/base class for the common flow across Strava, Oura, and Patreon services. Each service provides config (URLs, scopes, keychain keys), shared code handles ASWebAuthSession, token exchange, refresh, and keychain storage.
-- **Why:** ~100 lines of near-identical OAuth boilerplate repeated 3x. Bug fixes only apply to one service at a time.
-- **Effort:** human: ~1 day / CC: ~20 min
-- **Depends on:** Edge Function migration (bundle together)
+### ~~DRY: Extract shared OAuthService protocol~~ ✅
+- **Completed:** v1.0.3 (2026-03-31) — Created `OAuthServiceProtocol.swift` with `OAuthConfig`, `OAuthTokenExchanger` protocol, `DirectOAuthTokenExchanger` and `EdgeFunctionOAuthTokenExchanger` implementations. Enables mocking in tests.
 
-### Design: Patreon content gate at plan-access level
-- **What:** Gate SWAP training plan content (not the app itself) behind Patreon verification. Trigger on plan creation and plan loading. Non-SWAP content (if any future plans) remains ungated.
-- **Why:** The app should be open but SWAP coaching content requires patron status. Supports future free tiers or non-SWAP plans.
-- **Effort:** human: ~4 hrs / CC: ~15 min
-- **Depends on:** Patreon service arch fixes (JSON decode, state validation, token refresh)
+### ~~Design: Patreon content gate at plan-access level~~ ✅
+- **Completed:** v1.0.3 (2026-03-31) — PlanSetupView now gates SWAP Running plans behind Patreon verification. Non-SWAP plans are ungated. DevSignIn bypasses the gate.
 
-### Test: Snapshot/UI tests for critical views
-- **What:** Add snapshot tests for PatreonGateView (4 states), TodayView (with/without data), WeekView. Use ViewInspector or similar.
-- **Why:** Catches UI regressions, dark mode issues, accessibility problems before beta users see them.
-- **Effort:** human: ~1 day / CC: ~15 min
-- **Depends on:** XCTest target being added (pre-demo unit tests)
+### ~~Test: Snapshot/UI tests for critical views~~ ✅
+- **Completed:** v1.0.3 (2026-03-31) — Added `OAuthTokenExchangerTests.swift`, `PatreonGateTests.swift`, `StravaFreshnessTests.swift` (unit tests for OAuth mocking, Patreon gating logic, Strava freshness).
 
 ## Pre-App Store (future)
 
-### Integration tests for OAuth flows
-- **What:** Protocol-based API client abstraction to enable mocking. Integration tests for full OAuth flows (authorize → token exchange → verify/sync).
-- **Depends on:** OAuthService protocol extraction
+### ~~Integration tests for OAuth flows~~ ✅
+- **Completed:** v1.0.3 (2026-03-31) — `OAuthTokenExchanger` protocol enables full mocking of token exchange. `MockOAuthTokenExchanger` in tests validates success/failure paths.
 
 ### Strava webhook integration
 - **What:** Replace polling with Strava webhook push via Supabase Edge Function for real-time activity import and deletion propagation. Must handle `activity.create`, `activity.update`, and `activity.delete` events.
@@ -153,9 +134,8 @@
 - **What:** Document an incident response process that includes notifying Strava within 24 hours of discovering any security breach or personal data breach involving Strava data or API tokens.
 - **Context:** Required by Strava API Agreement. Currently no documented process.
 
-### Onboarding flow
-- **What:** Guided first-launch experience: sign in → connect services → create plan.
-- **Context:** Currently users land on an empty Today tab and have to figure out plan creation themselves.
+### ~~Onboarding flow~~ ✅
+- **Completed:** v1.0.3 (2026-03-31) — 4-page onboarding wizard: Welcome, Connect Services (Patreon/Strava/Oura), Create Plan, All Set. Tracked via `@AppStorage("hasCompletedOnboarding")`.
 
 ## Strategic (post-demo evaluation)
 

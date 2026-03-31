@@ -532,12 +532,12 @@ Track passive heat acclimation sessions (sauna, hot tub, heat suit) prescribed b
 - [x] Error handling — all OAuth flows surface errors via alerts in `SettingsView`. API failures logged with descriptive messages. Token refresh happens automatically before API calls.
 
 #### M6 — Remaining Polish (future)
-- [ ] Long run progression chart (separate visualization of long run distances over time).
-- [ ] Readiness trends chart (HRV, sleep score over past 30 days).
-- [ ] Unmatched Strava activities view — show extra activities (cross-training, bonus runs) that don't match a planned session.
+- [x] Long run progression chart (separate visualization of long run distances over time).
+- [x] Readiness trends chart (HRV, sleep score over past 30 days).
+- [x] Unmatched Strava activities view — show extra activities (cross-training, bonus runs) that don't match a planned session.
 - [ ] Strava webhook integration via Supabase Edge Function for real-time activity import.
-- [ ] Onboarding flow — guided first-launch experience (sign in → connect services → create plan).
-- [ ] Edge cases: handle expired/revoked OAuth tokens gracefully, network error retry, plan deletion cleanup.
+- [x] Onboarding flow — guided first-launch experience (sign in → connect services → create plan).
+- [x] Edge cases: handle expired/revoked OAuth tokens gracefully, network error retry, plan deletion cleanup.
 
 ### M7 — Manual Workout Adjustments & Strength Training ✅
 - [x] `SessionOverride` model and Supabase migration for `session_overrides` table.

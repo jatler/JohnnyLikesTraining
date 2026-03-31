@@ -10,6 +10,11 @@ final class SupabaseService {
     /// When true, all stores skip Supabase reads/writes (dev bypass mode with no real auth session).
     var isOffline = false
 
+    /// Base URL for Supabase Edge Functions (e.g. https://<project>.supabase.co/functions/v1).
+    static var edgeFunctionBaseURL: String {
+        return "\(shared.client.supabaseURL)/functions/v1"
+    }
+
     private init() {
         client = SupabaseClient(
             supabaseURL: Config.supabaseURL,

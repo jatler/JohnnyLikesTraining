@@ -20,6 +20,9 @@ struct ProgressDashboardView: View {
                             weeklyMileageChart
                             weeklyDetailList
                             raceReadinessCard
+                            LongRunProgressionChart()
+                            ReadinessTrendsChart()
+                            UnmatchedActivitiesView()
                         }
                         .padding()
                         .padding(.bottom, 20)
