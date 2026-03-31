@@ -432,6 +432,14 @@ struct ProgressDashboardView: View {
             let plannedKm = trackableRuns.compactMap(\.targetDistanceKm).reduce(0, +)
 
             // Only count running activities for mileage, hours, and vert
+            #if DEBUG
+            if weekNum == planStore.currentWeekNumber {
+                for session in trackableRuns {
+                    let act = strava.activity(for: session.id)
+                    print("Progress W\(weekNum) session \(session.workoutType.displayName) \(session.scheduledDate.formatted(.dateTime.month().day())): matched=\(act != nil) isRun=\(act?.isRun ?? false) km=\(act?.distanceKm ?? 0)")
+                }
+            }
+            #endif
             var actualKm: Double = 0
             var runsDone = 0
             var runSeconds = 0
