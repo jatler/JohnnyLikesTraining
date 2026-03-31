@@ -67,8 +67,6 @@ struct TodayView: View {
                     }
                 }
 
-                weeklyMileageSummary
-
                 tuesdayBanner
 
                 if let plan = planStore.activePlan {
@@ -214,57 +212,12 @@ struct TodayView: View {
 
             // Oura recovery
             if isFirst, oura.isConnected, let recovery = oura.todayReadiness() {
-                Divider()
                 SessionComponents.recoveryRow(recovery)
             }
 
             if !hasStravaMatch {
                 Divider()
                 sessionActions(session)
-            }
-        }
-    }
-
-    // MARK: - Weekly Mileage Summary
-
-    @ViewBuilder
-    private var weeklyMileageSummary: some View {
-        if let week = planStore.currentWeekNumber {
-            let weekSessions = planStore.sessions(for: week)
-                .filter { $0.workoutType != .strength && $0.workoutType != .rest }
-            let plannedMi = weekSessions.compactMap(\.targetDistanceMi).reduce(0, +)
-            let actualMi = weekSessions.compactMap { session -> Double? in
-                guard let activity = strava.activity(for: session.id), activity.isRun else { return nil }
-                return activity.distanceMi
-            }.reduce(0, +)
-
-            if plannedMi > 0 {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("Week \(week) Mileage")
-                            .font(.subheadline.bold())
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text(String(format: "%.0f / %.0f mi", actualMi, plannedMi))
-                            .font(.subheadline)
-                            .foregroundStyle(actualMi > 0 ? .primary : .secondary)
-                    }
-
-                    GeometryReader { geo in
-                        ZStack(alignment: .leading) {
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(Color.secondary.opacity(0.15))
-                                .frame(height: 8)
-
-                            RoundedRectangle(cornerRadius: 4)
-                                .fill(Color.swapAccent)
-                                .frame(width: geo.size.width * min(actualMi / plannedMi, 1.0), height: 8)
-                        }
-                    }
-                    .frame(height: 8)
-                }
-                .padding()
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
             }
         }
     }
