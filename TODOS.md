@@ -77,6 +77,36 @@
 ### ~~Fix: Parse Patreon expires_in from token response~~ ✅
 - **Completed:** v1.0 (2026-03-30) — Added expiresIn to PatreonTokenResponse, uses actual value
 
+### Fix: Champion plan not showing heat and strength days
+- **What:** The champion_plan_100k.json template includes `strength_exercises`, `heat_sessions`, and `stretch_exercises` data, but heat and strength sessions are not appearing in the app when the plan is loaded. Either the sessions aren't being created during plan setup, or they aren't being loaded/displayed correctly.
+- **Why:** Users on the Champion Plan see no strength or heat content despite the template containing it. Core feature gap.
+- **Effort:** human: ~1 hr / CC: ~10 min
+- **Depends on:** Nothing
+
+### Add: Manual strength and stretching program creation
+- **What:** Add a way for users to create their own strength or stretching program in the app, independent of what the plan template provides. Currently there is no UI to add exercises if the template doesn't include them.
+- **Why:** Users with custom strength routines or templates without strength data have no way to track this in the app.
+- **Effort:** human: ~4 hrs / CC: ~20 min
+- **Depends on:** Nothing
+
+### Fix: Today page vertical card order
+- **What:** Reorder the per-session content on TodayView so the vertical flow is: workout header → distance → pace → coach notes → Strava import → heat → strength → stretching → divider → Oura recovery data → race/plan info. Currently Strava appears after strength/stretch/heat.
+- **Why:** Coach notes and Strava completion data are the most-viewed items and should be higher in the flow.
+- **Effort:** human: ~15 min / CC: ~5 min
+- **Depends on:** Nothing
+
+### Add: Weekly mileage in progress bar
+- **What:** Show the sum of completed run miles for the current week in the progress/summary area. Pull from matched Strava activities for the current week.
+- **Why:** Users want to see at a glance how many miles they've run this week vs. the plan.
+- **Effort:** human: ~30 min / CC: ~10 min
+- **Depends on:** Nothing
+
+### Fix: App version incorrect in Settings
+- **What:** Settings page version display is not showing the correct version number. The `CFBundleShortVersionString` bundle read may not be returning the expected value, or the Xcode project version needs to be re-synced.
+- **Why:** Users see a wrong version, which is confusing for bug reports and support.
+- **Effort:** human: ~15 min / CC: ~5 min
+- **Depends on:** Nothing
+
 ## Pre-Beta (by May 1, 2026)
 
 ### Strava: Delete imported data from Supabase on disconnect
