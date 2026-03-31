@@ -92,6 +92,24 @@
 ### ~~Fix: App version incorrect in Settings~~ ✅
 - **Completed:** v1.0.2 (2026-03-30) — Already reading from CFBundleShortVersionString, project.yml at 1.0.2. Needs fresh build.
 
+### Fix: Data persistence across app updates
+- **What:** Strava activities, heat sessions, strength sessions, and stretch sessions must persist across app updates when the user is signed in with Apple. Currently data is stored in Supabase tied to the Apple Sign-In user ID, but verify that all stores correctly reload from Supabase on app launch after an update (no data loss from local-only state, no re-initialization that overwrites existing data).
+- **Why:** Users lose tracked progress if data doesn't survive an app update. This is a trust-breaking experience.
+- **Effort:** human: ~2 hrs / CC: ~15 min
+- **Depends on:** Nothing
+
+### Fix: Heat session UI stacking — cancel overlaps heat icon
+- **What:** In the heat log sheet, the Cancel button visually overlaps or stacks on top of the heat (flame) icon. The layout needs to be fixed so the toolbar cancel button and the session content don't collide.
+- **Why:** Broken layout makes the heat logging flow feel unfinished and can block interaction with the heat icon.
+- **Effort:** human: ~15 min / CC: ~5 min
+- **Depends on:** Nothing
+
+### Fix: Progress bar should count all imported Strava activities including rest days
+- **What:** The progress chart in ProgressDashboardView only counts Strava activities matched to non-rest sessions (`workoutType != .rest && workoutType != .strength`). If a user runs on a rest day, that mileage is not counted. Change the computation to include ALL matched Strava running activities for the week, regardless of the session's workout type. Also include unmatched Strava activities that fall within the week's date range.
+- **Why:** Users who run on rest days (common in ultrarunning) see their actual mileage underreported. The progress bar should reflect all running done, not just planned-day running.
+- **Effort:** human: ~30 min / CC: ~10 min
+- **Depends on:** Nothing
+
 ## Pre-Beta (by May 1, 2026)
 
 ### Strava: Delete imported data from Supabase on disconnect
