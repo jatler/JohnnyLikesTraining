@@ -339,7 +339,7 @@ struct SettingsView: View {
             HStack {
                 Text("Version")
                 Spacer()
-                Text("1.0.0")
+                Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.2")
                     .foregroundStyle(.secondary)
             }
 
@@ -361,7 +361,7 @@ struct SettingsView: View {
                 }
             }
 
-            Link(destination: URL(string: "mailto:atler.j@gmail.com")!) {
+            Link(destination: URL(string: "mailto:atler.j@me.com")!) {
                 HStack {
                     Text("Support")
                     Spacer()
