@@ -8,16 +8,16 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: #e5e5e7;
+            color: #d1d1d6;
             background: #000;
             line-height: 1.6;
         }
 
-        /* Hero */
         .hero {
-            background: linear-gradient(180deg, #2a9d3a 0%, #1a7a28 100%);
+            background: linear-gradient(180deg, #1a7a28 0%, #0a0a0a 100%);
             padding: 80px 24px 64px;
-            text-align: center;
+            max-width: 720px;
+            margin: 0 auto;
         }
         .hero h1 {
             font-size: 2.4rem;
@@ -28,187 +28,122 @@
         }
         .hero p {
             font-size: 1.15rem;
-            color: #98989d;
-            max-width: 540px;
-            margin: 0 auto;
+            color: #d1d1d6;
+            max-width: 480px;
         }
 
-        /* Features Grid */
-        .features {
+        .content {
             max-width: 720px;
-            margin: 48px auto;
+            margin: 0 auto;
             padding: 0 24px;
+        }
+
+        .features {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
+            margin: 48px 0;
         }
         .feature {
-            background: rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 24px;
-        }
-        .feature-icon {
-            font-size: 1.5rem;
-            margin-bottom: 12px;
-            display: block;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
         .feature h3 {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             color: #fff;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
         .feature p {
-            font-size: 0.9rem;
-            color: #98989d;
+            font-size: 0.875rem;
+            color: #a1a1a6;
+            line-height: 1.5;
         }
 
-        /* Colored feature accents matching app sections */
-        .feature--plans { border-color: rgba(0, 122, 255, 0.25); background: rgba(0, 122, 255, 0.06); }
-        .feature--recovery { border-color: rgba(175, 82, 222, 0.25); background: rgba(175, 82, 222, 0.06); }
-        .feature--strava { border-color: rgba(52, 199, 89, 0.25); background: rgba(52, 199, 89, 0.06); }
-        .feature--schedule { border-color: rgba(255, 149, 0, 0.25); background: rgba(255, 149, 0, 0.06); }
-
-        /* Sections */
         .section {
-            max-width: 720px;
-            margin: 0 auto 48px;
-            padding: 0 24px;
+            margin: 0 0 40px;
         }
         .section h2 {
-            font-size: 1.4rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: #fff;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
         .section p {
-            color: #98989d;
-            font-size: 0.95rem;
+            color: #a1a1a6;
+            font-size: 0.925rem;
         }
         .section a {
-            color: #0a84ff;
+            color: #34c759;
             text-decoration: none;
         }
         .section a:hover { text-decoration: underline; }
 
-        /* Workout types showcase */
-        .workout-types {
-            max-width: 720px;
-            margin: 0 auto 48px;
-            padding: 0 24px;
-        }
-        .workout-types h2 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 16px;
-        }
-        .type-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .type-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #e5e5e7;
-        }
-        .type-pill .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        /* Footer */
         footer {
-            text-align: center;
+            max-width: 720px;
+            margin: 0 auto;
             padding: 32px 24px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #636366;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
         footer a {
-            color: #98989d;
+            color: #a1a1a6;
             text-decoration: none;
-            margin: 0 12px;
+            margin-right: 16px;
         }
         footer a:hover { text-decoration: underline; }
+        .footer-links { margin-bottom: 12px; }
 
         @media (max-width: 520px) {
             .features { grid-template-columns: 1fr; }
             .hero h1 { font-size: 1.8rem; }
+            .hero { padding: 60px 24px 48px; }
         }
     </style>
 </head>
 <body>
     <div class="hero">
         <h1>JohnnyLikesTraining</h1>
-        <p>A personal ultrarunning training companion. Follow your plan, track recovery, and stay on course for race day.</p>
+        <p>Follow your ultrarunning plan, track recovery with Oura, and sync every run from Strava. One app for race day prep.</p>
     </div>
 
-    <div class="features">
-        <div class="feature feature--plans">
-            <span class="feature-icon">&#x1F3C3;</span>
-            <h3>Training Plans</h3>
-            <p>Load structured plans with daily prescriptions, coaching notes, and automatic calendar mapping to your race date.</p>
+    <div class="content">
+        <div class="features">
+            <div class="feature">
+                <h3>Structured Plans</h3>
+                <p>Daily prescriptions, coaching notes, and calendar mapping to your race date. Currently featuring SWAP Running plans.</p>
+            </div>
+            <div class="feature">
+                <h3>Recovery Data</h3>
+                <p>Oura Ring readiness, sleep scores, HRV, and resting heart rate shown alongside each workout.</p>
+            </div>
+            <div class="feature">
+                <h3>Strava Import</h3>
+                <p>Runs import automatically. Plan vs. actual comparison for distance, pace, and time.</p>
+            </div>
+            <div class="feature">
+                <h3>Swap and Skip</h3>
+                <p>Move workouts around, skip when life happens, edit prescriptions. Everything tracked.</p>
+            </div>
         </div>
-        <div class="feature feature--recovery">
-            <span class="feature-icon">&#x1F49C;</span>
-            <h3>Recovery Tracking</h3>
-            <p>Connect your Oura Ring to see readiness, sleep, and HRV alongside each day's workout.</p>
-        </div>
-        <div class="feature feature--strava">
-            <span class="feature-icon">&#x2705;</span>
-            <h3>Strava Sync</h3>
-            <p>Automatically import runs and compare plan vs. actual distance, pace, and effort.</p>
-        </div>
-        <div class="feature feature--schedule">
-            <span class="feature-icon">&#x1F504;</span>
-            <h3>Flexible Scheduling</h3>
-            <p>Swap workouts, skip days, and adjust your plan when life happens — all tracked and logged.</p>
-        </div>
-    </div>
 
-    <div class="workout-types">
-        <h2>Built for Every Session</h2>
-        <div class="type-grid">
-            <span class="type-pill"><span class="dot" style="background: #34c759;"></span> Easy</span>
-            <span class="type-pill"><span class="dot" style="background: #ff9500;"></span> Tempo</span>
-            <span class="type-pill"><span class="dot" style="background: #ff3b30;"></span> Intervals</span>
-            <span class="type-pill"><span class="dot" style="background: #0a84ff;"></span> Long Run</span>
-            <span class="type-pill"><span class="dot" style="background: #63e6be;"></span> Recovery</span>
-            <span class="type-pill"><span class="dot" style="background: #af52de;"></span> Race</span>
-            <span class="type-pill"><span class="dot" style="background: #5856d6;"></span> Strength</span>
-            <span class="type-pill"><span class="dot" style="background: #2ac3b5;"></span> Stretching</span>
-            <span class="type-pill"><span class="dot" style="background: #ff9500;"></span> Heat Training</span>
+        <div class="section">
+            <h2>About</h2>
+            <p>JohnnyLikesTraining is an iOS app for managing ultrarunning training blocks. It connects to Oura and Strava to show training load and recovery in one place. Currently in development, available via TestFlight.</p>
         </div>
-    </div>
 
-    <div class="section">
-        <h2>About</h2>
-        <p>JohnnyLikesTraining is a personal iOS app for managing ultrarunning training blocks. It integrates with Oura and Strava to give you a complete picture of your training load and recovery. The app is currently in development and available via TestFlight.</p>
-    </div>
-
-    <div class="section">
-        <h2>Contact</h2>
-        <p>For questions, data requests, or support, reach out at <a href="mailto:atler.j@gmail.com">atler.j@gmail.com</a>.</p>
+        <div class="section">
+            <h2>Contact</h2>
+            <p>Questions, data requests, or support: <a href="mailto:atler.j@gmail.com">atler.j@gmail.com</a></p>
+        </div>
     </div>
 
     <footer>
-        <a href="privacy.html">Privacy Policy</a>
-        <a href="terms.html">Terms of Service</a>
-        <br><br>
+        <div class="footer-links">
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="terms.html">Terms of Service</a>
+        </div>
         &copy; 2026 JohnnyLikesTraining
     </footer>
 </body>
