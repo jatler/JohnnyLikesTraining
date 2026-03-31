@@ -101,7 +101,7 @@ struct MainTabView: View {
                 // re-initialize from the bundled template (handles plans created
                 // before strength/heat/stretch were added to the template).
                 // Skip if offline — don't create duplicates that conflict on reconnect.
-                if !planStore.isOffline, let template = planStore.currentTemplate {
+                if !SupabaseService.shared.isOffline, let template = planStore.currentTemplate {
                     if !strengthStore.hasTemplate,
                        let exercises = template.strengthExercises, !exercises.isEmpty {
                         strengthStore.initializeFromTemplate(
