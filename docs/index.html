@@ -8,50 +8,143 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: #1a1a1a;
-            background: #fafafa;
+            color: #e5e5e7;
+            background: #000;
             line-height: 1.6;
         }
+
+        /* Hero */
         .hero {
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
-            color: #fff;
+            background: linear-gradient(180deg, #2a9d3a 0%, #1a7a28 100%);
             padding: 80px 24px 64px;
             text-align: center;
         }
-        .hero h1 { font-size: 2.4rem; font-weight: 700; margin-bottom: 12px; }
-        .hero p { font-size: 1.15rem; opacity: 0.85; max-width: 540px; margin: 0 auto; }
+        .hero h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+        .hero p {
+            font-size: 1.15rem;
+            color: #98989d;
+            max-width: 540px;
+            margin: 0 auto;
+        }
+
+        /* Features Grid */
         .features {
             max-width: 720px;
             margin: 48px auto;
             padding: 0 24px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 24px;
+            gap: 16px;
         }
         .feature {
-            background: #fff;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
             padding: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
-        .feature h3 { font-size: 1rem; margin-bottom: 6px; }
-        .feature p { font-size: 0.9rem; color: #555; }
+        .feature-icon {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            display: block;
+        }
+        .feature h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+        .feature p {
+            font-size: 0.9rem;
+            color: #98989d;
+        }
+
+        /* Colored feature accents matching app sections */
+        .feature--plans { border-color: rgba(0, 122, 255, 0.25); background: rgba(0, 122, 255, 0.06); }
+        .feature--recovery { border-color: rgba(175, 82, 222, 0.25); background: rgba(175, 82, 222, 0.06); }
+        .feature--strava { border-color: rgba(52, 199, 89, 0.25); background: rgba(52, 199, 89, 0.06); }
+        .feature--schedule { border-color: rgba(255, 149, 0, 0.25); background: rgba(255, 149, 0, 0.06); }
+
+        /* Sections */
         .section {
             max-width: 720px;
             margin: 0 auto 48px;
             padding: 0 24px;
         }
-        .section h2 { font-size: 1.4rem; margin-bottom: 12px; }
-        .section p { color: #444; font-size: 0.95rem; }
+        .section h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+        .section p {
+            color: #98989d;
+            font-size: 0.95rem;
+        }
+        .section a {
+            color: #0a84ff;
+            text-decoration: none;
+        }
+        .section a:hover { text-decoration: underline; }
+
+        /* Workout types showcase */
+        .workout-types {
+            max-width: 720px;
+            margin: 0 auto 48px;
+            padding: 0 24px;
+        }
+        .workout-types h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+        .type-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .type-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #e5e5e7;
+        }
+        .type-pill .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* Footer */
         footer {
             text-align: center;
             padding: 32px 24px;
             font-size: 0.85rem;
-            color: #888;
-            border-top: 1px solid #e5e5e5;
+            color: #636366;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
         }
-        footer a { color: #555; text-decoration: none; margin: 0 12px; }
+        footer a {
+            color: #98989d;
+            text-decoration: none;
+            margin: 0 12px;
+        }
         footer a:hover { text-decoration: underline; }
+
         @media (max-width: 520px) {
             .features { grid-template-columns: 1fr; }
             .hero h1 { font-size: 1.8rem; }
@@ -65,21 +158,40 @@
     </div>
 
     <div class="features">
-        <div class="feature">
+        <div class="feature feature--plans">
+            <span class="feature-icon">&#x1F3C3;</span>
             <h3>Training Plans</h3>
             <p>Load structured plans with daily prescriptions, coaching notes, and automatic calendar mapping to your race date.</p>
         </div>
-        <div class="feature">
+        <div class="feature feature--recovery">
+            <span class="feature-icon">&#x1F49C;</span>
             <h3>Recovery Tracking</h3>
             <p>Connect your Oura Ring to see readiness, sleep, and HRV alongside each day's workout.</p>
         </div>
-        <div class="feature">
+        <div class="feature feature--strava">
+            <span class="feature-icon">&#x2705;</span>
             <h3>Strava Sync</h3>
             <p>Automatically import runs and compare plan vs. actual distance, pace, and effort.</p>
         </div>
-        <div class="feature">
+        <div class="feature feature--schedule">
+            <span class="feature-icon">&#x1F504;</span>
             <h3>Flexible Scheduling</h3>
             <p>Swap workouts, skip days, and adjust your plan when life happens — all tracked and logged.</p>
+        </div>
+    </div>
+
+    <div class="workout-types">
+        <h2>Built for Every Session</h2>
+        <div class="type-grid">
+            <span class="type-pill"><span class="dot" style="background: #34c759;"></span> Easy</span>
+            <span class="type-pill"><span class="dot" style="background: #ff9500;"></span> Tempo</span>
+            <span class="type-pill"><span class="dot" style="background: #ff3b30;"></span> Intervals</span>
+            <span class="type-pill"><span class="dot" style="background: #0a84ff;"></span> Long Run</span>
+            <span class="type-pill"><span class="dot" style="background: #63e6be;"></span> Recovery</span>
+            <span class="type-pill"><span class="dot" style="background: #af52de;"></span> Race</span>
+            <span class="type-pill"><span class="dot" style="background: #5856d6;"></span> Strength</span>
+            <span class="type-pill"><span class="dot" style="background: #2ac3b5;"></span> Stretching</span>
+            <span class="type-pill"><span class="dot" style="background: #ff9500;"></span> Heat Training</span>
         </div>
     </div>
 
