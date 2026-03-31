@@ -21,26 +21,26 @@ struct HeatLogSheet: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
-                headerSection
+            ScrollView {
+                VStack(spacing: 24) {
+                    headerSection
 
-                typePickerSection
+                    typePickerSection
 
-                durationSection
+                    durationSection
 
-                if let notes = session.notes, !notes.isEmpty {
-                    notesDisplay(notes)
+                    if let notes = session.notes, !notes.isEmpty {
+                        notesDisplay(notes)
+                    }
+
+                    TextField("Notes (optional)", text: $notes, axis: .vertical)
+                        .textFieldStyle(.roundedBorder)
+                        .lineLimit(2...3)
+
+                    actionButtons
                 }
-
-                TextField("Notes (optional)", text: $notes, axis: .vertical)
-                    .textFieldStyle(.roundedBorder)
-                    .lineLimit(2...3)
-
-                Spacer()
-
-                actionButtons
+                .padding()
             }
-            .padding()
             .navigationTitle("Heat Session")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -357,12 +357,12 @@ final class StretchStore {
     private func persistTemplate() async {
         guard !isOffline, let template else { return }
         do {
-            try await supabase.from("stretch_templates").insert(template).execute()
+            try await supabase.from("stretch_templates").upsert(template).execute()
             if !exercises.isEmpty {
-                try await supabase.from("stretch_template_exercises").insert(exercises).execute()
+                try await supabase.from("stretch_template_exercises").upsert(exercises).execute()
             }
             if !sessions.isEmpty {
-                try await supabase.from("stretch_sessions").insert(sessions).execute()
+                try await supabase.from("stretch_sessions").upsert(sessions).execute()
             }
         } catch {
             print("Failed to persist stretch template to Supabase: \(error)")

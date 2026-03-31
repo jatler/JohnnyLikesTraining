@@ -100,7 +100,8 @@ struct MainTabView: View {
                 // If stores are still empty after loading from Supabase,
                 // re-initialize from the bundled template (handles plans created
                 // before strength/heat/stretch were added to the template).
-                if let template = planStore.currentTemplate {
+                // Skip if offline — don't create duplicates that conflict on reconnect.
+                if !planStore.isOffline, let template = planStore.currentTemplate {
                     if !strengthStore.hasTemplate,
                        let exercises = template.strengthExercises, !exercises.isEmpty {
                         strengthStore.initializeFromTemplate(

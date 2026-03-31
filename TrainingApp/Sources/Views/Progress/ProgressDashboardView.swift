@@ -431,28 +431,37 @@ struct ProgressDashboardView: View {
             let trackableRuns = weekSessions.filter { $0.workoutType != .rest && $0.workoutType != .strength }
             let plannedKm = trackableRuns.compactMap(\.targetDistanceKm).reduce(0, +)
 
-            // Only count running activities for mileage, hours, and vert
-            #if DEBUG
-            if let cw = planStore.currentWeekNumber, (weekNum == cw || weekNum == cw - 1) {
-                for session in trackableRuns {
-                    let act = strava.activity(for: session.id)
-                    if act != nil {
-                        print("Progress W\(weekNum) session \(session.workoutType.displayName) \(session.scheduledDate.formatted(.dateTime.month().day())): matched=\(act != nil) isRun=\(act?.isRun ?? false) km=\(act?.distanceKm ?? 0)")
-                    }
-                }
-                print("Progress W\(weekNum) total: \(trackableRuns.count) sessions, actualKm will be computed next")
-            }
-            #endif
+            // Count ALL running activities for the week — matched to any session type
+            // (including rest days) plus unmatched activities in the week's date range.
             var actualKm: Double = 0
             var runsDone = 0
             var runSeconds = 0
             var elevationM: Double = 0
-            for session in trackableRuns {
+            var countedActivityIds: Set<Int64> = []
+
+            // First: activities matched to any session this week
+            for session in weekSessions {
                 if let activity = strava.activity(for: session.id), activity.isRun {
                     actualKm += activity.distanceKm
                     runSeconds += activity.movingTimeSeconds
                     elevationM += activity.elevationGainM ?? 0
                     runsDone += 1
+                    countedActivityIds.insert(activity.stravaId)
+                }
+            }
+
+            // Second: unmatched Strava running activities in this week's date range
+            if let firstDate = weekSessions.first?.scheduledDate,
+               let lastDate = weekSessions.last?.scheduledDate {
+                for activity in strava.activities where activity.isRun && !countedActivityIds.contains(activity.stravaId) {
+                    if activity.activityDate >= calendar.startOfDay(for: firstDate),
+                       activity.activityDate < calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: lastDate))! {
+                        actualKm += activity.distanceKm
+                        runSeconds += activity.movingTimeSeconds
+                        elevationM += activity.elevationGainM ?? 0
+                        runsDone += 1
+                        countedActivityIds.insert(activity.stravaId)
+                    }
                 }
             }
 
