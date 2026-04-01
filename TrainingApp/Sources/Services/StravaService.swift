@@ -196,11 +196,25 @@ final class StravaService {
         activities = []
         lastSyncDate = nil
         athleteName = nil
+        LocalCacheService.remove(key: "strava_activities")
+    }
+
+    // MARK: - Local Cache
+
+    func saveToCache() {
+        LocalCacheService.save(activities, key: "strava_activities")
+    }
+
+    @discardableResult
+    func loadFromCache() -> Bool {
+        guard let cached = LocalCacheService.load([StravaActivity].self, key: "strava_activities"), !cached.isEmpty else { return false }
+        activities = cached
+        return true
     }
 
     // MARK: - Fetch Activities
 
-    func syncActivities(userId: UUID, after: Date? = nil) async throws {
+    func syncActivities(userId: UUID, after: Date? = nil, merge: Bool = false) async throws {
         guard isConnected else { throw StravaError.notConnected }
         isSyncing = true
         defer { isSyncing = false }
@@ -249,8 +263,17 @@ final class StravaService {
         }
 
         let mapped = allActivities.map { $0.toStravaActivity(userId: userId) }
-        activities = mapped
+        if merge {
+            var existingById = Dictionary(uniqueKeysWithValues: activities.map { ($0.stravaId, $0) })
+            for activity in mapped {
+                existingById[activity.stravaId] = activity
+            }
+            activities = existingById.values.sorted { $0.activityDate > $1.activityDate }
+        } else {
+            activities = mapped
+        }
         lastSyncDate = Date()
+        saveToCache()
 
         await persistActivities(mapped, userId: userId)
     }
@@ -279,6 +302,11 @@ final class StravaService {
                 activities[i].matchedSessionId = match.id
                 newlyMatched.append(activities[i])
             }
+        }
+
+        // Save updated matches to local cache
+        if !newlyMatched.isEmpty {
+            saveToCache()
         }
 
         // Persist newly matched activities to Supabase
@@ -318,6 +346,7 @@ final class StravaService {
                 .order("activity_date", ascending: false)
                 .execute()
                 .value
+            saveToCache()
         } catch {
             print("Failed to load Strava activities: \(error)")
         }

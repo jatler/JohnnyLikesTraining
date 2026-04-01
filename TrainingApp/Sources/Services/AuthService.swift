@@ -75,11 +75,15 @@ final class AuthService {
             isAuthenticated = false
             currentUserId = nil
             SupabaseService.shared.isOffline = false
+            LocalCacheService.clearAll()
+            PlanCacheService.clear()
             return
         }
         try await supabase.auth.signOut()
         isAuthenticated = false
         currentUserId = nil
+        LocalCacheService.clearAll()
+        PlanCacheService.clear()
     }
 }
 

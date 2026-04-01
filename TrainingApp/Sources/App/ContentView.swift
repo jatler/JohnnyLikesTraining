@@ -67,7 +67,16 @@ struct MainTabView: View {
             if !planStore.hasPlan {
                 await planStore.loadPlan(userId: userId)
             }
+
+            // Load from local cache first for instant display
+            strengthStore.loadFromCache()
+            heatStore.loadFromCache()
+            stretchStore.loadFromCache()
+            strava.loadFromCache()
+            oura.loadFromCache()
             dataLoaded = true
+
+            // Then refresh from Supabase in background
             if let plan = planStore.activePlan {
                 async let strengthLoad: () = {
                     if !strengthStore.hasTemplate {

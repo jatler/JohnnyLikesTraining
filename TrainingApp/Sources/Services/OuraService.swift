@@ -155,11 +155,25 @@ final class OuraService {
         isConnected = false
         dailyData = []
         lastSyncDate = nil
+        LocalCacheService.remove(key: "oura_daily")
+    }
+
+    // MARK: - Local Cache
+
+    func saveToCache() {
+        LocalCacheService.save(dailyData, key: "oura_daily")
+    }
+
+    @discardableResult
+    func loadFromCache() -> Bool {
+        guard let cached = LocalCacheService.load([OuraDaily].self, key: "oura_daily"), !cached.isEmpty else { return false }
+        dailyData = cached
+        return true
     }
 
     // MARK: - Sync Readiness & Sleep
 
-    func syncDaily(userId: UUID, days: Int = 30) async throws {
+    func syncDaily(userId: UUID, days: Int = 30, merge: Bool = false) async throws {
         guard isConnected else { throw OuraError.notConnected }
         isSyncing = true
         defer { isSyncing = false }
@@ -292,8 +306,20 @@ final class OuraService {
         }
         #endif
 
-        dailyData = merged.values.sorted { $0.date < $1.date }
+        let newData = merged.values.sorted { $0.date < $1.date }
+        if merge {
+            var existingByDate = Dictionary(uniqueKeysWithValues: dailyData.map {
+                (Calendar.current.startOfDay(for: $0.date), $0)
+            })
+            for entry in newData {
+                existingByDate[Calendar.current.startOfDay(for: entry.date)] = entry
+            }
+            dailyData = existingByDate.values.sorted { $0.date < $1.date }
+        } else {
+            dailyData = newData
+        }
         lastSyncDate = Date()
+        saveToCache()
 
         await persistDailyData(Array(merged.values), userId: userId)
     }
@@ -440,6 +466,7 @@ final class OuraService {
                 .limit(90)
                 .execute()
                 .value
+            saveToCache()
         } catch {
             print("Failed to load Oura daily data: \(error)")
         }

@@ -74,6 +74,7 @@ final class HeatStore {
         }
 
         sessions = newSessions
+        saveToCache()
         Task { await persistAllSessions(planId: planId) }
     }
 
@@ -94,6 +95,7 @@ final class HeatStore {
             notes: notes
         )
         logs.append(log)
+        saveToCache()
         Task { await persistLog(log) }
     }
 
@@ -126,6 +128,7 @@ final class HeatStore {
         }
 
         sessions.append(contentsOf: newSessions)
+        saveToCache()
         Task { await persistAllSessions(planId: planId) }
     }
 
@@ -133,6 +136,7 @@ final class HeatStore {
         let removedIds = Set(sessions.filter { $0.dayOfWeek == dayOfWeek }.map(\.id))
         sessions.removeAll { $0.dayOfWeek == dayOfWeek }
         logs.removeAll { removedIds.contains($0.sessionId) }
+        saveToCache()
         guard !isOffline else { return }
 
         if let planId = sessions.first?.planId {
@@ -157,6 +161,7 @@ final class HeatStore {
     func deleteLog(_ sessionId: UUID) {
         guard let log = logs.first(where: { $0.sessionId == sessionId }) else { return }
         logs.removeAll { $0.sessionId == sessionId }
+        saveToCache()
         guard !isOffline else { return }
 
         Task {
@@ -198,9 +203,30 @@ final class HeatStore {
                     .execute()
                     .value
             }
+            saveToCache()
         } catch {
             lastError = "Failed to load heat data."
         }
+    }
+
+    // MARK: - Local Cache
+
+    func saveToCache() {
+        LocalCacheService.save(sessions, key: "heat_sessions")
+        LocalCacheService.save(logs, key: "heat_logs")
+    }
+
+    @discardableResult
+    func loadFromCache() -> Bool {
+        guard let cached = LocalCacheService.load([HeatSession].self, key: "heat_sessions"), !cached.isEmpty else { return false }
+        sessions = cached
+        logs = LocalCacheService.load([HeatLog].self, key: "heat_logs") ?? []
+        return true
+    }
+
+    private func clearCache() {
+        LocalCacheService.remove(key: "heat_sessions")
+        LocalCacheService.remove(key: "heat_logs")
     }
 
     // MARK: - Clear
@@ -208,6 +234,7 @@ final class HeatStore {
     func clearAll() {
         sessions = []
         logs = []
+        clearCache()
     }
 
     // MARK: - Persistence

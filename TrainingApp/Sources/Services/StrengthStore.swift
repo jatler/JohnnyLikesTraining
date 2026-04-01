@@ -93,6 +93,7 @@ final class StrengthStore {
         )
         exercises = []
         sessions = []
+        saveToCache()
         Task { await persistTemplate() }
     }
 
@@ -137,6 +138,7 @@ final class StrengthStore {
             planStartDate: planStartDate,
             totalWeeks: totalWeeks
         )
+        saveToCache()
 
         Task { await persistTemplate() }
     }
@@ -201,6 +203,7 @@ final class StrengthStore {
         if propagateToFuture {
             regenerateFutureSessions(for: exercise)
         }
+        saveToCache()
 
         Task { await persistExerciseUpdate(exercise) }
     }
@@ -236,6 +239,7 @@ final class StrengthStore {
 
         exercises.append(exercise)
         regenerateFutureSessions(for: exercise)
+        saveToCache()
 
         Task { await persistNewExercise(exercise) }
     }
@@ -248,6 +252,7 @@ final class StrengthStore {
                 && !session.isTemplateOverride
                 && session.scheduledDate >= Calendar.current.startOfDay(for: Date())
         }
+        saveToCache()
 
         Task { await persistExerciseDelete(exercise) }
     }
@@ -259,6 +264,7 @@ final class StrengthStore {
         var updated = session
         updated.isTemplateOverride = true
         sessions[index] = updated
+        saveToCache()
 
         Task { await persistSessionUpdate(updated) }
     }
@@ -284,12 +290,14 @@ final class StrengthStore {
             notes: notes
         )
         logs.append(log)
+        saveToCache()
 
         Task { await persistLog(log) }
     }
 
     func deleteLog(_ logId: UUID) {
         logs.removeAll { $0.id == logId }
+        saveToCache()
         guard !isOffline else { return }
 
         Task {
@@ -484,9 +492,36 @@ final class StrengthStore {
                     .execute()
                     .value
             }
+            saveToCache()
         } catch {
             lastError = "Failed to load strength data."
         }
+    }
+
+    // MARK: - Local Cache
+
+    func saveToCache() {
+        LocalCacheService.save(template, key: "strength_template")
+        LocalCacheService.save(exercises, key: "strength_exercises")
+        LocalCacheService.save(sessions, key: "strength_sessions")
+        LocalCacheService.save(logs, key: "strength_logs")
+    }
+
+    @discardableResult
+    func loadFromCache() -> Bool {
+        guard let cached = LocalCacheService.load(StrengthTemplate.self, key: "strength_template") else { return false }
+        template = cached
+        exercises = LocalCacheService.load([StrengthTemplateExercise].self, key: "strength_exercises") ?? []
+        sessions = LocalCacheService.load([StrengthSession].self, key: "strength_sessions") ?? []
+        logs = LocalCacheService.load([StrengthLog].self, key: "strength_logs") ?? []
+        return true
+    }
+
+    private func clearCache() {
+        LocalCacheService.remove(key: "strength_template")
+        LocalCacheService.remove(key: "strength_exercises")
+        LocalCacheService.remove(key: "strength_sessions")
+        LocalCacheService.remove(key: "strength_logs")
     }
 
     // MARK: - Clear
@@ -497,6 +532,7 @@ final class StrengthStore {
         sessions = []
         logs = []
         suggestions = []
+        clearCache()
     }
 
     // MARK: - Persistence

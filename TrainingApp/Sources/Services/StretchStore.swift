@@ -74,6 +74,7 @@ final class StretchStore {
         )
         exercises = []
         sessions = []
+        saveToCache()
         Task { await persistTemplate() }
     }
 
@@ -117,6 +118,7 @@ final class StretchStore {
             planStartDate: planStartDate,
             totalWeeks: totalWeeks
         )
+        saveToCache()
 
         Task { await persistTemplate() }
     }
@@ -182,6 +184,7 @@ final class StretchStore {
 
         exercises.append(exercise)
         regenerateFutureSessions(for: exercise)
+        saveToCache()
 
         Task { await persistNewExercise(exercise) }
     }
@@ -192,6 +195,7 @@ final class StretchStore {
         template?.updatedAt = Date()
 
         regenerateFutureSessions(for: exercise)
+        saveToCache()
 
         Task { await persistExerciseUpdate(exercise) }
     }
@@ -206,6 +210,7 @@ final class StretchStore {
         )
         sessions.removeAll { $0.templateExerciseId == exercise.id }
         logs.removeAll { removedIds.contains($0.sessionId) }
+        saveToCache()
 
         Task { await persistExerciseDelete(exercise) }
     }
@@ -221,12 +226,14 @@ final class StretchStore {
             notes: notes
         )
         logs.append(log)
+        saveToCache()
         Task { await persistLog(log) }
     }
 
     func removeLog(sessionId: UUID) {
         guard let log = logs.first(where: { $0.sessionId == sessionId }) else { return }
         logs.removeAll { $0.sessionId == sessionId }
+        saveToCache()
         guard !isOffline else { return }
 
         Task {
@@ -338,9 +345,36 @@ final class StretchStore {
                     .execute()
                     .value
             }
+            saveToCache()
         } catch {
             lastError = "Failed to load stretch data."
         }
+    }
+
+    // MARK: - Local Cache
+
+    func saveToCache() {
+        LocalCacheService.save(template, key: "stretch_template")
+        LocalCacheService.save(exercises, key: "stretch_exercises")
+        LocalCacheService.save(sessions, key: "stretch_sessions")
+        LocalCacheService.save(logs, key: "stretch_logs")
+    }
+
+    @discardableResult
+    func loadFromCache() -> Bool {
+        guard let cached = LocalCacheService.load(StretchTemplate.self, key: "stretch_template") else { return false }
+        template = cached
+        exercises = LocalCacheService.load([StretchTemplateExercise].self, key: "stretch_exercises") ?? []
+        sessions = LocalCacheService.load([StretchSession].self, key: "stretch_sessions") ?? []
+        logs = LocalCacheService.load([StretchLog].self, key: "stretch_logs") ?? []
+        return true
+    }
+
+    private func clearCache() {
+        LocalCacheService.remove(key: "stretch_template")
+        LocalCacheService.remove(key: "stretch_exercises")
+        LocalCacheService.remove(key: "stretch_sessions")
+        LocalCacheService.remove(key: "stretch_logs")
     }
 
     // MARK: - Clear
@@ -350,6 +384,7 @@ final class StretchStore {
         exercises = []
         sessions = []
         logs = []
+        clearCache()
     }
 
     // MARK: - Persistence
