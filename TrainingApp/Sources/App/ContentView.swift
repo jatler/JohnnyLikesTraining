@@ -131,8 +131,15 @@ struct MainTabView: View {
                     }
                 }
 
+                #if DEBUG
+                print("Relaunch: strava.isConnected=\(strava.isConnected) activities=\(strava.activities.count) sessions=\(planStore.sessions.count)")
+                #endif
                 if strava.isConnected {
                     strava.autoMatchActivities(sessions: planStore.sessions)
+                    #if DEBUG
+                    let matched = strava.activities.filter { $0.matchedSessionId != nil }.count
+                    print("Relaunch: matched \(matched)/\(strava.activities.count) activities")
+                    #endif
                 }
                 if let week = planStore.currentWeekNumber {
                     strengthStore.computeSuggestions(

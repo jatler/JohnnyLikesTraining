@@ -258,6 +258,7 @@ final class StravaService {
     // MARK: - Auto-Match
 
     func autoMatchActivities(sessions: [PlannedSession]) {
+        var newlyMatched: [StravaActivity] = []
         for i in activities.indices {
             if activities[i].matchedSessionId != nil { continue }
             let actDate = Calendar.current.startOfDay(for: activities[i].activityDate)
@@ -276,6 +277,24 @@ final class StravaService {
             }
             if let match {
                 activities[i].matchedSessionId = match.id
+                newlyMatched.append(activities[i])
+            }
+        }
+
+        // Persist newly matched activities to Supabase
+        if !newlyMatched.isEmpty {
+            Task {
+                for activity in newlyMatched {
+                    do {
+                        try await supabase.from("strava_activities")
+                            .upsert(activity, onConflict: "strava_id")
+                            .execute()
+                    } catch {
+                        #if DEBUG
+                        print("Failed to persist match for activity \(activity.stravaId): \(error)")
+                        #endif
+                    }
+                }
             }
         }
     }
