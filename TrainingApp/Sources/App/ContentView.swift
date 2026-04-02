@@ -79,19 +79,13 @@ struct MainTabView: View {
             // Then refresh from Supabase in background
             if let plan = planStore.activePlan {
                 async let strengthLoad: () = {
-                    if !strengthStore.hasTemplate {
-                        await strengthStore.loadData(planId: plan.id)
-                    }
+                    await strengthStore.loadData(planId: plan.id)
                 }()
                 async let heatLoad: () = {
-                    if !heatStore.hasSessions {
-                        await heatStore.loadData(planId: plan.id)
-                    }
+                    await heatStore.loadData(planId: plan.id)
                 }()
                 async let stretchLoad: () = {
-                    if !stretchStore.hasTemplate {
-                        await stretchStore.loadData(planId: plan.id)
-                    }
+                    await stretchStore.loadData(planId: plan.id)
                 }()
                 async let stravaLoad: () = {
                     if strava.isConnected {

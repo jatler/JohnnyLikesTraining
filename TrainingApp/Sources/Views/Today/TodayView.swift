@@ -77,7 +77,9 @@ struct TodayView: View {
         }
         .refreshable {
             guard let userId = auth.currentUserId else { return }
-            let weekStart = Calendar.current.dateInterval(of: .weekOfYear, for: Date())?.start ?? Date()
+            var mondayCal = Calendar.current
+            mondayCal.firstWeekday = 2 // Monday
+            let weekStart = mondayCal.dateInterval(of: .weekOfYear, for: Date())?.start ?? Date()
             if strava.isConnected {
                 try? await strava.syncActivities(userId: userId, after: weekStart, merge: true)
                 strava.autoMatchActivities(sessions: planStore.sessions)
