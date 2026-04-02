@@ -226,7 +226,7 @@ struct ProgressDashboardView: View {
 
                 // Stats to the right
                 VStack(alignment: .trailing, spacing: 1) {
-                    Text(String(format: "%.0f/%.0f mi", entry.actualMi, entry.plannedMi))
+                    Text(String(format: "%.1f/%.1f mi", entry.actualMi, entry.plannedMi))
                         .font(.caption2.bold())
                     if entry.runHours > 0 || entry.elevationGainFt > 0 {
                         HStack(spacing: 4) {

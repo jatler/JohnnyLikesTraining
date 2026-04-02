@@ -180,11 +180,11 @@ struct WeekView: View {
         let totalDone = runsDone + strengthDone + stretchDone + heatDone
 
         return HStack(spacing: 16) {
-            Label(String(format: "%.0f mi planned", plannedMi), systemImage: "target")
+            Label(String(format: "%.1f mi planned", plannedMi), systemImage: "target")
                 .font(.caption)
 
             if actualMi > 0 {
-                Label(String(format: "%.0f mi done", actualMi), systemImage: "checkmark.circle")
+                Label(String(format: "%.1f mi done", actualMi), systemImage: "checkmark.circle")
                     .font(.caption)
                     .foregroundStyle(.green)
             }
