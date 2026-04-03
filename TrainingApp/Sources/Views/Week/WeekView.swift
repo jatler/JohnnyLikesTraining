@@ -227,10 +227,10 @@ struct WeekView: View {
         return HStack(spacing: 12) {
             VStack(spacing: 2) {
                 Text(session.scheduledDate.formatted(.dateTime.weekday(.abbreviated)))
-                    .font(.caption2)
+                    .font(.caption)
                     .foregroundStyle(.secondary)
                 Text("\(Calendar.current.component(.day, from: session.scheduledDate))")
-                    .font(.title3.bold())
+                    .font(.headline)
             }
             .frame(width: 40)
 
@@ -248,51 +248,8 @@ struct WeekView: View {
 
                     if overridden {
                         Image(systemName: "pencil.circle.fill")
-                            .font(.caption2)
+                            .font(.caption)
                             .foregroundStyle(.orange)
-                    }
-
-                    if !daySessions.isEmpty {
-                        Label("Strength", systemImage: "dumbbell.fill")
-                            .font(.caption2)
-                            .foregroundStyle(Color.swapAccent)
-                    }
-
-                    if let heat = dayHeat.first {
-                        Button {
-                            selectedHeatSession = heat
-                        } label: {
-                            Label {
-                                Text(heatStore.isComplete(heat.id) ? "Done" : "\(heat.targetDurationMinutes)m")
-                            } icon: {
-                                Image(systemName: heatStore.isComplete(heat.id) ? "checkmark.circle.fill" : "flame.fill")
-                            }
-                            .font(.caption2)
-                            .foregroundStyle(heatStore.isComplete(heat.id) ? .green : .orange)
-                        }
-                        .buttonStyle(.plain)
-                    }
-
-                    if !dayStretch.isEmpty {
-                        Button {
-                            selectedStretchDay = StretchDaySelection(
-                                weekNumber: session.weekNumber,
-                                dayOfWeek: session.dayOfWeek
-                            )
-                        } label: {
-                            let completed = stretchStore.completedCount(for: session.scheduledDate)
-                            let total = dayStretch.count
-                            let allDone = completed == total
-
-                            Label {
-                                Text(allDone ? "Done" : "\(completed)/\(total)")
-                            } icon: {
-                                Image(systemName: allDone ? "checkmark.circle.fill" : "figure.flexibility")
-                            }
-                            .font(.caption2)
-                            .foregroundStyle(allDone ? .green : Color.swapAccent)
-                        }
-                        .buttonStyle(.plain)
                     }
                 }
 
@@ -309,8 +266,60 @@ struct WeekView: View {
                         .lineLimit(1)
                 }
 
-                if !daySessions.isEmpty {
-                    strengthSummary(daySessions, date: session.scheduledDate)
+                if !daySessions.isEmpty || !dayHeat.isEmpty || !dayStretch.isEmpty {
+                    HStack(spacing: 10) {
+                        if !daySessions.isEmpty {
+                            let completed = strengthStore.completedExerciseCount(for: session.scheduledDate)
+                            let total = daySessions.count
+                            let allDone = completed == total
+
+                            Label {
+                                Text(allDone ? "Done" : "\(completed)/\(total)")
+                            } icon: {
+                                Image(systemName: allDone ? "checkmark.circle.fill" : "dumbbell.fill")
+                            }
+                            .font(.caption)
+                            .foregroundStyle(allDone ? .green : Color.swapAccent)
+                        }
+
+                        if let heat = dayHeat.first {
+                            Button {
+                                selectedHeatSession = heat
+                            } label: {
+                                Label {
+                                    Text(heatStore.isComplete(heat.id) ? "Done" : "\(heat.targetDurationMinutes)m")
+                                } icon: {
+                                    Image(systemName: heatStore.isComplete(heat.id) ? "checkmark.circle.fill" : "flame.fill")
+                                }
+                                .font(.caption)
+                                .foregroundStyle(heatStore.isComplete(heat.id) ? .green : .orange)
+                            }
+                            .buttonStyle(.plain)
+                        }
+
+                        if !dayStretch.isEmpty {
+                            Button {
+                                selectedStretchDay = StretchDaySelection(
+                                    weekNumber: session.weekNumber,
+                                    dayOfWeek: session.dayOfWeek
+                                )
+                            } label: {
+                                let completed = stretchStore.completedCount(for: session.scheduledDate)
+                                let total = dayStretch.count
+                                let allDone = completed == total
+
+                                Label {
+                                    Text(allDone ? "Done" : "\(completed)/\(total)")
+                                } icon: {
+                                    Image(systemName: allDone ? "checkmark.circle.fill" : "figure.flexibility")
+                                }
+                                .font(.caption)
+                                .foregroundStyle(allDone ? .green : Color.swapAccent)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.top, 2)
                 }
             }
 
@@ -322,17 +331,17 @@ struct WeekView: View {
                         .foregroundStyle(.green)
                     if activity.isRun {
                         Text(String(format: "%.1f mi", activity.distanceMi))
-                            .font(.caption2)
+                            .font(.caption)
                             .foregroundStyle(.green)
                     } else {
                         Text(activity.activityTypeDisplay)
-                            .font(.caption2)
+                            .font(.caption)
                             .foregroundStyle(.green)
                     }
                 }
             } else if skipped {
                 Text("Skipped")
-                    .font(.caption2)
+                    .font(.caption)
                     .foregroundStyle(.red)
                     .fontWeight(.semibold)
             }
@@ -353,22 +362,6 @@ struct WeekView: View {
         .opacity(skipped ? 0.6 : 1.0)
     }
 
-    private func strengthSummary(_ sessions: [StrengthSession], date: Date) -> some View {
-        let completed = strengthStore.completedExerciseCount(for: date)
-        let total = sessions.count
-
-        return HStack(spacing: 4) {
-            if completed > 0 {
-                Text("\(completed)/\(total)")
-                    .font(.caption2)
-                    .foregroundStyle(Color.swapAccent)
-            } else {
-                Text("\(total) exercises")
-                    .font(.caption2)
-                    .foregroundStyle(Color.swapAccent.opacity(0.6))
-            }
-        }
-    }
 
     // MARK: - Empty State
 

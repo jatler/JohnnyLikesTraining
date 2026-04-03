@@ -11,6 +11,10 @@ struct StrengthTemplateView: View {
     @State private var addDay: Int = 1
     @State private var selectedSession: StrengthDaySelection?
     @State private var editingExercise: StrengthTemplateExercise?
+    @State private var showingHistory = false
+    @State private var historyExerciseName: String = ""
+    @State private var showingDeleteConfirmation = false
+    @State private var exerciseToDelete: StrengthTemplateExercise?
     @State private var showingAddHeatDay = false
     @State private var showingAddStretch = false
     @State private var addStretchDay: Int = 1
@@ -52,6 +56,19 @@ struct StrengthTemplateView: View {
             }
             .sheet(item: $editingExercise) { exercise in
                 EditExerciseSheet(exercise: exercise)
+            }
+            .sheet(isPresented: $showingHistory) {
+                ExerciseHistoryView(exerciseName: historyExerciseName)
+            }
+            .alert("Remove Exercise?", isPresented: $showingDeleteConfirmation) {
+                Button("Remove", role: .destructive) {
+                    if let exercise = exerciseToDelete {
+                        strengthStore.removeExercise(exercise)
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This will remove \(exerciseToDelete?.exerciseName ?? "") from your template and all future weeks.")
             }
             .sheet(isPresented: $showingAddHeatDay) {
                 AddHeatDaySheet()
@@ -106,7 +123,7 @@ struct StrengthTemplateView: View {
     }
 
     private var stretchSegmentContent: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(spacing: 12) {
             if stretchStore.hasTemplate {
                 ForEach(stretchStore.daysWithExercises, id: \.self) { day in
                     stretchDaySection(day)
@@ -116,7 +133,7 @@ struct StrengthTemplateView: View {
             } else {
                 VStack(spacing: 16) {
                     Text("No stretches yet.")
-                        .font(.caption)
+                        .font(.subheadline)
                         .foregroundStyle(.tertiary)
 
                     if let plan = planStore.activePlan {
@@ -124,7 +141,6 @@ struct StrengthTemplateView: View {
                             stretchStore.createBlankTemplate(planId: plan.id)
                         } label: {
                             Label("Create Stretch Program", systemImage: "plus.circle.fill")
-                                .font(.caption)
                         }
                         .buttonStyle(.bordered)
                         .tint(Color.swapAccent)
@@ -154,7 +170,7 @@ struct StrengthTemplateView: View {
     private func suggestionCard(_ suggestion: ProgressionSuggestion) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(suggestion.exerciseName)
-                .font(.subheadline.bold())
+                .font(.body.bold())
 
             Text(suggestion.reason)
                 .font(.caption)
@@ -163,7 +179,7 @@ struct StrengthTemplateView: View {
             HStack(spacing: 12) {
                 VStack(spacing: 2) {
                     Text("Current")
-                        .font(.caption2)
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                     Text(formatPrescription(
                         sets: suggestion.currentSets,
@@ -179,7 +195,7 @@ struct StrengthTemplateView: View {
 
                 VStack(spacing: 2) {
                     Text("Suggested")
-                        .font(.caption2)
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                     Text(formatPrescription(
                         sets: suggestion.suggestedSets,
@@ -207,103 +223,103 @@ struct StrengthTemplateView: View {
             }
         }
         .padding(12)
-        .background(.green.opacity(0.06), in: RoundedRectangle(cornerRadius: 10))
+        .background(.green.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
         .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .strokeBorder(.green.opacity(0.2), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(.green.opacity(0.15), lineWidth: 1)
         )
     }
 
     // MARK: - Day Section
 
+    private var currentAdjustedDay: Int {
+        let wd = Calendar.current.component(.weekday, from: Date())
+        return wd == 1 ? 7 : wd - 1
+    }
+
     private func daySection(_ day: Int) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        let isToday = day == currentAdjustedDay
+        let exercises = strengthStore.exercises(for: day)
+        let weekSessions: [StrengthSession] = {
+            guard let week = planStore.currentWeekNumber else { return [] }
+            return strengthStore.sessions(for: week, dayOfWeek: day)
+        }()
+
+        return VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(dayNames[day])
                     .font(.headline)
 
                 Spacer()
 
-                Button {
-                    addDay = day
-                    showingAddExercise = true
-                } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .foregroundStyle(Color.swapAccent)
-                }
-
-                if let week = planStore.currentWeekNumber {
-                    Button {
-                        selectedSession = StrengthDaySelection(weekNumber: week, dayOfWeek: day)
-                    } label: {
-                        Label("Log", systemImage: "checkmark.circle")
-                            .font(.caption)
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .tint(Color.swapAccent)
+                if !weekSessions.isEmpty {
+                    let completed = weekSessions.filter { strengthStore.isSessionComplete($0.id) }.count
+                    Text("\(completed)/\(weekSessions.count) done")
+                        .font(.caption)
+                        .foregroundStyle(completed == weekSessions.count ? .green : .secondary)
                 }
             }
 
-            ForEach(strengthStore.exercises(for: day)) { exercise in
-                exerciseRow(exercise)
-                    .onTapGesture { editingExercise = exercise }
+            ForEach(exercises) { exercise in
+                let complete = weekSessions.first(where: { $0.templateExerciseId == exercise.id })
+                    .map { strengthStore.isSessionComplete($0.id) } ?? false
+
+                exerciseRow(exercise, complete: complete)
+                    .contextMenu {
+                        Button {
+                            editingExercise = exercise
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+
+                        Button {
+                            historyExerciseName = exercise.exerciseName
+                            showingHistory = true
+                        } label: {
+                            Label("View History", systemImage: "chart.line.uptrend.xyaxis")
+                        }
+
+                        Button(role: .destructive) {
+                            exerciseToDelete = exercise
+                            showingDeleteConfirmation = true
+                        } label: {
+                            Label("Remove", systemImage: "trash")
+                        }
+                    }
             }
         }
         .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(isToday ? Color.swapAccent.opacity(0.08) : Color(.systemBackground))
+        )
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(isToday ? Color.swapAccent.opacity(0.3) : .clear, lineWidth: 1)
+        )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            if let week = planStore.currentWeekNumber {
+                selectedSession = StrengthDaySelection(weekNumber: week, dayOfWeek: day)
+            }
+        }
     }
 
-    private func exerciseRow(_ exercise: StrengthTemplateExercise) -> some View {
+    private func exerciseRow(_ exercise: StrengthTemplateExercise, complete: Bool) -> some View {
         HStack(spacing: 12) {
-            Image(systemName: "dumbbell.fill")
-                .foregroundStyle(Color.swapAccent)
-                .frame(width: 28)
+            Image(systemName: complete ? "checkmark.circle.fill" : "circle")
+                .font(.title3)
+                .foregroundStyle(complete ? .green : .secondary.opacity(0.4))
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(exercise.exerciseName)
-                    .font(.subheadline.bold())
-
-                Text(formatPrescription(
-                    sets: exercise.targetSets,
-                    reps: exercise.targetReps,
-                    weightKg: exercise.targetWeightKg,
-                    isTimed: exercise.isTimed
-                ))
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-                if let notes = exercise.notes, !notes.isEmpty {
-                    Text(notes)
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                        .lineLimit(1)
-                }
-            }
+            Text(exercise.exerciseName)
+                .font(.body)
+                .strikethrough(complete)
+                .foregroundStyle(complete ? .secondary : .primary)
 
             Spacer()
-
-            if exercise.isTimed {
-                Text("Time")
-                    .font(.caption2.bold())
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(.quaternary, in: Capsule())
-            } else if exercise.isBodyweight {
-                Text("BW")
-                    .font(.caption2.bold())
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 6)
-                    .padding(.vertical, 2)
-                    .background(.quaternary, in: Capsule())
-            }
-
-            Image(systemName: "chevron.right")
-                .font(.caption)
-                .foregroundStyle(.quaternary)
         }
-        .padding(.vertical, 6)
+        .padding(.vertical, 4)
         .contentShape(Rectangle())
     }
 
@@ -328,122 +344,73 @@ struct StrengthTemplateView: View {
         .disabled(strengthStore.daysWithExercises.count >= 7)
     }
 
-    // MARK: - Stretch Template Section
-
-    private var stretchTemplateSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("Stretches", systemImage: "figure.flexibility")
-                .font(.headline)
-                .foregroundStyle(Color.swapAccent)
-
-            if stretchStore.hasTemplate {
-                ForEach(stretchStore.daysWithExercises, id: \.self) { day in
-                    stretchDaySection(day)
-                }
-
-                stretchAddDayButton
-            } else {
-                VStack(spacing: 12) {
-                    Text("No stretches yet.")
-                        .font(.caption)
-                        .foregroundStyle(.tertiary)
-
-                    if let plan = planStore.activePlan {
-                        Button {
-                            stretchStore.createBlankTemplate(planId: plan.id)
-                        } label: {
-                            Label("Create Stretch Program", systemImage: "plus.circle.fill")
-                                .font(.caption)
-                        }
-                        .buttonStyle(.bordered)
-                        .tint(Color.swapAccent)
-                    }
-                }
-            }
-        }
-        .padding()
-        .background(Color.swapAccent.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(Color.swapAccent.opacity(0.15), lineWidth: 1)
-        )
-    }
-
     private func stretchDaySection(_ day: Int) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+        let isToday = day == currentAdjustedDay
+        let exercises = stretchStore.exercises(for: day)
+        let weekSessions: [StretchSession] = {
+            guard let week = planStore.currentWeekNumber else { return [] }
+            return stretchStore.sessions(for: week, dayOfWeek: day)
+        }()
+
+        return VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(dayNames[day])
-                    .font(.subheadline.bold())
+                    .font(.headline)
 
                 Spacer()
 
-                Button {
-                    addStretchDay = day
-                    showingAddStretch = true
-                } label: {
-                    Image(systemName: "plus.circle.fill")
+                if !weekSessions.isEmpty {
+                    let completed = weekSessions.filter { stretchStore.isComplete($0.id) }.count
+                    Text("\(completed)/\(weekSessions.count) done")
                         .font(.caption)
-                        .foregroundStyle(Color.swapAccent)
-                }
-
-                if let week = planStore.currentWeekNumber {
-                    Button {
-                        selectedStretchDay = StretchDaySelection(weekNumber: week, dayOfWeek: day)
-                    } label: {
-                        Label("Log", systemImage: "checkmark.circle")
-                            .font(.caption)
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.mini)
-                    .tint(Color.swapAccent)
+                        .foregroundStyle(completed == weekSessions.count ? .green : .secondary)
                 }
             }
 
-            ForEach(stretchStore.exercises(for: day)) { exercise in
-                stretchExerciseRow(exercise)
-                    .onTapGesture { editingStretch = exercise }
+            ForEach(exercises) { exercise in
+                let complete = weekSessions.first(where: { $0.templateExerciseId == exercise.id })
+                    .map { stretchStore.isComplete($0.id) } ?? false
+
+                stretchExerciseRow(exercise, complete: complete)
+                    .contextMenu {
+                        Button {
+                            editingStretch = exercise
+                        } label: {
+                            Label("Edit", systemImage: "pencil")
+                        }
+                    }
             }
         }
-        .padding(.vertical, 4)
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(isToday ? Color.swapAccent.opacity(0.08) : Color(.systemBackground))
+        )
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(isToday ? Color.swapAccent.opacity(0.3) : .clear, lineWidth: 1)
+        )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            if let week = planStore.currentWeekNumber {
+                selectedStretchDay = StretchDaySelection(weekNumber: week, dayOfWeek: day)
+            }
+        }
     }
 
-    private func stretchExerciseRow(_ exercise: StretchTemplateExercise) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: "figure.flexibility")
-                .foregroundStyle(Color.swapAccent)
-                .frame(width: 24)
-                .font(.caption)
+    private func stretchExerciseRow(_ exercise: StretchTemplateExercise, complete: Bool) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: complete ? "checkmark.circle.fill" : "circle")
+                .font(.title3)
+                .foregroundStyle(complete ? .green : .secondary.opacity(0.4))
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(exercise.stretchName)
-                    .font(.caption.bold())
-
-                Text(exercise.displayDuration)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-
-                if let notes = exercise.notes, !notes.isEmpty {
-                    Text(notes)
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                        .lineLimit(1)
-                }
-            }
+            Text(exercise.stretchName)
+                .font(.body)
+                .strikethrough(complete)
+                .foregroundStyle(complete ? .secondary : .primary)
 
             Spacer()
-
-            if exercise.isBilateral {
-                Text("L+R")
-                    .font(.caption2.bold())
-                    .foregroundStyle(.secondary)
-                    .padding(.horizontal, 5)
-                    .padding(.vertical, 1)
-                    .background(.quaternary, in: Capsule())
-            }
-
-            Image(systemName: "chevron.right")
-                .font(.caption2)
-                .foregroundStyle(.quaternary)
         }
         .padding(.vertical, 4)
         .contentShape(Rectangle())
@@ -461,49 +428,35 @@ struct StrengthTemplateView: View {
             }
         } label: {
             Label("Add Stretches on Another Day", systemImage: "plus.circle")
-                .font(.caption)
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(.bordered)
         .tint(Color.swapAccent)
-        .controlSize(.small)
         .disabled(stretchStore.daysWithExercises.count >= 7)
     }
 
     // MARK: - Heat Template Section
 
     private var heatTemplateSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Label("Heat", systemImage: "flame.fill")
-                    .font(.headline)
-                    .foregroundStyle(.orange)
-
-                Spacer()
-
-                Button {
-                    showingAddHeatDay = true
-                } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .foregroundStyle(.orange)
-                }
-            }
-
+        VStack(spacing: 12) {
             if heatStore.hasSessions {
                 let heatDays = heatDaysFromSessions()
 
                 ForEach(heatDays, id: \.day) { entry in
+                    let isToday = entry.day == currentAdjustedDay
+                    let complete = heatStore.isComplete(entry.session.id)
+
                     HStack(spacing: 12) {
-                        Image(systemName: "flame.fill")
-                            .foregroundStyle(.orange)
-                            .frame(width: 28)
+                        Image(systemName: complete ? "checkmark.circle.fill" : "circle")
+                            .font(.title3)
+                            .foregroundStyle(complete ? .green : .secondary.opacity(0.4))
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(dayNames[entry.day])
-                                .font(.subheadline.bold())
+                                .font(.headline)
 
                             Text("\(entry.session.sessionType.displayName) • \(entry.session.targetDurationMinutes) min")
-                                .font(.caption)
+                                .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
 
@@ -517,20 +470,32 @@ struct StrengthTemplateView: View {
                                 .foregroundStyle(.red.opacity(0.6))
                         }
                     }
-                    .padding(.vertical, 4)
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(isToday ? Color.orange.opacity(0.08) : Color(.systemBackground))
+                    )
+                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .strokeBorder(isToday ? Color.orange.opacity(0.3) : .clear, lineWidth: 1)
+                    )
                 }
             } else {
                 Text("No heat sessions scheduled")
-                    .font(.caption)
+                    .font(.subheadline)
                     .foregroundStyle(.tertiary)
             }
+
+            Button {
+                showingAddHeatDay = true
+            } label: {
+                Label("Add Heat Day", systemImage: "plus.circle")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(.orange)
         }
-        .padding()
-        .background(.orange.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(.orange.opacity(0.15), lineWidth: 1)
-        )
     }
 
     private struct HeatDayEntry {

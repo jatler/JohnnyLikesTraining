@@ -8,6 +8,7 @@ struct StrengthDayDetailView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var logInputs: [UUID: [SetInput]] = [:]
+    @State private var showingAddExercise = false
 
     private let dayNames = ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
@@ -26,6 +27,15 @@ struct StrengthDayDetailView: View {
                             exerciseCard(session)
                         }
                     }
+
+                    Button {
+                        showingAddExercise = true
+                    } label: {
+                        Label("Add Exercise", systemImage: "plus.circle")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(Color.swapAccent)
                 }
                 .padding()
                 .padding(.bottom, 20)
@@ -38,6 +48,9 @@ struct StrengthDayDetailView: View {
                 }
             }
             .onAppear { initializeInputs() }
+            .sheet(isPresented: $showingAddExercise) {
+                AddExerciseSheet(dayOfWeek: dayOfWeek)
+            }
         }
         .presentationDetents([.large])
     }
