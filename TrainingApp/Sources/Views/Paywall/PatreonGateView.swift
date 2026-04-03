@@ -70,7 +70,7 @@ struct PatreonGateView: View {
 
             VStack(spacing: 6) {
                 Text("SWAP Training Plans")
-                    .font(.title2.bold())
+                    .font(.headline)
                 Text("Exclusive to SWAP Running Patrons")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
@@ -106,7 +106,7 @@ struct PatreonGateView: View {
                         onPatronVerified?()
                         dismiss()
                     }
-                    .font(.footnote)
+                    .font(.caption)
                     .foregroundStyle(.secondary)
                 }
             }
@@ -137,7 +137,7 @@ struct PatreonGateView: View {
 
             VStack(spacing: 6) {
                 Text("Patreon Connected")
-                    .font(.title2.bold())
+                    .font(.headline)
                 Text("Account not subscribed at $5+/mo")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)

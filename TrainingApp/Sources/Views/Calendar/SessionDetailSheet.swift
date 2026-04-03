@@ -225,7 +225,7 @@ struct SessionDetailSheet: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(session.workoutType.displayName)
-                        .font(.title3.bold())
+                        .font(.headline)
                         .strikethrough(isSkipped)
                         .opacity(isSkipped ? 0.5 : 1)
 
@@ -265,7 +265,7 @@ struct SessionDetailSheet: View {
             Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
                 .foregroundStyle(.secondary)
             Text(String(format: "%.1f mi", mi))
-                .font(.title2.bold())
+                .font(.headline)
         }
         .opacity(isSkipped ? 0.5 : 1)
     }
@@ -339,7 +339,7 @@ struct SessionDetailSheet: View {
                         Spacer()
 
                         Text(formatPrescription(s))
-                            .font(.caption2)
+                            .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -399,7 +399,7 @@ struct SessionDetailSheet: View {
 
                         if s.isBilateral {
                             Text("L+R")
-                                .font(.caption2.bold())
+                                .font(.caption.bold())
                                 .foregroundStyle(.secondary)
                                 .padding(.horizontal, 5)
                                 .padding(.vertical, 1)
@@ -407,7 +407,7 @@ struct SessionDetailSheet: View {
                         }
 
                         Text("\(s.prescribedSets)×\(s.prescribedHoldSeconds)s")
-                            .font(.caption2)
+                            .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                 }

@@ -50,7 +50,7 @@ struct SignInView: View {
                 Button("Skip Sign-In (Dev)") {
                     auth.devSignIn()
                 }
-                .font(.footnote)
+                .font(.caption)
                 .foregroundStyle(.secondary)
             }
 

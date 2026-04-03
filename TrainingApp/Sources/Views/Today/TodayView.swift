@@ -131,7 +131,7 @@ struct TodayView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
                         Text(session.workoutType.displayName)
-                            .font(.title3.bold())
+                            .font(.headline)
                             .strikethrough(skipped)
                             .opacity(skipped ? 0.5 : 1)
 
@@ -169,7 +169,7 @@ struct TodayView: View {
                     Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
                         .foregroundStyle(.secondary)
                     Text(String(format: "%.1f mi", DistanceFormatter.miles(from: distanceKm)))
-                        .font(.title2.bold())
+                        .font(.headline)
                 }
                 .opacity(skipped ? 0.5 : 1)
             }
@@ -344,7 +344,7 @@ struct TodayView: View {
                         Spacer()
 
                         Text(strengthPrescription(session))
-                            .font(.caption2)
+                            .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -418,7 +418,7 @@ struct TodayView: View {
 
                         if session.isBilateral {
                             Text("L+R")
-                                .font(.caption2.bold())
+                                .font(.caption.bold())
                                 .foregroundStyle(.secondary)
                                 .padding(.horizontal, 5)
                                 .padding(.vertical, 1)
@@ -426,7 +426,7 @@ struct TodayView: View {
                         }
 
                         Text(stretchPrescription(session))
-                            .font(.caption2)
+                            .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                 }

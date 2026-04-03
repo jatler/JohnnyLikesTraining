@@ -62,34 +62,34 @@ struct ProgressDashboardView: View {
             HStack(spacing: 16) {
                 VStack(spacing: 2) {
                     Text("\(stats.completedSessions)")
-                        .font(.title3.bold())
+                        .font(.headline)
                         .foregroundStyle(Color.swapAccent)
                     Text("Done")
-                        .font(.caption2)
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                 }
                 VStack(spacing: 2) {
                     Text("\(stats.missedSessions)")
-                        .font(.title3.bold())
+                        .font(.headline)
                         .foregroundStyle(.red.opacity(0.7))
                     Text("Missed")
-                        .font(.caption2)
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                 }
                 VStack(spacing: 2) {
                     Text("\(stats.skippedSessions)")
-                        .font(.title3.bold())
+                        .font(.headline)
                         .foregroundStyle(.orange.opacity(0.7))
                     Text("Skipped")
-                        .font(.caption2)
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                 }
                 VStack(spacing: 2) {
                     Text("\(stats.upcomingSessions)")
-                        .font(.title3.bold())
+                        .font(.headline)
                         .foregroundStyle(.secondary)
                     Text("Upcoming")
-                        .font(.caption2)
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                 }
             }
@@ -113,7 +113,7 @@ struct ProgressDashboardView: View {
             .frame(width: 60, height: 60)
 
             Text(label)
-                .font(.caption2)
+                .font(.caption)
                 .foregroundStyle(.secondary)
         }
     }
@@ -159,7 +159,7 @@ struct ProgressDashboardView: View {
                             .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
                             .annotation(position: .top, alignment: .center) {
                                 Text("Now")
-                                    .font(.caption2)
+                                    .font(.caption)
                                     .foregroundStyle(.orange)
                             }
                     }
@@ -227,7 +227,7 @@ struct ProgressDashboardView: View {
                 // Stats to the right
                 VStack(alignment: .trailing, spacing: 1) {
                     Text(String(format: "%.0f/%.0f mi", entry.actualMi, entry.plannedMi))
-                        .font(.caption2.bold())
+                        .font(.caption.bold())
                     if entry.runHours > 0 || entry.elevationGainFt > 0 {
                         HStack(spacing: 4) {
                             if entry.runHours > 0 {
@@ -237,7 +237,7 @@ struct ProgressDashboardView: View {
                                 Text(String(format: "%.0f'", entry.elevationGainFt))
                             }
                         }
-                        .font(.caption2)
+                        .font(.caption)
                         .foregroundStyle(.tertiary)
                     }
                 }
@@ -257,7 +257,7 @@ struct ProgressDashboardView: View {
                     .frame(height: 6)
 
                     Text(String(format: "%.1fh XT", entry.crossTrainHours))
-                        .font(.caption2)
+                        .font(.caption)
                         .foregroundStyle(.orange)
                         .frame(width: 70, alignment: .trailing)
                 }
@@ -294,7 +294,7 @@ struct ProgressDashboardView: View {
                         Text("\(max(daysUntilRace, 0))")
                             .font(.title.bold())
                         Text("Days to Race")
-                            .font(.caption2)
+                            .font(.caption)
                             .foregroundStyle(.secondary)
                     }
 
@@ -303,7 +303,7 @@ struct ProgressDashboardView: View {
                             .font(.title.bold())
                             .foregroundStyle(Color.swapAccent)
                         Text("Completion")
-                            .font(.caption2)
+                            .font(.caption)
                             .foregroundStyle(.secondary)
                     }
 
@@ -312,7 +312,7 @@ struct ProgressDashboardView: View {
                             Text("\(weekNum)/\(planStore.totalWeeks)")
                                 .font(.title.bold())
                             Text("Weeks")
-                                .font(.caption2)
+                                .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
                     }

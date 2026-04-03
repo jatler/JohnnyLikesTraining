@@ -124,7 +124,7 @@ struct ExerciseHistoryView: View {
 
                     if let rpe = log.rpe {
                         Text("RPE \(String(format: "%.0f", rpe))")
-                            .font(.caption2)
+                            .font(.caption)
                             .foregroundStyle(.tertiary)
                     }
                 }

@@ -11,7 +11,7 @@ enum SessionComponents {
                     HStack(spacing: 4) {
                         if score >= 85 {
                             Image(systemName: "crown.fill")
-                                .font(.caption2)
+                                .font(.caption)
                                 .foregroundStyle(.yellow)
                         } else {
                             Circle()
@@ -26,11 +26,11 @@ enum SessionComponents {
                     HStack(spacing: 4) {
                         if sleep >= 85 {
                             Image(systemName: "crown.fill")
-                                .font(.caption2)
+                                .font(.caption)
                                 .foregroundStyle(.yellow)
                         } else {
                             Image(systemName: "moon.fill")
-                                .font(.caption2)
+                                .font(.caption)
                                 .foregroundStyle(.blue)
                         }
                         Text("Sleep \(sleep)")
@@ -40,7 +40,7 @@ enum SessionComponents {
                 if let hrv = recovery.hrvAverage {
                     HStack(spacing: 4) {
                         Image(systemName: "waveform.path.ecg")
-                            .font(.caption2)
+                            .font(.caption)
                             .foregroundStyle(.purple)
                         Text(String(format: "HRV %.0f", hrv))
                             .font(.caption)
@@ -49,7 +49,7 @@ enum SessionComponents {
                 if let rhr = recovery.restingHr {
                     HStack(spacing: 4) {
                         Image(systemName: "heart.fill")
-                            .font(.caption2)
+                            .font(.caption)
                             .foregroundStyle(.red)
                         Text("RHR \(rhr)")
                             .font(.caption)
@@ -96,7 +96,7 @@ enum SessionComponents {
                     Spacer()
                     if !activity.isRun {
                         Text(activity.activityTypeDisplay)
-                            .font(.caption2.bold())
+                            .font(.caption.bold())
                             .foregroundStyle(.white)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
@@ -170,7 +170,7 @@ enum SessionComponents {
     static func comparisonCell(title: String, actual: String, planned: String?, delta: Double?) -> some View {
         VStack(spacing: 4) {
             Text(title)
-                .font(.caption2)
+                .font(.caption)
                 .foregroundStyle(.secondary)
 
             Text(actual)
@@ -178,13 +178,13 @@ enum SessionComponents {
 
             if let planned {
                 Text("Plan: \(planned)")
-                    .font(.caption2)
+                    .font(.caption)
                     .foregroundStyle(.secondary)
             }
 
             if let delta, abs(delta) >= 1 {
                 Text(String(format: "%+.0f%%", delta))
-                    .font(.caption2.bold())
+                    .font(.caption.bold())
                     .foregroundStyle(delta >= 0 ? .green : .orange)
             }
         }

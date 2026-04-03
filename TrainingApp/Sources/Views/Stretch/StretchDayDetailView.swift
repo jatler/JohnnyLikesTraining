@@ -98,7 +98,7 @@ struct StretchDayDetailView: View {
 
                 if session.isBilateral {
                     Text("Bilateral")
-                        .font(.caption2.bold())
+                        .font(.caption.bold())
                         .foregroundStyle(.secondary)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)

@@ -71,7 +71,7 @@ struct StrengthDayDetailView: View {
 
                 if session.isDeload {
                     Text("Deload")
-                        .font(.caption2.bold())
+                        .font(.caption.bold())
                         .foregroundStyle(.orange)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)

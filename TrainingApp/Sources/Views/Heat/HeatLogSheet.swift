@@ -71,7 +71,7 @@ struct HeatLogSheet: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Heat")
-                    .font(.title3.bold())
+                    .font(.headline)
 
                 Text("Week \(session.weekNumber) \u{2022} \(session.scheduledDate.formatted(.dateTime.weekday(.wide)))")
                     .font(.subheadline)

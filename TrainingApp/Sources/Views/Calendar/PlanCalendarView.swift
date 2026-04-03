@@ -88,7 +88,7 @@ struct PlanCalendarView: View {
 
             ForEach(0..<7, id: \.self) { i in
                 Text(dayLabels[i])
-                    .font(.caption2.bold())
+                    .font(.caption.bold())
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
             }
@@ -141,7 +141,7 @@ struct PlanCalendarView: View {
 
         return HStack(spacing: 4) {
             Text("W\(weekNumber)")
-                .font(.caption2.bold())
+                .font(.caption.bold())
                 .foregroundStyle(isCurrentWeek ? .blue : .secondary)
                 .frame(width: 32)
 
@@ -169,7 +169,7 @@ struct PlanCalendarView: View {
 
         return VStack(spacing: 2) {
             Text("\(dayNum)")
-                .font(.caption2)
+                .font(.caption)
                 .fontWeight(isToday ? .bold : .regular)
                 .foregroundStyle(isToday ? .primary : .secondary)
 
