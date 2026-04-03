@@ -16,10 +16,13 @@ struct StrengthTemplateView: View {
     @State private var showingDeleteConfirmation = false
     @State private var exerciseToDelete: StrengthTemplateExercise?
     @State private var showingAddHeatDay = false
+    @State private var selectedHeatSession: HeatSession?
     @State private var showingAddStretch = false
     @State private var addStretchDay: Int = 1
     @State private var editingStretch: StretchTemplateExercise?
     @State private var selectedStretchDay: StretchDaySelection?
+    @State private var showingStretchDeleteConfirmation = false
+    @State private var stretchToDelete: StretchTemplateExercise?
     @State private var selectedSegment: StrengthTabSegment = .strength
 
     private let dayNames = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -73,6 +76,9 @@ struct StrengthTemplateView: View {
             .sheet(isPresented: $showingAddHeatDay) {
                 AddHeatDaySheet()
             }
+            .sheet(item: $selectedHeatSession) { session in
+                HeatLogSheet(session: session)
+            }
             .sheet(isPresented: $showingAddStretch) {
                 AddStretchExerciseSheet(dayOfWeek: addStretchDay)
             }
@@ -81,6 +87,16 @@ struct StrengthTemplateView: View {
             }
             .sheet(item: $selectedStretchDay) { selection in
                 StretchDayDetailView(weekNumber: selection.weekNumber, dayOfWeek: selection.dayOfWeek)
+            }
+            .alert("Remove Stretch?", isPresented: $showingStretchDeleteConfirmation) {
+                Button("Remove", role: .destructive) {
+                    if let exercise = stretchToDelete {
+                        stretchStore.removeExercise(exercise)
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("This will remove \(stretchToDelete?.stretchName ?? "") from your template and all future weeks.")
             }
         }
     }
@@ -237,8 +253,17 @@ struct StrengthTemplateView: View {
         return wd == 1 ? 7 : wd - 1
     }
 
+    private func isHighlightedDay(_ day: Int, availableDays: [Int]) -> Bool {
+        let today = currentAdjustedDay
+        if day == today { return true }
+        let futureDays = availableDays.filter { $0 > today }.sorted()
+        let wrappedDays = availableDays.filter { $0 < today }.sorted()
+        let nextDay = futureDays.first ?? wrappedDays.first
+        return day == nextDay
+    }
+
     private func daySection(_ day: Int) -> some View {
-        let isToday = day == currentAdjustedDay
+        let isToday = isHighlightedDay(day, availableDays: strengthStore.daysWithExercises)
         let exercises = strengthStore.exercises(for: day)
         let weekSessions: [StrengthSession] = {
             guard let week = planStore.currentWeekNumber else { return [] }
@@ -345,7 +370,7 @@ struct StrengthTemplateView: View {
     }
 
     private func stretchDaySection(_ day: Int) -> some View {
-        let isToday = day == currentAdjustedDay
+        let isToday = isHighlightedDay(day, availableDays: stretchStore.daysWithExercises)
         let exercises = stretchStore.exercises(for: day)
         let weekSessions: [StretchSession] = {
             guard let week = planStore.currentWeekNumber else { return [] }
@@ -377,6 +402,13 @@ struct StrengthTemplateView: View {
                             editingStretch = exercise
                         } label: {
                             Label("Edit", systemImage: "pencil")
+                        }
+
+                        Button(role: .destructive) {
+                            stretchToDelete = exercise
+                            showingStretchDeleteConfirmation = true
+                        } label: {
+                            Label("Remove", systemImage: "trash")
                         }
                     }
             }
@@ -442,8 +474,10 @@ struct StrengthTemplateView: View {
             if heatStore.hasSessions {
                 let heatDays = heatDaysFromSessions()
 
+                let heatDayNumbers = heatDays.map(\.day)
+
                 ForEach(heatDays, id: \.day) { entry in
-                    let isToday = entry.day == currentAdjustedDay
+                    let highlighted = isHighlightedDay(entry.day, availableDays: heatDayNumbers)
                     let complete = heatStore.isComplete(entry.session.id)
 
                     HStack(spacing: 12) {
@@ -461,25 +495,34 @@ struct StrengthTemplateView: View {
                         }
 
                         Spacer()
-
-                        Button(role: .destructive) {
-                            heatStore.removeDay(entry.day)
-                        } label: {
-                            Image(systemName: "trash")
-                                .font(.caption)
-                                .foregroundStyle(.red.opacity(0.6))
-                        }
                     }
                     .padding()
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(isToday ? Color.orange.opacity(0.08) : Color(.systemBackground))
+                            .fill(highlighted ? Color.orange.opacity(0.08) : Color(.systemBackground))
                     )
                     .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .strokeBorder(isToday ? Color.orange.opacity(0.3) : .clear, lineWidth: 1)
+                            .strokeBorder(highlighted ? Color.orange.opacity(0.3) : .clear, lineWidth: 1)
                     )
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        selectedHeatSession = entry.session
+                    }
+                    .contextMenu {
+                        Button {
+                            selectedHeatSession = entry.session
+                        } label: {
+                            Label("Edit / Log", systemImage: "pencil")
+                        }
+
+                        Button(role: .destructive) {
+                            heatStore.removeDay(entry.day)
+                        } label: {
+                            Label("Remove Day", systemImage: "trash")
+                        }
+                    }
                 }
             } else {
                 Text("No heat sessions scheduled")
@@ -504,9 +547,19 @@ struct StrengthTemplateView: View {
     }
 
     private func heatDaysFromSessions() -> [HeatDayEntry] {
+        let currentWeek = planStore.currentWeekNumber
         var seen = Set<Int>()
         var entries: [HeatDayEntry] = []
-        for session in heatStore.sessions.sorted(by: { $0.dayOfWeek < $1.dayOfWeek }) {
+
+        // Prefer current week's session (reflects one-off edits), fall back to any week
+        let sorted = heatStore.sessions.sorted { a, b in
+            if a.dayOfWeek != b.dayOfWeek { return a.dayOfWeek < b.dayOfWeek }
+            let aIsCurrent = a.weekNumber == currentWeek
+            let bIsCurrent = b.weekNumber == currentWeek
+            if aIsCurrent != bIsCurrent { return aIsCurrent }
+            return a.weekNumber < b.weekNumber
+        }
+        for session in sorted {
             if seen.insert(session.dayOfWeek).inserted {
                 entries.append(HeatDayEntry(day: session.dayOfWeek, session: session))
             }

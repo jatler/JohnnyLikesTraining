@@ -8,6 +8,7 @@ struct HeatLogSheet: View {
     @State private var selectedType: HeatType
     @State private var duration: Int
     @State private var notes = ""
+    @State private var applyToAll = false
 
     private var existingLog: HeatLog? {
         heatStore.log(for: session.id)
@@ -36,6 +37,12 @@ struct HeatLogSheet: View {
                     TextField("Notes (optional)", text: $notes, axis: .vertical)
                         .textFieldStyle(.roundedBorder)
                         .lineLimit(2...3)
+
+                    if selectedType != session.sessionType || duration != session.targetDurationMinutes {
+                        Toggle("Apply to all weeks", isOn: $applyToAll)
+                            .font(.subheadline)
+                            .tint(.orange)
+                    }
 
                     actionButtons
                 }
@@ -155,6 +162,23 @@ struct HeatLogSheet: View {
             }
 
             Button {
+                // Update the session itself if type or duration changed
+                if selectedType != session.sessionType || duration != session.targetDurationMinutes {
+                    if applyToAll {
+                        heatStore.updateAllSessions(
+                            dayOfWeek: session.dayOfWeek,
+                            sessionType: selectedType,
+                            durationMinutes: duration
+                        )
+                    } else {
+                        var updated = session
+                        updated.sessionType = selectedType
+                        updated.targetDurationMinutes = duration
+                        heatStore.updateSession(updated)
+                    }
+                }
+
+                // Log completion
                 if existingLog != nil {
                     heatStore.deleteLog(session.id)
                 }

@@ -158,6 +158,41 @@ final class HeatStore {
         }
     }
 
+    // MARK: - Edit Sessions
+
+    func updateSession(_ session: HeatSession) {
+        guard let index = sessions.firstIndex(where: { $0.id == session.id }) else { return }
+        var updated = session
+        updated.isTemplateOverride = true
+        sessions[index] = updated
+        saveToCache()
+        Task { await persistSessionUpdate(updated) }
+    }
+
+    func updateAllSessions(dayOfWeek: Int, sessionType: HeatType, durationMinutes: Int) {
+        let today = Calendar.current.startOfDay(for: Date())
+        for i in sessions.indices where sessions[i].dayOfWeek == dayOfWeek
+            && !sessions[i].isTemplateOverride
+            && sessions[i].scheduledDate >= today {
+            sessions[i].sessionType = sessionType
+            sessions[i].targetDurationMinutes = durationMinutes
+        }
+        saveToCache()
+        if let planId = sessions.first?.planId {
+            Task { await persistAllSessions(planId: planId) }
+        }
+    }
+
+    private func persistSessionUpdate(_ session: HeatSession) async {
+        guard !isOffline else { return }
+        do {
+            try await supabase.from("heat_sessions").upsert(session).execute()
+        } catch {
+            print("Failed to persist heat session update: \(error)")
+            lastError = "Failed to save heat session."
+        }
+    }
+
     func deleteLog(_ sessionId: UUID) {
         guard let log = logs.first(where: { $0.sessionId == sessionId }) else { return }
         logs.removeAll { $0.sessionId == sessionId }
