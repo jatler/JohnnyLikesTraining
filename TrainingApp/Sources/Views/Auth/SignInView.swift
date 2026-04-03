@@ -16,7 +16,7 @@ struct SignInView: View {
                     .font(.system(size: 36, weight: .black))
                     .foregroundStyle(Color.swapAccent)
 
-                Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0")")
+                Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.3")")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
