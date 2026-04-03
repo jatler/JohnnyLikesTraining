@@ -339,14 +339,21 @@ final class StravaService {
 
     func loadActivities(userId: UUID) async {
         do {
-            activities = try await supabase
+            let loaded: [StravaActivity] = try await supabase
                 .from("strava_activities")
                 .select()
                 .eq("user_id", value: userId)
                 .order("activity_date", ascending: false)
                 .execute()
                 .value
-            saveToCache()
+            #if DEBUG
+            print("Supabase loaded \(loaded.count) Strava activities (had \(activities.count) in memory)")
+            #endif
+            // Don't overwrite existing data with empty Supabase result
+            if !loaded.isEmpty || activities.isEmpty {
+                activities = loaded
+                saveToCache()
+            }
         } catch {
             print("Failed to load Strava activities: \(error)")
         }
@@ -355,14 +362,16 @@ final class StravaService {
     // MARK: - Persistence
 
     private func persistActivities(_ activities: [StravaActivity], userId: UUID) async {
-        for activity in activities {
-            do {
-                try await supabase.from("strava_activities")
-                    .upsert(activity, onConflict: "strava_id")
-                    .execute()
-            } catch {
-                print("Failed to persist Strava activity \(activity.stravaId): \(error)")
-            }
+        guard !activities.isEmpty else { return }
+        do {
+            try await supabase.from("strava_activities")
+                .upsert(activities, onConflict: "strava_id")
+                .execute()
+            #if DEBUG
+            print("Persisted \(activities.count) Strava activities to Supabase")
+            #endif
+        } catch {
+            print("Failed to persist Strava activities: \(error)")
         }
     }
 }
