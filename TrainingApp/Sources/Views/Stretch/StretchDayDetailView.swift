@@ -71,9 +71,17 @@ struct StretchDayDetailView: View {
 
         return VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Image(systemName: complete ? "checkmark.circle.fill" : "circle")
-                    .font(.title3)
-                    .foregroundStyle(complete ? .green : .secondary.opacity(0.4))
+                Button {
+                    if complete {
+                        stretchStore.removeLog(sessionId: session.id)
+                    } else {
+                        stretchStore.logCompletion(sessionId: session.id)
+                    }
+                } label: {
+                    Image(systemName: complete ? "checkmark.circle.fill" : "circle")
+                        .font(.title3)
+                        .foregroundStyle(complete ? .green : .secondary.opacity(0.4))
+                }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(session.stretchName)
@@ -106,23 +114,6 @@ struct StretchDayDetailView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
 
-            Button {
-                if complete {
-                    stretchStore.removeLog(sessionId: session.id)
-                } else {
-                    stretchStore.logCompletion(sessionId: session.id)
-                }
-            } label: {
-                Label(
-                    complete ? "Undo" : "Mark Done",
-                    systemImage: complete ? "arrow.uturn.backward" : "checkmark"
-                )
-                .frame(maxWidth: .infinity)
-                .font(.subheadline.bold())
-            }
-            .buttonStyle(.bordered)
-            .tint(complete ? .secondary : Color.swapAccent)
-            .controlSize(.small)
         }
         .padding()
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
