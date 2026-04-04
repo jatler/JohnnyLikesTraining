@@ -255,7 +255,11 @@ struct StrengthTemplateView: View {
 
     private func isHighlightedDay(_ day: Int, availableDays: [Int]) -> Bool {
         let today = currentAdjustedDay
-        if day == today { return true }
+        // If today has a session, highlight only today
+        if availableDays.contains(today) {
+            return day == today
+        }
+        // Otherwise highlight the next upcoming day
         let futureDays = availableDays.filter { $0 > today }.sorted()
         let wrappedDays = availableDays.filter { $0 < today }.sorted()
         let nextDay = futureDays.first ?? wrappedDays.first
