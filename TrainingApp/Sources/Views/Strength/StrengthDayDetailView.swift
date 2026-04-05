@@ -35,7 +35,7 @@ struct StrengthDayDetailView: View {
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.bordered)
-                    .tint(Color.swapAccent)
+                    .tint(Color.trailGreen)
                 }
                 .padding()
                 .padding(.bottom, 20)
@@ -64,14 +64,14 @@ struct StrengthDayDetailView: View {
         return VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: "dumbbell.fill")
-                    .foregroundStyle(Color.swapAccent)
+                    .foregroundStyle(Color.trailGreen)
 
                 Text(session.exerciseName)
-                    .font(.headline)
+                    .font(TrailFont.title)
 
                 if session.isDeload {
                     Text("Deload")
-                        .font(.caption.bold())
+                        .font(TrailFont.metaBold)
                         .foregroundStyle(.orange)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
@@ -87,7 +87,7 @@ struct StrengthDayDetailView: View {
             }
 
             Text(prescriptionText(session))
-                .font(.subheadline)
+                .font(TrailFont.data)
                 .foregroundStyle(.secondary)
 
             ForEach(1...session.prescribedSets, id: \.self) { setNum in
@@ -103,7 +103,7 @@ struct StrengthDayDetailView: View {
     private func setRow(session: StrengthSession, setNumber: Int, existingLog: StrengthLog?) -> some View {
         HStack(spacing: 12) {
             Text(session.isTimed ? "Hold \(setNumber)" : "Set \(setNumber)")
-                .font(.caption.bold())
+                .font(TrailFont.metaBold)
                 .foregroundStyle(.secondary)
                 .frame(width: 50, alignment: .leading)
 
@@ -119,20 +119,20 @@ struct StrengthDayDetailView: View {
         HStack(spacing: 8) {
             Image(systemName: "checkmark.circle.fill")
                 .foregroundStyle(.green)
-                .font(.caption)
+                .font(TrailFont.meta)
 
             Text(isTimed ? "\(log.actualReps)s" : "\(log.actualReps) reps")
-                .font(.subheadline)
+                .font(TrailFont.data)
 
             if let kg = log.actualWeightKg {
                 Text("@ \(Int(kg * 2.205)) lbs")
-                    .font(.subheadline)
+                    .font(TrailFont.data)
                     .foregroundStyle(.secondary)
             }
 
             if let rpe = log.rpe {
                 Text("RPE \(String(format: "%.0f", rpe))")
-                    .font(.caption)
+                    .font(TrailFont.data)
                     .foregroundStyle(.tertiary)
             }
 
@@ -142,7 +142,7 @@ struct StrengthDayDetailView: View {
                 strengthStore.deleteLog(log.id)
             } label: {
                 Image(systemName: "xmark.circle")
-                    .font(.caption)
+                    .font(TrailFont.meta)
                     .foregroundStyle(.red.opacity(0.6))
             }
         }
@@ -175,7 +175,7 @@ struct StrengthDayDetailView: View {
                     logSetFromInput(session: session, setNumber: setNumber)
                 } label: {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(Color.swapAccent)
+                        .foregroundStyle(Color.trailGreen)
                 }
                 .disabled(inputs[inputIndex].reps.isEmpty)
             }

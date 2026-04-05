@@ -77,7 +77,7 @@ struct PlanEditView: View {
                             "Changing the template will replace your entire plan and reset all swaps and skips.",
                             systemImage: "exclamationmark.triangle.fill"
                         )
-                        .font(.caption)
+                        .font(TrailFont.meta)
                         .foregroundStyle(.orange)
                     }
                 }

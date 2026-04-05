@@ -40,7 +40,7 @@ struct HeatLogSheet: View {
 
                     if selectedType != session.sessionType || duration != session.targetDurationMinutes {
                         Toggle("Apply to all weeks", isOn: $applyToAll)
-                            .font(.subheadline)
+                            .font(TrailFont.detail)
                             .tint(.orange)
                     }
 
@@ -78,10 +78,10 @@ struct HeatLogSheet: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Heat")
-                    .font(.headline)
+                    .font(TrailFont.title)
 
                 Text("Week \(session.weekNumber) \u{2022} \(session.scheduledDate.formatted(.dateTime.weekday(.wide)))")
-                    .font(.subheadline)
+                    .font(TrailFont.detail)
                     .foregroundStyle(.secondary)
             }
 
@@ -98,7 +98,7 @@ struct HeatLogSheet: View {
     private var typePickerSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Type")
-                .font(.subheadline.bold())
+                .font(TrailFont.detailBold)
                 .foregroundStyle(.secondary)
 
             Picker("Type", selection: $selectedType) {
@@ -114,12 +114,12 @@ struct HeatLogSheet: View {
     private var durationSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Duration")
-                .font(.subheadline.bold())
+                .font(TrailFont.detailBold)
                 .foregroundStyle(.secondary)
 
             HStack {
                 Text("\(duration) min")
-                    .font(.title.bold())
+                    .font(TrailFont.dataLarge)
                     .foregroundStyle(.orange)
                     .frame(width: 100, alignment: .leading)
 
@@ -128,7 +128,7 @@ struct HeatLogSheet: View {
             }
 
             Text("Target: \(session.targetDurationMinutes) min")
-                .font(.caption)
+                .font(TrailFont.data)
                 .foregroundStyle(.tertiary)
         }
     }
@@ -137,9 +137,9 @@ struct HeatLogSheet: View {
         HStack(alignment: .top, spacing: 8) {
             Image(systemName: "info.circle")
                 .foregroundStyle(.secondary)
-                .font(.caption)
+                .font(TrailFont.meta)
             Text(text)
-                .font(.caption)
+                .font(TrailFont.meta)
                 .foregroundStyle(.secondary)
         }
         .padding(10)

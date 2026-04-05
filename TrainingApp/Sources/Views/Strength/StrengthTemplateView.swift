@@ -42,7 +42,7 @@ struct StrengthTemplateView: View {
                     emptyState
                 }
             }
-            .navigationTitle("Strength & More")
+            .toolbar(.hidden, for: .navigationBar)
             .alert("Error", isPresented: Binding(
                 get: { strengthStore.lastError != nil },
                 set: { if !$0 { strengthStore.lastError = nil } }
@@ -105,13 +105,20 @@ struct StrengthTemplateView: View {
 
     private var templateContent: some View {
         VStack(spacing: 0) {
-            Picker("Section", selection: $selectedSegment) {
-                ForEach(StrengthTabSegment.allCases, id: \.self) { segment in
-                    Text(segment.rawValue).tag(segment)
+            VStack(spacing: 12) {
+                Text("Strength & More")
+                    .font(TrailFont.dataLarge)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                Picker("Section", selection: $selectedSegment) {
+                    ForEach(StrengthTabSegment.allCases, id: \.self) { segment in
+                        Text(segment.rawValue).tag(segment)
+                    }
                 }
+                .pickerStyle(.segmented)
             }
-            .pickerStyle(.segmented)
             .padding()
+            .background(.bar)
 
             ScrollView {
                 VStack(spacing: 20) {
@@ -149,7 +156,7 @@ struct StrengthTemplateView: View {
             } else {
                 VStack(spacing: 16) {
                     Text("No stretches yet.")
-                        .font(.subheadline)
+                        .font(TrailFont.detail)
                         .foregroundStyle(.tertiary)
 
                     if let plan = planStore.activePlan {
@@ -159,7 +166,7 @@ struct StrengthTemplateView: View {
                             Label("Create Stretch Program", systemImage: "plus.circle.fill")
                         }
                         .buttonStyle(.bordered)
-                        .tint(Color.swapAccent)
+                        .tint(Color.trailGreen)
                     }
                 }
             }
@@ -173,7 +180,7 @@ struct StrengthTemplateView: View {
         if !strengthStore.suggestions.isEmpty {
             VStack(alignment: .leading, spacing: 8) {
                 Label("Progression Suggestions", systemImage: "arrow.up.circle.fill")
-                    .font(.subheadline.bold())
+                    .font(TrailFont.detailBold)
                     .foregroundStyle(.green)
 
                 ForEach(strengthStore.suggestions) { suggestion in
@@ -186,39 +193,39 @@ struct StrengthTemplateView: View {
     private func suggestionCard(_ suggestion: ProgressionSuggestion) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(suggestion.exerciseName)
-                .font(.body.bold())
+                .font(TrailFont.bodyBold)
 
             Text(suggestion.reason)
-                .font(.caption)
+                .font(TrailFont.meta)
                 .foregroundStyle(.secondary)
 
             HStack(spacing: 12) {
                 VStack(spacing: 2) {
                     Text("Current")
-                        .font(.caption)
+                        .font(TrailFont.meta)
                         .foregroundStyle(.secondary)
                     Text(formatPrescription(
                         sets: suggestion.currentSets,
                         reps: suggestion.currentReps,
                         weightKg: suggestion.currentWeightKg
                     ))
-                    .font(.caption.bold())
+                    .font(TrailFont.metaBold)
                 }
 
                 Image(systemName: "arrow.right")
-                    .font(.caption)
+                    .font(TrailFont.meta)
                     .foregroundStyle(.green)
 
                 VStack(spacing: 2) {
                     Text("Suggested")
-                        .font(.caption)
+                        .font(TrailFont.meta)
                         .foregroundStyle(.secondary)
                     Text(formatPrescription(
                         sets: suggestion.suggestedSets,
                         reps: suggestion.suggestedReps,
                         weightKg: suggestion.suggestedWeightKg
                     ))
-                    .font(.caption.bold())
+                    .font(TrailFont.metaBold)
                     .foregroundStyle(.green)
                 }
 
@@ -277,14 +284,14 @@ struct StrengthTemplateView: View {
         return VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(dayNames[day])
-                    .font(.headline)
+                    .font(TrailFont.title)
 
                 Spacer()
 
                 if !weekSessions.isEmpty {
                     let completed = weekSessions.filter { strengthStore.isSessionComplete($0.id) }.count
                     Text("\(completed)/\(weekSessions.count) done")
-                        .font(.caption)
+                        .font(TrailFont.meta)
                         .foregroundStyle(completed == weekSessions.count ? .green : .secondary)
                 }
             }
@@ -320,12 +327,12 @@ struct StrengthTemplateView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(isToday ? Color.swapAccent.opacity(0.08) : Color(.systemBackground))
+                .fill(isToday ? Color.trailGreen.opacity(0.08) : Color(.systemBackground))
         )
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(isToday ? Color.swapAccent.opacity(0.3) : .clear, lineWidth: 1)
+                .strokeBorder(isToday ? Color.trailGreen.opacity(0.3) : .clear, lineWidth: 1)
         )
         .contentShape(Rectangle())
         .onTapGesture {
@@ -342,7 +349,7 @@ struct StrengthTemplateView: View {
                 .foregroundStyle(complete ? .green : .secondary.opacity(0.4))
 
             Text(exercise.exerciseName)
-                .font(.body)
+                .font(TrailFont.body)
                 .strikethrough(complete)
                 .foregroundStyle(complete ? .secondary : .primary)
 
@@ -369,7 +376,7 @@ struct StrengthTemplateView: View {
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(.bordered)
-        .tint(Color.swapAccent)
+        .tint(Color.trailGreen)
         .disabled(strengthStore.daysWithExercises.count >= 7)
     }
 
@@ -384,14 +391,14 @@ struct StrengthTemplateView: View {
         return VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(dayNames[day])
-                    .font(.headline)
+                    .font(TrailFont.title)
 
                 Spacer()
 
                 if !weekSessions.isEmpty {
                     let completed = weekSessions.filter { stretchStore.isComplete($0.id) }.count
                     Text("\(completed)/\(weekSessions.count) done")
-                        .font(.caption)
+                        .font(TrailFont.meta)
                         .foregroundStyle(completed == weekSessions.count ? .green : .secondary)
                 }
             }
@@ -420,12 +427,12 @@ struct StrengthTemplateView: View {
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(isToday ? Color.swapAccent.opacity(0.08) : Color(.systemBackground))
+                .fill(isToday ? Color.trailGreen.opacity(0.08) : Color(.systemBackground))
         )
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(isToday ? Color.swapAccent.opacity(0.3) : .clear, lineWidth: 1)
+                .strokeBorder(isToday ? Color.trailGreen.opacity(0.3) : .clear, lineWidth: 1)
         )
         .contentShape(Rectangle())
         .onTapGesture {
@@ -442,7 +449,7 @@ struct StrengthTemplateView: View {
                 .foregroundStyle(complete ? .green : .secondary.opacity(0.4))
 
             Text(exercise.stretchName)
-                .font(.body)
+                .font(TrailFont.body)
                 .strikethrough(complete)
                 .foregroundStyle(complete ? .secondary : .primary)
 
@@ -467,7 +474,7 @@ struct StrengthTemplateView: View {
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(.bordered)
-        .tint(Color.swapAccent)
+        .tint(Color.trailGreen)
         .disabled(stretchStore.daysWithExercises.count >= 7)
     }
 
@@ -491,10 +498,10 @@ struct StrengthTemplateView: View {
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(dayNames[entry.day])
-                                .font(.headline)
+                                .font(TrailFont.title)
 
                             Text("\(entry.session.sessionType.displayName) • \(entry.session.targetDurationMinutes) min")
-                                .font(.subheadline)
+                                .font(TrailFont.detail)
                                 .foregroundStyle(.secondary)
                         }
 
@@ -530,7 +537,7 @@ struct StrengthTemplateView: View {
                 }
             } else {
                 Text("No heat sessions scheduled")
-                    .font(.subheadline)
+                    .font(TrailFont.detail)
                     .foregroundStyle(.tertiary)
             }
 
@@ -589,14 +596,14 @@ struct StrengthTemplateView: View {
                     case .strength:
                         Image(systemName: "dumbbell.fill")
                             .font(.system(size: 48))
-                            .foregroundStyle(Color.swapAccent)
+                            .foregroundStyle(Color.trailGreen)
 
                         Text("No strength program yet")
-                            .font(.title3)
+                            .font(TrailFont.title)
                             .foregroundStyle(.secondary)
 
                         Text("Start a strength program to track exercises alongside your runs.")
-                            .font(.subheadline)
+                            .font(TrailFont.detail)
                             .foregroundStyle(.tertiary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 40)

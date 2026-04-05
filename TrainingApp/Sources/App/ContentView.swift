@@ -61,7 +61,7 @@ struct MainTabView: View {
                     Label("Settings", systemImage: "gearshape")
                 }
         }
-        .tint(Color.swapAccent)
+        .tint(Color.trailGreen)
         .task {
             guard let userId = auth.currentUserId else { return }
             if !planStore.hasPlan {

@@ -44,7 +44,7 @@ struct ExerciseHistoryView: View {
         if !weightLogs.isEmpty {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Weight Over Time")
-                    .font(.subheadline.bold())
+                    .font(TrailFont.detailBold)
                     .foregroundStyle(.secondary)
 
                 Chart(weightLogs) { log in
@@ -52,13 +52,13 @@ struct ExerciseHistoryView: View {
                         x: .value("Date", log.completedAt),
                         y: .value("Weight (lbs)", (log.actualWeightKg ?? 0) * 2.205)
                     )
-                    .foregroundStyle(Color.swapAccent)
+                    .foregroundStyle(Color.trailGreen)
 
                     PointMark(
                         x: .value("Date", log.completedAt),
                         y: .value("Weight (lbs)", (log.actualWeightKg ?? 0) * 2.205)
                     )
-                    .foregroundStyle(Color.swapAccent)
+                    .foregroundStyle(Color.trailGreen)
                 }
                 .frame(height: 180)
                 .chartYAxisLabel("lbs")
@@ -73,7 +73,7 @@ struct ExerciseHistoryView: View {
     private func repsChart(_ logs: [StrengthLog]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Reps Over Time")
-                .font(.subheadline.bold())
+                .font(TrailFont.detailBold)
                 .foregroundStyle(.secondary)
 
             Chart(logs) { log in
@@ -81,7 +81,7 @@ struct ExerciseHistoryView: View {
                     x: .value("Date", log.completedAt),
                     y: .value("Reps", log.actualReps)
                 )
-                .foregroundStyle(Color.swapAccent.opacity(0.6))
+                .foregroundStyle(Color.trailGreen.opacity(0.6))
             }
             .frame(height: 140)
         }
@@ -94,7 +94,7 @@ struct ExerciseHistoryView: View {
     private func logTable(_ logs: [StrengthLog]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Recent Logs")
-                .font(.subheadline.bold())
+                .font(TrailFont.detailBold)
                 .foregroundStyle(.secondary)
 
             let recentLogs = Array(logs.suffix(20).reversed())
@@ -102,21 +102,21 @@ struct ExerciseHistoryView: View {
             ForEach(recentLogs) { log in
                 HStack {
                     Text(log.completedAt.formatted(.dateTime.month(.abbreviated).day()))
-                        .font(.caption)
+                        .font(TrailFont.meta)
                         .foregroundStyle(.secondary)
                         .frame(width: 60, alignment: .leading)
 
                     Text("Set \(log.setNumber)")
-                        .font(.caption)
+                        .font(TrailFont.meta)
                         .foregroundStyle(.tertiary)
                         .frame(width: 40)
 
                     Text("\(log.actualReps) reps")
-                        .font(.caption.bold())
+                        .font(TrailFont.metaBold)
 
                     if let kg = log.actualWeightKg {
                         Text("@ \(Int(kg * 2.205)) lbs")
-                            .font(.caption)
+                            .font(TrailFont.meta)
                             .foregroundStyle(.secondary)
                     }
 
@@ -124,7 +124,7 @@ struct ExerciseHistoryView: View {
 
                     if let rpe = log.rpe {
                         Text("RPE \(String(format: "%.0f", rpe))")
-                            .font(.caption)
+                            .font(TrailFont.meta)
                             .foregroundStyle(.tertiary)
                     }
                 }
@@ -147,14 +147,14 @@ struct ExerciseHistoryView: View {
 
             Image(systemName: "chart.line.uptrend.xyaxis")
                 .font(.system(size: 40))
-                .foregroundStyle(Color.swapAccent.opacity(0.5))
+                .foregroundStyle(Color.trailGreen.opacity(0.5))
 
             Text("No history yet")
-                .font(.title3)
+                .font(TrailFont.title)
                 .foregroundStyle(.secondary)
 
             Text("Log sets to start tracking progression for \(exerciseName).")
-                .font(.subheadline)
+                .font(TrailFont.detail)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)

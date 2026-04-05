@@ -6,58 +6,38 @@ enum SessionComponents {
 
     static func recoveryRow(_ recovery: OuraDaily) -> some View {
         VStack(spacing: 8) {
-            HStack(spacing: 16) {
+            HStack(spacing: 12) {
                 if let score = recovery.readinessScore {
-                    HStack(spacing: 4) {
-                        if score >= 85 {
-                            Image(systemName: "crown.fill")
-                                .font(.caption)
-                                .foregroundStyle(.yellow)
-                        } else {
-                            Circle()
-                                .fill(readinessColor(recovery.readinessLevel))
-                                .frame(width: 8, height: 8)
-                        }
-                        Text("Readiness \(score)")
-                            .font(.caption)
+                    HStack(spacing: 3) {
+                        Image(systemName: score >= 85 ? "crown.fill" : "circle.fill")
+                            .foregroundStyle(readinessColor(recovery.readinessLevel))
+                        Text("Rdy").font(TrailFont.data).foregroundStyle(.secondary)
+                        Text("\(score)").font(TrailFont.dataBold)
                     }
                 }
                 if let sleep = recovery.sleepScore {
-                    HStack(spacing: 4) {
-                        if sleep >= 85 {
-                            Image(systemName: "crown.fill")
-                                .font(.caption)
-                                .foregroundStyle(.yellow)
-                        } else {
-                            Image(systemName: "moon.fill")
-                                .font(.caption)
-                                .foregroundStyle(.blue)
-                        }
-                        Text("Sleep \(sleep)")
-                            .font(.caption)
+                    HStack(spacing: 3) {
+                        Image(systemName: "moon.fill").foregroundStyle(.blue)
+                        Text("Slp").font(TrailFont.data).foregroundStyle(.secondary)
+                        Text("\(sleep)").font(TrailFont.dataBold)
                     }
                 }
                 if let hrv = recovery.hrvAverage {
-                    HStack(spacing: 4) {
-                        Image(systemName: "waveform.path.ecg")
-                            .font(.caption)
-                            .foregroundStyle(.purple)
-                        Text(String(format: "HRV %.0f", hrv))
-                            .font(.caption)
+                    HStack(spacing: 3) {
+                        Image(systemName: "waveform.path.ecg").foregroundStyle(.purple)
+                        Text("HRV").font(TrailFont.data).foregroundStyle(.secondary)
+                        Text(String(format: "%.0f", hrv)).font(TrailFont.dataBold)
                     }
                 }
                 if let rhr = recovery.restingHr {
-                    HStack(spacing: 4) {
-                        Image(systemName: "heart.fill")
-                            .font(.caption)
-                            .foregroundStyle(.red)
-                        Text("RHR \(rhr)")
-                            .font(.caption)
+                    HStack(spacing: 3) {
+                        Image(systemName: "heart.fill").foregroundStyle(.red)
+                        Text("RHR").font(TrailFont.data).foregroundStyle(.secondary)
+                        Text("\(rhr)").font(TrailFont.dataBold)
                     }
                 }
                 Spacer()
             }
-            .foregroundStyle(.secondary)
 
             HStack {
                 Spacer()
@@ -92,18 +72,18 @@ enum SessionComponents {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(.green)
                     Text("Completed: \(activity.name)")
-                        .font(.subheadline.bold())
+                        .font(TrailFont.dataBold)
                     Spacer()
                     if !activity.isRun {
                         Text(activity.activityTypeDisplay)
-                            .font(.caption.bold())
+                            .font(TrailFont.metaBold)
                             .foregroundStyle(.white)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
                             .background(.blue, in: Capsule())
                     }
                     Image(systemName: "arrow.up.right.square")
-                        .font(.caption)
+                        .font(TrailFont.meta)
                         .foregroundStyle(.secondary)
                 }
 
@@ -141,13 +121,13 @@ enum SessionComponents {
                 HStack(spacing: 16) {
                     if let hr = activity.averageHr {
                         Label("\(hr) bpm", systemImage: "heart.fill")
-                            .font(.caption)
+                            .font(TrailFont.data)
                             .foregroundStyle(.red)
                     }
 
                     if let elev = activity.elevationGainM, activity.isRun {
                         Label(String(format: "%.0f ft", elev * 3.281), systemImage: "mountain.2.fill")
-                            .font(.caption)
+                            .font(TrailFont.data)
                             .foregroundStyle(.green)
                     }
                 }
@@ -170,21 +150,21 @@ enum SessionComponents {
     static func comparisonCell(title: String, actual: String, planned: String?, delta: Double?) -> some View {
         VStack(spacing: 4) {
             Text(title)
-                .font(.caption)
+                .font(TrailFont.meta)
                 .foregroundStyle(.secondary)
 
             Text(actual)
-                .font(.subheadline.bold())
+                .font(TrailFont.dataBold)
 
             if let planned {
                 Text("Plan: \(planned)")
-                    .font(.caption)
+                    .font(TrailFont.meta)
                     .foregroundStyle(.secondary)
             }
 
             if let delta, abs(delta) >= 1 {
                 Text(String(format: "%+.0f%%", delta))
-                    .font(.caption.bold())
+                    .font(TrailFont.dataBold)
                     .foregroundStyle(delta >= 0 ? .green : .orange)
             }
         }

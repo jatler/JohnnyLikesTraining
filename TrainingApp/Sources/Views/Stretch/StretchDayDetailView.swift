@@ -46,14 +46,14 @@ struct StretchDayDetailView: View {
         HStack(spacing: 12) {
             Image(systemName: "figure.flexibility")
                 .font(.title3)
-                .foregroundStyle(Color.swapAccent)
+                .foregroundStyle(Color.trailGreen)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(completed)/\(total) stretches done")
-                    .font(.subheadline.bold())
+                    .font(TrailFont.detailBold)
 
                 ProgressView(value: Double(completed), total: Double(total))
-                    .tint(Color.swapAccent)
+                    .tint(Color.trailGreen)
             }
 
             if completed == total {
@@ -63,7 +63,7 @@ struct StretchDayDetailView: View {
             }
         }
         .padding()
-        .background(Color.swapAccent.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
+        .background(Color.trailGreen.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
     }
 
     private func stretchCard(_ session: StretchSession) -> some View {
@@ -85,12 +85,12 @@ struct StretchDayDetailView: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(session.stretchName)
-                        .font(.headline)
+                        .font(TrailFont.title)
                         .strikethrough(complete)
                         .foregroundStyle(complete ? .secondary : .primary)
 
                     Text(prescriptionText(session))
-                        .font(.subheadline)
+                        .font(TrailFont.detail)
                         .foregroundStyle(.secondary)
                 }
 
@@ -98,7 +98,7 @@ struct StretchDayDetailView: View {
 
                 if session.isBilateral {
                     Text("Bilateral")
-                        .font(.caption.bold())
+                        .font(TrailFont.metaBold)
                         .foregroundStyle(.secondary)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)
@@ -109,7 +109,7 @@ struct StretchDayDetailView: View {
             if let exercise = stretchStore.exercises.first(where: { $0.id == session.templateExerciseId }),
                let notes = exercise.notes, !notes.isEmpty {
                 Text(notes)
-                    .font(.caption)
+                    .font(TrailFont.meta)
                     .foregroundStyle(.tertiary)
                     .fixedSize(horizontal: false, vertical: true)
             }

@@ -13,11 +13,11 @@ struct SignInView: View {
 
             VStack(spacing: 8) {
                 Text("JohnnyLikesTraining")
-                    .font(.system(size: 36, weight: .black))
-                    .foregroundStyle(Color.swapAccent)
+                    .font(TrailFont.dataHero)
+                    .foregroundStyle(Color.trailGreen)
 
-                Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.3")")
-                    .font(.subheadline)
+                Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.4")")
+                    .font(TrailFont.detail)
                     .foregroundStyle(.secondary)
             }
 
@@ -50,13 +50,13 @@ struct SignInView: View {
                 Button("Skip Sign-In (Dev)") {
                     auth.devSignIn()
                 }
-                .font(.caption)
+                .font(TrailFont.meta)
                 .foregroundStyle(.secondary)
             }
 
             if let errorMessage {
                 Text(errorMessage)
-                    .font(.caption)
+                    .font(TrailFont.meta)
                     .foregroundStyle(.red)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal)

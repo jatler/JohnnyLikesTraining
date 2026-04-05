@@ -64,21 +64,21 @@ struct PatreonGateView: View {
         VStack(spacing: 24) {
             Image(systemName: "figure.run.circle.fill")
                 .font(.system(size: 56))
-                .foregroundStyle(Color.swapAccent)
+                .foregroundStyle(Color.trailGreen)
                 .padding(.top, 16)
                 .accessibilityHidden(true)
 
             VStack(spacing: 6) {
                 Text("SWAP Training Plans")
-                    .font(.headline)
+                    .font(TrailFont.title)
                 Text("Exclusive to SWAP Running Patrons")
-                    .font(.subheadline)
+                    .font(TrailFont.detail)
                     .foregroundStyle(.secondary)
                     .accessibilityHidden(true)
             }
 
             Text("Connect your Patreon account to unlock all \(BrandKit.coachCredit) training plans, Oura integration, and the progression engine.")
-                .font(.body)
+                .font(TrailFont.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
 
@@ -90,14 +90,14 @@ struct PatreonGateView: View {
                         .fontWeight(.semibold)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background(Color.swapAccent, in: RoundedRectangle(cornerRadius: 12))
+                        .background(Color.trailGreen, in: RoundedRectangle(cornerRadius: 12))
                         .foregroundStyle(.white)
                 }
 
                 Link(destination: BrandKit.patreonURL) {
                     Text("Subscribe on Patreon ↗")
-                        .font(.subheadline)
-                        .foregroundStyle(Color.swapAccent)
+                        .font(TrailFont.detail)
+                        .foregroundStyle(Color.trailGreen)
                 }
                 .accessibilityLabel("Subscribe to SWAP on Patreon - opens in browser")
 
@@ -106,7 +106,7 @@ struct PatreonGateView: View {
                         onPatronVerified?()
                         dismiss()
                     }
-                    .font(.caption)
+                    .font(TrailFont.meta)
                     .foregroundStyle(.secondary)
                 }
             }
@@ -119,7 +119,7 @@ struct PatreonGateView: View {
         VStack(spacing: 16) {
             Spacer()
             ProgressView("Checking your membership\u{2026}")
-                .font(.subheadline)
+                .font(TrailFont.detail)
                 .foregroundStyle(.secondary)
             Spacer()
         }
@@ -137,14 +137,14 @@ struct PatreonGateView: View {
 
             VStack(spacing: 6) {
                 Text("Patreon Connected")
-                    .font(.headline)
+                    .font(TrailFont.title)
                 Text("Account not subscribed at $5+/mo")
-                    .font(.subheadline)
+                    .font(TrailFont.detail)
                     .foregroundStyle(.secondary)
             }
 
             Text("To access SWAP training plans, subscribe to the SWAP Running Patreon at the $5/month tier or higher.")
-                .font(.body)
+                .font(TrailFont.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
 
@@ -154,7 +154,7 @@ struct PatreonGateView: View {
                         .fontWeight(.semibold)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background(Color.swapAccent, in: RoundedRectangle(cornerRadius: 12))
+                        .background(Color.trailGreen, in: RoundedRectangle(cornerRadius: 12))
                         .foregroundStyle(.white)
                 }
                 .accessibilityLabel("Subscribe to SWAP on Patreon - opens in browser")
@@ -163,7 +163,7 @@ struct PatreonGateView: View {
                     patreon.disconnect()
                 } label: {
                     Text("Try another account")
-                        .font(.subheadline)
+                        .font(TrailFont.detail)
                         .foregroundStyle(.secondary)
                 }
             }
@@ -180,7 +180,7 @@ struct PatreonGateView: View {
                 .padding(.top, 16)
 
             Text("Couldn't reach Patreon. Check your connection.")
-                .font(.subheadline)
+                .font(TrailFont.detail)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
 
@@ -193,7 +193,7 @@ struct PatreonGateView: View {
                         .fontWeight(.semibold)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 14)
-                        .background(Color.swapAccent, in: RoundedRectangle(cornerRadius: 12))
+                        .background(Color.trailGreen, in: RoundedRectangle(cornerRadius: 12))
                         .foregroundStyle(.white)
                 }
 
@@ -202,7 +202,7 @@ struct PatreonGateView: View {
                     dismiss()
                 } label: {
                     Text("Continue anyway")
-                        .font(.subheadline)
+                        .font(TrailFont.detail)
                         .foregroundStyle(.secondary)
                 }
             }

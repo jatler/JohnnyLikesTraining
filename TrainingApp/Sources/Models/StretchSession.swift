@@ -98,7 +98,7 @@ enum StretchRoutineType: String, Codable, CaseIterable, Identifiable {
 
     var color: Color {
         switch self {
-        case .preRun: Color.swapAccent
+        case .preRun: Color.trailGreen
         case .postRun: .mint
         case .recovery: .cyan
         case .mobility: .blue

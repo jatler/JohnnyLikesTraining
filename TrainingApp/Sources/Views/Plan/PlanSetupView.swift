@@ -65,7 +65,7 @@ struct PlanSetupView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             if template.source == "SWAP Running" {
                                 Text("By \(BrandKit.coachCredit) • \(template.durationWeeks) weeks")
-                                    .foregroundStyle(Color.swapAccent)
+                                    .foregroundStyle(Color.trailGreen)
                             } else {
                                 Text("\(template.durationWeeks) weeks \u{2022} \(template.author)")
                             }

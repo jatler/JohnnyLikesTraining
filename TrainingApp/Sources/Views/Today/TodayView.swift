@@ -28,7 +28,7 @@ struct TodayView: View {
                     emptyState
                 }
             }
-            .navigationTitle("Today")
+            .toolbar(.hidden, for: .navigationBar)
             .alert("Error", isPresented: Binding(
                 get: { planStore.lastError != nil },
                 set: { if !$0 { planStore.lastError = nil } }
@@ -50,13 +50,60 @@ struct TodayView: View {
 
     // MARK: - Today's Content
 
-    private var todayContent: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                let todaySessions = planStore.todaySessions
-                    .filter { $0.workoutType != .strength }
+    private var todayHeader: some View {
+        let todaySessions = planStore.todaySessions.filter { $0.workoutType != .strength }
+        let firstSession = todaySessions.first
+        let skipped = firstSession.map { planStore.isSkipped($0.id) } ?? false
+        let hasMatch = firstSession.flatMap { strava.activity(for: $0.id) } != nil
 
-                if todaySessions.isEmpty {
+        return HStack(alignment: .top) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(firstSession?.workoutType.displayName ?? "Rest Day")
+                    .font(TrailFont.dataLarge)
+                    .strikethrough(skipped)
+                    .opacity(skipped ? 0.5 : 1)
+                HStack(spacing: 8) {
+                    if let mi = firstSession?.targetDistanceMi {
+                        Text(String(format: "%.1f mi", mi))
+                            .font(TrailFont.data)
+                            .foregroundStyle(.secondary)
+                    }
+                    if let s = firstSession {
+                        Text("Week \(s.weekNumber) \u{2022} Day \(s.dayOfWeek)")
+                            .font(TrailFont.meta)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+            Spacer()
+            if skipped {
+                Text("Skipped")
+                    .font(TrailFont.meta)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(.red.opacity(0.8), in: Capsule())
+            } else if hasMatch {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+                    .font(TrailFont.title)
+            }
+        }
+        .padding()
+        .background(.bar)
+    }
+
+    private var todayContent: some View {
+        VStack(spacing: 0) {
+            todayHeader
+
+            ScrollView {
+                VStack(spacing: 20) {
+                    let todaySessions = planStore.todaySessions
+                        .filter { $0.workoutType != .strength }
+
+                    if todaySessions.isEmpty {
                     if oura.isConnected, let recovery = oura.todayReadiness() {
                         SessionComponents.recoveryRow(recovery)
                     }
@@ -108,6 +155,7 @@ struct TodayView: View {
         .sheet(item: $selectedSession) { session in
             SessionDetailSheet(session: session)
         }
+        }
     }
 
     // MARK: - Per-Session Block
@@ -120,67 +168,13 @@ struct TodayView: View {
         let hasStravaMatch = activity != nil
 
         VStack(alignment: .leading, spacing: 20) {
-            // Workout header
-            HStack {
-                Image(systemName: session.workoutType.iconName)
-                    .font(.title2)
-                    .foregroundStyle(session.workoutType.swiftUIColor)
-                    .frame(width: 44, height: 44)
-                    .background(session.workoutType.swiftUIColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 10))
-
-                VStack(alignment: .leading, spacing: 2) {
-                    HStack(spacing: 6) {
-                        Text(session.workoutType.displayName)
-                            .font(.headline)
-                            .strikethrough(skipped)
-                            .opacity(skipped ? 0.5 : 1)
-
-                        if overridden {
-                            Image(systemName: "pencil.circle.fill")
-                                .font(.caption)
-                                .foregroundStyle(.orange)
-                        }
-                    }
-
-                    Text("Week \(session.weekNumber) \u{2022} Day \(session.dayOfWeek)")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-
-                Spacer()
-
-                if skipped {
-                    Text("Skipped")
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(.red.opacity(0.8), in: Capsule())
-                } else if hasStravaMatch {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                        .font(.title3)
-                }
-            }
-
-            if let distanceKm = session.targetDistanceKm {
-                HStack(spacing: 6) {
-                    Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
-                        .foregroundStyle(.secondary)
-                    Text(String(format: "%.1f mi", DistanceFormatter.miles(from: distanceKm)))
-                        .font(.headline)
-                }
-                .opacity(skipped ? 0.5 : 1)
-            }
-
             let coachText = session.verbatimCoachNotesForDisplay
             let pace = session.targetPaceDescription?.trimmingCharacters(in: .whitespacesAndNewlines)
             let paceRedundant = pace.map { coachText.lowercased().contains($0.lowercased()) } ?? true
 
             if let pace, !pace.isEmpty, !paceRedundant {
                 Label(pace, systemImage: "gauge.with.needle")
-                    .font(.subheadline)
+                    .font(TrailFont.data)
                     .foregroundStyle(.secondary)
                     .opacity(skipped ? 0.5 : 1)
             }
@@ -188,10 +182,10 @@ struct TodayView: View {
             if !coachText.isEmpty {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Coach notes")
-                        .font(.subheadline.bold())
+                        .font(TrailFont.title)
                         .foregroundStyle(.secondary)
                     Text(coachText)
-                        .font(.body)
+                        .font(TrailFont.coach)
                         .foregroundStyle(skipped ? .secondary : .primary)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .fixedSize(horizontal: false, vertical: true)
@@ -234,21 +228,21 @@ struct TodayView: View {
                 HStack(spacing: 12) {
                     Image(systemName: "headphones")
                         .font(.title2)
-                        .foregroundStyle(Color.swapAccent)
+                        .foregroundStyle(Color.trailGreen)
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Happy Tuesday! It's Tuesday!!!")
-                            .font(.headline)
+                            .font(TrailFont.title)
                             .foregroundStyle(.primary)
                         Text("Listen to the latest SWAP podcast ↗")
-                            .font(.subheadline)
-                            .foregroundStyle(Color.swapAccent)
+                            .font(TrailFont.detail)
+                            .foregroundStyle(Color.trailGreen)
                     }
 
                     Spacer()
                 }
                 .padding(12)
-                .background(Color.swapAccentLight, in: RoundedRectangle(cornerRadius: 12))
+                .background(Color.trailGreenLight, in: RoundedRectangle(cornerRadius: 12))
             }
         }
     }
@@ -267,11 +261,11 @@ struct TodayView: View {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
                     Text("Low Readiness (\(today.readinessScore ?? 0))")
-                        .font(.subheadline.bold())
+                        .font(TrailFont.detailBold)
                 }
 
                 Text("Consider swapping today's \(session.workoutType.displayName) for \(easyDay.scheduledDate.formatted(.dateTime.weekday(.wide)))'s \(easyDay.workoutType.displayName).")
-                    .font(.subheadline)
+                    .font(TrailFont.detail)
                     .foregroundStyle(.secondary)
 
                 Button {
@@ -279,7 +273,7 @@ struct TodayView: View {
                 } label: {
                     Label("Swap to \(easyDay.workoutType.displayName)", systemImage: "arrow.left.arrow.right.circle.fill")
                         .frame(maxWidth: .infinity)
-                        .font(.subheadline.bold())
+                        .font(TrailFont.detailBold)
                 }
                 .buttonStyle(.bordered)
                 .tint(.orange)
@@ -304,8 +298,8 @@ struct TodayView: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Label("Strength", systemImage: "dumbbell.fill")
-                        .font(.subheadline.bold())
-                        .foregroundStyle(Color.swapAccent)
+                        .font(TrailFont.detailBold)
+                        .foregroundStyle(Color.trailGreen)
 
                     Spacer()
 
@@ -314,7 +308,7 @@ struct TodayView: View {
 
                     if completed > 0 {
                         Text("\(completed)/\(total) done")
-                            .font(.caption)
+                            .font(TrailFont.meta)
                             .foregroundStyle(.green)
                     }
 
@@ -322,11 +316,11 @@ struct TodayView: View {
                         showingStrengthDay = true
                     } label: {
                         Label("Log", systemImage: "checkmark.circle")
-                            .font(.caption)
+                            .font(TrailFont.meta)
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
-                    .tint(Color.swapAccent)
+                    .tint(Color.trailGreen)
                 }
 
                 ForEach(daySessions) { session in
@@ -334,24 +328,24 @@ struct TodayView: View {
                         let complete = strengthStore.isSessionComplete(session.id)
 
                         Image(systemName: complete ? "checkmark.circle.fill" : "circle")
-                            .font(.caption)
+                            .font(TrailFont.meta)
                             .foregroundStyle(complete ? .green : Color.secondary.opacity(0.3))
 
                         Text(session.exerciseName)
-                            .font(.caption)
+                            .font(TrailFont.meta)
                             .foregroundStyle(complete ? .secondary : .primary)
 
                         Spacer()
 
                         Text(strengthPrescription(session))
-                            .font(.caption)
+                            .font(TrailFont.data)
                             .foregroundStyle(.secondary)
                     }
                 }
             }
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.swapAccent.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+            .background(Color.trailGreen.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
         }
     }
 
@@ -366,8 +360,8 @@ struct TodayView: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Label("Stretches", systemImage: "figure.flexibility")
-                        .font(.subheadline.bold())
-                        .foregroundStyle(Color.swapAccent)
+                        .font(TrailFont.detailBold)
+                        .foregroundStyle(Color.trailGreen)
 
                     Spacer()
 
@@ -376,7 +370,7 @@ struct TodayView: View {
 
                     if completed > 0 {
                         Text("\(completed)/\(total) done")
-                            .font(.caption)
+                            .font(TrailFont.meta)
                             .foregroundStyle(.green)
                     }
 
@@ -384,11 +378,11 @@ struct TodayView: View {
                         showingStretchDay = true
                     } label: {
                         Label("Log", systemImage: "checkmark.circle")
-                            .font(.caption)
+                            .font(TrailFont.meta)
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
-                    .tint(Color.swapAccent)
+                    .tint(Color.trailGreen)
                 }
 
                 ForEach(daySessions) { session in
@@ -405,20 +399,20 @@ struct TodayView: View {
                             }
                         } label: {
                             Image(systemName: complete ? "checkmark.circle.fill" : "circle")
-                                .font(.caption)
+                                .font(TrailFont.meta)
                                 .foregroundStyle(complete ? .green : Color.secondary.opacity(0.3))
                         }
                         .buttonStyle(.plain)
 
                         Text(session.stretchName)
-                            .font(.caption)
+                            .font(TrailFont.meta)
                             .foregroundStyle(complete ? .secondary : .primary)
 
                         Spacer()
 
                         if session.isBilateral {
                             Text("L+R")
-                                .font(.caption.bold())
+                                .font(TrailFont.metaBold)
                                 .foregroundStyle(.secondary)
                                 .padding(.horizontal, 5)
                                 .padding(.vertical, 1)
@@ -426,14 +420,14 @@ struct TodayView: View {
                         }
 
                         Text(stretchPrescription(session))
-                            .font(.caption)
+                            .font(TrailFont.data)
                             .foregroundStyle(.secondary)
                     }
                 }
             }
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.swapAccent.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+            .background(Color.trailGreen.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
         }
     }
 
@@ -448,7 +442,7 @@ struct TodayView: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Label("Heat", systemImage: "flame.fill")
-                        .font(.subheadline.bold())
+                        .font(TrailFont.detailBold)
                         .foregroundStyle(.orange)
 
                     Spacer()
@@ -463,21 +457,21 @@ struct TodayView: View {
                     } label: {
                         HStack(spacing: 8) {
                             Image(systemName: complete ? "checkmark.circle.fill" : "flame")
-                                .font(.caption)
+                                .font(TrailFont.meta)
                                 .foregroundStyle(complete ? .green : .orange)
 
                             Text(session.sessionType.displayName)
-                                .font(.caption)
+                                .font(TrailFont.meta)
 
                             Spacer()
 
                             if let log {
                                 Text("\(log.actualDurationMinutes) min")
-                                    .font(.caption)
+                                    .font(TrailFont.data)
                                     .foregroundStyle(.green)
                             } else {
                                 Text("\(session.targetDurationMinutes) min")
-                                    .font(.caption)
+                                    .font(TrailFont.data)
                                     .foregroundStyle(.secondary)
                             }
                         }
@@ -585,9 +579,9 @@ struct TodayView: View {
 
                             VStack(alignment: .leading) {
                                 Text(target.scheduledDate.formatted(.dateTime.weekday(.wide)))
-                                    .font(.subheadline.bold())
+                                    .font(TrailFont.detailBold)
                                 Text(target.workoutType.displayName)
-                                    .font(.caption)
+                                    .font(TrailFont.meta)
                                     .foregroundStyle(.secondary)
                             }
 
@@ -595,7 +589,7 @@ struct TodayView: View {
 
                             if let mi = target.targetDistanceMi {
                                 Text(String(format: "%.1f mi", mi))
-                                    .font(.caption)
+                                    .font(TrailFont.data)
                                     .foregroundStyle(.secondary)
                             }
                         }
@@ -621,14 +615,14 @@ struct TodayView: View {
                 .font(.system(size: 40))
                 .foregroundStyle(.green)
             Text("No workout scheduled today")
-                .font(.title3)
+                .font(TrailFont.title)
                 .foregroundStyle(.secondary)
             if let plan = planStore.activePlan {
                 let today = Calendar.current.startOfDay(for: Date())
                 let planStart = Calendar.current.startOfDay(for: plan.planStartDate)
                 if today < planStart {
                     Text("Your plan starts \(plan.planStartDate.formatted(date: .long, time: .omitted))")
-                        .font(.subheadline)
+                        .font(TrailFont.detail)
                         .foregroundStyle(.tertiary)
                 }
             }
@@ -642,7 +636,7 @@ struct TodayView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(plan.name)
-                    .font(.headline)
+                    .font(TrailFont.title)
 
                 Spacer()
 
@@ -650,7 +644,7 @@ struct TodayView: View {
                     showingPlanEdit = true
                 } label: {
                     Image(systemName: "pencil.circle")
-                        .font(.title3)
+                        .font(TrailFont.title)
                 }
             }
 
@@ -662,7 +656,7 @@ struct TodayView: View {
                         .fontWeight(.medium)
                 }
             }
-            .font(.subheadline)
+            .font(TrailFont.detail)
             .foregroundStyle(.secondary)
         }
         .padding()
@@ -677,14 +671,14 @@ struct TodayView: View {
 
             Image(systemName: "figure.run")
                 .font(.system(size: 48))
-                .foregroundStyle(Color.swapAccent)
+                .foregroundStyle(Color.trailGreen)
 
             Text("No training plan yet")
-                .font(.title3)
+                .font(TrailFont.title)
                 .foregroundStyle(.secondary)
 
             Text("Set up a plan for your next race to see daily workouts.")
-                .font(.subheadline)
+                .font(TrailFont.detail)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)

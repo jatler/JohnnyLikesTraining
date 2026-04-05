@@ -24,7 +24,7 @@ struct WeekView: View {
                     emptyState
                 }
             }
-            .navigationTitle("Week \(selectedWeek)")
+            .toolbar(.hidden, for: .navigationBar)
             .alert("Error", isPresented: Binding(
                 get: { planStore.lastError != nil },
                 set: { if !$0 { planStore.lastError = nil } }
@@ -32,15 +32,6 @@ struct WeekView: View {
                 Button("OK") { planStore.lastError = nil }
             } message: {
                 Text(planStore.lastError ?? "")
-            }
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink {
-                        PlanCalendarView()
-                    } label: {
-                        Image(systemName: "calendar.badge.clock")
-                    }
-                }
             }
         }
     }
@@ -90,37 +81,48 @@ struct WeekView: View {
     // MARK: - Week Navigator
 
     private var weekNavigator: some View {
-        HStack {
-            Button {
-                if selectedWeek > 1 { selectedWeek -= 1 }
-            } label: {
-                Image(systemName: "chevron.left")
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text("Week \(selectedWeek)")
+                    .font(TrailFont.dataLarge)
+
+                Spacer()
+
+                HStack(spacing: 16) {
+                    Button {
+                        if selectedWeek > 1 { selectedWeek -= 1 }
+                    } label: {
+                        Image(systemName: "chevron.left")
+                    }
+                    .disabled(selectedWeek <= 1)
+
+                    Button {
+                        if selectedWeek < planStore.totalWeeks { selectedWeek += 1 }
+                    } label: {
+                        Image(systemName: "chevron.right")
+                    }
+                    .disabled(selectedWeek >= planStore.totalWeeks)
+
+                    NavigationLink {
+                        PlanCalendarView()
+                    } label: {
+                        Image(systemName: "calendar.badge.clock")
+                    }
+                }
             }
-            .disabled(selectedWeek <= 1)
 
-            Spacer()
-
-            VStack(spacing: 2) {
+            HStack(spacing: 8) {
                 Text(weekDateRange)
-                    .font(.subheadline)
+                    .font(TrailFont.meta)
                     .foregroundStyle(.secondary)
 
                 if planStore.currentWeekNumber == selectedWeek {
                     Text("Current Week")
-                        .font(.caption)
-                        .foregroundStyle(Color.swapAccent)
+                        .font(TrailFont.meta)
+                        .foregroundStyle(Color.trailGreen)
                         .fontWeight(.semibold)
                 }
             }
-
-            Spacer()
-
-            Button {
-                if selectedWeek < planStore.totalWeeks { selectedWeek += 1 }
-            } label: {
-                Image(systemName: "chevron.right")
-            }
-            .disabled(selectedWeek >= planStore.totalWeeks)
         }
         .padding()
         .background(.bar)
@@ -138,23 +140,44 @@ struct WeekView: View {
 
     private var weekSummaryBar: some View {
         let calendar = Calendar.current
-        let sessions = planStore.sessions(for: selectedWeek)
-            .filter { $0.workoutType != .strength }
+        let weekSessions = planStore.sessions(for: selectedWeek)
+        let sessions = weekSessions.filter { $0.workoutType != .strength }
         let trackableRuns = sessions.filter { $0.workoutType != .rest }
         let plannedMi = trackableRuns.compactMap(\.targetDistanceMi).reduce(0, +)
-        let runsDone = trackableRuns.filter { strava.activity(for: $0.id) != nil }.count
         let skipped = trackableRuns.filter { planStore.isSkipped($0.id) }.count
-        // Only count running activities for mileage
-        let actualMi = trackableRuns.compactMap { session -> Double? in
-            guard let activity = strava.activity(for: session.id), activity.isRun else { return nil }
-            return activity.distanceMi
-        }.reduce(0, +)
+
+        // Count ALL running activities: matched + unmatched in week date range (matches Progress tab)
+        var actualMi: Double = 0
+        var runsDone = 0
+        var countedActivityIds: Set<Int64> = []
+
+        for session in weekSessions {
+            if let activity = strava.activity(for: session.id), activity.isRun {
+                actualMi += activity.distanceMi
+                runsDone += 1
+                countedActivityIds.insert(activity.stravaId)
+            }
+        }
+
+        if let firstDate = weekSessions.first?.scheduledDate,
+           let lastDate = weekSessions.last?.scheduledDate {
+            for activity in strava.activities where activity.isRun && !countedActivityIds.contains(activity.stravaId) {
+                if activity.activityDate >= calendar.startOfDay(for: firstDate),
+                   activity.activityDate < calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: lastDate))! {
+                    actualMi += activity.distanceMi
+                    runsDone += 1
+                    countedActivityIds.insert(activity.stravaId)
+                }
+            }
+        }
 
         // Cross-training hours
-        let crossTrainSeconds = sessions.compactMap { session -> Int? in
-            guard let activity = strava.activity(for: session.id), activity.isCrossTraining else { return nil }
-            return activity.movingTimeSeconds
-        }.reduce(0, +)
+        var crossTrainSeconds = 0
+        for session in weekSessions {
+            if let activity = strava.activity(for: session.id), activity.isCrossTraining {
+                crossTrainSeconds += activity.movingTimeSeconds
+            }
+        }
         let crossTrainHours = Double(crossTrainSeconds) / 3600.0
 
         let weekStrengthDates = Set(
@@ -179,19 +202,19 @@ struct WeekView: View {
         let totalItems = trackableRuns.count + weekStrengthDates.count + weekStretchDates.count + weekHeat.count
         let totalDone = runsDone + strengthDone + stretchDone + heatDone
 
-        return HStack(spacing: 16) {
-            Label(String(format: "%.0f mi planned", plannedMi), systemImage: "target")
-                .font(.caption)
+        return HStack(spacing: 12) {
+            Label(String(format: "%.1f mi planned", plannedMi), systemImage: "target")
+                .font(TrailFont.data)
 
             if actualMi > 0 {
-                Label(String(format: "%.0f mi done", actualMi), systemImage: "checkmark.circle")
-                    .font(.caption)
+                Label(String(format: "%.1f mi done", actualMi), systemImage: "checkmark.circle")
+                    .font(TrailFont.data)
                     .foregroundStyle(.green)
             }
 
             if crossTrainHours > 0 {
                 Label(String(format: "%.1fh XT", crossTrainHours), systemImage: "figure.mixed.cardio")
-                    .font(.caption)
+                    .font(TrailFont.data)
                     .foregroundStyle(.orange)
             }
 
@@ -199,12 +222,12 @@ struct WeekView: View {
 
             if totalDone > 0 {
                 Text("\(totalDone)/\(totalItems) done")
-                    .font(.caption)
+                    .font(TrailFont.data)
                     .foregroundStyle(.green)
             }
             if skipped > 0 {
                 Text("\(skipped) skipped")
-                    .font(.caption)
+                    .font(TrailFont.data)
                     .foregroundStyle(.red)
             }
         }
@@ -224,18 +247,18 @@ struct WeekView: View {
         let dayHeat = heatStore.sessions(for: session.scheduledDate)
         let dayStretch = stretchStore.sessions(for: session.scheduledDate)
 
-        return HStack(spacing: 12) {
+        return HStack(alignment: .top, spacing: 12) {
             VStack(spacing: 2) {
                 Text(session.scheduledDate.formatted(.dateTime.weekday(.abbreviated)))
-                    .font(.caption)
+                    .font(TrailFont.meta)
                     .foregroundStyle(.secondary)
                 Text("\(Calendar.current.component(.day, from: session.scheduledDate))")
-                    .font(.headline)
+                    .font(TrailFont.title)
             }
             .frame(width: 40)
 
             Image(systemName: session.workoutType.iconName)
-                .font(.body)
+                .font(TrailFont.body)
                 .foregroundStyle(session.workoutType.swiftUIColor)
                 .frame(width: 32, height: 32)
                 .background(session.workoutType.swiftUIColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
@@ -243,25 +266,25 @@ struct WeekView: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(session.workoutType.displayName)
-                        .font(.headline)
+                        .font(TrailFont.title)
                         .strikethrough(skipped)
 
                     if overridden {
                         Image(systemName: "pencil.circle.fill")
-                            .font(.caption)
+                            .font(TrailFont.meta)
                             .foregroundStyle(.orange)
                     }
                 }
 
                 if let mi = session.targetDistanceMi {
                     Text(String(format: "%.1f mi", mi))
-                        .font(.subheadline)
+                        .font(TrailFont.data)
                         .foregroundStyle(.secondary)
                 }
 
                 if let pace = session.targetPaceDescription, !pace.isEmpty {
                     Text(pace)
-                        .font(.caption)
+                        .font(TrailFont.data)
                         .foregroundStyle(.tertiary)
                         .lineLimit(1)
                 }
@@ -278,8 +301,8 @@ struct WeekView: View {
                             } icon: {
                                 Image(systemName: allDone ? "checkmark.circle.fill" : "dumbbell.fill")
                             }
-                            .font(.caption)
-                            .foregroundStyle(allDone ? .green : Color.swapAccent)
+                            .font(TrailFont.meta)
+                            .foregroundStyle(allDone ? .green : Color.trailGreen)
                         }
 
                         if let heat = dayHeat.first {
@@ -291,7 +314,7 @@ struct WeekView: View {
                                 } icon: {
                                     Image(systemName: heatStore.isComplete(heat.id) ? "checkmark.circle.fill" : "flame.fill")
                                 }
-                                .font(.caption)
+                                .font(TrailFont.meta)
                                 .foregroundStyle(heatStore.isComplete(heat.id) ? .green : .orange)
                             }
                             .buttonStyle(.plain)
@@ -313,8 +336,8 @@ struct WeekView: View {
                                 } icon: {
                                     Image(systemName: allDone ? "checkmark.circle.fill" : "figure.flexibility")
                                 }
-                                .font(.caption)
-                                .foregroundStyle(allDone ? .green : Color.swapAccent)
+                                .font(TrailFont.meta)
+                                .foregroundStyle(allDone ? .green : Color.trailGreen)
                             }
                             .buttonStyle(.plain)
                         }
@@ -331,23 +354,23 @@ struct WeekView: View {
                         .foregroundStyle(.green)
                     if activity.isRun {
                         Text(String(format: "%.1f mi", activity.distanceMi))
-                            .font(.caption)
+                            .font(TrailFont.data)
                             .foregroundStyle(.green)
                     } else {
                         Text(activity.activityTypeDisplay)
-                            .font(.caption)
+                            .font(TrailFont.data)
                             .foregroundStyle(.green)
                     }
                 }
             } else if skipped {
                 Text("Skipped")
-                    .font(.caption)
+                    .font(TrailFont.meta)
                     .foregroundStyle(.red)
                     .fontWeight(.semibold)
             }
 
             Image(systemName: "chevron.right")
-                .font(.caption)
+                .font(TrailFont.meta)
                 .foregroundStyle(.quaternary)
         }
         .padding(12)
@@ -362,7 +385,6 @@ struct WeekView: View {
         .opacity(skipped ? 0.6 : 1.0)
     }
 
-
     // MARK: - Empty State
 
     private var emptyState: some View {
@@ -371,14 +393,14 @@ struct WeekView: View {
 
             Image(systemName: "calendar")
                 .font(.system(size: 48))
-                .foregroundStyle(Color.swapAccent)
+                .foregroundStyle(Color.trailGreen)
 
             Text("No plan loaded yet")
-                .font(.title3)
+                .font(TrailFont.title)
                 .foregroundStyle(.secondary)
 
             Text("Create a training plan to see your weekly schedule.")
-                .font(.subheadline)
+                .font(TrailFont.detail)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)

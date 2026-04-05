@@ -17,7 +17,7 @@ struct PlanCalendarView: View {
                 emptyState
             }
         }
-        .navigationTitle("Plan")
+        .toolbar(.hidden, for: .navigationBar)
     }
 
     // MARK: - Calendar Content
@@ -62,7 +62,7 @@ struct PlanCalendarView: View {
     private func planHeader(_ plan: TrainingPlan) -> some View {
         VStack(spacing: 4) {
             Text(plan.name)
-                .font(.headline)
+                .font(TrailFont.title)
             HStack(spacing: 16) {
                 Label(plan.raceDate.formatted(date: .abbreviated, time: .omitted), systemImage: "flag.fill")
                 if let week = planStore.currentWeekNumber {
@@ -70,7 +70,7 @@ struct PlanCalendarView: View {
                         .fontWeight(.medium)
                 }
             }
-            .font(.caption)
+            .font(TrailFont.meta)
             .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
@@ -88,7 +88,7 @@ struct PlanCalendarView: View {
 
             ForEach(0..<7, id: \.self) { i in
                 Text(dayLabels[i])
-                    .font(.caption.bold())
+                    .font(TrailFont.metaBold)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
             }
@@ -115,7 +115,7 @@ struct PlanCalendarView: View {
         let date = sessions.first?.scheduledDate ?? Date()
 
         return Text(date.formatted(.dateTime.month(.wide).year()))
-            .font(.subheadline.bold())
+            .font(TrailFont.detailBold)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.top, week == planStore.allWeekNumbers.first ? 0 : 12)
             .padding(.bottom, 4)
@@ -141,7 +141,7 @@ struct PlanCalendarView: View {
 
         return HStack(spacing: 4) {
             Text("W\(weekNumber)")
-                .font(.caption.bold())
+                .font(TrailFont.metaBold)
                 .foregroundStyle(isCurrentWeek ? .blue : .secondary)
                 .frame(width: 32)
 
@@ -169,7 +169,7 @@ struct PlanCalendarView: View {
 
         return VStack(spacing: 2) {
             Text("\(dayNum)")
-                .font(.caption)
+                .font(TrailFont.meta)
                 .fontWeight(isToday ? .bold : .regular)
                 .foregroundStyle(isToday ? .primary : .secondary)
 
@@ -188,7 +188,7 @@ struct PlanCalendarView: View {
                 if hasStrength {
                     Image(systemName: "dumbbell.fill")
                         .font(.system(size: 6))
-                        .foregroundStyle(Color.swapAccent)
+                        .foregroundStyle(Color.trailGreen)
                         .offset(x: -8, y: -6)
                 }
 
@@ -232,28 +232,28 @@ struct PlanCalendarView: View {
     // MARK: - Calendar Cell Color Mapping
 
     private func calendarCellBackground(_ type: WorkoutType, skipped: Bool) -> Color {
-        if skipped { return Color.swapAccent.opacity(0.04) }
+        if skipped { return Color.trailGreen.opacity(0.04) }
         switch type {
         case .easy, .recovery:
-            return Color.swapAccent.opacity(0.15)
+            return Color.trailGreen.opacity(0.15)
         case .tempo:
-            return Color.swapAccent.opacity(0.4)
+            return Color.trailGreen.opacity(0.4)
         case .intervals:
-            return Color.swapAccent.opacity(0.7)
+            return Color.trailGreen.opacity(0.7)
         case .longRun, .race:
-            return Color.swapAccent
+            return Color.trailGreen
         case .rest:
             return .clear
         case .crossTrain:
             return .clear
         case .strength:
-            return Color.swapAccent.opacity(0.15)
+            return Color.trailGreen.opacity(0.15)
         }
     }
 
     private func calendarCellBorder(_ type: WorkoutType, isToday: Bool) -> Color {
         if isToday { return .primary }
-        if type == .crossTrain { return Color.swapAccent.opacity(0.4) }
+        if type == .crossTrain { return Color.trailGreen.opacity(0.4) }
         return .clear
     }
 
@@ -268,11 +268,11 @@ struct PlanCalendarView: View {
                 .foregroundStyle(.blue)
 
             Text("No plan loaded yet")
-                .font(.title3)
+                .font(TrailFont.title)
                 .foregroundStyle(.secondary)
 
             Text("Create a training plan to see your full schedule.")
-                .font(.subheadline)
+                .font(TrailFont.detail)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)

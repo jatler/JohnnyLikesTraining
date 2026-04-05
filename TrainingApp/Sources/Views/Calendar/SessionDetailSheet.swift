@@ -133,12 +133,12 @@ struct SessionDetailSheet: View {
         VStack(alignment: .leading, spacing: 16) {
             Section {
                 Text("Edit Workout")
-                    .font(.headline)
+                    .font(TrailFont.title)
             }
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("Workout Type")
-                    .font(.subheadline.bold())
+                    .font(TrailFont.detailBold)
                     .foregroundStyle(.secondary)
 
                 Picker("Type", selection: $editWorkoutType) {
@@ -151,7 +151,7 @@ struct SessionDetailSheet: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("Distance (miles)")
-                    .font(.subheadline.bold())
+                    .font(TrailFont.detailBold)
                     .foregroundStyle(.secondary)
 
                 TextField("e.g. 8.0", text: $editDistanceMi)
@@ -161,7 +161,7 @@ struct SessionDetailSheet: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("Effort / Pace")
-                    .font(.subheadline.bold())
+                    .font(TrailFont.detailBold)
                     .foregroundStyle(.secondary)
 
                 TextField("e.g. Easy effort, Z1/Z2", text: $editPace)
@@ -170,7 +170,7 @@ struct SessionDetailSheet: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("Coach notes")
-                    .font(.subheadline.bold())
+                    .font(TrailFont.title)
                     .foregroundStyle(.secondary)
 
                 ZStack(alignment: .topLeading) {
@@ -182,7 +182,7 @@ struct SessionDetailSheet: View {
                             .allowsHitTesting(false)
                     }
                     TextEditor(text: $editNotes)
-                        .font(.body)
+                        .font(TrailFont.body)
                         .frame(minHeight: 260)
                         .scrollContentBackground(.hidden)
                         .padding(.horizontal, 4)
@@ -196,7 +196,7 @@ struct SessionDetailSheet: View {
             }
 
             Toggle("Apply to all \(dayOfWeekName)s", isOn: $propagateToSameDay)
-                .font(.subheadline)
+                .font(TrailFont.detail)
 
             if isOverridden {
                 Button {
@@ -217,7 +217,7 @@ struct SessionDetailSheet: View {
     private var workoutHeader: some View {
         HStack {
             Image(systemName: session.workoutType.iconName)
-                .font(.title2)
+                .font(TrailFont.title)
                 .foregroundStyle(session.workoutType.swiftUIColor)
                 .frame(width: 44, height: 44)
                 .background(session.workoutType.swiftUIColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 10))
@@ -225,19 +225,19 @@ struct SessionDetailSheet: View {
             VStack(alignment: .leading, spacing: 2) {
                 HStack(spacing: 6) {
                     Text(session.workoutType.displayName)
-                        .font(.headline)
+                        .font(TrailFont.title)
                         .strikethrough(isSkipped)
                         .opacity(isSkipped ? 0.5 : 1)
 
                     if isOverridden {
                         Image(systemName: "pencil.circle.fill")
-                            .font(.caption)
+                            .font(TrailFont.meta)
                             .foregroundStyle(.orange)
                     }
                 }
 
                 Text("Week \(session.weekNumber) \u{2022} Day \(session.dayOfWeek)")
-                    .font(.subheadline)
+                    .font(TrailFont.detail)
                     .foregroundStyle(.secondary)
             }
 
@@ -245,7 +245,7 @@ struct SessionDetailSheet: View {
 
             if isSkipped {
                 Text("Skipped")
-                    .font(.caption)
+                    .font(TrailFont.meta)
                     .fontWeight(.semibold)
                     .foregroundStyle(.white)
                     .padding(.horizontal, 8)
@@ -265,14 +265,14 @@ struct SessionDetailSheet: View {
             Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
                 .foregroundStyle(.secondary)
             Text(String(format: "%.1f mi", mi))
-                .font(.headline)
+                .font(TrailFont.dataBold)
         }
         .opacity(isSkipped ? 0.5 : 1)
     }
 
     private func paceRow(_ pace: String) -> some View {
         Label(pace, systemImage: "gauge.with.needle")
-            .font(.subheadline)
+            .font(TrailFont.detail)
             .foregroundStyle(.secondary)
             .opacity(isSkipped ? 0.5 : 1)
     }
@@ -280,10 +280,10 @@ struct SessionDetailSheet: View {
     private func notesSection(_ notes: String) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Coach notes")
-                .font(.subheadline.bold())
+                .font(TrailFont.detailBold)
                 .foregroundStyle(.secondary)
             Text(notes)
-                .font(.body)
+                .font(TrailFont.body)
                 .foregroundStyle(isSkipped ? .secondary : .primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
@@ -299,8 +299,8 @@ struct SessionDetailSheet: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Label("Strength", systemImage: "dumbbell.fill")
-                        .font(.subheadline.bold())
-                        .foregroundStyle(Color.swapAccent)
+                        .font(TrailFont.detailBold)
+                        .foregroundStyle(Color.trailGreen)
 
                     Spacer()
 
@@ -311,11 +311,11 @@ struct SessionDetailSheet: View {
                         )
                     } label: {
                         Label("Log", systemImage: "checkmark.circle")
-                            .font(.caption)
+                            .font(TrailFont.meta)
                     }
                     .buttonStyle(.bordered)
                     .controlSize(.small)
-                    .tint(Color.swapAccent)
+                    .tint(Color.trailGreen)
                 }
 
                 ForEach(daySessions) { s in
@@ -324,29 +324,29 @@ struct SessionDetailSheet: View {
 
                         if complete {
                             Image(systemName: "checkmark.circle.fill")
-                                .font(.caption)
+                                .font(TrailFont.meta)
                                 .foregroundStyle(.green)
                         } else {
                             Image(systemName: "circle")
-                                .font(.caption)
+                                .font(TrailFont.meta)
                                 .foregroundStyle(.quaternary)
                         }
 
                         Text(s.exerciseName)
-                            .font(.caption)
+                            .font(TrailFont.meta)
                             .foregroundStyle(complete ? .secondary : .primary)
 
                         Spacer()
 
                         Text(formatPrescription(s))
-                            .font(.caption)
+                            .font(TrailFont.meta)
                             .foregroundStyle(.secondary)
                     }
                 }
             }
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.swapAccent.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+            .background(Color.trailGreen.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
             .opacity(isSkipped ? 0.5 : 1)
         }
     }
@@ -368,8 +368,8 @@ struct SessionDetailSheet: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Label("Stretches", systemImage: "figure.flexibility")
-                        .font(.subheadline.bold())
-                        .foregroundStyle(Color.swapAccent)
+                        .font(TrailFont.detailBold)
+                        .foregroundStyle(Color.trailGreen)
 
                     Spacer()
 
@@ -378,7 +378,7 @@ struct SessionDetailSheet: View {
 
                     if completed > 0 {
                         Text("\(completed)/\(total) done")
-                            .font(.caption)
+                            .font(TrailFont.meta)
                             .foregroundStyle(.green)
                     }
                 }
@@ -388,18 +388,18 @@ struct SessionDetailSheet: View {
                         let complete = stretchStore.isComplete(s.id)
 
                         Image(systemName: complete ? "checkmark.circle.fill" : "circle")
-                            .font(.caption)
+                            .font(TrailFont.meta)
                             .foregroundStyle(complete ? .green : Color.secondary.opacity(0.3))
 
                         Text(s.stretchName)
-                            .font(.caption)
+                            .font(TrailFont.meta)
                             .foregroundStyle(complete ? .secondary : .primary)
 
                         Spacer()
 
                         if s.isBilateral {
                             Text("L+R")
-                                .font(.caption.bold())
+                                .font(TrailFont.metaBold)
                                 .foregroundStyle(.secondary)
                                 .padding(.horizontal, 5)
                                 .padding(.vertical, 1)
@@ -407,14 +407,14 @@ struct SessionDetailSheet: View {
                         }
 
                         Text("\(s.prescribedSets)×\(s.prescribedHoldSeconds)s")
-                            .font(.caption)
+                            .font(TrailFont.meta)
                             .foregroundStyle(.secondary)
                     }
                 }
             }
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.swapAccent.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+            .background(Color.trailGreen.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
             .opacity(isSkipped ? 0.5 : 1)
         }
     }
@@ -427,7 +427,7 @@ struct SessionDetailSheet: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Label("Heat", systemImage: "flame.fill")
-                        .font(.subheadline.bold())
+                        .font(TrailFont.detailBold)
                         .foregroundStyle(.orange)
 
                     Spacer()
@@ -442,21 +442,21 @@ struct SessionDetailSheet: View {
                     } label: {
                         HStack(spacing: 8) {
                             Image(systemName: complete ? "checkmark.circle.fill" : "flame")
-                                .font(.caption)
+                                .font(TrailFont.meta)
                                 .foregroundStyle(complete ? .green : .orange)
 
                             Text(hs.sessionType.displayName)
-                                .font(.caption)
+                                .font(TrailFont.meta)
 
                             Spacer()
 
                             if let log {
                                 Text("\(log.actualDurationMinutes) min")
-                                    .font(.caption)
+                                    .font(TrailFont.meta)
                                     .foregroundStyle(.green)
                             } else {
                                 Text("\(hs.targetDurationMinutes) min")
-                                    .font(.caption)
+                                    .font(TrailFont.meta)
                                     .foregroundStyle(.secondary)
                             }
                         }
@@ -532,7 +532,7 @@ struct SessionDetailSheet: View {
     private var swapTargetsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Select a day to swap with:")
-                .font(.subheadline.bold())
+                .font(TrailFont.detailBold)
                 .foregroundStyle(.secondary)
 
             let targets = planStore.sessions(for: session.weekNumber)
@@ -550,9 +550,9 @@ struct SessionDetailSheet: View {
 
                         VStack(alignment: .leading) {
                             Text(target.scheduledDate.formatted(.dateTime.weekday(.wide)))
-                                .font(.subheadline.bold())
+                                .font(TrailFont.detailBold)
                             Text(target.workoutType.displayName)
-                                .font(.caption)
+                                .font(TrailFont.meta)
                                 .foregroundStyle(.secondary)
                         }
 
@@ -560,7 +560,7 @@ struct SessionDetailSheet: View {
 
                         if let mi = target.targetDistanceMi {
                             Text(String(format: "%.1f mi", mi))
-                                .font(.caption)
+                                .font(TrailFont.meta)
                                 .foregroundStyle(.secondary)
                         }
                     }

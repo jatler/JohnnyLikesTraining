@@ -17,8 +17,15 @@ struct SettingsView: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                gracePeriodBanner
+            VStack(spacing: 0) {
+                Text("Settings")
+                    .font(TrailFont.dataLarge)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding()
+                    .background(.bar)
+
+                List {
+                    gracePeriodBanner
                 patreonSection
                 stravaSection
                 ouraSection
@@ -26,7 +33,8 @@ struct SettingsView: View {
                 accountSection
                 aboutSection
             }
-            .navigationTitle("Settings")
+            }
+            .toolbar(.hidden, for: .navigationBar)
             .alert("Error", isPresented: $showingError) {
                 Button("OK") {}
             } message: {
@@ -46,9 +54,9 @@ struct SettingsView: View {
                         .foregroundStyle(.yellow)
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Your access expires in \(daysLeft) day\(daysLeft == 1 ? "" : "s")")
-                            .font(.subheadline.bold())
+                            .font(TrailFont.detailBold)
                         Link("Resubscribe on Patreon ↗", destination: BrandKit.patreonURL)
-                            .font(.caption)
+                            .font(TrailFont.meta)
                             .foregroundStyle(.yellow)
                     }
                 }
@@ -64,10 +72,10 @@ struct SettingsView: View {
             if patreon.isConnected {
                 HStack {
                     Label("SWAP Patreon", systemImage: "star.circle.fill")
-                        .foregroundStyle(Color.swapAccent)
+                        .foregroundStyle(Color.trailGreen)
                     Spacer()
                     Text("Connected")
-                        .font(.subheadline)
+                        .font(TrailFont.detail)
                         .foregroundStyle(.green)
                 }
 
@@ -78,7 +86,7 @@ struct SettingsView: View {
                         Spacer()
                         Text(lastVerified.formatted(.relative(presentation: .named)))
                     }
-                    .font(.subheadline)
+                    .font(TrailFont.detail)
                 }
 
                 Button("Disconnect Patreon", role: .destructive) {
@@ -96,7 +104,7 @@ struct SettingsView: View {
                 } label: {
                     HStack {
                         Label("Connect Patreon", systemImage: "star.circle.fill")
-                            .foregroundStyle(Color.swapAccent)
+                            .foregroundStyle(Color.trailGreen)
                         Spacer()
                         Image(systemName: "arrow.up.right.square")
                             .foregroundStyle(.secondary)
@@ -124,7 +132,7 @@ struct SettingsView: View {
                         .frame(height: 16)
                     Spacer()
                     Text("Connected")
-                        .font(.subheadline)
+                        .font(TrailFont.detail)
                         .foregroundStyle(.green)
                 }
 
@@ -135,7 +143,7 @@ struct SettingsView: View {
                         Spacer()
                         Text(name)
                     }
-                    .font(.subheadline)
+                    .font(TrailFont.detail)
                 }
 
                 if let lastSync = strava.lastSyncDate {
@@ -145,7 +153,7 @@ struct SettingsView: View {
                         Spacer()
                         Text(lastSync.formatted(.relative(presentation: .named)))
                     }
-                    .font(.subheadline)
+                    .font(TrailFont.detail)
                 }
 
                 Button {
@@ -204,7 +212,7 @@ struct SettingsView: View {
                         .foregroundStyle(.primary)
                     Spacer()
                     Text("Connected")
-                        .font(.subheadline)
+                        .font(TrailFont.detail)
                         .foregroundStyle(.green)
                 }
 
@@ -215,7 +223,7 @@ struct SettingsView: View {
                         Spacer()
                         Text(lastSync.formatted(.relative(presentation: .named)))
                     }
-                    .font(.subheadline)
+                    .font(TrailFont.detail)
                 }
 
                 Button {
@@ -278,7 +286,7 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                         Spacer()
                         Text(plan.name)
-                            .font(.subheadline)
+                            .font(TrailFont.detail)
                     }
 
                     HStack {
@@ -286,7 +294,7 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                         Spacer()
                         Text(plan.raceDate.formatted(date: .abbreviated, time: .omitted))
-                            .font(.subheadline)
+                            .font(TrailFont.detail)
                     }
 
                     HStack {
@@ -294,7 +302,7 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                         Spacer()
                         Text("\(planStore.sessions.count)")
-                            .font(.subheadline)
+                            .font(TrailFont.detail)
                     }
                 }
 
@@ -339,7 +347,7 @@ struct SettingsView: View {
             HStack {
                 Text("Version")
                 Spacer()
-                Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.3")
+                Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.4")
                     .foregroundStyle(.secondary)
             }
 

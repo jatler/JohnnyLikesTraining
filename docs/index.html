@@ -3,18 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JohnnyLikesTraining</title>
+    <title>SWAP Training</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #FAFAF7;
+            --surface: #FFFFFF;
+            --text-primary: #1C1C1A;
+            --text-secondary: #5A5750;
+            --text-tertiary: #8A8478;
+            --border: #E8E4DF;
+            --accent: #14532d;
+            --font-display: 'Fraunces', Georgia, serif;
+            --font-body: 'Source Sans 3', -apple-system, sans-serif;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1C1C1A;
+                --surface: #2A2A27;
+                --text-primary: #F0EDE8;
+                --text-secondary: #B8B2A8;
+                --text-tertiary: #8A8478;
+                --border: #3D3D38;
+                --accent: #00B068;
+            }
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: #1d1d1f;
-            background: #fff;
-            line-height: 1.6;
+            font-family: var(--font-body);
+            color: var(--text-primary);
+            background: var(--bg);
+            line-height: 1.7;
         }
 
         .hero {
-            background: #14532d;
+            background: var(--accent);
             padding: 80px 24px 64px;
         }
         .hero-inner {
@@ -22,16 +49,30 @@
             margin: 0 auto;
         }
         .hero h1 {
-            font-size: 2.4rem;
-            font-weight: 700;
+            font-family: var(--font-display);
+            font-size: 2.6rem;
+            font-weight: 400;
             color: #fff;
             margin-bottom: 12px;
             letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+        .hero h1 em {
+            font-style: italic;
         }
         .hero p {
             font-size: 1.15rem;
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.85);
             max-width: 480px;
+            line-height: 1.7;
+        }
+        .hero .tagline {
+            font-family: var(--font-display);
+            font-style: italic;
+            font-weight: 300;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 12px;
         }
 
         .content {
@@ -48,35 +89,37 @@
         }
         .feature {
             padding: 20px 0;
-            border-bottom: 1px solid #e5e5ea;
+            border-bottom: 1px solid var(--border);
         }
         .feature h3 {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #1d1d1f;
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: var(--text-primary);
             margin-bottom: 4px;
         }
         .feature p {
-            font-size: 0.875rem;
-            color: #6e6e73;
-            line-height: 1.5;
+            font-size: 0.925rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
         }
 
         .section {
             margin: 0 0 40px;
         }
         .section h2 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1d1d1f;
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: var(--text-primary);
             margin-bottom: 8px;
         }
         .section p {
-            color: #6e6e73;
+            color: var(--text-secondary);
             font-size: 0.925rem;
         }
         .section a {
-            color: #1a7a28;
+            color: var(--accent);
             text-decoration: none;
         }
         .section a:hover { text-decoration: underline; }
@@ -86,11 +129,11 @@
             margin: 0 auto;
             padding: 32px 24px;
             font-size: 0.8rem;
-            color: #aeaeb2;
-            border-top: 1px solid #e5e5ea;
+            color: var(--text-tertiary);
+            border-top: 1px solid var(--border);
         }
         footer a {
-            color: #6e6e73;
+            color: var(--text-secondary);
             text-decoration: none;
             margin-right: 16px;
         }
