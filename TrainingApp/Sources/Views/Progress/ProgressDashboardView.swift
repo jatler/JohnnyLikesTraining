@@ -23,7 +23,7 @@ struct ProgressDashboardView: View {
                             .background(.bar)
 
                         ScrollView {
-                            VStack(spacing: 24) {
+                            VStack(spacing: 12) {
                                 weeklyDetailList
                                 raceReadinessCard
                                 if let plan = planStore.activePlan {

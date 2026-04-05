@@ -121,7 +121,7 @@ struct StrengthTemplateView: View {
             .background(.bar)
 
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(spacing: 12) {
                     switch selectedSegment {
                     case .strength:
                         suggestionsSection
@@ -329,10 +329,9 @@ struct StrengthTemplateView: View {
             RoundedRectangle(cornerRadius: 12)
                 .fill(isToday ? Color.trailGreen.opacity(0.08) : Color(.systemBackground))
         )
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(isToday ? Color.trailGreen.opacity(0.3) : .clear, lineWidth: 1)
+                .strokeBorder(isToday ? Color.trailGreen.opacity(0.3) : Color(.separator).opacity(0.3), lineWidth: 1)
         )
         .contentShape(Rectangle())
         .onTapGesture {
@@ -443,10 +442,9 @@ struct StrengthTemplateView: View {
             RoundedRectangle(cornerRadius: 12)
                 .fill(isToday ? Color.trailGreen.opacity(0.08) : Color(.systemBackground))
         )
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(isToday ? Color.trailGreen.opacity(0.3) : .clear, lineWidth: 1)
+                .strokeBorder(isToday ? Color.trailGreen.opacity(0.3) : Color(.separator).opacity(0.3), lineWidth: 1)
         )
         .contentShape(Rectangle())
         .onTapGesture {
@@ -518,17 +516,23 @@ struct StrengthTemplateView: View {
                     let highlighted = isHighlightedDay(entry.day, availableDays: heatDayNumbers)
                     let complete = heatStore.isComplete(entry.session.id)
 
-                    HStack(spacing: 12) {
+                    HStack(alignment: .top, spacing: 12) {
                         Image(systemName: complete ? "checkmark.circle.fill" : "circle")
                             .font(.title3)
                             .foregroundStyle(complete ? .green : .secondary.opacity(0.4))
+
+                        Image(systemName: "flame.fill")
+                            .font(TrailFont.body)
+                            .foregroundStyle(.orange)
+                            .frame(width: 32, height: 32)
+                            .background(Color.orange.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text(dayNames[entry.day])
                                 .font(TrailFont.title)
 
                             Text("\(entry.session.sessionType.displayName) • \(entry.session.targetDurationMinutes) min")
-                                .font(TrailFont.detail)
+                                .font(TrailFont.data)
                                 .foregroundStyle(.secondary)
                         }
 
@@ -539,7 +543,6 @@ struct StrengthTemplateView: View {
                         RoundedRectangle(cornerRadius: 12)
                             .fill(highlighted ? Color.orange.opacity(0.08) : Color(.systemBackground))
                     )
-                    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
                             .strokeBorder(highlighted ? Color.orange.opacity(0.3) : .clear, lineWidth: 1)

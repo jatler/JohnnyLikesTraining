@@ -396,9 +396,13 @@ Every tappable list item follows the same anatomy:
 ### Content Cards
 
 - Sections within scroll content do NOT wrap in `.regularMaterial` cards. Use flat layout.
-- Individual tappable rows use `RoundedRectangle(cornerRadius: 12)` with optional tint highlight.
+- Individual tappable rows use `RoundedRectangle(cornerRadius: 12)` with tint fill for current day + subtle stroke border for non-highlighted rows.
+- No `.regularMaterial` backgrounds on content cards. Use `Color(.systemBackground)` fill + `Color(.separator).opacity(0.3)` stroke.
 - Section labels use `TrailFont.title` (Fraunces).
 - Stat callouts left-align, never center.
+- Scroll content spacing: `VStack(spacing: 12)` or `LazyVStack(spacing: 12)` across all tabs.
+- Every list item type (workout, exercise, stretch, heat) gets its own icon badge (32x32, rounded 8, 0.15 opacity tint).
+- Inline data (prescriptions, durations, distances) always in `TrailFont.data`.
 
 ## Navigation Patterns
 
@@ -423,7 +427,7 @@ Every tappable list item follows the same anatomy:
 
 Show summary at the group level, full detail on tap-through:
 - **Week tab**: Session type + distance + completion status. Tap for detail sheet.
-- **Strength tab**: Day name + exercise names + completion circles. Tap day for full prescription + logging.
+- **Strength tab**: Day name + icon badge + exercise name + inline prescription (3x10 @ 45 lbs). Tap day for logging.
 - **Today view**: Current session with coach notes expanded. Ancillary sections compact.
 
 ## Interaction States
