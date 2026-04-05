@@ -115,10 +115,6 @@ struct TodayView: View {
                 }
 
                 tuesdayBanner
-
-                if let plan = planStore.activePlan {
-                    planInfoBar(plan)
-                }
             }
             .padding()
         }

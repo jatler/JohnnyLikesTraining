@@ -343,15 +343,29 @@ struct StrengthTemplateView: View {
     }
 
     private func exerciseRow(_ exercise: StrengthTemplateExercise, complete: Bool) -> some View {
-        HStack(spacing: 12) {
+        HStack(alignment: .top, spacing: 12) {
             Image(systemName: complete ? "checkmark.circle.fill" : "circle")
                 .font(.title3)
                 .foregroundStyle(complete ? .green : .secondary.opacity(0.4))
 
-            Text(exercise.exerciseName)
+            Image(systemName: "dumbbell.fill")
                 .font(TrailFont.body)
-                .strikethrough(complete)
-                .foregroundStyle(complete ? .secondary : .primary)
+                .foregroundStyle(Color.trailGreen)
+                .frame(width: 32, height: 32)
+                .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(exercise.exerciseName)
+                    .font(TrailFont.body)
+                    .strikethrough(complete)
+                    .foregroundStyle(complete ? .secondary : .primary)
+
+                let repsLabel = exercise.isTimed ? "\(exercise.prescribedReps)s" : "\(exercise.prescribedReps)"
+                let prescription = "\(exercise.prescribedSets)x\(repsLabel)" + (exercise.prescribedWeightKg.map { " @ \(Int($0 * 2.205)) lbs" } ?? "")
+                Text(prescription)
+                    .font(TrailFont.data)
+                    .foregroundStyle(.secondary)
+            }
 
             Spacer()
         }
@@ -443,15 +457,28 @@ struct StrengthTemplateView: View {
     }
 
     private func stretchExerciseRow(_ exercise: StretchTemplateExercise, complete: Bool) -> some View {
-        HStack(spacing: 12) {
+        HStack(alignment: .top, spacing: 12) {
             Image(systemName: complete ? "checkmark.circle.fill" : "circle")
                 .font(.title3)
                 .foregroundStyle(complete ? .green : .secondary.opacity(0.4))
 
-            Text(exercise.stretchName)
+            Image(systemName: "figure.flexibility")
                 .font(TrailFont.body)
-                .strikethrough(complete)
-                .foregroundStyle(complete ? .secondary : .primary)
+                .foregroundStyle(Color.trailGreen)
+                .frame(width: 32, height: 32)
+                .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(exercise.stretchName)
+                    .font(TrailFont.body)
+                    .strikethrough(complete)
+                    .foregroundStyle(complete ? .secondary : .primary)
+
+                let perSide = exercise.isBilateral ? " each side" : ""
+                Text("\(exercise.sets)x\(exercise.holdSeconds)s\(perSide)")
+                    .font(TrailFont.data)
+                    .foregroundStyle(.secondary)
+            }
 
             Spacer()
         }

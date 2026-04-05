@@ -374,6 +374,32 @@ Every tab follows the same structure. Today and Week are the golden references.
 | Strength  | "Strength & More" + segmented picker | — | VStack(spacing: 20), day sections |
 | Settings  | "Settings" | — | List with sections |
 
+### Row Pattern (shared across all tabs)
+
+Every tappable list item follows the same anatomy:
+
+```
+┌─────────────────────────────────────────────────────┐
+│ [icon badge 32x32]  Title (TrailFont.title)    [>]  │
+│                     Subtitle (TrailFont.data)        │
+│                     Status badges (TrailFont.meta)   │
+└─────────────────────────────────────────────────────┘
+```
+
+- `HStack(alignment: .top, spacing: 12)` for top alignment
+- Icon badge: `Image(systemName:).frame(width:32, height:32).background(color.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))`
+- Text in a `VStack(alignment: .leading, spacing: 2)`
+- Data values (distance, pace, prescriptions) in `TrailFont.data`
+- Trailing chevron for tappable rows
+- Current day/week highlight: `.opacity(0.08)` tinted background + `.opacity(0.3)` stroke border
+
+### Content Cards
+
+- Sections within scroll content do NOT wrap in `.regularMaterial` cards. Use flat layout.
+- Individual tappable rows use `RoundedRectangle(cornerRadius: 12)` with optional tint highlight.
+- Section labels use `TrailFont.title` (Fraunces).
+- Stat callouts left-align, never center.
+
 ## Navigation Patterns
 
 ### Tab Structure

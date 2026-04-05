@@ -26,6 +26,9 @@ struct ProgressDashboardView: View {
                             VStack(spacing: 24) {
                                 weeklyDetailList
                                 raceReadinessCard
+                                if let plan = planStore.activePlan {
+                                    planInfoBar(plan)
+                                }
                             }
                             .padding()
                             .padding(.bottom, 20)
@@ -195,8 +198,6 @@ struct ProgressDashboardView: View {
                 weekDetailRow(entry, globalMaxMi: globalMaxMi)
             }
         }
-        .padding()
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
     }
 
     private func weekDetailRow(_ entry: WeekMileageEntry, globalMaxMi: Double) -> some View {
@@ -274,7 +275,7 @@ struct ProgressDashboardView: View {
         let stats = computeCompletionStats()
         let readiness = computeRaceReadiness(stats: stats)
 
-        return VStack(spacing: 16) {
+        return VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("Race Readiness")
                     .font(TrailFont.title)
@@ -290,7 +291,7 @@ struct ProgressDashboardView: View {
                 ).day ?? 0
 
                 HStack(spacing: 24) {
-                    VStack(spacing: 2) {
+                    VStack(alignment: .leading, spacing: 2) {
                         Text("\(max(daysUntilRace, 0))")
                             .font(TrailFont.dataLarge)
                         Text("Days to Race")
@@ -298,7 +299,7 @@ struct ProgressDashboardView: View {
                             .foregroundStyle(.secondary)
                     }
 
-                    VStack(spacing: 2) {
+                    VStack(alignment: .leading, spacing: 2) {
                         Text(String(format: "%.0f%%", stats.completionRate * 100))
                             .font(TrailFont.dataLarge)
                             .foregroundStyle(Color.trailGreen)
@@ -308,7 +309,7 @@ struct ProgressDashboardView: View {
                     }
 
                     if let weekNum = planStore.currentWeekNumber {
-                        VStack(spacing: 2) {
+                        VStack(alignment: .leading, spacing: 2) {
                             Text("\(weekNum)/\(planStore.totalWeeks)")
                                 .font(TrailFont.dataLarge)
                             Text("Weeks")
@@ -321,11 +322,9 @@ struct ProgressDashboardView: View {
                 Text(readiness.message)
                     .font(TrailFont.detail)
                     .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
             }
         }
-        .padding()
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .padding(.top, 16)
     }
 
     private func readinessBadge(_ level: RaceReadinessLevel) -> some View {
@@ -335,6 +334,27 @@ struct ProgressDashboardView: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 4)
             .background(level.color, in: Capsule())
+    }
+
+    // MARK: - Plan Info
+
+    private func planInfoBar(_ plan: TrainingPlan) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(plan.name)
+                .font(TrailFont.title)
+
+            HStack {
+                Label("Race: \(plan.raceDate.formatted(date: .abbreviated, time: .omitted))", systemImage: "flag.fill")
+                Spacer()
+                if let week = planStore.currentWeekNumber {
+                    Text("Week \(week) of \(planStore.totalWeeks)")
+                        .fontWeight(.medium)
+                }
+            }
+            .font(TrailFont.detail)
+            .foregroundStyle(.secondary)
+        }
+        .padding(.top, 16)
     }
 
     // MARK: - Empty State
