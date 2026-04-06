@@ -347,7 +347,7 @@ struct SettingsView: View {
             HStack {
                 Text("Version")
                 Spacer()
-                Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.4")
+                Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.5")
                     .foregroundStyle(.secondary)
             }
 
