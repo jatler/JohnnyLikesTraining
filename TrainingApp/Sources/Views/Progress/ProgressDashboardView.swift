@@ -420,10 +420,10 @@ struct ProgressDashboardView: View {
         let pastHeatSessions = allHeatSessions.filter { calendar.startOfDay(for: $0.scheduledDate) <= today }
         let completedHeatSessions = pastHeatSessions.filter { heatStore.isComplete($0.id) }.count
 
-        // --- Unified totals ---
-        let totalTrackable = trackableRuns.count + allStrengthDates.count + allStretchDates.count + allHeatSessions.count
-        let totalPast = pastRuns.count + pastStrengthDates.count + pastStretchDates.count + pastHeatSessions.count
-        let totalCompleted = completedRuns + completedStrengthDays + completedStretchDays + completedHeatSessions
+        // --- Unified totals (runs + XT only for race readiness) ---
+        let totalTrackable = trackableRuns.count
+        let totalPast = pastRuns.count
+        let totalCompleted = completedRuns
         let missedCount = max(totalPast - totalCompleted - skippedCount, 0)
         let upcomingCount = totalTrackable - totalPast
 
