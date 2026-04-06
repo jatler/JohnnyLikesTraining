@@ -359,8 +359,8 @@ struct StrengthTemplateView: View {
                     .strikethrough(complete)
                     .foregroundStyle(complete ? .secondary : .primary)
 
-                let repsLabel = exercise.isTimed ? "\(exercise.prescribedReps)s" : "\(exercise.prescribedReps)"
-                let prescription = "\(exercise.prescribedSets)x\(repsLabel)" + (exercise.prescribedWeightKg.map { " @ \(Int($0 * 2.205)) lbs" } ?? "")
+                let repsLabel = exercise.isTimed ? "\(exercise.targetReps)s" : "\(exercise.targetReps)"
+                let prescription = "\(exercise.targetSets)x\(repsLabel)" + (exercise.targetWeightKg.map { " @ \(Int($0 * 2.205)) lbs" } ?? "")
                 Text(prescription)
                     .font(TrailFont.data)
                     .foregroundStyle(.secondary)
