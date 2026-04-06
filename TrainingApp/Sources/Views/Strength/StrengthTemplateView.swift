@@ -516,27 +516,45 @@ struct StrengthTemplateView: View {
                     let highlighted = isHighlightedDay(entry.day, availableDays: heatDayNumbers)
                     let complete = heatStore.isComplete(entry.session.id)
 
-                    HStack(alignment: .top, spacing: 12) {
-                        Image(systemName: complete ? "checkmark.circle.fill" : "circle")
-                            .font(.title3)
-                            .foregroundStyle(complete ? .green : .secondary.opacity(0.4))
-
-                        Image(systemName: "flame.fill")
-                            .font(TrailFont.body)
-                            .foregroundStyle(.orange)
-                            .frame(width: 32, height: 32)
-                            .background(Color.orange.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
-
-                        VStack(alignment: .leading, spacing: 2) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
                             Text(dayNames[entry.day])
                                 .font(TrailFont.title)
 
-                            Text("\(entry.session.sessionType.displayName) • \(entry.session.targetDurationMinutes) min")
-                                .font(TrailFont.data)
-                                .foregroundStyle(.secondary)
+                            Spacer()
+
+                            if complete {
+                                Text("Done")
+                                    .font(TrailFont.meta)
+                                    .foregroundStyle(.green)
+                            }
                         }
 
-                        Spacer()
+                        HStack(alignment: .top, spacing: 12) {
+                            Image(systemName: complete ? "checkmark.circle.fill" : "circle")
+                                .font(.title3)
+                                .foregroundStyle(complete ? .green : .secondary.opacity(0.4))
+
+                            Image(systemName: "flame.fill")
+                                .font(TrailFont.body)
+                                .foregroundStyle(.orange)
+                                .frame(width: 32, height: 32)
+                                .background(Color.orange.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(entry.session.sessionType.displayName)
+                                    .font(TrailFont.body)
+                                    .strikethrough(complete)
+                                    .foregroundStyle(complete ? .secondary : .primary)
+
+                                Text("\(entry.session.targetDurationMinutes) min")
+                                    .font(TrailFont.data)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Spacer()
+                        }
+                        .padding(.vertical, 4)
                     }
                     .padding()
                     .background(
@@ -545,7 +563,7 @@ struct StrengthTemplateView: View {
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .strokeBorder(highlighted ? Color.orange.opacity(0.3) : .clear, lineWidth: 1)
+                            .strokeBorder(highlighted ? Color.orange.opacity(0.3) : Color(.separator).opacity(0.3), lineWidth: 1)
                     )
                     .contentShape(Rectangle())
                     .onTapGesture {
