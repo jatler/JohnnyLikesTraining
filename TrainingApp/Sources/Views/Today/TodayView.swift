@@ -118,17 +118,17 @@ struct TodayView: View {
             }
             .padding()
         }
-        .refreshable {
-            guard let userId = auth.currentUserId else { return }
-            let sevenDaysAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date()) ?? Date()
-            if strava.isConnected {
-                try? await strava.syncActivities(userId: userId, after: sevenDaysAgo, merge: true)
-                strava.autoMatchActivities(sessions: planStore.sessions)
+            .refreshable {
+                guard let userId = auth.currentUserId else { return }
+                let sevenDaysAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date()) ?? Date()
+                if strava.isConnected {
+                    try? await strava.syncActivities(userId: userId, after: sevenDaysAgo, merge: true)
+                    strava.autoMatchActivities(sessions: planStore.sessions)
+                }
+                if oura.isConnected {
+                    try? await oura.syncDaily(userId: userId, days: 7, merge: true)
+                }
             }
-            if oura.isConnected {
-                try? await oura.syncDaily(userId: userId, days: 7, merge: true)
-            }
-        }
         .sheet(item: $selectedHeatSession) { session in
             HeatLogSheet(session: session)
         }
