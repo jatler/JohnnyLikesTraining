@@ -290,32 +290,25 @@ struct WeekView: View {
                 }
 
                 if !daySessions.isEmpty || !dayHeat.isEmpty || !dayStretch.isEmpty {
-                    HStack(spacing: 10) {
+                    HStack(spacing: 8) {
                         if !daySessions.isEmpty {
                             let completed = strengthStore.completedExerciseCount(for: session.scheduledDate)
                             let total = daySessions.count
                             let allDone = completed == total
 
-                            Label {
-                                Text(allDone ? "Done" : "\(completed)/\(total)")
-                            } icon: {
-                                Image(systemName: allDone ? "checkmark.circle.fill" : "dumbbell.fill")
-                            }
-                            .font(TrailFont.meta)
-                            .foregroundStyle(allDone ? .green : Color.trailGreen)
+                            Label(allDone ? "✓" : "\(completed)/\(total)", systemImage: "dumbbell.fill")
+                                .font(TrailFont.meta)
+                                .foregroundStyle(allDone ? .green : Color.trailGreen)
                         }
 
                         if let heat = dayHeat.first {
                             Button {
                                 selectedHeatSession = heat
                             } label: {
-                                Label {
-                                    Text(heatStore.isComplete(heat.id) ? "Done" : "\(heat.targetDurationMinutes)m")
-                                } icon: {
-                                    Image(systemName: heatStore.isComplete(heat.id) ? "checkmark.circle.fill" : "flame.fill")
-                                }
-                                .font(TrailFont.meta)
-                                .foregroundStyle(heatStore.isComplete(heat.id) ? .green : .orange)
+                                let done = heatStore.isComplete(heat.id)
+                                Label(done ? "✓" : "\(heat.targetDurationMinutes)m", systemImage: "flame.fill")
+                                    .font(TrailFont.meta)
+                                    .foregroundStyle(done ? .green : .orange)
                             }
                             .buttonStyle(.plain)
                         }
@@ -331,17 +324,14 @@ struct WeekView: View {
                                 let total = dayStretch.count
                                 let allDone = completed == total
 
-                                Label {
-                                    Text(allDone ? "Done" : "\(completed)/\(total)")
-                                } icon: {
-                                    Image(systemName: allDone ? "checkmark.circle.fill" : "figure.flexibility")
-                                }
-                                .font(TrailFont.meta)
-                                .foregroundStyle(allDone ? .green : Color.trailGreen)
+                                Label(allDone ? "✓" : "\(completed)/\(total)", systemImage: "figure.flexibility")
+                                    .font(TrailFont.meta)
+                                    .foregroundStyle(allDone ? .green : Color.trailGreen)
                             }
                             .buttonStyle(.plain)
                         }
                     }
+                    .lineLimit(1)
                     .padding(.top, 2)
                 }
             }
