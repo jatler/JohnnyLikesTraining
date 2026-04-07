@@ -736,12 +736,8 @@ struct AddExerciseSheet: View {
                         Stepper("Reps: \(reps)", value: $reps, in: 1...50)
                     }
 
-                    Toggle("Bodyweight", isOn: $isBodyweight)
-
-                    if !isBodyweight {
-                        TextField("Weight (lbs)", text: $weightLbs)
-                            .keyboardType(.decimalPad)
-                    }
+                    TextField("Weight (lbs, optional)", text: $weightLbs)
+                        .keyboardType(.decimalPad)
 
                     TextField("Target RPE (optional)", text: $rpe)
                         .keyboardType(.decimalPad)
@@ -776,8 +772,8 @@ struct AddExerciseSheet: View {
             name: name.trimmingCharacters(in: .whitespaces),
             sets: sets,
             reps: effectiveReps,
-            weightKg: isBodyweight ? nil : weightKg,
-            isBodyweight: isBodyweight,
+            weightKg: weightKg,
+            isBodyweight: weightKg == nil,
             isTimed: isTimed,
             rpe: targetRpe,
             notes: notes.isEmpty ? nil : notes
@@ -823,12 +819,8 @@ struct EditExerciseSheet: View {
                         Stepper("Reps: \(reps)", value: $reps, in: 1...50)
                     }
 
-                    Toggle("Bodyweight", isOn: $isBodyweight)
-
-                    if !isBodyweight {
-                        TextField("Weight (lbs)", text: $weightLbs)
-                            .keyboardType(.decimalPad)
-                    }
+                    TextField("Weight (lbs, optional)", text: $weightLbs)
+                        .keyboardType(.decimalPad)
 
                     TextField("Target RPE (optional)", text: $rpe)
                         .keyboardType(.decimalPad)
@@ -903,9 +895,10 @@ struct EditExerciseSheet: View {
         updated.exerciseName = name.trimmingCharacters(in: .whitespaces)
         updated.targetSets = sets
         updated.targetReps = isTimed ? durationSeconds : reps
-        updated.isBodyweight = isBodyweight
+        let weightKg = Double(weightLbs).map { $0 / 2.205 }
+        updated.isBodyweight = weightKg == nil
         updated.isTimed = isTimed
-        updated.targetWeightKg = isBodyweight ? nil : Double(weightLbs).map { $0 / 2.205 }
+        updated.targetWeightKg = weightKg
         updated.targetRpe = Double(rpe)
         updated.notes = notes.isEmpty ? nil : notes
 
