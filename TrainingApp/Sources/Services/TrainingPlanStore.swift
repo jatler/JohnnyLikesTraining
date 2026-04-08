@@ -16,6 +16,11 @@ final class TrainingPlanStore {
 
     var hasPlan: Bool { activePlan != nil }
 
+    private func saveToCache() {
+        guard let plan = activePlan else { return }
+        PlanCacheService.save(plan: plan, sessions: sessions, skips: skips, swaps: swaps, overrides: overrides)
+    }
+
     // MARK: - Computed Helpers
 
     var todaySessions: [PlannedSession] {
@@ -209,6 +214,7 @@ final class TrainingPlanStore {
             swappedAt: Date()
         )
         swaps.append(swap)
+        saveToCache()
 
         let updatedA = sessions[indexA]
         let updatedB = sessions[indexB]
@@ -227,6 +233,7 @@ final class TrainingPlanStore {
             skippedAt: Date()
         )
         skips.append(skip)
+        saveToCache()
 
         Task { await persistSkip(skip) }
     }
@@ -234,6 +241,7 @@ final class TrainingPlanStore {
     func unskipSession(_ sessionId: UUID) {
         guard let index = skips.firstIndex(where: { $0.sessionId == sessionId }) else { return }
         let skip = skips.remove(at: index)
+        saveToCache()
         guard !isOffline else { return }
 
         Task {
@@ -317,6 +325,8 @@ final class TrainingPlanStore {
                 Task { await persistSessionFieldUpdate(sessions[otherIndex]) }
             }
         }
+
+        saveToCache()
     }
 
     func resetToOriginal(_ sessionId: UUID) {
@@ -334,6 +344,7 @@ final class TrainingPlanStore {
 
         let overrideId = overrides[overrideIndex].id
         overrides.remove(at: overrideIndex)
+        saveToCache()
         guard !isOffline else { return }
 
         Task {
