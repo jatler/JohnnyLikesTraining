@@ -20,7 +20,7 @@
 		1C51CC95D337B05BF3093A96 /* ProgressionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D2D3BC0E8B003565E5025D /* ProgressionEngine.swift */; };
 		275CADF1B33668F5B1D7353F /* StrengthStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5300AFFAABD6197E8F30D8 /* StrengthStore.swift */; };
 		2A2882EF65D9D87E33B384E3 /* StretchLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E80497D9A53018EEB5DDC9 /* StretchLog.swift */; };
-		2B510AFEAD0B2CE398731C9B /* SourceSans3-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 34193A0FCF9C9D05DF07EDC0 /* SourceSans3-SemiBold.ttf */; };
+
 		314A48FC6E46199FB265D062 /* swap_6_week_6w.json in Resources */ = {isa = PBXBuildFile; fileRef = B67572F92E767F702F3E8237 /* swap_6_week_6w.json */; };
 		318F754953A5B84505A9ECBD /* OuraDaily.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38427D1E7D9E72609E2756A6 /* OuraDaily.swift */; };
 		340974BD8F3C6D08E7B5BFAC /* ProgressionEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C01F97738C00E24FC785ED9 /* ProgressionEngineTests.swift */; };
@@ -39,7 +39,7 @@
 		5B13DA79B4AC7453D868630B /* Fraunces-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 747D2F3B56EEE28598D1536A /* Fraunces-LightItalic.ttf */; };
 		5C6B00911C4B919BE7AA7B0E /* PlanEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F8ED3535E0F5907E9AE4267 /* PlanEditView.swift */; };
 		5F862E196FF0910C46CC6F36 /* PatreonGateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76EDCC53D92978C810161580 /* PatreonGateView.swift */; };
-		632A388290CE494C0C05B908 /* SourceSans3-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7B8DB3AD41A1ECC38BB9F585 /* SourceSans3-Regular.ttf */; };
+
 		6F888519D7D6238904329600 /* SessionDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF23FA6E5F2C1983F9EF2ADA /* SessionDetailSheet.swift */; };
 		73B281FD62E689360910B786 /* champion_plan_100k.json in Resources */ = {isa = PBXBuildFile; fileRef = 2B21B45B9C3E88F085CD54AC /* champion_plan_100k.json */; };
 		74326E628177691CA8E40514 /* swap_50mile_12w.json in Resources */ = {isa = PBXBuildFile; fileRef = 43AD51FDF5F6406D076D2693 /* swap_50mile_12w.json */; };
@@ -115,7 +115,7 @@
 		28888F4CADF007802DC7B327 /* swap_50k_12w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_50k_12w.json; sourceTree = "<group>"; };
 		2B21B45B9C3E88F085CD54AC /* champion_plan_100k.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = champion_plan_100k.json; sourceTree = "<group>"; };
 		2BF1F9E0F6BDC1529AB3ECEB /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		34193A0FCF9C9D05DF07EDC0 /* SourceSans3-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSans3-SemiBold.ttf"; sourceTree = "<group>"; };
+
 		38427D1E7D9E72609E2756A6 /* OuraDaily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OuraDaily.swift; sourceTree = "<group>"; };
 		3895561C0376F954DE01A693 /* StravaActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StravaActivity.swift; sourceTree = "<group>"; };
 		3922D09D3B1CE07E2DC0618A /* PlanSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanSetupView.swift; sourceTree = "<group>"; };
@@ -137,7 +137,7 @@
 		73F7D70B55AEC2E0E3D0A3F1 /* TrainingPlanStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlanStore.swift; sourceTree = "<group>"; };
 		747D2F3B56EEE28598D1536A /* Fraunces-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-LightItalic.ttf"; sourceTree = "<group>"; };
 		76EDCC53D92978C810161580 /* PatreonGateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatreonGateView.swift; sourceTree = "<group>"; };
-		7B8DB3AD41A1ECC38BB9F585 /* SourceSans3-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSans3-Regular.ttf"; sourceTree = "<group>"; };
+
 		7F1D1B0C706F6397245A0BF0 /* Fraunces-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-Medium.ttf"; sourceTree = "<group>"; };
 		80616D13A59D3EE3E33D4BB0 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		84A8563FB47BFB14F6BC6B82 /* StretchSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StretchSession.swift; sourceTree = "<group>"; };
@@ -202,8 +202,6 @@
 				9A7B5C389858A370B1F4C111 /* Fraunces-SemiBold.ttf */,
 				62A149729ECB7294CE4DE3A2 /* GeistMono-Medium.ttf */,
 				BE39EF6B9313E979362B4DFA /* GeistMono-Regular.ttf */,
-				7B8DB3AD41A1ECC38BB9F585 /* SourceSans3-Regular.ttf */,
-				34193A0FCF9C9D05DF07EDC0 /* SourceSans3-SemiBold.ttf */,
 			);
 			path = Fonts;
 			sourceTree = "<group>";
@@ -556,8 +554,6 @@
 				39C0F0E80BC49A04136D8EC1 /* Fraunces-SemiBold.ttf in Resources */,
 				F43D0DDC2380114E3655EA97 /* GeistMono-Medium.ttf in Resources */,
 				E1B5DFAB2881392BD72E03D7 /* GeistMono-Regular.ttf in Resources */,
-				632A388290CE494C0C05B908 /* SourceSans3-Regular.ttf in Resources */,
-				2B510AFEAD0B2CE398731C9B /* SourceSans3-SemiBold.ttf in Resources */,
 				73B281FD62E689360910B786 /* champion_plan_100k.json in Resources */,
 				DD120492B8F1AC178B512745 /* swap_100k_16w.json in Resources */,
 				54581A03989F155A85C0F2E6 /* swap_100mile_12w.json in Resources */,

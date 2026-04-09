@@ -15,14 +15,14 @@
 
 ## Typography
 
-Three font families, strict separation of concerns. No system fonts for content.
+Three font families, strict separation of concerns.
 
 ### Font Families
 
-| Font          | Role                  | Weights bundled          |
+| Font          | Role                  | Weights used             |
 |---------------|-----------------------|--------------------------|
 | Fraunces      | Section labels only   | Medium (500), SemiBold (600) |
-| Source Sans 3 | All body/UI text      | Regular (400), SemiBold (600) |
+| SF Pro (system) | All body/UI text    | Regular (400), SemiBold (600) |
 | Geist Mono    | Stats, data, tab headers, activity titles | Regular (400), Medium (500) |
 
 ### iOS Token Reference (`TrailFont.*`)
@@ -31,13 +31,13 @@ Three font families, strict separation of concerns. No system fonts for content.
 |-------------|-----------------|------|--------|----------------------------------------------------|
 | `title`     | Fraunces        | 20pt | 500    | Section labels: "Coach notes", "Strength", "Heat"  |
 | `titleBold` | Fraunces        | 20pt | 600    | Emphasized section labels                          |
-| `body`      | Source Sans 3   | 17pt | 400    | Exercise names, workout descriptions               |
-| `bodyBold`  | Source Sans 3   | 17pt | 600    | Emphasized body text                               |
-| `detail`    | Source Sans 3   | 15pt | 400    | Descriptions, pace text, week/day labels           |
-| `detailBold`| Source Sans 3   | 15pt | 600    | Form labels, sub-section headers                   |
-| `meta`      | Source Sans 3   | 12pt | 400    | Dates, counts, badges, attribution                 |
-| `metaBold`  | Source Sans 3   | 12pt | 600    | Emphasized metadata, badge labels                  |
-| `coach`     | Source Sans 3   | 15pt | 400    | Coach notes text (readable, not decorative)        |
+| `body`      | SF Pro          | 17pt | 400    | Exercise names, workout descriptions               |
+| `bodyBold`  | SF Pro          | 17pt | 600    | Emphasized body text                               |
+| `detail`    | SF Pro          | 15pt | 400    | Descriptions, pace text, week/day labels           |
+| `detailBold`| SF Pro          | 15pt | 600    | Form labels, sub-section headers                   |
+| `meta`      | SF Pro          | 12pt | 400    | Dates, counts, badges, attribution                 |
+| `metaBold`  | SF Pro          | 12pt | 600    | Emphasized metadata, badge labels                  |
+| `coach`     | SF Pro          | 15pt | 400    | Coach notes text (readable, not decorative)        |
 | `data`      | Geist Mono      | 13pt | 400    | Inline stats: pace, distance, HR, elevation, Oura scores, prescriptions |
 | `dataBold`  | Geist Mono      | 13pt | 500    | Emphasized stats: Strava titles, comparison values, deltas |
 | `dataLarge` | Geist Mono      | 24pt | 500    | Tab headers ("Today", "Week 11"), activity type titles ("Long Run"), hero stat callouts |
@@ -50,7 +50,7 @@ Three font families, strict separation of concerns. No system fonts for content.
 - Day names in week view session rows (the date number)
 - Plan names
 
-**Source Sans 3 (sans-serif, for all readable text):**
+**SF Pro (system sans-serif, for all readable text):**
 - Exercise and workout names in lists
 - Coach notes body text
 - Descriptions, prescriptions (as prose)
@@ -70,23 +70,23 @@ Three font families, strict separation of concerns. No system fonts for content.
 - Never use raw `.font(.headline)`, `.font(.body)`, `.font(.subheadline)`, or `.font(.caption)`. Always use `TrailFont.*` tokens.
 - `.font(.system(size: N))` is allowed ONLY on SF Symbol `Image` views for icon sizing. Never on `Text`.
 - `.font(.title2)` and `.font(.title3)` are allowed ONLY on SF Symbol `Image` views.
-- No inline `Font.custom()` calls outside BrandKit.swift. All font access goes through `TrailFont.*`.
+- No inline `Font.custom()` or `Font.system()` calls outside BrandKit.swift. All font access goes through `TrailFont.*`.
 - Use `.strikethrough()` for completed/skipped items, not opacity reduction.
 - Navigation bar titles are hidden on all tab views. Each tab renders its own header using `TrailFont.dataLarge`.
 - Fraunces is for labels only, never body text, never stats, never notes.
-- Coach notes use Source Sans 3, not Fraunces. Readability over decoration.
+- Coach notes use SF Pro, not Fraunces. Readability over decoration.
 
 ### Website
 
 | Role        | Font              | Size     | Weight    | Usage                                    |
 |-------------|-------------------|----------|-----------|------------------------------------------|
 | Display     | Fraunces          | 3.2rem   | 400       | Hero headings, section titles            |
-| Body        | Source Sans 3     | 1rem     | 400       | Paragraphs, feature descriptions         |
-| UI/Labels   | Source Sans 3     | 0.85rem  | 500       | Buttons, nav links, form labels          |
+| Body        | System (SF Pro)   | 1rem     | 400       | Paragraphs, feature descriptions         |
+| UI/Labels   | System (SF Pro)   | 0.85rem  | 500       | Buttons, nav links, form labels          |
 | Data        | Geist Mono        | 0.9rem   | 400       | Stats, metrics, technical details        |
-| Coach Quote | Source Sans 3     | 1.05rem  | 400       | Pull-quotes, testimonials, coach voice   |
+| Coach Quote | System (SF Pro)   | 1.05rem  | 400       | Pull-quotes, testimonials, coach voice   |
 
-**Loading:** Google Fonts: `Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400` + `Source+Sans+3:wght@300;400;500;600` + `Geist+Mono:wght@400;500`
+**Loading:** Google Fonts: `Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400` + `Geist+Mono:wght@400;500`. Body text uses system font stack (`-apple-system, BlinkMacSystemFont, system-ui, sans-serif`).
 
 ### Modular Type Scale (website)
 
@@ -317,7 +317,7 @@ Text(coachNote)
 
 ```css
 .coach-note {
-    font-family: 'Source Sans 3', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
     font-size: 1.05rem;
     line-height: 1.7;
     color: var(--text-secondary);
@@ -477,6 +477,7 @@ Every list/section that can be empty needs:
 | 2026-04-04 | Source Sans 3 for website body    | Slightly warmer than system fonts, pairs well with Fraunces |
 | 2026-04-04 | Source Sans 3 for all body/UI     | Consistent brand font across iOS and web                 |
 | 2026-04-04 | Coach notes in Source Sans 3      | Readability over decoration, Fraunces italic too hard to read |
+| 2026-04-09 | SF Pro (system) replaces Source Sans 3 | Native iOS legibility, zero bundle cost, excellent Dynamic Type support. Fraunces + Geist Mono carry the brand personality. |
 | 2026-04-04 | Geist Mono for tab headers        | Tab titles, activity names, and stats all in monospace for data-forward feel |
 | 2026-04-04 | Hidden navigation bars            | System SF navigation titles removed, replaced with custom TrailFont headers |
 | 2026-04-04 | Fraunces for section labels only  | Serif reserved for "Coach notes", "Strength", "Heat" labels, not body or data |
