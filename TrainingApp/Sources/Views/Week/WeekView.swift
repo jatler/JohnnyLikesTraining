@@ -85,6 +85,7 @@ struct WeekView: View {
             HStack {
                 Text("Week \(selectedWeek)")
                     .font(TrailFont.dataLarge)
+                    .foregroundStyle(Color.trailGreen)
 
                 Spacer()
 

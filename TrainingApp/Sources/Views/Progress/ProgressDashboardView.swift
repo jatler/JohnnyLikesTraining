@@ -18,6 +18,7 @@ struct ProgressDashboardView: View {
                     VStack(spacing: 0) {
                         Text("Progress")
                             .font(TrailFont.dataLarge)
+                            .foregroundStyle(Color.trailGreen)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding()
                             .background(.bar)

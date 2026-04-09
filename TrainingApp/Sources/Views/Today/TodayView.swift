@@ -60,6 +60,7 @@ struct TodayView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(firstSession?.workoutType.displayName ?? "Rest Day")
                     .font(TrailFont.dataLarge)
+                    .foregroundStyle(Color.trailGreen)
                     .strikethrough(skipped)
                     .opacity(skipped ? 0.5 : 1)
                 HStack(spacing: 8) {

@@ -20,6 +20,7 @@ struct SettingsView: View {
             VStack(spacing: 0) {
                 Text("Settings")
                     .font(TrailFont.dataLarge)
+                    .foregroundStyle(Color.trailGreen)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
                     .background(.bar)

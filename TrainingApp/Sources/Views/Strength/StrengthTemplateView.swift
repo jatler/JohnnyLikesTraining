@@ -108,6 +108,7 @@ struct StrengthTemplateView: View {
             VStack(spacing: 12) {
                 Text("Strength & More")
                     .font(TrailFont.dataLarge)
+                    .foregroundStyle(Color.trailGreen)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 Picker("Section", selection: $selectedSegment) {
