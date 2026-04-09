@@ -56,7 +56,15 @@ struct TodayView: View {
         let skipped = firstSession.map { planStore.isSkipped($0.id) } ?? false
         let hasMatch = firstSession.flatMap { strava.activity(for: $0.id) } != nil
 
-        return HStack(alignment: .top) {
+        return HStack(alignment: .top, spacing: 12) {
+            if let session = firstSession {
+                Image(systemName: session.workoutType.iconName)
+                    .font(TrailFont.body)
+                    .foregroundStyle(session.workoutType.swiftUIColor)
+                    .frame(width: 32, height: 32)
+                    .background(session.workoutType.swiftUIColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
+            }
+
             VStack(alignment: .leading, spacing: 2) {
                 Text(firstSession?.workoutType.displayName ?? "Rest Day")
                     .font(TrailFont.dataLarge)
