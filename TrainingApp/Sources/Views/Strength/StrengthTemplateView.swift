@@ -124,8 +124,6 @@ struct StrengthTemplateView: View {
                 VStack(spacing: 12) {
                     switch selectedSegment {
                     case .strength:
-                        suggestionsSection
-
                         ForEach(strengthStore.daysWithExercises, id: \.self) { day in
                             daySection(day)
                         }

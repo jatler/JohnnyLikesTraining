@@ -144,13 +144,6 @@ struct MainTabView: View {
                     print("Relaunch: matched \(matched)/\(strava.activities.count) activities")
                     #endif
                 }
-                if let week = planStore.currentWeekNumber {
-                    strengthStore.computeSuggestions(
-                        runningSessions: planStore.sessions,
-                        ouraData: oura.dailyData,
-                        currentWeek: week
-                    )
-                }
             } else {
                 if strava.isConnected {
                     await strava.loadActivities(userId: userId)
