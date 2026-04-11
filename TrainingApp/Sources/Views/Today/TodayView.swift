@@ -273,6 +273,9 @@ struct TodayView: View {
 
                 Button {
                     planStore.swapSessions(session, with: easyDay, reason: "Low readiness (\(today.readinessScore ?? 0))")
+                    if let planId = planStore.activePlan?.id {
+                        strengthStore.refreshFromPlannedSessions(planStore.sessions, planId: planId)
+                    }
                 } label: {
                     Label("Swap to \(easyDay.workoutType.displayName)", systemImage: "arrow.left.arrow.right.circle.fill")
                         .frame(maxWidth: .infinity)
@@ -562,6 +565,9 @@ struct TodayView: View {
                 ForEach(targets) { target in
                     Button {
                         planStore.swapSessions(session, with: target)
+                        if let planId = planStore.activePlan?.id {
+                            strengthStore.refreshFromPlannedSessions(planStore.sessions, planId: planId)
+                        }
                         showingSwapPicker = false
                     } label: {
                         HStack {

@@ -524,6 +524,9 @@ struct SessionDetailSheet: View {
             ForEach(targets) { target in
                 Button {
                     planStore.swapSessions(session, with: target)
+                    if let planId = planStore.activePlan?.id {
+                        strengthStore.refreshFromPlannedSessions(planStore.sessions, planId: planId)
+                    }
                     dismiss()
                 } label: {
                     HStack {

@@ -196,14 +196,39 @@ final class TrainingPlanStore {
               let indexB = sessions.firstIndex(where: { $0.id == sessionB.id }),
               let planId = activePlan?.id else { return }
 
-        let tempDate = sessions[indexA].scheduledDate
-        let tempDay = sessions[indexA].dayOfWeek
+        let dateA = sessions[indexA].scheduledDate
+        let dayA = sessions[indexA].dayOfWeek
+        let dateB = sessions[indexB].scheduledDate
+        let dayB = sessions[indexB].dayOfWeek
 
-        sessions[indexA].scheduledDate = sessions[indexB].scheduledDate
-        sessions[indexA].dayOfWeek = sessions[indexB].dayOfWeek
+        // Swap the primary sessions
+        sessions[indexA].scheduledDate = dateB
+        sessions[indexA].dayOfWeek = dayB
+        sessions[indexB].scheduledDate = dateA
+        sessions[indexB].dayOfWeek = dayA
 
-        sessions[indexB].scheduledDate = tempDate
-        sessions[indexB].dayOfWeek = tempDay
+        // Also swap any strength sessions on the same days so they stay
+        // paired with their run. Strength sessions share (weekNumber, dayOfWeek)
+        // with the run they accompany.
+        var movedStrengthIds: [UUID] = []
+        for i in sessions.indices {
+            guard sessions[i].workoutType == .strength else { continue }
+            guard sessions[i].weekNumber == sessionA.weekNumber else { continue }
+
+            if sessions[i].id != sessionA.id && sessions[i].id != sessionB.id {
+                if sessions[i].dayOfWeek == dayA
+                    && Calendar.current.isDate(sessions[i].scheduledDate, inSameDayAs: dateA) {
+                    sessions[i].scheduledDate = dateB
+                    sessions[i].dayOfWeek = dayB
+                    movedStrengthIds.append(sessions[i].id)
+                } else if sessions[i].dayOfWeek == dayB
+                    && Calendar.current.isDate(sessions[i].scheduledDate, inSameDayAs: dateB) {
+                    sessions[i].scheduledDate = dateA
+                    sessions[i].dayOfWeek = dayA
+                    movedStrengthIds.append(sessions[i].id)
+                }
+            }
+        }
 
         let swap = SessionSwap(
             id: UUID(),
@@ -218,7 +243,8 @@ final class TrainingPlanStore {
 
         let updatedA = sessions[indexA]
         let updatedB = sessions[indexB]
-        Task { await persistSwap(swap, sessionA: updatedA, sessionB: updatedB) }
+        let movedStrength = sessions.filter { movedStrengthIds.contains($0.id) }
+        Task { await persistSwap(swap, sessionA: updatedA, sessionB: updatedB, movedStrength: movedStrength) }
     }
 
     // MARK: - Skip / Unskip
@@ -536,11 +562,22 @@ final class TrainingPlanStore {
 }
     }
 
-    private func persistSwap(_ swap: SessionSwap, sessionA: PlannedSession, sessionB: PlannedSession) async {
+    private func persistSwap(
+        _ swap: SessionSwap,
+        sessionA: PlannedSession,
+        sessionB: PlannedSession,
+        movedStrength: [PlannedSession] = []
+    ) async {
         guard !isOffline else { return }
         do {
             try await supabase.from("session_swaps").insert(swap).execute()
+        } catch {
+            print("Failed to insert swap record: \(error)")
+            lastError = "Failed to save swap record."
+            return
+        }
 
+        do {
             try await supabase.from("planned_sessions")
                 .update(SessionDateUpdate(scheduledDate: sessionA.scheduledDate, dayOfWeek: sessionA.dayOfWeek))
                 .eq("id", value: sessionA.id)
@@ -550,10 +587,18 @@ final class TrainingPlanStore {
                 .update(SessionDateUpdate(scheduledDate: sessionB.scheduledDate, dayOfWeek: sessionB.dayOfWeek))
                 .eq("id", value: sessionB.id)
                 .execute()
+
+            // Also persist date changes for any strength sessions that moved
+            for session in movedStrength {
+                try await supabase.from("planned_sessions")
+                    .update(SessionDateUpdate(scheduledDate: session.scheduledDate, dayOfWeek: session.dayOfWeek))
+                    .eq("id", value: session.id)
+                    .execute()
+            }
         } catch {
-            print("Failed to persist swap to Supabase: \(error)")
-            lastError = "Failed to save swap."
-}
+            print("Failed to update session dates after swap: \(error)")
+            lastError = "Swap saved but failed to update session dates."
+        }
     }
 
     private func persistSkip(_ skip: SessionSkip) async {
