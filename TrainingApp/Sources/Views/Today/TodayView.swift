@@ -306,7 +306,7 @@ struct TodayView: View {
 
                     Spacer()
 
-                    let completed = strengthStore.completedExerciseCount(for: today)
+                    let completed = strengthStore.completedCount(for: today)
                     let total = daySessions.count
 
                     if completed > 0 {
@@ -318,7 +318,7 @@ struct TodayView: View {
                     Button {
                         showingStrengthDay = true
                     } label: {
-                        Label("Log", systemImage: "checkmark.circle")
+                        Label("Details", systemImage: "chevron.right")
                             .font(TrailFont.meta)
                     }
                     .buttonStyle(.bordered)
@@ -327,22 +327,20 @@ struct TodayView: View {
                 }
 
                 ForEach(daySessions) { session in
-                    HStack(spacing: 8) {
-                        let complete = strengthStore.isSessionComplete(session.id)
+                    HStack(alignment: .top, spacing: 8) {
+                        Button {
+                            strengthStore.toggleComplete(session.id)
+                        } label: {
+                            Image(systemName: session.isComplete ? "checkmark.circle.fill" : "circle")
+                                .font(TrailFont.meta)
+                                .foregroundStyle(session.isComplete ? .green : Color.secondary.opacity(0.3))
+                        }
+                        .buttonStyle(.plain)
 
-                        Image(systemName: complete ? "checkmark.circle.fill" : "circle")
-                            .font(TrailFont.meta)
-                            .foregroundStyle(complete ? .green : Color.secondary.opacity(0.3))
-
-                        Text(session.exerciseName)
-                            .font(TrailFont.meta)
-                            .foregroundStyle(complete ? .secondary : .primary)
-
-                        Spacer()
-
-                        Text(strengthPrescription(session))
-                            .font(TrailFont.data)
-                            .foregroundStyle(.secondary)
+                        Text(session.label)
+                            .font(TrailFont.coach)
+                            .foregroundStyle(session.isComplete ? .secondary : .primary)
+                            .strikethrough(session.isComplete)
                     }
                 }
             }
@@ -489,15 +487,6 @@ struct TodayView: View {
     }
 
     // MARK: - Helpers
-
-    private func strengthPrescription(_ session: StrengthSession) -> String {
-        let repsLabel = session.isTimed ? "\(session.prescribedReps)s" : "\(session.prescribedReps)"
-        var text = "\(session.prescribedSets)×\(repsLabel)"
-        if let kg = session.prescribedWeightKg {
-            text += " @ \(Int(kg * 2.205)) lbs"
-        }
-        return text
-    }
 
     private func stretchPrescription(_ session: StretchSession) -> String {
         let perSide = session.isBilateral ? " each side" : ""

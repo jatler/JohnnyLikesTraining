@@ -7,14 +7,7 @@ struct StrengthTemplateView: View {
     @Environment(StretchStore.self) private var stretchStore
     @Environment(OuraService.self) private var oura
 
-    @State private var showingAddExercise = false
-    @State private var addDay: Int = 1
-    @State private var selectedSession: StrengthDaySelection?
-    @State private var editingExercise: StrengthTemplateExercise?
-    @State private var showingHistory = false
-    @State private var historyExerciseName: String = ""
-    @State private var showingDeleteConfirmation = false
-    @State private var exerciseToDelete: StrengthTemplateExercise?
+    @State private var selectedSession: StrengthSession?
     @State private var showingAddHeatDay = false
     @State private var selectedHeatSession: HeatSession?
     @State private var showingAddStretch = false
@@ -36,7 +29,7 @@ struct StrengthTemplateView: View {
     var body: some View {
         NavigationStack {
             Group {
-                if strengthStore.hasTemplate || stretchStore.hasTemplate {
+                if strengthStore.hasSessions || stretchStore.hasTemplate {
                     templateContent
                 } else {
                     emptyState
@@ -51,27 +44,11 @@ struct StrengthTemplateView: View {
             } message: {
                 Text(strengthStore.lastError ?? "")
             }
-            .sheet(item: $selectedSession) { selection in
-                StrengthDayDetailView(weekNumber: selection.weekNumber, dayOfWeek: selection.dayOfWeek)
-            }
-            .sheet(isPresented: $showingAddExercise) {
-                AddExerciseSheet(dayOfWeek: addDay)
-            }
-            .sheet(item: $editingExercise) { exercise in
-                EditExerciseSheet(exercise: exercise)
-            }
-            .sheet(isPresented: $showingHistory) {
-                ExerciseHistoryView(exerciseName: historyExerciseName)
-            }
-            .alert("Remove Exercise?", isPresented: $showingDeleteConfirmation) {
-                Button("Remove", role: .destructive) {
-                    if let exercise = exerciseToDelete {
-                        strengthStore.removeExercise(exercise)
-                    }
-                }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("This will remove \(exerciseToDelete?.exerciseName ?? "") from your template and all future weeks.")
+            .sheet(item: $selectedSession) { session in
+                StrengthDayDetailView(
+                    weekNumber: session.weekNumber,
+                    dayOfWeek: session.dayOfWeek
+                )
             }
             .sheet(isPresented: $showingAddHeatDay) {
                 AddHeatDaySheet()
@@ -125,11 +102,7 @@ struct StrengthTemplateView: View {
                 VStack(spacing: 12) {
                     switch selectedSegment {
                     case .strength:
-                        ForEach(strengthStore.daysWithExercises, id: \.self) { day in
-                            daySection(day)
-                        }
-
-                        addDayButton
+                        strengthSegmentContent
 
                     case .stretch:
                         stretchSegmentContent
@@ -143,6 +116,129 @@ struct StrengthTemplateView: View {
             }
         }
     }
+
+    // MARK: - Strength Segment (Coach Notes)
+
+    private var strengthSegmentContent: some View {
+        let currentWeek = planStore.currentWeekNumber ?? 1
+        let weekDays = strengthStore.daysWithSessions(for: currentWeek)
+
+        return VStack(spacing: 12) {
+            if weekDays.isEmpty {
+                VStack(spacing: 8) {
+                    Text("No strength sessions this week")
+                        .font(TrailFont.detail)
+                        .foregroundStyle(.tertiary)
+                }
+                .padding(.top, 20)
+            } else {
+                HStack {
+                    Text("Week \(currentWeek)")
+                        .font(TrailFont.title)
+                    Spacer()
+                    let completed = strengthStore.sessions(for: currentWeek).filter(\.isComplete).count
+                    let total = strengthStore.sessions(for: currentWeek).count
+                    Text("\(completed)/\(total) done")
+                        .font(TrailFont.meta)
+                        .foregroundStyle(completed == total ? .green : .secondary)
+                }
+
+                ForEach(weekDays, id: \.self) { day in
+                    strengthDayCard(weekNumber: currentWeek, dayOfWeek: day)
+                }
+            }
+        }
+    }
+
+    private func strengthDayCard(weekNumber: Int, dayOfWeek: Int) -> some View {
+        let daySessions = strengthStore.sessions(for: weekNumber, dayOfWeek: dayOfWeek)
+        let isToday = isHighlightedDay(
+            dayOfWeek,
+            availableDays: strengthStore.daysWithSessions(for: weekNumber)
+        )
+
+        return VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(dayNames[dayOfWeek])
+                    .font(TrailFont.title)
+
+                Spacer()
+
+                let completed = daySessions.filter(\.isComplete).count
+                if completed == daySessions.count && !daySessions.isEmpty {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                }
+            }
+
+            ForEach(daySessions) { session in
+                strengthSessionRow(session)
+            }
+        }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(isToday ? Color.trailGreen.opacity(0.08) : Color(.systemBackground))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .strokeBorder(isToday ? Color.trailGreen.opacity(0.3) : Color(.separator).opacity(0.3), lineWidth: 1)
+        )
+        .contentShape(Rectangle())
+        .onTapGesture {
+            selectedSession = daySessions.first
+        }
+    }
+
+    private func strengthSessionRow(_ session: StrengthSession) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Button {
+                strengthStore.toggleComplete(session.id)
+            } label: {
+                Image(systemName: session.isComplete ? "checkmark.circle.fill" : "circle")
+                    .font(.title3)
+                    .foregroundStyle(session.isComplete ? .green : .secondary.opacity(0.4))
+            }
+            .buttonStyle(.plain)
+
+            Image(systemName: "dumbbell.fill")
+                .font(TrailFont.body)
+                .foregroundStyle(Color.trailGreen)
+                .frame(width: 32, height: 32)
+                .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(session.label)
+                    .font(TrailFont.body)
+                    .strikethrough(session.isComplete)
+                    .foregroundStyle(session.isComplete ? .secondary : .primary)
+            }
+
+            Spacer()
+        }
+        .padding(.vertical, 4)
+        .contentShape(Rectangle())
+    }
+
+    // MARK: - Day Highlighting
+
+    private var currentAdjustedDay: Int {
+        let wd = Calendar.current.component(.weekday, from: Date())
+        return wd == 1 ? 7 : wd - 1
+    }
+
+    private func isHighlightedDay(_ day: Int, availableDays: [Int]) -> Bool {
+        let today = currentAdjustedDay
+        if availableDays.contains(today) {
+            return day == today
+        }
+        let futureDays = availableDays.filter { $0 > today }.sorted()
+        let wrappedDays = availableDays.filter { $0 < today }.sorted()
+        let nextDay = futureDays.first ?? wrappedDays.first
+        return day == nextDay
+    }
+
+    // MARK: - Stretch Segment (unchanged)
 
     private var stretchSegmentContent: some View {
         VStack(spacing: 12) {
@@ -170,226 +266,6 @@ struct StrengthTemplateView: View {
                 }
             }
         }
-    }
-
-    // MARK: - Suggestions
-
-    @ViewBuilder
-    private var suggestionsSection: some View {
-        if !strengthStore.suggestions.isEmpty {
-            VStack(alignment: .leading, spacing: 8) {
-                Label("Progression Suggestions", systemImage: "arrow.up.circle.fill")
-                    .font(TrailFont.detailBold)
-                    .foregroundStyle(.green)
-
-                ForEach(strengthStore.suggestions) { suggestion in
-                    suggestionCard(suggestion)
-                }
-            }
-        }
-    }
-
-    private func suggestionCard(_ suggestion: ProgressionSuggestion) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(suggestion.exerciseName)
-                .font(TrailFont.bodyBold)
-
-            Text(suggestion.reason)
-                .font(TrailFont.meta)
-                .foregroundStyle(.secondary)
-
-            HStack(spacing: 12) {
-                VStack(spacing: 2) {
-                    Text("Current")
-                        .font(TrailFont.meta)
-                        .foregroundStyle(.secondary)
-                    Text(formatPrescription(
-                        sets: suggestion.currentSets,
-                        reps: suggestion.currentReps,
-                        weightKg: suggestion.currentWeightKg
-                    ))
-                    .font(TrailFont.metaBold)
-                }
-
-                Image(systemName: "arrow.right")
-                    .font(TrailFont.meta)
-                    .foregroundStyle(.green)
-
-                VStack(spacing: 2) {
-                    Text("Suggested")
-                        .font(TrailFont.meta)
-                        .foregroundStyle(.secondary)
-                    Text(formatPrescription(
-                        sets: suggestion.suggestedSets,
-                        reps: suggestion.suggestedReps,
-                        weightKg: suggestion.suggestedWeightKg
-                    ))
-                    .font(TrailFont.metaBold)
-                    .foregroundStyle(.green)
-                }
-
-                Spacer()
-
-                Button("Accept") {
-                    strengthStore.acceptSuggestion(suggestion)
-                }
-                .buttonStyle(.bordered)
-                .tint(.green)
-                .controlSize(.small)
-
-                Button("Dismiss") {
-                    strengthStore.dismissSuggestion(suggestion)
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-            }
-        }
-        .padding(12)
-        .background(.green.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(.green.opacity(0.15), lineWidth: 1)
-        )
-    }
-
-    // MARK: - Day Section
-
-    private var currentAdjustedDay: Int {
-        let wd = Calendar.current.component(.weekday, from: Date())
-        return wd == 1 ? 7 : wd - 1
-    }
-
-    private func isHighlightedDay(_ day: Int, availableDays: [Int]) -> Bool {
-        let today = currentAdjustedDay
-        // If today has a session, highlight only today
-        if availableDays.contains(today) {
-            return day == today
-        }
-        // Otherwise highlight the next upcoming day
-        let futureDays = availableDays.filter { $0 > today }.sorted()
-        let wrappedDays = availableDays.filter { $0 < today }.sorted()
-        let nextDay = futureDays.first ?? wrappedDays.first
-        return day == nextDay
-    }
-
-    private func daySection(_ day: Int) -> some View {
-        let isToday = isHighlightedDay(day, availableDays: strengthStore.daysWithExercises)
-        let exercises = strengthStore.exercises(for: day)
-        let weekSessions: [StrengthSession] = {
-            guard let week = planStore.currentWeekNumber else { return [] }
-            return strengthStore.sessions(for: week, dayOfWeek: day)
-        }()
-
-        return VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(dayNames[day])
-                    .font(TrailFont.title)
-
-                Spacer()
-
-                if !weekSessions.isEmpty {
-                    let completed = weekSessions.filter { strengthStore.isSessionComplete($0.id) }.count
-                    Text("\(completed)/\(weekSessions.count) done")
-                        .font(TrailFont.meta)
-                        .foregroundStyle(completed == weekSessions.count ? .green : .secondary)
-                }
-            }
-
-            ForEach(exercises) { exercise in
-                let complete = weekSessions.first(where: { $0.templateExerciseId == exercise.id })
-                    .map { strengthStore.isSessionComplete($0.id) } ?? false
-
-                exerciseRow(exercise, complete: complete)
-                    .contextMenu {
-                        Button {
-                            editingExercise = exercise
-                        } label: {
-                            Label("Edit", systemImage: "pencil")
-                        }
-
-                        Button {
-                            historyExerciseName = exercise.exerciseName
-                            showingHistory = true
-                        } label: {
-                            Label("View History", systemImage: "chart.line.uptrend.xyaxis")
-                        }
-
-                        Button(role: .destructive) {
-                            exerciseToDelete = exercise
-                            showingDeleteConfirmation = true
-                        } label: {
-                            Label("Remove", systemImage: "trash")
-                        }
-                    }
-            }
-        }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(isToday ? Color.trailGreen.opacity(0.08) : Color(.systemBackground))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(isToday ? Color.trailGreen.opacity(0.3) : Color(.separator).opacity(0.3), lineWidth: 1)
-        )
-        .contentShape(Rectangle())
-        .onTapGesture {
-            if let week = planStore.currentWeekNumber {
-                selectedSession = StrengthDaySelection(weekNumber: week, dayOfWeek: day)
-            }
-        }
-    }
-
-    private func exerciseRow(_ exercise: StrengthTemplateExercise, complete: Bool) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: complete ? "checkmark.circle.fill" : "circle")
-                .font(.title3)
-                .foregroundStyle(complete ? .green : .secondary.opacity(0.4))
-
-            Image(systemName: "dumbbell.fill")
-                .font(TrailFont.body)
-                .foregroundStyle(Color.trailGreen)
-                .frame(width: 32, height: 32)
-                .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(exercise.exerciseName)
-                    .font(TrailFont.body)
-                    .strikethrough(complete)
-                    .foregroundStyle(complete ? .secondary : .primary)
-
-                let repsLabel = exercise.isTimed ? "\(exercise.targetReps)s" : "\(exercise.targetReps)"
-                let prescription = "\(exercise.targetSets)x\(repsLabel)" + (exercise.targetWeightKg.map { " @ \(Int($0 * 2.205)) lbs" } ?? "")
-                Text(prescription)
-                    .font(TrailFont.data)
-                    .foregroundStyle(.secondary)
-            }
-
-            Spacer()
-        }
-        .padding(.vertical, 4)
-        .contentShape(Rectangle())
-    }
-
-    // MARK: - Add Day
-
-    private var addDayButton: some View {
-        Menu {
-            ForEach(1...7, id: \.self) { day in
-                if !strengthStore.daysWithExercises.contains(day) {
-                    Button(dayNames[day]) {
-                        addDay = day
-                        showingAddExercise = true
-                    }
-                }
-            }
-        } label: {
-            Label("Add Exercises on Another Day", systemImage: "plus.circle")
-                .frame(maxWidth: .infinity)
-        }
-        .buttonStyle(.bordered)
-        .tint(Color.trailGreen)
-        .disabled(strengthStore.daysWithExercises.count >= 7)
     }
 
     private func stretchDaySection(_ day: Int) -> some View {
@@ -502,7 +378,7 @@ struct StrengthTemplateView: View {
         .disabled(stretchStore.daysWithExercises.count >= 7)
     }
 
-    // MARK: - Heat Template Section
+    // MARK: - Heat Template Section (unchanged)
 
     private var heatTemplateSection: some View {
         VStack(spacing: 12) {
@@ -609,7 +485,6 @@ struct StrengthTemplateView: View {
         var seen = Set<Int>()
         var entries: [HeatDayEntry] = []
 
-        // Prefer current week's session (reflects one-off edits), fall back to any week
         let sorted = heatStore.sessions.sorted { a, b in
             if a.dayOfWeek != b.dayOfWeek { return a.dayOfWeek < b.dayOfWeek }
             let aIsCurrent = a.weekNumber == currentWeek
@@ -645,25 +520,15 @@ struct StrengthTemplateView: View {
                             .font(.system(size: 48))
                             .foregroundStyle(Color.trailGreen)
 
-                        Text("No strength program yet")
+                        Text("No strength sessions")
                             .font(TrailFont.title)
                             .foregroundStyle(.secondary)
 
-                        Text("Start a strength program to track exercises alongside your runs.")
+                        Text("Strength workouts will appear here once you activate a training plan with coach-prescribed strength sessions.")
                             .font(TrailFont.detail)
                             .foregroundStyle(.tertiary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 40)
-
-                        if let plan = planStore.activePlan {
-                            Button {
-                                strengthStore.createBlankTemplate(planId: plan.id)
-                            } label: {
-                                Label("Create Strength Program", systemImage: "plus.circle.fill")
-                                    .fontWeight(.semibold)
-                            }
-                            .buttonStyle(.borderedProminent)
-                        }
 
                     case .stretch:
                         stretchSegmentContent
@@ -677,17 +542,6 @@ struct StrengthTemplateView: View {
             }
         }
     }
-
-    // MARK: - Helpers
-
-    private func formatPrescription(sets: Int, reps: Int, weightKg: Double?, isTimed: Bool = false) -> String {
-        let repsLabel = isTimed ? "\(reps)s" : "\(reps)"
-        if let kg = weightKg {
-            let lbs = kg * 2.205
-            return "\(sets)×\(repsLabel) @ \(Int(lbs)) lbs"
-        }
-        return "\(sets)×\(repsLabel)"
-    }
 }
 
 // MARK: - Day Selection for Sheet
@@ -696,214 +550,6 @@ struct StrengthDaySelection: Identifiable {
     let id = UUID()
     let weekNumber: Int
     let dayOfWeek: Int
-}
-
-// MARK: - Add Exercise Sheet
-
-struct AddExerciseSheet: View {
-    let dayOfWeek: Int
-    @Environment(StrengthStore.self) private var strengthStore
-    @Environment(\.dismiss) private var dismiss
-
-    @State private var name = ""
-    @State private var sets = 3
-    @State private var reps = 10
-    @State private var durationSeconds = 30
-    @State private var weightLbs = ""
-    @State private var isBodyweight = true
-    @State private var isTimed = false
-    @State private var rpe = ""
-    @State private var notes = ""
-
-    private let dayNames = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section("Exercise") {
-                    TextField("Exercise name", text: $name)
-                }
-
-                Section("Prescription") {
-                    Stepper("Sets: \(sets)", value: $sets, in: 1...10)
-
-                    Toggle("Timed (hold for duration)", isOn: $isTimed)
-
-                    if isTimed {
-                        Stepper("Duration: \(durationSeconds)s", value: $durationSeconds, in: 5...300, step: 5)
-                    } else {
-                        Stepper("Reps: \(reps)", value: $reps, in: 1...50)
-                    }
-
-                    TextField("Weight (lbs, optional)", text: $weightLbs)
-                        .keyboardType(.decimalPad)
-
-                    TextField("Target RPE (optional)", text: $rpe)
-                        .keyboardType(.decimalPad)
-                }
-
-                Section("Notes") {
-                    TextField("Optional notes", text: $notes, axis: .vertical)
-                        .lineLimit(2...4)
-                }
-            }
-            .navigationTitle("Add to \(dayNames[dayOfWeek])")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Add") { addExercise() }
-                        .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
-                }
-            }
-        }
-    }
-
-    private func addExercise() {
-        let weightKg = Double(weightLbs).map { $0 / 2.205 }
-        let targetRpe = Double(rpe)
-        let effectiveReps = isTimed ? durationSeconds : reps
-
-        strengthStore.addExercise(
-            dayOfWeek: dayOfWeek,
-            name: name.trimmingCharacters(in: .whitespaces),
-            sets: sets,
-            reps: effectiveReps,
-            weightKg: weightKg,
-            isBodyweight: weightKg == nil,
-            isTimed: isTimed,
-            rpe: targetRpe,
-            notes: notes.isEmpty ? nil : notes
-        )
-        dismiss()
-    }
-}
-
-// MARK: - Edit Exercise Sheet
-
-struct EditExerciseSheet: View {
-    @State var exercise: StrengthTemplateExercise
-    @Environment(StrengthStore.self) private var strengthStore
-    @Environment(\.dismiss) private var dismiss
-
-    @State private var name: String = ""
-    @State private var sets: Int = 3
-    @State private var reps: Int = 10
-    @State private var durationSeconds: Int = 30
-    @State private var weightLbs: String = ""
-    @State private var isBodyweight: Bool = true
-    @State private var isTimed: Bool = false
-    @State private var rpe: String = ""
-    @State private var notes: String = ""
-    @State private var showingDeleteConfirmation = false
-    @State private var showingHistory = false
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section("Exercise") {
-                    TextField("Exercise name", text: $name)
-                }
-
-                Section("Prescription") {
-                    Stepper("Sets: \(sets)", value: $sets, in: 1...10)
-
-                    Toggle("Timed (hold for duration)", isOn: $isTimed)
-
-                    if isTimed {
-                        Stepper("Duration: \(durationSeconds)s", value: $durationSeconds, in: 5...300, step: 5)
-                    } else {
-                        Stepper("Reps: \(reps)", value: $reps, in: 1...50)
-                    }
-
-                    TextField("Weight (lbs, optional)", text: $weightLbs)
-                        .keyboardType(.decimalPad)
-
-                    TextField("Target RPE (optional)", text: $rpe)
-                        .keyboardType(.decimalPad)
-                }
-
-                Section("Notes") {
-                    TextField("Optional notes", text: $notes, axis: .vertical)
-                        .lineLimit(2...4)
-                }
-
-                Section {
-                    Button {
-                        showingHistory = true
-                    } label: {
-                        Label("View History", systemImage: "chart.line.uptrend.xyaxis")
-                    }
-                }
-
-                Section {
-                    Button(role: .destructive) {
-                        showingDeleteConfirmation = true
-                    } label: {
-                        Label("Remove Exercise", systemImage: "trash")
-                    }
-                }
-            }
-            .navigationTitle("Edit Exercise")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { saveExercise() }
-                }
-            }
-            .alert("Remove Exercise?", isPresented: $showingDeleteConfirmation) {
-                Button("Remove", role: .destructive) {
-                    strengthStore.removeExercise(exercise)
-                    dismiss()
-                }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("This will remove \(exercise.exerciseName) from your template and all future weeks.")
-            }
-            .sheet(isPresented: $showingHistory) {
-                ExerciseHistoryView(exerciseName: exercise.exerciseName)
-            }
-            .onAppear {
-                name = exercise.exerciseName
-                sets = exercise.targetSets
-                isTimed = exercise.isTimed
-                if exercise.isTimed {
-                    durationSeconds = exercise.targetReps
-                } else {
-                    reps = exercise.targetReps
-                }
-                isBodyweight = exercise.isBodyweight
-                if let kg = exercise.targetWeightKg {
-                    weightLbs = String(format: "%.0f", kg * 2.205)
-                }
-                if let r = exercise.targetRpe {
-                    rpe = String(format: "%.1f", r)
-                }
-                notes = exercise.notes ?? ""
-            }
-        }
-    }
-
-    private func saveExercise() {
-        var updated = exercise
-        updated.exerciseName = name.trimmingCharacters(in: .whitespaces)
-        updated.targetSets = sets
-        updated.targetReps = isTimed ? durationSeconds : reps
-        let weightKg = Double(weightLbs).map { $0 / 2.205 }
-        updated.isBodyweight = weightKg == nil
-        updated.isTimed = isTimed
-        updated.targetWeightKg = weightKg
-        updated.targetRpe = Double(rpe)
-        updated.notes = notes.isEmpty ? nil : notes
-
-        strengthStore.updateExercise(updated)
-        dismiss()
-    }
 }
 
 private struct AddHeatDaySheet: View {

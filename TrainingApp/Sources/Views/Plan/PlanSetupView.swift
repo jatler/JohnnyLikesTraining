@@ -138,14 +138,10 @@ struct PlanSetupView: View {
         )
 
         if let plan = planStore.activePlan {
-            if let strengthExercises = template.strengthExercises, !strengthExercises.isEmpty {
-                strengthStore.initializeFromTemplate(
-                    strengthExercises,
-                    planId: plan.id,
-                    planStartDate: plan.planStartDate,
-                    totalWeeks: template.durationWeeks
-                )
-            }
+            strengthStore.initializeFromPlannedSessions(
+                planStore.sessions,
+                planId: plan.id
+            )
 
             if let heatTemplates = template.heatSessions, !heatTemplates.isEmpty {
                 heatStore.initializeFromTemplate(

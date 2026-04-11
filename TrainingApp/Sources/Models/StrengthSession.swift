@@ -1,39 +1,40 @@
 import Foundation
 
+/// A strength session derived from coach notes in the training plan.
+/// Each session corresponds to a `PlannedSession` with `workoutType == .strength`.
 struct StrengthSession: Codable, Identifiable {
     let id: UUID
     let planId: UUID
-    var templateExerciseId: UUID?
+    var plannedSessionId: UUID
     var scheduledDate: Date
     var weekNumber: Int
     var dayOfWeek: Int
-    var exerciseName: String
-    var prescribedSets: Int
-    var prescribedReps: Int
-    var prescribedWeightKg: Double?
-    var prescribedRpe: Double?
-    var isTimed: Bool
-    var isDeload: Bool
-    var isTemplateOverride: Bool
+    var coachNotes: String
+    var isComplete: Bool
 
     enum CodingKeys: String, CodingKey {
         case id
         case planId = "plan_id"
-        case templateExerciseId = "template_exercise_id"
+        case plannedSessionId = "planned_session_id"
         case scheduledDate = "scheduled_date"
         case weekNumber = "week_number"
         case dayOfWeek = "day_of_week"
-        case exerciseName = "exercise_name"
-        case prescribedSets = "prescribed_sets"
-        case prescribedReps = "prescribed_reps"
-        case prescribedWeightKg = "prescribed_weight_kg"
-        case prescribedRpe = "prescribed_rpe"
-        case isTimed = "is_timed"
-        case isDeload = "is_deload"
-        case isTemplateOverride = "is_template_override"
+        case coachNotes = "coach_notes"
+        case isComplete = "is_complete"
     }
 
-    var prescribedWeightLbs: Double? {
-        prescribedWeightKg.map { $0 * 2.205 }
+    /// Short label extracted from the coach notes for display in compact views.
+    var label: String {
+        let text = coachNotes.trimmingCharacters(in: .whitespacesAndNewlines)
+        if text.isEmpty { return "Strength" }
+
+        // Use the first sentence or up to 60 chars as a label
+        if let dotIndex = text.firstIndex(of: ".") {
+            let firstSentence = String(text[text.startIndex...dotIndex])
+            if firstSentence.count <= 80 { return firstSentence }
+        }
+        if text.count <= 60 { return text }
+        let prefix = String(text.prefix(57))
+        return prefix + "..."
     }
 }

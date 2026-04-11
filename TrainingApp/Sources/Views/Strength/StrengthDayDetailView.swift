@@ -7,9 +7,6 @@ struct StrengthDayDetailView: View {
     @Environment(StrengthStore.self) private var strengthStore
     @Environment(\.dismiss) private var dismiss
 
-    @State private var logInputs: [UUID: [SetInput]] = [:]
-    @State private var showingAddExercise = false
-
     private let dayNames = ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
     var body: some View {
@@ -19,23 +16,14 @@ struct StrengthDayDetailView: View {
                     let daySessions = strengthStore.sessions(for: weekNumber, dayOfWeek: dayOfWeek)
 
                     if daySessions.isEmpty {
-                        Text("No strength exercises for this day")
+                        Text("No strength sessions for this day")
                             .foregroundStyle(.secondary)
                             .padding(.top, 40)
                     } else {
                         ForEach(daySessions) { session in
-                            exerciseCard(session)
+                            strengthCard(session)
                         }
                     }
-
-                    Button {
-                        showingAddExercise = true
-                    } label: {
-                        Label("Add Exercise", systemImage: "plus.circle")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(Color.trailGreen)
                 }
                 .padding()
                 .padding(.bottom, 20)
@@ -47,196 +35,47 @@ struct StrengthDayDetailView: View {
                     Button("Done") { dismiss() }
                 }
             }
-            .onAppear { initializeInputs() }
-            .sheet(isPresented: $showingAddExercise) {
-                AddExerciseSheet(dayOfWeek: dayOfWeek)
-            }
         }
         .presentationDetents([.large])
     }
 
-    // MARK: - Exercise Card
+    // MARK: - Strength Card
 
-    private func exerciseCard(_ session: StrengthSession) -> some View {
-        let sessionLogs = strengthStore.logs(for: session.id)
-        let isComplete = strengthStore.isSessionComplete(session.id)
-
-        return VStack(alignment: .leading, spacing: 12) {
+    private func strengthCard(_ session: StrengthSession) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: "dumbbell.fill")
                     .foregroundStyle(Color.trailGreen)
 
-                Text(session.exerciseName)
+                Text("Strength")
                     .font(TrailFont.title)
-
-                if session.isDeload {
-                    Text("Deload")
-                        .font(TrailFont.metaBold)
-                        .foregroundStyle(.orange)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(.orange.opacity(0.15), in: Capsule())
-                }
-
-                Spacer()
-
-                if isComplete {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                }
-            }
-
-            Text(prescriptionText(session))
-                .font(TrailFont.data)
-                .foregroundStyle(.secondary)
-
-            ForEach(1...session.prescribedSets, id: \.self) { setNum in
-                setRow(session: session, setNumber: setNum, existingLog: sessionLogs.first { $0.setNumber == setNum })
-            }
-        }
-        .padding()
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
-    }
-
-    // MARK: - Set Row
-
-    private func setRow(session: StrengthSession, setNumber: Int, existingLog: StrengthLog?) -> some View {
-        HStack(spacing: 12) {
-            Text(session.isTimed ? "Hold \(setNumber)" : "Set \(setNumber)")
-                .font(TrailFont.metaBold)
-                .foregroundStyle(.secondary)
-                .frame(width: 50, alignment: .leading)
-
-            if let log = existingLog {
-                completedSetView(log, isTimed: session.isTimed)
-            } else {
-                editableSetView(session: session, setNumber: setNumber)
-            }
-        }
-    }
-
-    private func completedSetView(_ log: StrengthLog, isTimed: Bool = false) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: "checkmark.circle.fill")
-                .foregroundStyle(.green)
-                .font(TrailFont.meta)
-
-            Text(isTimed ? "\(log.actualReps)s" : "\(log.actualReps) reps")
-                .font(TrailFont.data)
-
-            if let kg = log.actualWeightKg {
-                Text("@ \(Int(kg * 2.205)) lbs")
-                    .font(TrailFont.data)
-                    .foregroundStyle(.secondary)
-            }
-
-            if let rpe = log.rpe {
-                Text("RPE \(String(format: "%.0f", rpe))")
-                    .font(TrailFont.data)
-                    .foregroundStyle(.tertiary)
-            }
-
-            Spacer()
-
-            Button {
-                strengthStore.deleteLog(log.id)
-            } label: {
-                Image(systemName: "xmark.circle")
-                    .font(TrailFont.meta)
-                    .foregroundStyle(.red.opacity(0.6))
-            }
-        }
-        .padding(.vertical, 4)
-        .padding(.horizontal, 8)
-        .background(.green.opacity(0.06), in: RoundedRectangle(cornerRadius: 6))
-    }
-
-    private func editableSetView(session: StrengthSession, setNumber: Int) -> some View {
-        HStack(spacing: 8) {
-            let inputs = logInputs[session.id] ?? []
-            let inputIndex = setNumber - 1
-
-            if inputIndex < inputs.count {
-                TextField(session.isTimed ? "secs" : "reps", text: binding(session: session.id, set: inputIndex, keyPath: \.reps))
-                    .keyboardType(.numberPad)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(width: 50)
-
-                if session.prescribedWeightKg != nil {
-                    TextField("lbs", text: binding(session: session.id, set: inputIndex, keyPath: \.weight))
-                        .keyboardType(.decimalPad)
-                        .textFieldStyle(.roundedBorder)
-                        .frame(width: 55)
-                }
 
                 Spacer()
 
                 Button {
-                    logSetFromInput(session: session, setNumber: setNumber)
+                    strengthStore.toggleComplete(session.id)
                 } label: {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(Color.trailGreen)
+                    HStack(spacing: 4) {
+                        Image(systemName: session.isComplete ? "checkmark.circle.fill" : "circle")
+                        Text(session.isComplete ? "Done" : "Mark Done")
+                            .font(TrailFont.meta)
+                    }
+                    .foregroundStyle(session.isComplete ? .green : .secondary)
                 }
-                .disabled(inputs[inputIndex].reps.isEmpty)
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .tint(session.isComplete ? .green : .secondary)
             }
+
+            Text(session.coachNotes)
+                .font(TrailFont.coach)
+                .foregroundStyle(session.isComplete ? .secondary : .primary)
+                .textSelection(.enabled)
+                .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(.vertical, 2)
+        .padding()
+        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
     }
-
-    // MARK: - Helpers
-
-    private func prescriptionText(_ session: StrengthSession) -> String {
-        let repsLabel = session.isTimed ? "\(session.prescribedReps)s" : "\(session.prescribedReps)"
-        var text = "\(session.prescribedSets)×\(repsLabel)"
-        if let kg = session.prescribedWeightKg {
-            text += " @ \(Int(kg * 2.205)) lbs"
-        }
-        if let rpe = session.prescribedRpe {
-            text += " • RPE \(String(format: "%.0f", rpe))"
-        }
-        return text
-    }
-
-    private func initializeInputs() {
-        let daySessions = strengthStore.sessions(for: weekNumber, dayOfWeek: dayOfWeek)
-        for session in daySessions {
-            let defaultWeight = session.prescribedWeightKg.map { String(Int($0 * 2.205)) } ?? ""
-            let defaultReps = String(session.prescribedReps)
-            logInputs[session.id] = (0..<session.prescribedSets).map { _ in
-                SetInput(reps: defaultReps, weight: defaultWeight)
-            }
-        }
-    }
-
-    private func binding(session sessionId: UUID, set index: Int, keyPath: WritableKeyPath<SetInput, String>) -> Binding<String> {
-        Binding {
-            logInputs[sessionId]?[index][keyPath: keyPath] ?? ""
-        } set: { newValue in
-            logInputs[sessionId]?[index][keyPath: keyPath] = newValue
-        }
-    }
-
-    private func logSetFromInput(session: StrengthSession, setNumber: Int) {
-        let inputIndex = setNumber - 1
-        guard let inputs = logInputs[session.id],
-              inputIndex < inputs.count,
-              let reps = Int(inputs[inputIndex].reps) else { return }
-
-        let weightKg = Double(inputs[inputIndex].weight).map { $0 / 2.205 }
-
-        strengthStore.logSet(
-            sessionId: session.id,
-            setNumber: setNumber,
-            reps: reps,
-            weightKg: weightKg ?? session.prescribedWeightKg,
-            rpe: nil
-        )
-    }
-}
-
-private struct SetInput {
-    var reps: String
-    var weight: String
 }
 
 #Preview {

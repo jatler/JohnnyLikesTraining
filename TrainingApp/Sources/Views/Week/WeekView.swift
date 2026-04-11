@@ -293,7 +293,7 @@ struct WeekView: View {
                 if !daySessions.isEmpty || !dayHeat.isEmpty || !dayStretch.isEmpty {
                     HStack(spacing: 8) {
                         if !daySessions.isEmpty {
-                            let completed = strengthStore.completedExerciseCount(for: session.scheduledDate)
+                            let completed = strengthStore.completedCount(for: session.scheduledDate)
                             let total = daySessions.count
                             let allDone = completed == total
 

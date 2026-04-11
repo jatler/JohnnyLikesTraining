@@ -310,7 +310,7 @@ struct SessionDetailSheet: View {
                             dayOfWeek: session.dayOfWeek
                         )
                     } label: {
-                        Label("Log", systemImage: "checkmark.circle")
+                        Label("Details", systemImage: "chevron.right")
                             .font(TrailFont.meta)
                     }
                     .buttonStyle(.bordered)
@@ -319,28 +319,20 @@ struct SessionDetailSheet: View {
                 }
 
                 ForEach(daySessions) { s in
-                    HStack(spacing: 8) {
-                        let complete = strengthStore.isSessionComplete(s.id)
-
-                        if complete {
-                            Image(systemName: "checkmark.circle.fill")
+                    HStack(alignment: .top, spacing: 8) {
+                        Button {
+                            strengthStore.toggleComplete(s.id)
+                        } label: {
+                            Image(systemName: s.isComplete ? "checkmark.circle.fill" : "circle")
                                 .font(TrailFont.meta)
-                                .foregroundStyle(.green)
-                        } else {
-                            Image(systemName: "circle")
-                                .font(TrailFont.meta)
-                                .foregroundStyle(.quaternary)
+                                .foregroundStyle(s.isComplete ? .green : .quaternary)
                         }
+                        .buttonStyle(.plain)
 
-                        Text(s.exerciseName)
-                            .font(TrailFont.meta)
-                            .foregroundStyle(complete ? .secondary : .primary)
-
-                        Spacer()
-
-                        Text(formatPrescription(s))
-                            .font(TrailFont.meta)
-                            .foregroundStyle(.secondary)
+                        Text(s.coachNotes.isEmpty ? "Strength" : s.coachNotes)
+                            .font(TrailFont.coach)
+                            .foregroundStyle(s.isComplete ? .secondary : .primary)
+                            .strikethrough(s.isComplete)
                     }
                 }
             }
@@ -349,15 +341,6 @@ struct SessionDetailSheet: View {
             .background(Color.trailGreen.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
             .opacity(isSkipped ? 0.5 : 1)
         }
-    }
-
-    private func formatPrescription(_ session: StrengthSession) -> String {
-        let repsLabel = session.isTimed ? "\(session.prescribedReps)s" : "\(session.prescribedReps)"
-        var text = "\(session.prescribedSets)×\(repsLabel)"
-        if let kg = session.prescribedWeightKg {
-            text += " @ \(Int(kg * 2.205)) lbs"
-        }
-        return text
     }
 
     @ViewBuilder

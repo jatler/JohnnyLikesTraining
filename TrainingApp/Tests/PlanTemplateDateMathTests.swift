@@ -17,7 +17,6 @@ final class PlanTemplateDateMathTests: XCTestCase {
                 SessionTemplate(week: 1, day: 3, workoutType: .tempo, targetDistanceKm: 10.0, paceDescription: "tempo", notes: nil),
                 SessionTemplate(week: 1, day: 6, workoutType: .longRun, targetDistanceKm: 20.0, paceDescription: nil, notes: nil),
             ],
-            strengthExercises: nil,
             heatSessions: nil,
             stretchExercises: nil
         )
