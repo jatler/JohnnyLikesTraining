@@ -325,7 +325,7 @@ struct SessionDetailSheet: View {
                         } label: {
                             Image(systemName: s.isComplete ? "checkmark.circle.fill" : "circle")
                                 .font(TrailFont.meta)
-                                .foregroundStyle(s.isComplete ? .green : .quaternary)
+                                .foregroundStyle(s.isComplete ? AnyShapeStyle(Color.green) : AnyShapeStyle(.quaternary))
                         }
                         .buttonStyle(.plain)
 
