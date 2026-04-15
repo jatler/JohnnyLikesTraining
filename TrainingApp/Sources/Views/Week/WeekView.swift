@@ -85,7 +85,7 @@ struct WeekView: View {
             HStack {
                 Text("Week \(selectedWeek)")
                     .font(TrailFont.dataLarge)
-                    .foregroundStyle(Color.trailGreen)
+                    .foregroundStyle(.white)
 
                 Spacer()
 
@@ -115,18 +115,19 @@ struct WeekView: View {
             HStack(spacing: 8) {
                 Text(weekDateRange)
                     .font(TrailFont.meta)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.white.opacity(0.85))
 
                 if planStore.currentWeekNumber == selectedWeek {
                     Text("Current Week")
                         .font(TrailFont.meta)
-                        .foregroundStyle(Color.trailGreen)
+                        .foregroundStyle(.white)
                         .fontWeight(.semibold)
                 }
             }
         }
         .padding()
-        .background(.bar)
+        .background(Color.trailGreen)
+        .tint(.white)
     }
 
     private var weekDateRange: String {

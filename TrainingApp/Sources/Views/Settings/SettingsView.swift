@@ -20,10 +20,10 @@ struct SettingsView: View {
             VStack(spacing: 0) {
                 Text("Settings")
                     .font(TrailFont.dataLarge)
-                    .foregroundStyle(Color.trailGreen)
+                    .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding()
-                    .background(.bar)
+                    .background(Color.trailGreen)
 
                 List {
                     gracePeriodBanner

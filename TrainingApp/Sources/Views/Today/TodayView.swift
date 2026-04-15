@@ -68,19 +68,19 @@ struct TodayView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(firstSession?.workoutType.displayName ?? "Rest Day")
                     .font(TrailFont.dataLarge)
-                    .foregroundStyle(Color.trailGreen)
+                    .foregroundStyle(.white)
                     .strikethrough(skipped)
                     .opacity(skipped ? 0.5 : 1)
                 HStack(spacing: 8) {
                     if let mi = firstSession?.targetDistanceMi {
                         Text(String(format: "%.1f mi", mi))
                             .font(TrailFont.data)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.white.opacity(0.85))
                     }
                     if let s = firstSession {
                         Text("Week \(s.weekNumber) \u{2022} Day \(s.dayOfWeek)")
                             .font(TrailFont.meta)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.white.opacity(0.85))
                     }
                 }
             }
@@ -95,12 +95,12 @@ struct TodayView: View {
                     .background(.red.opacity(0.8), in: Capsule())
             } else if hasMatch {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
+                    .foregroundStyle(.white)
                     .font(TrailFont.title)
             }
         }
         .padding()
-        .background(.bar)
+        .background(Color.trailGreen)
     }
 
     private var todayContent: some View {

@@ -18,10 +18,10 @@ struct ProgressDashboardView: View {
                     VStack(spacing: 0) {
                         Text("Progress")
                             .font(TrailFont.dataLarge)
-                            .foregroundStyle(Color.trailGreen)
+                            .foregroundStyle(.white)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding()
-                            .background(.bar)
+                            .background(Color.trailGreen)
 
                         ScrollView {
                             VStack(spacing: 12) {

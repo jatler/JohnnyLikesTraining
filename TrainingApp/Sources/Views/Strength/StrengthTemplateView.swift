@@ -85,7 +85,7 @@ struct StrengthTemplateView: View {
             VStack(spacing: 12) {
                 Text("Strength & More")
                     .font(TrailFont.dataLarge)
-                    .foregroundStyle(Color.trailGreen)
+                    .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 Picker("Section", selection: $selectedSegment) {
@@ -96,7 +96,7 @@ struct StrengthTemplateView: View {
                 .pickerStyle(.segmented)
             }
             .padding()
-            .background(.bar)
+            .background(Color.trailGreen)
 
             ScrollView {
                 VStack(spacing: 12) {
