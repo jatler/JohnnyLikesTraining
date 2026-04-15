@@ -44,9 +44,9 @@
     {
       "week": 1,
       "day": 5,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 7.2405,
-      "pace_description": "Rest or 3-6 mi easy (x-train an option on any Friday)",
+      "pace_description": null,
       "notes": "Rest or 3-6 mi easy (x-train an option on any Friday)"
     },
     {
@@ -60,9 +60,9 @@
     {
       "week": 1,
       "day": 7,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 11.263,
-      "pace_description": "4-10 mi easy with 4 x 30 sec fast/2 min easy in the middle",
+      "pace_description": null,
       "notes": "4-10 mi easy with 4 x 30 sec fast/2 min easy in the middle (Sun ideally on trails each week, and you can sub in x-training too)"
     },
     {
@@ -84,9 +84,9 @@
     {
       "week": 2,
       "day": 3,
-      "workout_type": "intervals",
+      "workout_type": "easy",
       "target_distance_km": 8.045,
-      "pace_description": "2-3 mi easy, 2 x (5 x 1 min fast/1 min easy) with 3 min",
+      "pace_description": null,
       "notes": "2-3 mi easy, 2 x (5 x 1 min fast/1 min easy) with 3 min easy between sets, 3 min easy, 4 x 1 min hills hard with run down recovery, 2-3 mi easy. On flatter intervals, think 5k effort, with more effort on hills"
     },
     {
@@ -196,9 +196,9 @@
     {
       "week": 4,
       "day": 3,
-      "workout_type": "intervals",
+      "workout_type": "easy",
       "target_distance_km": 12.872,
-      "pace_description": "6-10 mi easy",
+      "pace_description": null,
       "notes": "6-10 mi easy"
     },
     {
@@ -340,9 +340,9 @@
     {
       "week": 6,
       "day": 7,
-      "workout_type": "race",
+      "workout_type": "easy",
       "target_distance_km": null,
-      "pace_description": "5k to half marathon hard if you want a celebration, or a",
+      "pace_description": null,
       "notes": "5k to half marathon hard if you want a celebration, or a long run if you are building into training for longer races!"
     }
   ]

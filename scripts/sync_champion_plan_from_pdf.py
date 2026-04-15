@@ -17,7 +17,7 @@ import pdfplumber
 
 REPO = Path(__file__).resolve().parents[1]
 JSON_PATH = REPO / "TrainingApp" / "Resources" / "champion_plan_100k.json"
-DEFAULT_PDF = Path.home() / "Downloads" / "The Champion Plan for 100 km to 100 miles.pdf"
+DEFAULT_PDF = REPO / "scripts" / "source_pdfs" / "The Champion Plan for 100 km to 100 miles.pdf"
 
 
 def norm_cell(s: str | None) -> str:

@@ -28,9 +28,9 @@
     {
       "week": 1,
       "day": 3,
-      "workout_type": "cross_train",
+      "workout_type": "intervals",
       "target_distance_km": 8.045,
-      "pace_description": "2-3 miles easy warm-up (can always add a couple light",
+      "pace_description": null,
       "notes": "2-3 miles easy warm-up (can always add a couple light strides to the warm-up on workout days), 6 x 2 min hills around 5k effort, 5 x 45 sec hills around 5k effort, 2-3 miles easy cool- down. These hills are a major power and VO2 max stimulus with limited impact Optional easy double. All doubles are 20-40 min easy unless otherwise noted. May substitute a treadmill uphill, 20-30 min at 15% grade hiking and/or running, or x-training"
     },
     {
@@ -52,9 +52,9 @@
     {
       "week": 1,
       "day": 6,
-      "workout_type": "race",
+      "workout_type": "long_run",
       "target_distance_km": null,
-      "pace_description": "8-14 miles easy/mod",
+      "pace_description": null,
       "notes": "8-14 miles easy/mod. On easy/mod long runs, you can go on feel, letting your body dictate effort, with the option to push a bit more on uphills. Fuel all long runs well! Long runs ideally on trails like the race when possible, but roads or other terrain work until specific efforts later"
     },
     {
@@ -196,9 +196,9 @@
     {
       "week": 4,
       "day": 3,
-      "workout_type": "tempo",
+      "workout_type": "easy",
       "target_distance_km": 16.09,
-      "pace_description": "8-12 miles easy/mod, starting easy and settling in at a",
+      "pace_description": null,
       "notes": "8-12 miles easy/mod, starting easy and settling in at a steady effort progressing to marathon/50k. This steady running may feel a bit unnatural at first as the body adjust to the new strain Optional easy double/treadhill"
     },
     {
@@ -244,17 +244,17 @@
     {
       "week": 5,
       "day": 2,
-      "workout_type": "easy",
+      "workout_type": "intervals",
       "target_distance_km": 8.045,
-      "pace_description": "2-3 miles easy warm-up, 1/2/3/4/3/2/1 min fast with 1 min",
+      "pace_description": "5-10 miles easy",
       "notes": "2-3 miles easy warm-up, 1/2/3/4/3/2/1 min fast with 1 min easy recovery (think 10k effort), 3 min easy, 5 x 1 min fast/1 min easy (think 5k effort), 2-3 miles easy cool-down. This combo workout builds the aerobic system and speed! Optional easy double/treadhill"
     },
     {
       "week": 5,
       "day": 3,
-      "workout_type": "intervals",
+      "workout_type": "easy",
       "target_distance_km": 12.067499999999999,
-      "pace_description": "5-10 miles easy",
+      "pace_description": "2-3 miles easy warm-up, 1/2/3/4/3/2/1 min fast with 1 min",
       "notes": "5-10 miles easy"
     },
     {
@@ -340,9 +340,9 @@
     {
       "week": 6,
       "day": 7,
-      "workout_type": "race",
+      "workout_type": "easy",
       "target_distance_km": null,
-      "pace_description": "10-14 miles easy on trails with strong downhills",
+      "pace_description": null,
       "notes": "10-14 miles easy on trails with strong downhills. Running well on downhills after a tough long run is especially important for races with more climbing"
     },
     {
@@ -356,17 +356,17 @@
     {
       "week": 7,
       "day": 2,
-      "workout_type": "easy",
+      "workout_type": "intervals",
       "target_distance_km": 8.045,
-      "pace_description": "2-3 miles easy warm-up, 3 x 8 min fast (think 10k effort)",
+      "pace_description": "6-10 miles easy",
       "notes": "2-3 miles easy warm-up, 3 x 8 min fast (think 10k effort) with 3 min easy recovery, 6 x 1 min slight hills fast with run back recovery (think 5k), 2-3 miles easy. Longer intervals will be tough, and the hills at the end will be a full power stimulus. Optional easy double/treadhill"
     },
     {
       "week": 7,
       "day": 3,
-      "workout_type": "intervals",
+      "workout_type": "easy",
       "target_distance_km": 12.872,
-      "pace_description": "6-10 miles easy",
+      "pace_description": "2-3 miles easy warm-up, 3 x 8 min fast (think 10k effort)",
       "notes": "6-10 miles easy"
     },
     {
@@ -412,17 +412,17 @@
     {
       "week": 8,
       "day": 2,
-      "workout_type": "race",
+      "workout_type": "intervals",
       "target_distance_km": null,
-      "pace_description": "2-3 miles easy warm-up, 20 min mod/hard around 1-hour",
+      "pace_description": null,
       "notes": "2-3 miles easy warm-up, 20 min mod/hard around 1-hour effort, 5 min easy, 6 x 1 min fast/30 seconds easy (think 5k or a bit easier effort), 2-3 miles easy cool- down. Threshold/speed combo before race sim! This serves as a reset week, like the one at week 4 as well Optional easy double/treadhill"
     },
     {
       "week": 8,
       "day": 3,
-      "workout_type": "intervals",
+      "workout_type": "easy",
       "target_distance_km": 12.067499999999999,
-      "pace_description": "5-10 miles easy",
+      "pace_description": null,
       "notes": "5-10 miles easy. Nice little reset before weekend!"
     },
     {
@@ -444,9 +444,9 @@
     {
       "week": 8,
       "day": 6,
-      "workout_type": "race",
+      "workout_type": "long_run",
       "target_distance_km": 3.218,
-      "pace_description": "1-2 mile easy warm-up, 13",
+      "pace_description": null,
       "notes": "1-2 mile easy warm-up, 13.1 miles hard on trails like race, 1-2 mile easy cool-down. This race or race simulation will be a tough stress on every system. You can move this effort to any week between weeks 5 and 10!"
     },
     {
@@ -500,17 +500,17 @@
     {
       "week": 9,
       "day": 6,
-      "workout_type": "race",
+      "workout_type": "long_run",
       "target_distance_km": null,
-      "pace_description": "20-26",
+      "pace_description": null,
       "notes": "20-26.2 miles easy/mod on trails with strong uphills around 50k effort or a bit easier. This will be the largest aerobic strain of the training block, a time to practice fueling like race day."
     },
     {
       "week": 9,
       "day": 7,
-      "workout_type": "race",
+      "workout_type": "easy",
       "target_distance_km": null,
-      "pace_description": "14-20 miles easy on trails with 6 x 20 second hills",
+      "pace_description": null,
       "notes": "14-20 miles easy on trails with 6 x 20 second hills. The big back-to-back will make the 50k feel short, and help you truly race it to potential"
     },
     {
@@ -556,17 +556,17 @@
     {
       "week": 10,
       "day": 6,
-      "workout_type": "race",
+      "workout_type": "long_run",
       "target_distance_km": null,
-      "pace_description": "16-22 miles easy/mod on trails (1 hour moderate around",
+      "pace_description": null,
       "notes": "16-22 miles easy/mod on trails (1 hour moderate around marathon effort to start, faster to finish). The extended tempo will prepare the muscular system for the demands of race day"
     },
     {
       "week": 10,
       "day": 7,
-      "workout_type": "race",
+      "workout_type": "easy",
       "target_distance_km": null,
-      "pace_description": "10-16 miles easy on trails with strong, purposeful downhills",
+      "pace_description": null,
       "notes": "10-16 miles easy on trails with strong, purposeful downhills. Practicing owning the downhills will be free speed on race day."
     },
     {
@@ -612,9 +612,9 @@
     {
       "week": 11,
       "day": 6,
-      "workout_type": "race",
+      "workout_type": "long_run",
       "target_distance_km": null,
-      "pace_description": "12-16 miles easy to easy/mod on trails",
+      "pace_description": null,
       "notes": "12-16 miles easy to easy/mod on trails. A nice aerobic long run a week before the race activates the nervous and aerobic systems for peak performance."
     },
     {
@@ -644,17 +644,17 @@
     {
       "week": 12,
       "day": 3,
-      "workout_type": "intervals",
+      "workout_type": "easy",
       "target_distance_km": 8.045,
-      "pace_description": "4-6 miles easy",
+      "pace_description": null,
       "notes": "4-6 miles easy"
     },
     {
       "week": 12,
       "day": 4,
-      "workout_type": "easy",
+      "workout_type": "rest",
       "target_distance_km": null,
-      "pace_description": "Rest and recovery",
+      "pace_description": null,
       "notes": "Rest and recovery"
     },
     {

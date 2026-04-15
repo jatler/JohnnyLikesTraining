@@ -25,7 +25,7 @@ import pdfplumber
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_SWAP_DIR = Path.home() / "Downloads" / "SWAP_Plans"
+DEFAULT_SWAP_DIR = REPO_ROOT / "scripts" / "source_pdfs"
 OUT_DIR = REPO_ROOT / "TrainingApp" / "Resources"
 
 ALLOWED_WORKOUT_TYPES = {
@@ -212,37 +212,89 @@ def parse_race_distance_km(text: str) -> Optional[Tuple[float, str]]:
 
 
 def workout_type_for(day_of_week: int, week_cell_text: str) -> str:
-    t = (week_cell_text or "").strip().lower()
+    """Content-first classifier; day-of-week only as a tiebreaker.
 
-    if not t:
+    The previous version assigned types purely by day-of-week, which mislabelled
+    workouts whenever a plan deviated from the standard Tue=easy / Wed=intervals
+    template (e.g. Champion Plan W3 swaps Tuesday and Wednesday). See
+    `scripts/recategorize_bundled_plans.py` for the same logic applied as a
+    one-shot fix to existing bundled JSONs.
+    """
+    if not week_cell_text or not week_cell_text.strip():
         return "rest"
+    t = re.sub(r"\s+", " ", week_cell_text).strip()
+    tl = t.lower()
 
-    if "race" in t:
+    if re.match(r"^\d+\s*(?:mile|mi|k|km)(?:\s*or\s*\d+\s*(?:mile|mi|k|km))?\s*race\b", tl):
+        return "race"
+    if re.match(r"^race\s*(?:day|week|!|$)", tl):
         return "race"
 
-    if "cross train" in t or "x-train" in t or "x train" in t:
-        return "cross_train"
-
-    if day_of_week == 1:
+    if re.match(r"^rest[\.\s!]*$", tl):
         return "rest"
+    if re.match(r"^rest[\.,!\s]", tl):
+        rest_only = (
+            "miles" not in tl
+            and " mi " not in tl
+            and " mi." not in tl
+            and not re.search(r"\bx[-\s]?train\b", tl)
+            and not re.match(r"^rest\s+or\s+\d", tl)
+        )
+        if rest_only:
+            return "rest"
 
-    if "very easy" in t or "aerobic recovery" in t or "recovery day" in t:
-        return "recovery"
+    starts_with_warmup = bool(re.match(
+        r"^\d+(?:\.\d+)?(?:\s*[-–]\s*\d+(?:\.\d+)?)?\s*(?:mi|miles)\s+(?:easy|easy/mod|very easy)(?:\s+jog)?\s+warm[-\s]?up\b",
+        tl,
+    ))
+    starts_with_treadmill_workout = bool(re.match(
+        r"^uphill\s+treadmill\s+(?:at\s+\d|workout|with\s+\d+\s*x|in\s+z\d|\d+[-–]\d+\s*min\s+with|\d)",
+        tl,
+    ))
+    starts_with_easy_then_intervals = bool(re.match(
+        r"^\d+(?:\.\d+)?(?:\s*[-–]\s*\d+(?:\.\d+)?)?\s*(?:mi|miles)\s+easy[,.\s]+\d+\s*x\s*\d+\s*(?:min|sec|second|minute|hour)\b",
+        tl,
+    ))
 
-    if day_of_week == 6:
-        # Saturday is the long run / hardest weekend day in these SWAP plans.
-        return "long_run"
-
-    if day_of_week == 3:
-        # Wednesday is typically intervals or tempo/threshold.
-        if "threshold" in t or "tempo" in t or "steady" in t or "around 1-hour" in t:
+    if starts_with_warmup or starts_with_treadmill_workout or starts_with_easy_then_intervals:
+        has_short_intervals = bool(re.search(
+            r"\d+\s*x\s*\d+\s*(?:min|sec|second|minute)\s*(?:fast|hill|hard)", tl
+        ))
+        if "threshold" in tl and not has_short_intervals:
+            return "tempo"
+        if (
+            starts_with_treadmill_workout
+            and "around 1-hour effort" in tl
+            and not has_short_intervals
+        ):
             return "tempo"
         return "intervals"
 
-    # Thursday is often easy or cross training; Sunday is easy.
-    if day_of_week in (2, 4, 7):
-        return "easy"
+    if re.match(r"^\d+(?:\.\d+)?(?:\s*[-–]\s*\d+(?:\.\d+)?)?\s*(?:mi|miles)\s+easy/mod\s+to\s+mod\b", tl):
+        return "tempo"
+    if re.match(r"^\d+(?:\.\d+)?(?:\s*[-–]\s*\d+(?:\.\d+)?)?\s*(?:mi|miles)\s+steady\b", tl):
+        return "tempo"
 
+    if re.match(
+        r"^(?:about\s+)?\d+(?:\.\d+)?(?:\s*[-–]\s*\d+(?:\.\d+)?)?\s*(?:hours?|hr|min|minutes?)\b[a-z\s/]*x[-\s]?train\b",
+        tl,
+    ):
+        return "cross_train"
+    nospace = tl.replace(" ", "")
+    if re.match(r"^\d+(?:\.\d+)?[-–]\d+(?:\.\d+)?(?:hours?|min|minutes?)easy(?:/mod)?x[-\s]?train", nospace):
+        return "cross_train"
+    if re.match(r"^rest\s+or\s+x[-\s]?train", tl):
+        return "cross_train"
+
+    if re.match(r"^\d+(?:\.\d+)?(?:\s*[-–]\s*\d+(?:\.\d+)?)?\s*(?:mi|miles)\s+very\s+easy\b", tl):
+        return "recovery"
+    if "aerobic recovery" in tl[:80]:
+        return "recovery"
+
+    if day_of_week == 1:
+        return "rest"
+    if day_of_week == 6:
+        return "long_run"
     return "easy"
 
 

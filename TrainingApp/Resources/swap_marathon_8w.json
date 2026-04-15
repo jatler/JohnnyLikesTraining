@@ -20,17 +20,17 @@
     {
       "week": 1,
       "day": 2,
-      "workout_type": "race",
+      "workout_type": "easy",
       "target_distance_km": null,
-      "pace_description": "4-10 mi easy plus 4 x 30 sec hills",
+      "pace_description": null,
       "notes": "4-10 mi easy plus 4 x 30 sec hills. Easy runs just mean relaxed, fun, mini adventures! Can be around the block or on trails or anything fun, except for long runs, which should be on terrain like the race unless otherwise noted. 20 or 30 sec hill strides involve running as quickly as you can without straining up a moderate (not steep grade), running down and around for 60-90 sec as recovery. All strides can be done anytime after halfway"
     },
     {
       "week": 1,
       "day": 3,
-      "workout_type": "cross_train",
+      "workout_type": "intervals",
       "target_distance_km": 8.045,
-      "pace_description": "2-3 mi easy, 15 x 1 min fast/1 min easy (think 5k), 2-3 mi",
+      "pace_description": null,
       "notes": "2-3 mi easy, 15 x 1 min fast/1 min easy (think 5k), 2-3 mi easy/mod. Can progress effort on easy/mod running at the end, ending faster! Optional easy double or x-train. On doubles, can be run or x-train under an hour later in the day, with 20-35 min ideal. It is an advanced training principle, only do if 100%. Cross train can be bike, hike, uphill treadmill, ski, or anything else, with the time being flexible. Mtn legs"
     },
     {
@@ -60,9 +60,9 @@
     {
       "week": 1,
       "day": 7,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 14.481,
-      "pace_description": "6-12 mi easy on trails with 4 x 20 second hills",
+      "pace_description": null,
       "notes": "6-12 mi easy on trails with 4 x 20 second hills. Can always add or substitute x-train or rest on Sundays. The low end of weekly mileage is given with Sun as x- train Mtn legs"
     },
     {
@@ -116,9 +116,9 @@
     {
       "week": 2,
       "day": 7,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 17.698999999999998,
-      "pace_description": "8-14 mi easy on trails or x-train Mtn legs",
+      "pace_description": null,
       "notes": "8-14 mi easy on trails or x-train Mtn legs"
     },
     {
@@ -140,9 +140,9 @@
     {
       "week": 3,
       "day": 3,
-      "workout_type": "tempo",
+      "workout_type": "easy",
       "target_distance_km": 19.308,
-      "pace_description": "10-14 mi easy/mod at 90-95% of M effort",
+      "pace_description": null,
       "notes": "10-14 mi easy/mod at 90-95% of M effort. Steady running can be the gateway to endurance in long events! Optional easy double up to 6 mi over hills with 2nd half at M effort. Mtn legs"
     },
     {
@@ -172,9 +172,9 @@
     {
       "week": 3,
       "day": 7,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 16.8945,
-      "pace_description": "8-13 miles easy on trails plus 4 x 20 sec hills or x-train",
+      "pace_description": null,
       "notes": "8-13 miles easy on trails plus 4 x 20 sec hills or x-train Mtn legs"
     },
     {
@@ -252,9 +252,9 @@
     {
       "week": 5,
       "day": 3,
-      "workout_type": "tempo",
+      "workout_type": "easy",
       "target_distance_km": 8.045,
-      "pace_description": "2-3 miles easy, 6-10 x 3 min at 1-hour effort with 90 sec",
+      "pace_description": null,
       "notes": "2-3 miles easy, 6-10 x 3 min at 1-hour effort with 90 sec easy recovery, 2-3 mi easy. After halfway in the workout, end each interval with more effort. A big tempo workout to provide major aerobic stress! Impress yourself! Optional double up to 6 mi with 20 min starting at M effort, ending 2nd half of tempo faster. Big day, similar to Canova block, only do this if you are very experienced. No leg strength this week with big aerobic focus"
     },
     {
@@ -276,9 +276,9 @@
     {
       "week": 5,
       "day": 6,
-      "workout_type": "race",
+      "workout_type": "long_run",
       "target_distance_km": null,
-      "pace_description": "20-24 miles easy/moderate, targeting an effort that is 90",
+      "pace_description": null,
       "notes": "20-24 miles easy/moderate, targeting an effort that is 90 to 95% of M effort on terrain like race Fuel like the event, this one can be a confidence builder or confidence destroyer, so ease into it and practice self-belief!"
     },
     {
@@ -308,9 +308,9 @@
     {
       "week": 6,
       "day": 3,
-      "workout_type": "race",
+      "workout_type": "easy",
       "target_distance_km": null,
-      "pace_description": "2-3 mi easy, 10k hard, 2-3 mi easy",
+      "pace_description": null,
       "notes": "2-3 mi easy, 10k hard, 2-3 mi easy. Treat this like a little race simulation, and you can even do it on a net downhill of 100-250 ft. Plug it into an online calculator for pacing guidance! If you’re lower volume or more prone to fades, go a bit easier than calculator suggests for M pace workouts and race. Can also do a road race in place of a long run on a preceding week. Optional easy double Mtn legs"
     },
     {
@@ -340,9 +340,9 @@
     {
       "week": 6,
       "day": 7,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 16.8945,
-      "pace_description": "8-13 mi easy on trails with 4 x 30 sec hills or x-train",
+      "pace_description": null,
       "notes": "8-13 mi easy on trails with 4 x 30 sec hills or x-train Optional easy double Mtn legs"
     },
     {
@@ -356,17 +356,17 @@
     {
       "week": 7,
       "day": 2,
-      "workout_type": "race",
+      "workout_type": "easy",
       "target_distance_km": null,
-      "pace_description": "4-10 mi easy with 4 x 30 sec fast/30 sec easy",
+      "pace_description": null,
       "notes": "4-10 mi easy with 4 x 30 sec fast/30 sec easy. Final strides before race to focus on aerobic system and ST- muscle fibers"
     },
     {
       "week": 7,
       "day": 3,
-      "workout_type": "tempo",
+      "workout_type": "easy",
       "target_distance_km": 8.045,
-      "pace_description": "2-3 mi easy, 12/8/4 min mod/hard with 4 min easy recovery,",
+      "pace_description": null,
       "notes": "2-3 mi easy, 12/8/4 min mod/hard with 4 min easy recovery, 2-3 mi easy. Think 1-hour effort, finishing harder. Final controlled tempo effort for neuromuscular and aerobic stimulus! Optional easy double. Final optional double! Mtn legs. Final leg strength work!"
     },
     {
@@ -396,9 +396,9 @@
     {
       "week": 7,
       "day": 7,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 12.067499999999999,
-      "pace_description": "5-10 mi easy on trails plus 4 x 20 sec hills or x-train",
+      "pace_description": null,
       "notes": "5-10 mi easy on trails plus 4 x 20 sec hills or x-train"
     },
     {
@@ -420,9 +420,9 @@
     {
       "week": 8,
       "day": 3,
-      "workout_type": "intervals",
+      "workout_type": "easy",
       "target_distance_km": 8.045,
-      "pace_description": "2-3 mi easy, 20 min at M pace plus 3 min faster (ideally",
+      "pace_description": null,
       "notes": "2-3 mi easy, 20 min at M pace plus 3 min faster (ideally toward 1-hour effort), 2-3 mi easy with 4 x 30 sec fast/30 sec easy, thinking smooth and strong!"
     },
     {
@@ -436,9 +436,9 @@
     {
       "week": 8,
       "day": 5,
-      "workout_type": "easy",
+      "workout_type": "rest",
       "target_distance_km": null,
-      "pace_description": "Rest",
+      "pace_description": null,
       "notes": "Rest"
     },
     {

@@ -141,9 +141,9 @@
     {
       "week": 3,
       "day": 3,
-      "workout_type": "intervals",
+      "workout_type": "easy",
       "target_distance_km": null,
-      "pace_description": "1-hour effort on uphill threshold intervals",
+      "pace_description": null,
       "notes": "75-105 min uphill treadmill with 8-12 x 3 minutes around 1-hour effort with light progression with 1 min easy recovery. These types of bigger uphill threshold workouts are wonderful for winter training, allowing athletes to build aerobic fitness without much impact. The ideal grade for the intervals is 8%, keeping the recoveries at 8% but just slowing them down a lot. You can also do these workouts at lower grades (even flat) if that brings you the most joy!"
     },
     {
@@ -309,9 +309,9 @@
     {
       "week": 6,
       "day": 3,
-      "workout_type": "intervals",
+      "workout_type": "easy",
       "target_distance_km": null,
-      "pace_description": "1-hour effort on uphill threshold intervals",
+      "pace_description": null,
       "notes": "75-105 min uphill treadmill with 5-8 x 5 minutes around 1-hour effort with 2 minutes easy recovery. A bigger threshold session here--you should start feeling more comfortable with lactate shuttling!"
     },
     {
@@ -533,9 +533,9 @@
     {
       "week": 10,
       "day": 3,
-      "workout_type": "intervals",
+      "workout_type": "easy",
       "target_distance_km": null,
-      "pace_description": "1-hour effort on uphill threshold intervals",
+      "pace_description": null,
       "notes": "75-105 min uphill TM with 3-6 x 10 minutes around 1-hour effort with 3 minutes easy recovery"
     },
     {

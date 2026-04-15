@@ -28,25 +28,25 @@
     {
       "week": 1,
       "day": 3,
-      "workout_type": "cross_train",
+      "workout_type": "intervals",
       "target_distance_km": 8.045,
-      "pace_description": "2-3 miles easy warm-up, 6 x 2 min hills at 5k effort, 4 x 1",
+      "pace_description": null,
       "notes": "2-3 miles easy warm-up, 6 x 2 min hills at 5k effort, 4 x 1 min hills at 5k effort, 2-3 miles easy. Muscle power is the first focus! PM: Optional 20-40 min treadhill—10-15% grade hike/run. Anytime “treadhill” is noted, you can run or x-train instead if no treadmill access (all doubles 20- 40 min unless otherwise noted) Mountain legs"
     },
     {
       "week": 1,
       "day": 4,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 9.654,
-      "pace_description": "4-8 miles easy or optional x- train",
+      "pace_description": null,
       "notes": "4-8 miles easy or optional x- train. Can sub in x-train on any day as things build—for 200s, it’s much less important to focus on running economy, but we still want to promote long- term growth. Be very flexible based on how you feel! Speed legs"
     },
     {
       "week": 1,
       "day": 5,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 7.2405,
-      "pace_description": "Rest or 3-6 miles easy or x-train",
+      "pace_description": null,
       "notes": "Rest or 3-6 miles easy or x-train. Fridays are flex recovery days to prepare for the weekend!"
     },
     {
@@ -100,9 +100,9 @@
     {
       "week": 2,
       "day": 5,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 7.2405,
-      "pace_description": "Rest or 3-6 miles easy or x-train",
+      "pace_description": null,
       "notes": "Rest or 3-6 miles easy or x-train"
     },
     {
@@ -140,9 +140,9 @@
     {
       "week": 3,
       "day": 3,
-      "workout_type": "intervals",
+      "workout_type": "easy",
       "target_distance_km": 12.872,
-      "pace_description": "6-10 miles easy",
+      "pace_description": null,
       "notes": "6-10 miles easy. Aerobic week to absorb the stress and recover for things ramping up No double Mountain legs"
     },
     {
@@ -156,9 +156,9 @@
     {
       "week": 3,
       "day": 5,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 7.2405,
-      "pace_description": "Rest or 3-6 miles easy or x-train",
+      "pace_description": null,
       "notes": "Rest or 3-6 miles easy or x-train"
     },
     {
@@ -212,9 +212,9 @@
     {
       "week": 4,
       "day": 5,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 7.2405,
-      "pace_description": "Rest or 3-6 miles easy or x-train",
+      "pace_description": null,
       "notes": "Rest or 3-6 miles easy or x-train"
     },
     {
@@ -268,9 +268,9 @@
     {
       "week": 5,
       "day": 5,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 9.654,
-      "pace_description": "Rest or 4-8 miles easy or x-train",
+      "pace_description": null,
       "notes": "Rest or 4-8 miles easy or x-train"
     },
     {
@@ -308,9 +308,9 @@
     {
       "week": 6,
       "day": 3,
-      "workout_type": "intervals",
+      "workout_type": "easy",
       "target_distance_km": 16.09,
-      "pace_description": "8-12 miles easy/mod",
+      "pace_description": null,
       "notes": "8-12 miles easy/mod"
     },
     {
@@ -324,9 +324,9 @@
     {
       "week": 6,
       "day": 5,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 7.2405,
-      "pace_description": "Rest or 3-6 miles easy or x-train",
+      "pace_description": null,
       "notes": "Rest or 3-6 miles easy or x-train"
     },
     {
@@ -380,9 +380,9 @@
     {
       "week": 7,
       "day": 5,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 9.654,
-      "pace_description": "Rest or 4-8 miles easy or x-train",
+      "pace_description": null,
       "notes": "Rest or 4-8 miles easy or x-train"
     },
     {
@@ -420,9 +420,9 @@
     {
       "week": 8,
       "day": 3,
-      "workout_type": "intervals",
+      "workout_type": "easy",
       "target_distance_km": 11.263,
-      "pace_description": "4-10 miles easy",
+      "pace_description": null,
       "notes": "4-10 miles easy. Two workouts this week!"
     },
     {
@@ -436,9 +436,9 @@
     {
       "week": 8,
       "day": 5,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 7.2405,
-      "pace_description": "Rest or 3-6 miles easy or x-train",
+      "pace_description": null,
       "notes": "Rest or 3-6 miles easy or x-train"
     },
     {
@@ -492,9 +492,9 @@
     {
       "week": 9,
       "day": 5,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 8.045,
-      "pace_description": "Rest or 4-6 miles easy or x-train",
+      "pace_description": null,
       "notes": "Rest or 4-6 miles easy or x-train"
     },
     {
@@ -532,9 +532,9 @@
     {
       "week": 10,
       "day": 3,
-      "workout_type": "intervals",
+      "workout_type": "easy",
       "target_distance_km": 12.872,
-      "pace_description": "6-10 miles easy/mod,",
+      "pace_description": null,
       "notes": "6-10 miles easy/mod,"
     },
     {
@@ -548,9 +548,9 @@
     {
       "week": 10,
       "day": 5,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 7.2405,
-      "pace_description": "Rest or 3-6 miles easy or x-train",
+      "pace_description": null,
       "notes": "Rest or 3-6 miles easy or x-train"
     },
     {
@@ -596,25 +596,25 @@
     {
       "week": 11,
       "day": 4,
-      "workout_type": "race",
+      "workout_type": "easy",
       "target_distance_km": null,
-      "pace_description": "5-12 miles easy Optional easy double No speed legs this",
+      "pace_description": null,
       "notes": "5-12 miles easy Optional easy double No speed legs this week with race simulation on weekend."
     },
     {
       "week": 11,
       "day": 5,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 7.2405,
-      "pace_description": "Rest or 3-6 miles easy or x-train",
+      "pace_description": null,
       "notes": "Rest or 3-6 miles easy or x-train"
     },
     {
       "week": 11,
       "day": 6,
-      "workout_type": "race",
+      "workout_type": "long_run",
       "target_distance_km": null,
-      "pace_description": "50k moderate",
+      "pace_description": null,
       "notes": "50k moderate. 5 weeks out, view this almost like a shorter race—run in a focused way, aiming to get to the end fatigued. An advanced athlete could do a training race like a 50 miler or even 100k!"
     },
     {
@@ -644,9 +644,9 @@
     {
       "week": 12,
       "day": 3,
-      "workout_type": "intervals",
+      "workout_type": "easy",
       "target_distance_km": 4.0225,
-      "pace_description": "2-3 miles easy,",
+      "pace_description": null,
       "notes": "2-3 miles easy,"
     },
     {
@@ -660,9 +660,9 @@
     {
       "week": 12,
       "day": 5,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 7.2405,
-      "pace_description": "Rest or 3-6 miles easy or x-train",
+      "pace_description": null,
       "notes": "Rest or 3-6 miles easy or x-train"
     },
     {
@@ -700,9 +700,9 @@
     {
       "week": 13,
       "day": 3,
-      "workout_type": "tempo",
+      "workout_type": "easy",
       "target_distance_km": 14.481,
-      "pace_description": "6-12 miles easy/mod, progressing to steady or moderate if",
+      "pace_description": null,
       "notes": "6-12 miles easy/mod, progressing to steady or moderate if feeling good. Another one where you might see big progress! No double Speed legs"
     },
     {
@@ -716,9 +716,9 @@
     {
       "week": 13,
       "day": 5,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 9.654,
-      "pace_description": "Rest or 4-8 miles easy or x-train",
+      "pace_description": null,
       "notes": "Rest or 4-8 miles easy or x-train"
     },
     {
@@ -756,9 +756,9 @@
     {
       "week": 14,
       "day": 3,
-      "workout_type": "intervals",
+      "workout_type": "easy",
       "target_distance_km": 4.0225,
-      "pace_description": "2-3 miles easy, 30 min",
+      "pace_description": null,
       "notes": "2-3 miles easy, 30 min"
     },
     {
@@ -772,25 +772,25 @@
     {
       "week": 14,
       "day": 5,
-      "workout_type": "cross_train",
+      "workout_type": "easy",
       "target_distance_km": 7.2405,
-      "pace_description": "Rest or 3-6 miles easy or x-train",
+      "pace_description": null,
       "notes": "Rest or 3-6 miles easy or x-train"
     },
     {
       "week": 14,
       "day": 6,
-      "workout_type": "race",
+      "workout_type": "long_run",
       "target_distance_km": null,
-      "pace_description": "14-18 miles easy/mod on trails with strong downhills",
+      "pace_description": null,
       "notes": "14-18 miles easy/mod on trails with strong downhills. 2 weeks out from the race is the last time we want to risk any muscle damage, so find some fun trails and push the downs a bit for one last stimulus for the eccentric muscle contractions and impact"
     },
     {
       "week": 14,
       "day": 7,
-      "workout_type": "race",
+      "workout_type": "easy",
       "target_distance_km": null,
-      "pace_description": "8-14 miles easy run/hike",
+      "pace_description": null,
       "notes": "8-14 miles easy run/hike. Ideally around race effort—getting a feel for how you are going to approach the day."
     },
     {
@@ -812,9 +812,9 @@
     {
       "week": 15,
       "day": 3,
-      "workout_type": "tempo",
+      "workout_type": "easy",
       "target_distance_km": 10.4585,
-      "pace_description": "5-8 miles easy/mod, progressing to steady or moderate if",
+      "pace_description": null,
       "notes": "5-8 miles easy/mod, progressing to steady or moderate if feeling good"
     },
     {
@@ -828,25 +828,25 @@
     {
       "week": 15,
       "day": 5,
-      "workout_type": "easy",
+      "workout_type": "rest",
       "target_distance_km": null,
-      "pace_description": "Rest",
+      "pace_description": null,
       "notes": "Rest. Dialing things back!"
     },
     {
       "week": 15,
       "day": 6,
-      "workout_type": "race",
+      "workout_type": "long_run",
       "target_distance_km": null,
-      "pace_description": "8-12 miles easy",
+      "pace_description": null,
       "notes": "8-12 miles easy. The final long run goal is to find some flow on fun trails, working on a positive and loving self-talk that will be key during the race"
     },
     {
       "week": 15,
       "day": 7,
-      "workout_type": "race",
+      "workout_type": "easy",
       "target_distance_km": null,
-      "pace_description": "2-4 hour hike",
+      "pace_description": null,
       "notes": "2-4 hour hike. Time on feet, dialing in aerobic metabolism for race day"
     },
     {
@@ -868,17 +868,17 @@
     {
       "week": 16,
       "day": 3,
-      "workout_type": "intervals",
+      "workout_type": "easy",
       "target_distance_km": 4.827,
-      "pace_description": "2-4 miles easy",
+      "pace_description": null,
       "notes": "2-4 miles easy"
     },
     {
       "week": 16,
       "day": 4,
-      "workout_type": "easy",
+      "workout_type": "rest",
       "target_distance_km": null,
-      "pace_description": "Rest and recovery",
+      "pace_description": null,
       "notes": "Rest and recovery. This is getting real!"
     },
     {
@@ -892,9 +892,9 @@
     {
       "week": 16,
       "day": 6,
-      "workout_type": "race",
+      "workout_type": "long_run",
       "target_distance_km": null,
-      "pace_description": "Race celebration of life!",
+      "pace_description": null,
       "notes": "Race celebration of life!"
     },
     {
