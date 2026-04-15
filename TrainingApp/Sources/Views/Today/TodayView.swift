@@ -235,7 +235,7 @@ struct TodayView: View {
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Happy Tuesday! It's Tuesday!")
-                            .font(TrailFont.dataLarge)
+                            .font(TrailFont.body)
                             .foregroundStyle(.primary)
                         Text("Listen to the latest SWAP podcast")
                             .font(TrailFont.detail)
