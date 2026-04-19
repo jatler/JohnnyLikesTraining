@@ -18,6 +18,8 @@ enum TrailFont {
     static let data  = Font.custom("GeistMono-Regular", size: 13, relativeTo: .caption)
     // Tab-level display heading: Fraunces for dynamic tab titles (Week 11, Progress, Strength, Settings).
     static let tabHeading = Font.custom("Fraunces-Medium", size: 28, relativeTo: .largeTitle)
+    // Big stat numbers in cards (focused-week stats, race-card days count). Replaces inline .custom() escapes.
+    static let bigNumber = Font.custom("GeistMono-Medium", size: 20, relativeTo: .title3)
 }
 
 // MARK: - Brand Constants

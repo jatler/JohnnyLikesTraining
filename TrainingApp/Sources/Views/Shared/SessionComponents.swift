@@ -5,41 +5,11 @@ enum SessionComponents {
     // MARK: - Oura Recovery Row
 
     static func recoveryRow(_ recovery: OuraDaily) -> some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 12) {
-                if let score = recovery.readinessScore {
-                    HStack(spacing: 3) {
-                        Image(systemName: score >= 85 ? "crown.fill" : "circle.fill")
-                            .foregroundStyle(readinessColor(recovery.readinessLevel))
-                        Text("Rdy").font(TrailFont.data).foregroundStyle(.secondary)
-                        Text("\(score)").font(TrailFont.data)
-                    }
-                }
-                if let sleep = recovery.sleepScore {
-                    HStack(spacing: 3) {
-                        Image(systemName: "moon.fill").foregroundStyle(.blue)
-                        Text("Slp").font(TrailFont.data).foregroundStyle(.secondary)
-                        Text("\(sleep)").font(TrailFont.data)
-                    }
-                }
-                if let hrv = recovery.hrvAverage {
-                    HStack(spacing: 3) {
-                        Image(systemName: "waveform.path.ecg").foregroundStyle(.purple)
-                        Text("HRV").font(TrailFont.data).foregroundStyle(.secondary)
-                        Text(String(format: "%.0f", hrv)).font(TrailFont.data)
-                    }
-                }
-                if let rhr = recovery.restingHr {
-                    HStack(spacing: 3) {
-                        Image(systemName: "heart.fill").foregroundStyle(.red)
-                        Text("RHR").font(TrailFont.data).foregroundStyle(.secondary)
-                        Text("\(rhr)").font(TrailFont.data)
-                    }
-                }
-                Spacer()
-            }
-
+        VStack(alignment: .leading, spacing: 10) {
             HStack {
+                Text("RECOVERY")
+                    .font(TrailFont.data).tracking(0.5)
+                    .foregroundStyle(.secondary)
                 Spacer()
                 Image("OuraLogo")
                     .resizable()
@@ -47,9 +17,44 @@ enum SessionComponents {
                     .frame(height: 12)
                     .foregroundStyle(.secondary)
             }
+
+            HStack(spacing: 14) {
+                if let score = recovery.readinessScore {
+                    recoveryStat(
+                        label: "Rdy",
+                        value: "\(score)",
+                        icon: score >= 85 ? "crown.fill" : "circle.fill",
+                        color: readinessColor(recovery.readinessLevel)
+                    )
+                }
+                if let sleep = recovery.sleepScore {
+                    recoveryStat(label: "Slp", value: "\(sleep)", icon: "moon.fill", color: .blue)
+                }
+                if let hrv = recovery.hrvAverage {
+                    recoveryStat(label: "HRV", value: String(format: "%.0f", hrv), icon: "waveform.path.ecg", color: .purple)
+                }
+                if let rhr = recovery.restingHr {
+                    recoveryStat(label: "RHR", value: "\(rhr)", icon: "heart.fill", color: .red)
+                }
+                Spacer(minLength: 0)
+            }
         }
-        .padding(10)
-        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 8))
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
+        )
+    }
+
+    private static func recoveryStat(label: String, value: String, icon: String, color: Color) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: icon).foregroundStyle(color).font(.system(size: 13))
+            Text(value).font(TrailFont.data).fontWeight(.medium)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(label) \(value)")
     }
 
     // MARK: - Readiness Color
@@ -68,23 +73,32 @@ enum SessionComponents {
     static func planVsActualSection(session: PlannedSession, activity: StravaActivity) -> some View {
         Link(destination: URL(string: "https://www.strava.com/activities/\(activity.stravaId)")!) {
             VStack(alignment: .leading, spacing: 12) {
-                HStack {
+                HStack(spacing: 8) {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                    Text("Completed: \(activity.name)")
-                        .font(TrailFont.data)
+                        .font(.system(size: 14))
+                        .foregroundStyle(Color.trailGreen)
+                        .frame(width: 24, height: 24)
+                        .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 6))
+                    Text("LOGGED ACTIVITY")
+                        .font(TrailFont.data).tracking(0.5)
+                        .foregroundStyle(.secondary)
                     Spacer()
-                    if !activity.isRun {
-                        Text(activity.activityTypeDisplay)
-                            .font(TrailFont.meta)
-                            .foregroundStyle(.white)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(.blue, in: Capsule())
-                    }
                     Image(systemName: "arrow.up.right.square")
                         .font(TrailFont.meta)
                         .foregroundStyle(.secondary)
+                }
+
+                HStack(spacing: 8) {
+                    Text(activity.name)
+                        .font(TrailFont.body)
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                    Spacer()
+                    if !activity.isRun {
+                        Text(activity.activityTypeDisplay.uppercased())
+                            .font(TrailFont.data).tracking(0.5)
+                            .foregroundStyle(.secondary)
+                    }
                 }
 
                 LazyVGrid(columns: [
@@ -128,21 +142,26 @@ enum SessionComponents {
                     if let elev = activity.elevationGainM, activity.isRun {
                         Label(String(format: "%.0f ft", elev * 3.281), systemImage: "mountain.2.fill")
                             .font(TrailFont.data)
-                            .foregroundStyle(.green)
+                            .foregroundStyle(Color.trailGreen)
                     }
-                }
 
-                HStack {
                     Spacer()
+
                     Image("PoweredByStrava")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(height: 12)
                 }
             }
-            .padding()
-            .background(.green.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
+            )
         }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Comparison Cell

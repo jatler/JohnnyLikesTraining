@@ -338,6 +338,13 @@ final class StravaService {
         activities.filter { Calendar.current.isDate($0.localCalendarDay, inSameDayAs: date) }
     }
 
+    /// All running activities (Run, TrailRun, VirtualRun) on a given calendar day
+    /// — interpreted in each activity's own timezone. Used wherever the UI needs
+    /// to sum the day's mileage across multiple runs (doubles days).
+    func runActivities(on date: Date) -> [StravaActivity] {
+        activities(on: date).filter(\.isRun)
+    }
+
     // MARK: - Load from Supabase
 
     func loadActivities(userId: UUID) async {

@@ -131,130 +131,51 @@ struct PlanCalendarView: View {
             .compactMap { (_, daySessions) in daySessions.first(where: { $0.workoutType != .strength }) ?? daySessions.first }
             .sorted { $0.dayOfWeek < $1.dayOfWeek }
 
-        let daysWithStrength = Set(
-            weekSessions.filter { $0.workoutType == .strength }.map(\.dayOfWeek)
-        )
-
-        let heatWeekSessions = heatStore.sessions(for: weekNumber)
-        let daysWithHeat = Set(heatWeekSessions.map(\.dayOfWeek))
-        let daysWithHeatDone = Set(heatWeekSessions.filter { heatStore.isComplete($0.id) }.map(\.dayOfWeek))
-
         return HStack(spacing: 4) {
             Text("W\(weekNumber)")
                 .font(TrailFont.meta)
-                .foregroundStyle(isCurrentWeek ? .blue : .secondary)
+                .foregroundStyle(isCurrentWeek ? Color.trailGreen : .secondary)
                 .frame(width: 32)
 
             ForEach(primarySessions) { session in
-                dayCell(
-                    session,
-                    isCurrentWeek: isCurrentWeek,
-                    hasStrength: daysWithStrength.contains(session.dayOfWeek),
-                    hasHeat: daysWithHeat.contains(session.dayOfWeek),
-                    heatDone: daysWithHeatDone.contains(session.dayOfWeek)
-                )
-                .onTapGesture { selectedSession = session }
+                dayCell(session)
+                    .onTapGesture { selectedSession = session }
             }
         }
     }
 
     // MARK: - Day Cell
 
-    private func dayCell(_ session: PlannedSession, isCurrentWeek: Bool, hasStrength: Bool = false, hasHeat: Bool = false, heatDone: Bool = false) -> some View {
+    private func dayCell(_ session: PlannedSession) -> some View {
         let isToday = Calendar.current.isDateInToday(session.scheduledDate)
         let skipped = planStore.isSkipped(session.id)
-        let overridden = planStore.isOverridden(session.id)
-        let dayNum = Calendar.current.component(.day, from: session.scheduledDate)
         let hasActivity = strava.activity(for: session.id) != nil
 
-        return VStack(spacing: 2) {
-            Text("\(dayNum)")
-                .font(TrailFont.meta)
-                .fontWeight(isToday ? .bold : .regular)
-                .foregroundStyle(isToday ? .primary : .secondary)
+        return ZStack(alignment: .bottomTrailing) {
+            Image(systemName: session.workoutType.iconName)
+                .font(.system(size: 18))
+                .foregroundStyle(session.workoutType.swiftUIColor)
+                .frame(maxWidth: .infinity)
+                .frame(height: 40)
 
-            ZStack {
-                Image(systemName: session.workoutType.iconName)
-                    .font(.system(size: 10))
-                    .foregroundStyle(calendarIconColor(session.workoutType))
-
-                if hasActivity {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 7))
-                        .foregroundStyle(.green)
-                        .offset(x: 8, y: -6)
-                }
-
-                if hasStrength {
-                    Image(systemName: "dumbbell.fill")
-                        .font(.system(size: 6))
-                        .foregroundStyle(Color.trailGreen)
-                        .offset(x: -8, y: -6)
-                }
-
-                if overridden {
-                    Image(systemName: "pencil.circle.fill")
-                        .font(.system(size: 6))
-                        .foregroundStyle(.orange)
-                        .offset(x: 8, y: 6)
-                }
-
-                if hasHeat {
-                    Image(systemName: heatDone ? "checkmark.circle.fill" : "flame.fill")
-                        .font(.system(size: 6))
-                        .foregroundStyle(heatDone ? .green : .orange)
-                        .offset(x: -8, y: 6)
-                }
+            if hasActivity {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 9))
+                    .foregroundStyle(Color.trailGreen)
+                    .background(Circle().fill(Color(.systemBackground)))
+                    .padding(.trailing, 3)
+                    .padding(.bottom, 3)
             }
         }
-        .frame(maxWidth: .infinity)
-        .frame(height: 40)
         .background(
-            RoundedRectangle(cornerRadius: 6)
-                .fill(calendarCellBackground(session.workoutType, skipped: skipped))
+            RoundedRectangle(cornerRadius: 8)
+                .fill(isToday ? Color.trailGreenSubtle : Color.clear)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 6)
-                .strokeBorder(calendarCellBorder(session.workoutType, isToday: isToday), lineWidth: 1.5)
+            RoundedRectangle(cornerRadius: 8)
+                .strokeBorder(isToday ? Color.trailGreen : Color.clear, lineWidth: 2)
         )
         .opacity(skipped ? 0.5 : 1.0)
-    }
-
-    private func calendarIconColor(_ type: WorkoutType) -> Color {
-        switch type {
-        case .intervals, .longRun, .race:
-            return .white
-        default:
-            return type.swiftUIColor
-        }
-    }
-
-    // MARK: - Calendar Cell Color Mapping
-
-    private func calendarCellBackground(_ type: WorkoutType, skipped: Bool) -> Color {
-        if skipped { return Color.trailGreen.opacity(0.04) }
-        switch type {
-        case .easy, .recovery:
-            return Color.trailGreen.opacity(0.15)
-        case .tempo:
-            return Color.trailGreen.opacity(0.4)
-        case .intervals:
-            return Color.trailGreen.opacity(0.7)
-        case .longRun, .race:
-            return Color.trailGreen
-        case .rest:
-            return .clear
-        case .crossTrain:
-            return .clear
-        case .strength:
-            return Color.trailGreen.opacity(0.15)
-        }
-    }
-
-    private func calendarCellBorder(_ type: WorkoutType, isToday: Bool) -> Color {
-        if isToday { return .primary }
-        if type == .crossTrain { return Color.trailGreen.opacity(0.4) }
-        return .clear
     }
 
     // MARK: - Empty State

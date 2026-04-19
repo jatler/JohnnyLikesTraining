@@ -290,17 +290,24 @@ Image(systemName: workoutType.iconName)
 
 ### Coach Note (iOS)
 
+Fraunces is reserved for the **label** only. Body prose reads in SF Pro for legibility; the container's hairline card border does the structural work — no Trail Green left border on the prose.
+
 ```swift
-Text(coachNote)
-    .font(TrailFont.coach)
-    .foregroundStyle(.secondary)
-    .padding(.leading, 12)
-    .overlay(
-        Rectangle()
-            .fill(Color.trailGreen)
-            .frame(width: 2),
-        alignment: .leading
-    )
+VStack(alignment: .leading, spacing: 8) {
+    Text("Coach notes")
+        .font(TrailFont.coach)          // Fraunces 16pt — the label
+        .foregroundStyle(.secondary)
+    Text(coachNote)
+        .font(TrailFont.body)           // SF Pro 17pt — the prose
+        .foregroundStyle(.primary)
+        .fixedSize(horizontal: false, vertical: true)
+}
+.padding(14)
+.background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
+.overlay(
+    RoundedRectangle(cornerRadius: 18)
+        .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
+)
 ```
 
 ### Coach Note (Website)
@@ -349,7 +356,7 @@ Every tab follows the same structure. Week is the golden reference — it leads 
 - **No summary bar** below the header on the Week tab — removed in the Bold Day refresh; summary info lives inside the content cards or is surfaced through the Progress tab instead.
 - **Scroll content** uses `LazyVStack(spacing: 10)` or `VStack(spacing: 12)` with `.padding(.horizontal, 12)` and `.padding(.vertical, 12)`.
 - **Rows** are `cornerRadius: 18`, `Color(.systemBackground)` fill with a `Color(.separator).opacity(0.3)` hairline border.
-- **Section labels** inside content use `TrailFont.title` (Geist Mono 20pt). Workout-type names render as-is (title case) — no uppercase, no tracking. Uppercase is reserved for status pills and meta strings.
+- **Section labels** inside content use `TrailFont.title` (Geist Mono 20pt) — except **workout-type labels in Week rows** (e.g. "Easy", "Tempo", "Long Run") and **phase labels in Progress** (e.g. "Base", "Peak") which use **SF Pro 18pt** (`.font(.system(size: 18))`) for friendlier, less-data-forward voice on the item label itself. Uppercase is reserved for status pills and meta strings.
 - **All stats** use `TrailFont.data` (Geist Mono 13pt).
 - **Trailing edge** on Week rows is one of: green "TODAY" pill (today), checkmark + actual distance (completed), red "SKIPPED" label (skipped), or empty (upcoming). No trailing chevron — the whole row is tappable and opens the detail sheet; an empty trailing slot lets the week's data breathe.
 - **Top alignment** (`HStack(alignment: .top)`) on multi-line rows so icons, dates, and titles align to the first line.
@@ -358,8 +365,8 @@ Every tab follows the same structure. Week is the golden reference — it leads 
 
 | Tab       | Header                                | Summary bar | Content style                                    |
 |-----------|---------------------------------------|-------------|--------------------------------------------------|
-| Week      | "Week N" (Fraunces 28) + UPPERCASE date range meta, chevrons + calendar icon on right | — (removed) | `LazyVStack(spacing: 10)`, Bold-Day session rows |
-| Progress  | "Progress" (Fraunces 28)              | — | `VStack(spacing: 12)`, week-by-week list          |
+| Week      | "Week N" (Fraunces 28) + UPPERCASE date range meta, chevrons + calendar icon on right | — (removed) | `TabView(.page(indexDisplayMode: .never))` paging per week; inside each page, `LazyVStack(spacing: 10)` of Bold-Day session rows. Horizontal swipe changes weeks. |
+| Progress  | "Progress" (Fraunces 28) + UPPERCASE training-plan name meta | — | Focused-week card on top (swipe animates the content) + `TabView(.page(indexDisplayMode: .always))` paging three chart cards (Miles / Vert / Time) + race card pinned below. |
 | Strength  | "Strength & More" (Fraunces 28) + segmented picker | — | `VStack(spacing: 12)`, day cards                 |
 | Settings  | "Settings" (Fraunces 28)              | — | Grouped `List` with sections                     |
 
@@ -406,6 +413,85 @@ Strength, Stretch, and Heat rows inside day cards keep a lighter anatomy (they l
 - Scroll content spacing: `VStack(spacing: 12)` or `LazyVStack(spacing: 12)` across all tabs.
 - Every list item type (workout, exercise, stretch, heat) gets its own icon badge (32x32, rounded 8, 0.15 opacity tint).
 - Inline data (prescriptions, durations, distances) always in `TrailFont.data`.
+
+## Progress Charts
+
+Three charts render inside the Progress tab's paginated `TabView` (page dots always shown). All three share the same card chrome: `Color(.systemBackground)` fill, 18pt corner radius, 1pt `Color(.separator).opacity(0.3)` border, 14pt internal padding. Chart height fixed at 142pt; TabView total height 260pt so all three pages have identical dimensions.
+
+### Card header (shared)
+
+| Slot | Format | Font |
+|------|--------|------|
+| Left label | UPPERCASE (e.g. "TOTAL MILES") | `TrailFont.data` `.tracking(0.5)` `.secondary` |
+| Left value | Integer (miles, vert) or integer hours (time) | `TrailFont.data` `.secondary` |
+| Right label | `"WEEKLY AVG"` UPPERCASE | `TrailFont.data` `.tracking(0.5)` `.secondary` |
+| Right value | One-decimal miles / rounded ft / one-decimal hours | `TrailFont.data` `.secondary` |
+
+### Bar anatomy
+
+| Chart | Green bar | Orange stack | Ghost/future | Accent |
+|-------|-----------|--------------|--------------|--------|
+| Miles | `actualMi` | — (cross-train moved out) | Current-week remainder + all future weeks in `Color(.systemGray5)` | Current week in Trail Green; completed weeks in Trail Green at 0.55 opacity |
+| Vert  | `elevationGainFt` | — | synthesized `plannedMi × 55 ft/mi` for current/future | Custom purple `Color(0.54, 0.42, 0.82)` current / 0.76, 0.71, 0.90 completed |
+| Time  | `runHours` | `crossTrainHours` stacked on top | `plannedHours = plannedMi / 6 mph` for current/future | Trail Green (runs) + orange (cross-train); `.orange.opacity(0.5)` for completed past weeks |
+
+### Rules
+
+- Bar width 12pt; spacing auto-computed; y-axis 20pt (miles/time) or 28pt (vert, wider for "k" labels).
+- Y-axis labels at 9pt monospace, `.tertiary` — topmost tick hidden so the number doesn't clip the card edge.
+- Tap any bar → focuses that week. Tap animates with `withAnimation(.easeOut(0.22))`.
+- Focused week's bar label renders in the chart accent color and semibold; current-week label is always accent-colored too.
+- Cross-training lives on the **Time** chart only — not stacked on Miles, per 2026-04-19 decision: miles and hours are different units and shouldn't be summed visually.
+
+## Session Detail Sheet (Day sheet)
+
+The per-session detail sheet presents as a custom-detent bottom sheet that leaves the underlying tab's green banner fully visible with a 12pt gap. The Week tab's banner **is** the sheet's visual anchor — the sheet itself does not carry its own banner.
+
+### Detent
+
+- Single custom detent: `BannerGapDetent: CustomPresentationDetent` returning `context.maxDetentValue - 87` (banner ≈75pt + 12pt gap).
+- No `.medium` secondary detent.
+- Drag indicator **visible** (iOS default) so the user sees the sheet is draggable, but the banner above is the contextual title.
+
+### Chrome
+
+- No in-sheet banner. First row of scroll content is a small right-aligned close button (xmark, 30×30 r10 squircle, `Color(.secondarySystemBackground)` fill, `.secondary` glyph).
+- Edit mode replaces the close button with a left-aligned "Cancel" text button and a right-aligned Trail Green "Save" capsule.
+
+### Content cards
+
+Stacked 18pt-radius / `Color(.systemBackground)` / `Color(.separator).opacity(0.3)` 1pt-border cards, 12pt gap between:
+
+1. **Summary card** — `workoutHeader` (43×43 r15 icon badge @ workout hue 0.15 opacity; workout name in SF Pro 18pt; uppercase "WEEK N · DAY d" mono meta) + a **range display** row using `session.displayTargetRange` ("8–14 mi" etc.) in `TrailFont.data`. Same `displayTargetRange` used by the Week tab — one source of truth. Skipped sessions render the workout name with `.strikethrough()` + a red "SKIPPED" capsule pill. Completed days render a green checkmark + summed miles across all day's run activities.
+2. **Coach notes card** — label "Coach notes" in `TrailFont.coach` (Fraunces Medium 16pt, `.secondary`), body prose in `TrailFont.body` (SF Pro 17pt, `.primary`). No left border — the card border alone carries the container.
+3. **Strength / Heat cards** — 14pt padding, label row is icon-in-tinted-badge (24×24 r6) + UPPERCASE mono label. Item rows use tappable `checkmark.circle.fill` / `circle` on the left (Trail Green / secondary 0.4) + SF body text. Completed items strike through.
+4. **Recovery (Oura) card** — UPPERCASE "RECOVERY" label + Oura logo on the right of the header row; four stat chips (Rdy / Slp / HRV / RHR) below, each colored by metric. Same card chrome as everything else.
+5. **Strava (plan vs actual) card** — checkmark + activity name header (SF body), 3-column grid (Distance / Pace / Duration) with delta %, optional HR + elevation row with Powered by Strava lockup tucked inline. Tap = open in Strava app/web.
+6. **Activities list card** (shown when > 1 run on the same day) — UPPERCASE "ACTIVITIES" label + summed miles, then one row per run: 32×32 r8 run badge, activity name (SF body), `distance · duration · pace` in mono, start time on the right.
+7. **Actions card** — Skip / Swap / Edit buttons.
+
+### Edit form
+
+Edit header row at top of scroll content: Cancel (plain text button) on the left, Save (Trail Green capsule) on the right. Fields (type picker, distance, pace, coach notes TextEditor) stack below in the same scroll.
+
+## Multi-Activity Day
+
+For doubles days where multiple Strava run activities land on the same calendar day:
+- **Week row trailing slot:** sums `strava.runActivities(on: session.scheduledDate)` miles; checkmark + total.
+- **Day sheet `workoutHeader`:** same sum next to the checkmark.
+- **Day sheet content:** if exactly one run, flow through the existing `planVsActualSection` card (with its full plan-vs-actual grid). If more than one, render an **Activities list card** with per-activity rows.
+- Backed by `StravaService.runActivities(on: Date)` — filters `activities(on:)` by `isRun`, using each activity's own `localCalendarDay` for timezone safety.
+
+## Calendar (PlanCalendarView)
+
+Month grid view reached from the Week tab's calendar-icon button. Cells are intentionally minimal after the 2026-04-19 cleanup:
+
+- Each cell = a single workout-type SF Symbol at 18pt, rendered in `workoutType.swiftUIColor`, centered in a 40pt-tall cell.
+- **No day number.** **No heatmap fill.** **No corner glyphs** (done checkmark, strength dumbbell, edit pencil, heat flame).
+- **Today marker:** 1pt Trail Green stroke on the cell's 8pt-radius outline — color is the only today signal.
+- **Skipped:** 0.5 opacity (only state-change kept).
+- Cells remain tappable → opens the Session Detail Sheet.
+- Rationale: at this zoom-out the week-by-week rhythm is what reads, not per-day detail. The sheet carries the per-day data.
 
 ## Navigation Patterns
 
@@ -487,3 +573,15 @@ Every list/section that can be empty needs:
 | 2026-04-19 | Bold Day Week tab refresh         | Added `tabHeading` token (Fraunces 28pt Medium) for tab display titles; removed the Week summary bar; new row anatomy at 18pt radius with 43×43 r15 badges, "TODAY" pill, and a Trail Green accent bar on today's row. Tightens visual hierarchy and lets the day itself carry the weight. |
 | 2026-04-19 | Week row polish: quiet content, structural signals | Dropped forced UPPERCASE + `.tracking(0.3)` on workout titles (shouted at 20pt Geist Mono); made the date column `.secondary` on every row including today. Today's identity is now fully carried by the accent bar + tint + "TODAY" pill, so the content (dates, titles) stays calm. |
 | 2026-04-19 | Removed "Current Week" meta + trailing chevrons on Week tab | "Current Week" was redundant alongside the implicit "you landed on this tab" context. Trailing chevrons on upcoming rows added noise without information — the row's card shape already signals tappability. Empty trailing slots let the date + mileage breathe. |
+| 2026-04-19 | Bold Day Progress refresh         | Rewrote Progress tab around focused-week card + stacked-bar mileage chart + elevation chart + race card. Swipe/tap navigates weeks. Header subtitle = training plan name (no "Week N / N" pill). |
+| 2026-04-19 | 18pt SF Pro for workout + phase labels | Dropped `TrailFont.title` (Geist Mono 20) on workout-type names and Progress phase labels — monospace at 20pt read as shouting. SF Pro 18pt is friendlier at the item-label slot while data/numbers keep mono. |
+| 2026-04-19 | TOTAL TIME chart + paginated Progress charts | Three charts — Miles, Vert, Time — now live in a horizontal `TabView` with page dots; default page = Miles. Unifies chart chrome and cuts vertical scroll. |
+| 2026-04-19 | Cross-train moved from Miles to Time chart | Orange cross-train stack on the Miles chart confused units (hours bolted onto miles via a pace hack). Cross-train belongs on the Time chart where hours stack naturally on run hours. Miles chart is now single-color. |
+| 2026-04-19 | Week tab horizontal swipe via `TabView` paging | Chevrons stay, but horizontal swipe on the session list now moves between weeks with the native page animation. Each week is a tagged `.page` in the TabView. |
+| 2026-04-19 | Calendar icon-only cells          | Stripped day number, heatmap fills, four corner glyphs from Calendar cells. Only the workout icon + its color + a Trail Green ring for today remain. The sheet carries the per-day detail — the grid is a rhythm view. |
+| 2026-04-19 | Day sheet banner-aware custom detent + Bold Day chrome | Replaced `.large`/`.medium` with `BannerGapDetent` that pops the sheet just below the tab's green banner (+12pt gap). Removed internal `NavigationStack`; replaced with a Trail Green banner matching the main tabs (Fraunces date + mono meta). Coach notes switch to `TrailFont.coach` (Fraunces) with a Trail Green left border. |
+| 2026-04-19 | Removed redundant day-sheet banner | Week tab's green banner is already visible above the sheet thanks to the custom detent — an in-sheet banner doubled up on the title. Dropped the banner; sheet now opens straight into the summary card with a small close button top-right. |
+| 2026-04-19 | Coach note reversal: Fraunces label, SF Pro body, no left border | Fraunces Medium as body prose was too ornate for running notes that mix mileage prescriptions and pace callouts. Kept Fraunces on the literal "Coach notes" label so the serif voice still signals the section. The card border alone carries the container — removed the 2pt Trail Green left rule. |
+| 2026-04-19 | Multi-activity day aggregation | Doubles days were hidden: the Week row and day sheet only showed the single matched Strava activity. Added `StravaService.runActivities(on:)`; Week row sums miles across all runs on that date; day sheet renders every activity as its own row when the count is > 1. |
+| 2026-04-19 | Planned-distance range in day sheet | Day sheet was rendering a single `%.1f mi` value; Week rows show the coach's range (e.g. "8–14 mi"). Swapped the day sheet to `session.displayTargetRange` so the range reads identically everywhere. |
+| 2026-04-19 | Unified 18pt-radius chrome for Oura / Strava / Heat / Strength cards | Pre-redesign these lived on tinted `.opacity(0.06-0.08)` fills with 8–12pt radii — stood out from the Week/Progress Bold Day cards. Migrated all four to `Color(.systemBackground)` / 18pt radius / 0.3-separator 1pt border. Accent colors now live in the section label's icon badge (24×24 r6) only, not the full fill. |

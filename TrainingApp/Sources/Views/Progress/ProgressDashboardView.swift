@@ -10,6 +10,12 @@ struct ProgressDashboardView: View {
 
     @State private var showingPlanSetup = false
     @State private var focusedWeek: Int = 1
+    @State private var selectedChartPage: ChartPage = .miles
+
+    private enum ChartPage: Int, CaseIterable, Identifiable {
+        case miles, vert, time
+        var id: Int { rawValue }
+    }
 
     var body: some View {
         NavigationStack {
@@ -57,8 +63,13 @@ struct ProgressDashboardView: View {
         return ScrollView {
             VStack(spacing: 12) {
                 focusedWeekCard(entries: entries)
-                mileageCard(entries: entries)
-                elevationCard(entries: entries)
+                TabView(selection: $selectedChartPage) {
+                    mileageCard(entries: entries).tag(ChartPage.miles)
+                    elevationCard(entries: entries).tag(ChartPage.vert)
+                    timeCard(entries: entries).tag(ChartPage.time)
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .frame(height: 240)
                 raceCard(entries: entries)
             }
             .padding(.horizontal, 12)
@@ -76,7 +87,48 @@ struct ProgressDashboardView: View {
         let canGoPrev = focusedWeek > (entries.first?.week ?? 1)
         let canGoNext = focusedWeek < (entries.last?.week ?? 1)
 
-        return VStack(alignment: .leading, spacing: 0) {
+        return focusedWeekCardContent(entry: entry, isCurrent: isCurrent)
+            .id(focusedWeek)
+            .transition(.asymmetric(
+                insertion: .move(edge: .trailing).combined(with: .opacity),
+                removal: .move(edge: .leading).combined(with: .opacity)
+            ))
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(isCurrent ? Color.trailGreenSubtle : Color(.systemBackground))
+            .overlay(alignment: .leading) {
+                if isCurrent {
+                    Rectangle()
+                        .fill(Color.trailGreen)
+                        .frame(width: 4)
+                }
+            }
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .strokeBorder(isCurrent ? Color.trailGreen.opacity(0.33) : Color(.separator).opacity(0.3),
+                                  lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 18))
+            .opacity(isFuture ? 0.65 : 1)
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture(minimumDistance: 24)
+                    .onEnded { value in
+                        if value.translation.width < 0, canGoNext {
+                            withAnimation(.easeOut(duration: 0.22)) {
+                                focusedWeek = min(focusedWeek + 1, entries.last?.week ?? focusedWeek)
+                            }
+                        } else if value.translation.width > 0, canGoPrev {
+                            withAnimation(.easeOut(duration: 0.22)) {
+                                focusedWeek = max(focusedWeek - 1, entries.first?.week ?? focusedWeek)
+                            }
+                        }
+                    }
+            )
+    }
+
+    @ViewBuilder
+    private func focusedWeekCardContent(entry: WeekProgressEntry?, isCurrent: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .center, spacing: 12) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("WK")
@@ -106,7 +158,7 @@ struct ProgressDashboardView: View {
                     label: "MILES",
                     primary: entry?.actualMi.map { String(format: "%.1f", $0) } ?? "—",
                     primaryColor: isCurrent ? Color.trailGreen : .primary,
-                    secondary: "/ \(String(format: "%.1f", entry?.plannedMi ?? 0)) mi"
+                    secondary: "/\(String(format: "%.1f", entry?.plannedMi ?? 0)) mi"
                 )
                 focusedStat(
                     label: "CROSS-TRAIN",
@@ -124,34 +176,6 @@ struct ProgressDashboardView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(isCurrent ? Color.trailGreenSubtle : Color(.systemBackground))
-        .overlay(alignment: .leading) {
-            if isCurrent {
-                Rectangle()
-                    .fill(Color.trailGreen)
-                    .frame(width: 4)
-            }
-        }
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(isCurrent ? Color.trailGreen.opacity(0.33) : Color(.separator).opacity(0.3),
-                              lineWidth: 1)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 18))
-        .opacity(isFuture ? 0.65 : 1)
-        .contentShape(Rectangle())
-        .gesture(
-            DragGesture(minimumDistance: 24)
-                .onEnded { value in
-                    if value.translation.width < 0, canGoNext {
-                        focusedWeek = min(focusedWeek + 1, entries.last?.week ?? focusedWeek)
-                    } else if value.translation.width > 0, canGoPrev {
-                        focusedWeek = max(focusedWeek - 1, entries.first?.week ?? focusedWeek)
-                    }
-                }
-        )
-        .animation(.easeOut(duration: 0.2), value: focusedWeek)
     }
 
     private func focusedStat(label: String, primary: String, primaryColor: Color, secondary: String) -> some View {
@@ -161,12 +185,14 @@ struct ProgressDashboardView: View {
                 .foregroundStyle(.secondary)
             HStack(alignment: .firstTextBaseline, spacing: 2) {
                 Text(primary)
-                    .font(.custom("GeistMono-Medium", size: 20, relativeTo: .title3))
+                    .font(TrailFont.bigNumber)
                     .foregroundStyle(primaryColor)
                 Text(secondary)
                     .font(TrailFont.data)
                     .foregroundStyle(.secondary)
             }
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -191,7 +217,7 @@ struct ProgressDashboardView: View {
 
         return VStack(alignment: .leading, spacing: 8) {
             chartHeader(
-                leftLabel: "TOTAL MILES",
+                leftLabel: "01 · TOTAL MILES",
                 leftValue: "\(Int(completedMilesTotal)) mi",
                 rightLabel: "WEEKLY AVG",
                 rightValue: String(format: "%.1f mi", weeklyAvgMiles)
@@ -216,13 +242,13 @@ struct ProgressDashboardView: View {
 
         return VStack(alignment: .leading, spacing: 8) {
             chartHeader(
-                leftLabel: "TOTAL VERT",
+                leftLabel: "02 · TOTAL VERT",
                 leftValue: "\(formatFt(completedVertTotal)) ft",
                 rightLabel: "WEEKLY AVG",
                 rightValue: "\(formatFt(weeklyAvgVert)) ft"
             )
             ElevationChart(entries: entries, focusedWeek: $focusedWeek)
-                .frame(height: 86)
+                .frame(height: 142)
         }
         .padding(14)
         .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
@@ -230,6 +256,38 @@ struct ProgressDashboardView: View {
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
+    }
+
+    // MARK: - Time Card
+
+    private func timeCard(entries: [WeekProgressEntry]) -> some View {
+        let elapsed = entries.filter { !$0.isFuture }
+        let totalRunH = elapsed.reduce(0.0) { $0 + ($1.runHours ?? 0) }
+        let totalCtH = elapsed.reduce(0.0) { $0 + ($1.crossTrainHours ?? 0) }
+        let totalH = totalRunH + totalCtH
+        let weeklyAvgH = elapsed.isEmpty ? 0 : totalH / Double(elapsed.count)
+
+        return VStack(alignment: .leading, spacing: 8) {
+            chartHeader(
+                leftLabel: "03 · TOTAL TIME",
+                leftValue: formatHours(totalH),
+                rightLabel: "WEEKLY AVG",
+                rightValue: formatHours(weeklyAvgH)
+            )
+            TotalTimeChart(entries: entries, focusedWeek: $focusedWeek)
+                .frame(height: 142)
+        }
+        .padding(14)
+        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
+        )
+    }
+
+    private func formatHours(_ value: Double) -> String {
+        if value >= 10 { return String(format: "%.0f hr", value) }
+        return String(format: "%.1f hr", value)
     }
 
     private func chartHeader(leftLabel: String, leftValue: String, rightLabel: String, rightValue: String) -> some View {
@@ -272,7 +330,7 @@ struct ProgressDashboardView: View {
                             .foregroundStyle(.secondary)
                         HStack(alignment: .firstTextBaseline, spacing: 2) {
                             Text("\(daysToRace)")
-                                .font(.custom("GeistMono-Medium", size: 20, relativeTo: .title3))
+                                .font(TrailFont.bigNumber)
                                 .foregroundStyle(.primary)
                             Text("d")
                                 .font(TrailFont.data)
@@ -431,12 +489,6 @@ struct ProgressDashboardView: View {
             )
         }
 
-        // Plan-wide run pace (mph) across every week with actual run data.
-        // Falls back to 6.0 mph when no history yet.
-        let totalMi = rawWeeks.reduce(0.0) { $0 + DistanceFormatter.miles(from: $1.actualKm) }
-        let totalRunHours = rawWeeks.reduce(0.0) { $0 + Double($1.runSeconds) / 3600.0 }
-        let runPaceMph = totalRunHours > 0 ? totalMi / totalRunHours : 6.0
-
         return rawWeeks.map { raw in
             let weekNum = raw.weekNum
             let weekSessions = raw.weekSessions
@@ -471,6 +523,7 @@ struct ProgressDashboardView: View {
             let plannedMi = DistanceFormatter.miles(from: raw.plannedKm)
             let actualMi = DistanceFormatter.miles(from: raw.actualKm)
             let elevationFt = raw.elevationM * 3.28084
+            let runHours = Double(raw.runSeconds) / 3600.0
             let crossTrainHours = Double(raw.crossTrainSeconds) / 3600.0
 
             return WeekProgressEntry(
@@ -478,13 +531,13 @@ struct ProgressDashboardView: View {
                 rangeLabel: rangeLabel(from: firstDate, to: lastDate),
                 plannedMi: plannedMi,
                 actualMi: (isFuture || (actualMi == 0 && !isCurrent && lastDate > today)) ? nil : actualMi,
+                runHours: isFuture ? nil : (runHours > 0 ? runHours : nil),
                 crossTrainHours: isFuture ? nil : (crossTrainHours > 0 ? crossTrainHours : nil),
                 elevationGainFt: isFuture ? nil : (elevationFt > 0 ? elevationFt : nil),
                 sessionsCompleted: completedItems,
                 totalSessions: totalItems,
                 isCurrent: isCurrent,
-                isFuture: isFuture,
-                runPaceMph: runPaceMph
+                isFuture: isFuture
             )
         }
     }
@@ -509,19 +562,19 @@ struct WeekProgressEntry: Identifiable, Equatable {
     let rangeLabel: String
     let plannedMi: Double
     let actualMi: Double?
+    let runHours: Double?
     let crossTrainHours: Double?
     let elevationGainFt: Double?
     let sessionsCompleted: Int
     let totalSessions: Int
     let isCurrent: Bool
     let isFuture: Bool
-    let runPaceMph: Double
 
     var id: Int { week }
 
-    /// Cross-training hours converted to mile-equivalents at the athlete's average running pace.
-    /// This sums cross-train hours into the same "load" unit as run hours.
-    var crossTrainMileEquivalent: Double { (crossTrainHours ?? 0) * runPaceMph }
+    /// Planned hours for the week — derived from planned mileage at a nominal 6 mph.
+    /// Used as the grey-ghost bar on the Total Time chart for current/future weeks.
+    var plannedHours: Double { plannedMi / 6.0 }
 }
 
 // MARK: - Mileage Chart
@@ -578,7 +631,7 @@ private struct MileageChart: View {
                                         .offset(y: 14)
                                 }
                                 .contentShape(Rectangle())
-                                .onTapGesture { focusedWeek = entry.week }
+                                .onTapGesture { withAnimation(.easeOut(duration: 0.22)) { focusedWeek = entry.week } }
                         }
                     }
                     .frame(height: chartHeight, alignment: .bottom)
@@ -592,12 +645,10 @@ private struct MileageChart: View {
     private func mileageBar(entry: WeekProgressEntry, niceMax: Double, chartHeight: CGFloat) -> some View {
         let planH = CGFloat(entry.plannedMi / niceMax) * chartHeight
         let actH = CGFloat((entry.actualMi ?? 0) / niceMax) * chartHeight
-        let ctH = CGFloat(entry.crossTrainMileEquivalent / niceMax) * chartHeight
-        let remH = entry.isCurrent ? max(0, planH - actH - ctH) : 0
+        let remH = entry.isCurrent ? max(0, planH - actH) : 0
 
         VStack(spacing: 0) {
             if remH > 0 { Rectangle().fill(Color(.systemGray5)).frame(height: remH) }
-            if ctH > 0 { Rectangle().fill(Color.orange.opacity(entry.isCurrent ? 1.0 : 0.5)).frame(height: ctH) }
             if actH > 0 {
                 Rectangle()
                     .fill(entry.isCurrent ? Color.trailGreen : Color.trailGreen.opacity(0.55))
@@ -610,7 +661,7 @@ private struct MileageChart: View {
     }
 
     private func niceMax(for entries: [WeekProgressEntry]) -> Double {
-        let raw = entries.map { max($0.plannedMi, ($0.actualMi ?? 0) + $0.crossTrainMileEquivalent) }.max() ?? 10
+        let raw = entries.map { max($0.plannedMi, $0.actualMi ?? 0) }.max() ?? 10
         return max(10, ceil(raw / 10) * 10)
     }
 }
@@ -667,7 +718,7 @@ private struct ElevationChart: View {
                                         .offset(y: 14)
                                 }
                                 .contentShape(Rectangle())
-                                .onTapGesture { focusedWeek = entry.week }
+                                .onTapGesture { withAnimation(.easeOut(duration: 0.22)) { focusedWeek = entry.week } }
                         }
                     }
                     .frame(height: chartHeight, alignment: .bottom)
@@ -705,6 +756,95 @@ private struct ElevationChart: View {
     private func labelText(_ value: Double) -> String {
         if value >= 1000 { return String(format: "%.1fk", value / 1000) }
         return "\(Int(value))"
+    }
+}
+
+// MARK: - Total Time Chart
+
+private struct TotalTimeChart: View {
+    let entries: [WeekProgressEntry]
+    @Binding var focusedWeek: Int
+
+    private let axisWidth: CGFloat = 22
+    private let barWidth: CGFloat = 12
+
+    var body: some View {
+        GeometryReader { geo in
+            let chartHeight = geo.size.height - 20
+            let availableWidth = geo.size.width - axisWidth
+            let n = max(entries.count, 1)
+            let spacing = n > 1 ? max(2, (availableWidth - CGFloat(n) * barWidth) / CGFloat(n - 1)) : 0
+            let niceMax = niceMax(for: entries)
+
+            HStack(alignment: .top, spacing: 0) {
+                ZStack(alignment: .topTrailing) {
+                    ForEach(0..<4, id: \.self) { tick in
+                        let v = niceMax * Double(tick) / 4
+                        let y = chartHeight - CGFloat(v / niceMax) * chartHeight
+                        Text("\(Int(v))")
+                            .font(.system(size: 9, design: .monospaced))
+                            .foregroundStyle(.tertiary)
+                            .offset(x: -3, y: y - 6)
+                    }
+                }
+                .frame(width: axisWidth, height: chartHeight, alignment: .topTrailing)
+
+                ZStack(alignment: .bottomLeading) {
+                    ForEach(0..<5, id: \.self) { tick in
+                        let y = chartHeight * CGFloat(tick) / 4
+                        Rectangle()
+                            .fill(Color(.separator).opacity(0.5))
+                            .frame(height: 0.5)
+                            .offset(y: -(chartHeight - y))
+                    }
+                    HStack(alignment: .bottom, spacing: spacing) {
+                        ForEach(entries) { entry in
+                            timeBar(entry: entry, niceMax: niceMax, chartHeight: chartHeight)
+                                .frame(width: barWidth, height: chartHeight, alignment: .bottom)
+                                .overlay(alignment: .bottom) {
+                                    Text("\(entry.week)")
+                                        .font(.system(size: 9, design: .monospaced))
+                                        .fontWeight(entry.week == focusedWeek || entry.isCurrent ? .semibold : .regular)
+                                        .foregroundStyle(entry.week == focusedWeek || entry.isCurrent ? Color.trailGreen : Color.secondary.opacity(0.55))
+                                        .offset(y: 14)
+                                }
+                                .contentShape(Rectangle())
+                                .onTapGesture { withAnimation(.easeOut(duration: 0.22)) { focusedWeek = entry.week } }
+                        }
+                    }
+                    .frame(height: chartHeight, alignment: .bottom)
+                }
+                .frame(height: chartHeight, alignment: .bottom)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func timeBar(entry: WeekProgressEntry, niceMax: Double, chartHeight: CGFloat) -> some View {
+        let runH = CGFloat((entry.runHours ?? 0) / niceMax) * chartHeight
+        let ctH = CGFloat((entry.crossTrainHours ?? 0) / niceMax) * chartHeight
+        let planH = CGFloat(entry.plannedHours / niceMax) * chartHeight
+        let remH = entry.isCurrent ? max(0, planH - runH - ctH) : 0
+
+        VStack(spacing: 0) {
+            if remH > 0 { Rectangle().fill(Color(.systemGray5)).frame(height: remH) }
+            if ctH > 0 { Rectangle().fill(Color.orange.opacity(entry.isCurrent ? 1.0 : 0.5)).frame(height: ctH) }
+            if runH > 0 {
+                Rectangle()
+                    .fill(entry.isCurrent ? Color.trailGreen : Color.trailGreen.opacity(0.55))
+                    .frame(height: runH)
+            }
+            if entry.isFuture && planH > 0 {
+                Rectangle().fill(Color(.systemGray5)).frame(height: planH)
+            }
+        }
+    }
+
+    private func niceMax(for entries: [WeekProgressEntry]) -> Double {
+        let raw = entries.map {
+            max($0.plannedHours, ($0.runHours ?? 0) + ($0.crossTrainHours ?? 0))
+        }.max() ?? 2
+        return max(2, ceil(raw / 2) * 2)
     }
 }
 

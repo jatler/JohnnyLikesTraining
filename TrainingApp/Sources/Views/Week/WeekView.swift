@@ -44,18 +44,24 @@ struct WeekView: View {
                     .padding(.top, 12)
             }
 
-            ScrollView {
-                LazyVStack(spacing: 10) {
-                    let sessions = planStore.sessions(for: selectedWeek)
-                        .filter { $0.workoutType != .strength }
-                    ForEach(sessions) { session in
-                        sessionRow(session)
-                            .onTapGesture { selectedSession = session }
+            TabView(selection: $selectedWeek) {
+                ForEach(planStore.allWeekNumbers, id: \.self) { week in
+                    ScrollView {
+                        LazyVStack(spacing: 10) {
+                            let sessions = planStore.sessions(for: week)
+                                .filter { $0.workoutType != .strength }
+                            ForEach(sessions) { session in
+                                sessionRow(session)
+                                    .onTapGesture { selectedSession = session }
+                            }
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 12)
                     }
+                    .tag(week)
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 12)
             }
+            .tabViewStyle(.page(indexDisplayMode: .never))
         }
         .frame(maxHeight: .infinity)
         .onAppear {
@@ -218,13 +224,17 @@ struct WeekView: View {
 
     @ViewBuilder
     private func trailingStatus(session: PlannedSession, activity: StravaActivity?, skipped: Bool, isToday: Bool) -> some View {
-        if let activity {
+        if activity != nil {
+            // Sum miles across every run on this session's date — handles doubles days
+            // where multiple Strava runs land on one scheduled session.
+            let dayRuns = strava.runActivities(on: session.scheduledDate)
+            let dayMiles = dayRuns.reduce(0.0) { $0 + $1.distanceMi }
             VStack(alignment: .trailing, spacing: 2) {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 18))
                     .foregroundStyle(.green)
-                if activity.isRun {
-                    Text(String(format: "%.1f mi", activity.distanceMi))
+                if dayMiles > 0 {
+                    Text(String(format: "%.1f mi", dayMiles))
                         .font(TrailFont.data)
                         .fontWeight(.medium)
                         .foregroundStyle(.green)

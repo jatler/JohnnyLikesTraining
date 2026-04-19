@@ -19,7 +19,6 @@ struct SessionDetailSheet: View {
     @State private var propagateToSameDay = false
     @State private var selectedStrengthDay: StrengthDaySelection?
     @State private var selectedHeatSession: HeatSession?
-    @State private var sheetDetent: PresentationDetent = .large
 
     private var isSkipped: Bool {
         planStore.isSkipped(session.id)
@@ -33,43 +32,44 @@ struct SessionDetailSheet: View {
         strava.activity(for: session.id)
     }
 
+    private var dayRunActivities: [StravaActivity] {
+        strava.runActivities(on: session.scheduledDate)
+    }
+
+    private var dayTotalMiles: Double {
+        dayRunActivities.reduce(0.0) { $0 + $1.distanceMi }
+    }
+
     private var dayRecovery: OuraDaily? {
         oura.data(for: session.scheduledDate)
     }
 
-    var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    if isEditing {
-                        editForm
-                    } else {
-                        readOnlyContent
-                    }
-                }
-                .padding()
-                .padding(.bottom, 20)
-            }
-            .navigationTitle(formattedDate)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    if isEditing {
-                        Button("Cancel") {
-                            isEditing = false
-                        }
-                    }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    if isEditing {
-                        Button("Save") { saveOverride() }
-                    } else {
-                        Button("Done") { dismiss() }
-                    }
-                }
-            }
+    /// Summary-card meta line: "WK 11 D1 · 8–14 MI" (range omitted when plan has none).
+    private var metaLine: String {
+        var parts = ["WK \(session.weekNumber) D\(session.dayOfWeek)"]
+        if let range = session.displayTargetRange {
+            parts.append(range.uppercased())
         }
-        .presentationDetents([.large, .medium], selection: $sheetDetent)
+        return parts.joined(separator: " · ")
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                if isEditing {
+                    editHeader
+                    editForm
+                } else {
+                    readOnlyHeader
+                    readOnlyContent
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 14)
+            .padding(.bottom, 20)
+        }
+        .presentationDetents([.custom(BannerGapDetent.self)])
+        .presentationDragIndicator(.visible)
         .sheet(item: $selectedStrengthDay) { selection in
             StrengthDayDetailView(weekNumber: selection.weekNumber, dayOfWeek: selection.dayOfWeek)
         }
@@ -78,23 +78,49 @@ struct SessionDetailSheet: View {
         }
     }
 
+    // MARK: - Header row (close / save / cancel)
+
+    private var readOnlyHeader: some View {
+        HStack {
+            Text(session.scheduledDate.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()).uppercased())
+                .font(TrailFont.data).tracking(0.5)
+                .foregroundStyle(.secondary)
+            Spacer()
+            Button { dismiss() } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 30, height: 30)
+                    .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 10))
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    private var editHeader: some View {
+        HStack {
+            Button("Cancel") { isEditing = false }
+                .font(TrailFont.data).fontWeight(.semibold)
+                .foregroundStyle(.secondary)
+            Spacer()
+            Button("Save") { saveOverride() }
+                .font(TrailFont.data).fontWeight(.semibold)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Color.trailGreen, in: Capsule())
+        }
+    }
+
     // MARK: - Read-Only Content
 
     private var readOnlyContent: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            workoutHeader
+        let coachText = session.verbatimCoachNotesForDisplay
+        let pace = session.targetPaceDescription?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let paceRedundant = pace.map { coachText.lowercased().contains($0.lowercased()) } ?? true
 
-            if let distance = session.targetDistanceKm {
-                distanceRow(distance)
-            }
-
-            let coachText = session.verbatimCoachNotesForDisplay
-            let pace = session.targetPaceDescription?.trimmingCharacters(in: .whitespacesAndNewlines)
-            let paceRedundant = pace.map { coachText.lowercased().contains($0.lowercased()) } ?? true
-
-            if let pace, !pace.isEmpty, !paceRedundant {
-                paceRow(pace)
-            }
+        return VStack(alignment: .leading, spacing: 12) {
+            summaryCard(pace: (pace != nil && !pace!.isEmpty && !paceRedundant) ? pace : nil)
 
             if !coachText.isEmpty {
                 notesSection(coachText)
@@ -105,16 +131,16 @@ struct SessionDetailSheet: View {
             heatSection
 
             if let recovery = dayRecovery {
-                Divider()
                 SessionComponents.recoveryRow(recovery)
             }
 
-            if let activity = matchedActivity {
-                Divider()
+            // If multiple runs on this date, list them all. Single-run days still flow
+            // through the plan-vs-actual card for the matched activity.
+            if dayRunActivities.count > 1 {
+                activitiesListCard(dayRunActivities)
+            } else if let activity = matchedActivity {
                 SessionComponents.planVsActualSection(session: session, activity: activity)
             }
-
-            Divider()
 
             actionsSection
 
@@ -122,6 +148,102 @@ struct SessionDetailSheet: View {
                 swapTargetsSection
             }
         }
+    }
+
+    private func activitiesListCard(_ acts: [StravaActivity]) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("ACTIVITIES")
+                    .font(TrailFont.data).tracking(0.5)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text(String(format: "%.1f mi total", dayTotalMiles))
+                    .font(TrailFont.data)
+                    .foregroundStyle(.secondary)
+            }
+            ForEach(acts) { act in
+                activityRow(act)
+                if act.id != acts.last?.id {
+                    Divider()
+                }
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
+        )
+    }
+
+    @ViewBuilder
+    private func activityRow(_ activity: StravaActivity) -> some View {
+        let startTime = activity.startDateLocal ?? activity.activityDate
+        let pace: Double? = activity.distanceMi > 0
+            ? (Double(activity.movingTimeSeconds) / 60.0) / activity.distanceMi
+            : nil
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "figure.run")
+                .font(.system(size: 18))
+                .foregroundStyle(Color.trailGreen)
+                .frame(width: 32, height: 32)
+                .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
+            VStack(alignment: .leading, spacing: 3) {
+                Text(activity.name)
+                    .font(TrailFont.body)
+                    .lineLimit(1)
+                HStack(spacing: 6) {
+                    Text(String(format: "%.1f mi", activity.distanceMi))
+                        .font(TrailFont.data)
+                    Text("·").foregroundStyle(.secondary)
+                    Text(formatDuration(activity.movingTimeSeconds))
+                        .font(TrailFont.data).foregroundStyle(.secondary)
+                    if let pace {
+                        Text("·").foregroundStyle(.secondary)
+                        Text(formatPace(pace))
+                            .font(TrailFont.data).foregroundStyle(.secondary)
+                    }
+                }
+            }
+            Spacer()
+            Text(startTime.formatted(.dateTime.hour().minute()))
+                .font(TrailFont.data)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private func formatDuration(_ seconds: Int) -> String {
+        let h = seconds / 3600
+        let m = (seconds % 3600) / 60
+        return h > 0 ? "\(h)h \(m)m" : "\(m)m"
+    }
+
+    private func formatPace(_ minutesPerMile: Double) -> String {
+        let m = Int(minutesPerMile)
+        let s = Int((minutesPerMile - Double(m)) * 60)
+        return String(format: "%d:%02d/mi", m, s)
+    }
+
+    private func summaryCard(pace: String?) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            workoutHeader
+            if let pace {
+                HStack(spacing: 6) {
+                    Image(systemName: "gauge.with.needle")
+                        .foregroundStyle(.secondary)
+                    Text(pace).font(TrailFont.data).foregroundStyle(.secondary)
+                }
+                .opacity(isSkipped ? 0.5 : 1)
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
+        )
     }
 
     // MARK: - Edit Form
@@ -212,17 +334,17 @@ struct SessionDetailSheet: View {
     // MARK: - Subviews
 
     private var workoutHeader: some View {
-        HStack {
+        HStack(spacing: 14) {
             Image(systemName: session.workoutType.iconName)
-                .font(TrailFont.title)
+                .font(.system(size: 20))
                 .foregroundStyle(session.workoutType.swiftUIColor)
-                .frame(width: 44, height: 44)
-                .background(session.workoutType.swiftUIColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 10))
+                .frame(width: 43, height: 43)
+                .background(session.workoutType.swiftUIColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
 
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
                     Text(session.workoutType.displayName)
-                        .font(TrailFont.title)
+                        .font(.system(size: 18))
                         .strikethrough(isSkipped)
                         .opacity(isSkipped ? 0.5 : 1)
 
@@ -232,26 +354,30 @@ struct SessionDetailSheet: View {
                             .foregroundStyle(.orange)
                     }
                 }
-
-                Text("Week \(session.weekNumber) \u{2022} Day \(session.dayOfWeek)")
-                    .font(TrailFont.body)
+                Text(metaLine)
+                    .font(TrailFont.data).tracking(0.5)
                     .foregroundStyle(.secondary)
             }
 
             Spacer()
 
             if isSkipped {
-                Text("Skipped")
-                    .font(TrailFont.meta)
-                    .fontWeight(.semibold)
+                Text("SKIPPED")
+                    .font(.system(size: 12, weight: .semibold))
+                    .tracking(0.5)
                     .foregroundStyle(.white)
-                    .padding(.horizontal, 8)
+                    .padding(.horizontal, 10)
                     .padding(.vertical, 4)
-                    .background(.red.opacity(0.8), in: Capsule())
-            } else if matchedActivity != nil {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
-                    .font(.title3)
+                    .background(Color.red.opacity(0.8), in: Capsule())
+            } else if !dayRunActivities.isEmpty {
+                HStack(spacing: 6) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(Color.trailGreen)
+                        .font(.title3)
+                    Text(String(format: "%.1f mi", dayTotalMiles))
+                        .font(TrailFont.data)
+                        .fontWeight(.medium)
+                }
             }
         }
     }
@@ -275,9 +401,9 @@ struct SessionDetailSheet: View {
     }
 
     private func notesSection(_ notes: String) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("Coach notes")
-                .font(TrailFont.body)
+                .font(TrailFont.coach)
                 .foregroundStyle(.secondary)
             Text(notes)
                 .font(TrailFont.body)
@@ -286,6 +412,13 @@ struct SessionDetailSheet: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .textSelection(.enabled)
         }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
+        )
     }
 
     @ViewBuilder
@@ -293,50 +426,58 @@ struct SessionDetailSheet: View {
         let daySessions = strengthStore.sessions(for: session.scheduledDate)
 
         if !daySessions.isEmpty {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Label("Strength", systemImage: "dumbbell.fill")
-                        .font(TrailFont.body)
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 8) {
+                    Image(systemName: "dumbbell.fill")
+                        .font(.system(size: 14))
                         .foregroundStyle(Color.trailGreen)
-
+                        .frame(width: 24, height: 24)
+                        .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 6))
+                    Text("STRENGTH")
+                        .font(TrailFont.data).tracking(0.5)
+                        .foregroundStyle(.secondary)
                     Spacer()
-
                     Button {
                         selectedStrengthDay = StrengthDaySelection(
                             weekNumber: session.weekNumber,
                             dayOfWeek: session.dayOfWeek
                         )
                     } label: {
-                        Label("Details", systemImage: "chevron.right")
-                            .font(TrailFont.meta)
+                        HStack(spacing: 2) {
+                            Text("Details").font(TrailFont.data)
+                            Image(systemName: "chevron.right").font(.system(size: 10, weight: .semibold))
+                        }
+                        .foregroundStyle(Color.trailGreen)
                     }
-                    .buttonStyle(.bordered)
-                    .controlSize(.small)
-                    .tint(Color.trailGreen)
+                    .buttonStyle(.plain)
                 }
 
                 ForEach(daySessions) { s in
-                    HStack(alignment: .top, spacing: 8) {
+                    HStack(alignment: .top, spacing: 10) {
                         Button {
                             strengthStore.toggleComplete(s.id)
                         } label: {
                             Image(systemName: s.isComplete ? "checkmark.circle.fill" : "circle")
-                                .font(TrailFont.meta)
-                                .foregroundStyle(s.isComplete ? AnyShapeStyle(Color.green) : AnyShapeStyle(.quaternary))
+                                .font(.system(size: 14))
+                                .foregroundStyle(s.isComplete ? AnyShapeStyle(Color.trailGreen) : AnyShapeStyle(Color.secondary.opacity(0.4)))
                                 .completionPulse(s.isComplete)
                         }
                         .buttonStyle(.plain)
 
                         Text(s.coachNotes.isEmpty ? "Strength" : s.coachNotes)
-                            .font(TrailFont.coach)
+                            .font(TrailFont.body)
                             .foregroundStyle(s.isComplete ? .secondary : .primary)
                             .strikethrough(s.isComplete)
                     }
                 }
             }
-            .padding(12)
+            .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.trailGreen.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+            .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
+            )
             .opacity(isSkipped ? 0.5 : 1)
         }
     }
@@ -346,12 +487,16 @@ struct SessionDetailSheet: View {
         let heatSessions = heatStore.sessions(for: session.scheduledDate)
 
         if !heatSessions.isEmpty {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Label("Heat", systemImage: "flame.fill")
-                        .font(TrailFont.body)
+            VStack(alignment: .leading, spacing: 10) {
+                HStack(spacing: 8) {
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: 14))
                         .foregroundStyle(.orange)
-
+                        .frame(width: 24, height: 24)
+                        .background(Color.orange.opacity(0.15), in: RoundedRectangle(cornerRadius: 6))
+                    Text("HEAT")
+                        .font(TrailFont.data).tracking(0.5)
+                        .foregroundStyle(.secondary)
                     Spacer()
                 }
 
@@ -362,23 +507,24 @@ struct SessionDetailSheet: View {
                     Button {
                         selectedHeatSession = hs
                     } label: {
-                        HStack(spacing: 8) {
-                            Image(systemName: complete ? "checkmark.circle.fill" : "flame")
-                                .font(TrailFont.meta)
-                                .foregroundStyle(complete ? .green : .orange)
+                        HStack(spacing: 10) {
+                            Image(systemName: complete ? "checkmark.circle.fill" : "circle")
+                                .font(.system(size: 14))
+                                .foregroundStyle(complete ? Color.trailGreen : Color.secondary.opacity(0.4))
 
                             Text(hs.sessionType.displayName)
-                                .font(TrailFont.meta)
+                                .font(TrailFont.body)
+                                .foregroundStyle(.primary)
 
                             Spacer()
 
                             if let log {
                                 Text("\(log.actualDurationMinutes) min")
-                                    .font(TrailFont.meta)
-                                    .foregroundStyle(.green)
+                                    .font(TrailFont.data)
+                                    .foregroundStyle(Color.trailGreen)
                             } else {
                                 Text("\(hs.targetDurationMinutes) min")
-                                    .font(TrailFont.meta)
+                                    .font(TrailFont.data)
                                     .foregroundStyle(.secondary)
                             }
                         }
@@ -386,9 +532,13 @@ struct SessionDetailSheet: View {
                     .buttonStyle(.plain)
                 }
             }
-            .padding(12)
+            .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.orange.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+            .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
+            )
             .opacity(isSkipped ? 0.5 : 1)
         }
     }
@@ -526,5 +676,16 @@ struct SessionDetailSheet: View {
         )
         isEditing = false
         dismiss()
+    }
+}
+
+// MARK: - Custom Detent
+
+/// Pops the day sheet just below the Week tab's green banner, leaving the banner visible
+/// with a ~12pt gap. Tuned against the `tabHeading` (Fraunces 28pt) title + mono meta line
+/// (~51pt content) plus 12pt vertical padding on each side = ~75pt banner + 12pt gap.
+private struct BannerGapDetent: CustomPresentationDetent {
+    static func height(in context: Context) -> CGFloat? {
+        context.maxDetentValue - 87
     }
 }
