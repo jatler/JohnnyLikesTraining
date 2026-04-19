@@ -46,7 +46,7 @@ struct WeekView: View {
             }
 
             ScrollView {
-                LazyVStack(spacing: 6) {
+                LazyVStack(spacing: 14) {
                     let sessions = planStore.sessions(for: selectedWeek)
                         .filter { $0.workoutType != .strength }
                     ForEach(sessions) { session in
@@ -200,23 +200,41 @@ struct WeekView: View {
         let skipped = planStore.isSkipped(session.id)
         let isToday = Calendar.current.isDateInToday(session.scheduledDate)
         let activity = strava.activity(for: session.id)
+        let isCompleted = activity != nil
         let day = Calendar.current.component(.day, from: session.scheduledDate)
         let weekday = session.scheduledDate.formatted(.dateTime.weekday(.abbreviated))
+        let rangeText = session.displayTargetRange
 
-        return HStack(spacing: 12) {
+        return HStack(spacing: 10) {
             if isToday {
                 RoundedRectangle(cornerRadius: 2)
                     .fill(Color.trailGreen)
-                    .frame(width: 3, height: 28)
+                    .frame(width: 3, height: 40)
             } else {
-                Color.clear.frame(width: 3, height: 28)
+                Color.clear.frame(width: 3, height: 40)
             }
 
-            Text("\(weekday) \(day)")
-                .font(TrailFont.body)
-                .foregroundStyle(isToday ? Color.trailGreen : .secondary)
-                .fontWeight(isToday ? .semibold : .regular)
-                .frame(width: 52, alignment: .leading)
+            Group {
+                if isCompleted {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 20))
+                        .foregroundStyle(Color.trailGreen)
+                } else {
+                    Color.clear
+                }
+            }
+            .frame(width: 24)
+
+            VStack(spacing: 0) {
+                Text(weekday)
+                    .font(TrailFont.meta)
+                    .foregroundStyle(isToday ? Color.trailGreen : .secondary)
+                    .fontWeight(isToday ? .semibold : .regular)
+                Text("\(day)")
+                    .font(TrailFont.title)
+                    .foregroundStyle(isToday ? Color.trailGreen : .primary)
+            }
+            .frame(width: 36)
 
             Image(systemName: session.workoutType.iconName)
                 .font(.system(size: 14))
@@ -224,19 +242,17 @@ struct WeekView: View {
                 .frame(width: 28, height: 28)
                 .background(session.workoutType.swiftUIColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
 
-            HStack(spacing: 6) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(session.workoutType.displayName)
-                    .font(TrailFont.title)
+                    .font(TrailFont.body)
                     .strikethrough(skipped)
                     .lineLimit(1)
 
-                if let mi = session.targetDistanceMi, session.workoutType != .rest {
-                    Text("·")
-                        .font(TrailFont.data)
-                        .foregroundStyle(.tertiary)
-                    Text(String(format: "%.1f mi", mi))
+                if let rangeText {
+                    Text(rangeText)
                         .font(TrailFont.data)
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
                 }
             }
 
@@ -245,8 +261,8 @@ struct WeekView: View {
             trailingStatus(session: session, activity: activity, skipped: skipped)
         }
         .padding(.horizontal, 8)
-        .padding(.vertical, 8)
-        .frame(minHeight: 44)
+        .padding(.vertical, 10)
+        .frame(minHeight: 60)
         .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 10))
         .overlay(
             RoundedRectangle(cornerRadius: 10)
@@ -256,23 +272,16 @@ struct WeekView: View {
 
     @ViewBuilder
     private func trailingStatus(session: PlannedSession, activity: StravaActivity?, skipped: Bool) -> some View {
-        if let activity {
-            HStack(spacing: 4) {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 14))
-                    .foregroundStyle(.green)
-                if activity.isRun {
-                    Text(String(format: "%.1f", activity.distanceMi))
-                        .font(TrailFont.data)
-                        .foregroundStyle(.green)
-                }
-            }
+        if let activity, activity.isRun {
+            Text(String(format: "%.1f mi", activity.distanceMi))
+                .font(TrailFont.data)
+                .foregroundStyle(.green)
         } else if skipped {
             Text("Skipped")
                 .font(TrailFont.meta)
                 .foregroundStyle(.red)
                 .fontWeight(.semibold)
-        } else {
+        } else if activity == nil {
             Image(systemName: "chevron.right")
                 .font(.system(size: 12))
                 .foregroundStyle(.quaternary)
