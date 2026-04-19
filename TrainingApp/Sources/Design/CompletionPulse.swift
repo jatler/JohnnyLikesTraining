@@ -12,7 +12,7 @@ struct CompletionPulse: ViewModifier {
             .scaleEffect(scale)
             .overlay(
                 Circle()
-                    .strokeBorder(Color.trailGreen, lineWidth: 2)
+                    .strokeBorder(Color.trailGreen, lineWidth: 1.5)
                     .opacity(ringOpacity)
                     .scaleEffect(ringScale)
                     .allowsHitTesting(false)
@@ -28,9 +28,9 @@ struct CompletionPulse: ViewModifier {
                 }
 
                 ringScale = 1.0
-                ringOpacity = 0.9
-                withAnimation(.easeOut(duration: 0.45)) {
-                    ringScale = 1.9
+                ringOpacity = 0.7
+                withAnimation(.easeOut(duration: 0.5)) {
+                    ringScale = 1.65
                     ringOpacity = 0.0
                 }
             }

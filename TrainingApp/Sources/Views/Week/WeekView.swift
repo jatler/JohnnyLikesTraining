@@ -39,12 +39,14 @@ struct WeekView: View {
             weekNavigator
             weekSummaryBar
 
+            if let todaySession = todaySession {
+                readinessBanner(for: todaySession)
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+            }
+
             ScrollView {
                 LazyVStack(spacing: 6) {
-                    if let todaySession = todaySession {
-                        readinessBanner(for: todaySession)
-                    }
-
                     let sessions = planStore.sessions(for: selectedWeek)
                         .filter { $0.workoutType != .strength }
                     ForEach(sessions) { session in
@@ -108,7 +110,7 @@ struct WeekView: View {
                     .foregroundStyle(.white.opacity(0.85))
 
                 if planStore.currentWeekNumber == selectedWeek {
-                    Text("Current")
+                    Text("Current Week")
                         .font(TrailFont.meta)
                         .foregroundStyle(.white)
                         .fontWeight(.semibold)
@@ -165,7 +167,8 @@ struct WeekView: View {
 
         return HStack(spacing: 10) {
             Label(String(format: "%.1f planned", plannedMi), systemImage: "target")
-                .font(TrailFont.data)
+                .font(TrailFont.body)
+                .fontWeight(.semibold)
 
             if actualMi > 0 {
                 Label(String(format: "%.1f done", actualMi), systemImage: "checkmark.circle")
@@ -197,16 +200,23 @@ struct WeekView: View {
         let skipped = planStore.isSkipped(session.id)
         let isToday = Calendar.current.isDateInToday(session.scheduledDate)
         let activity = strava.activity(for: session.id)
+        let day = Calendar.current.component(.day, from: session.scheduledDate)
+        let weekday = session.scheduledDate.formatted(.dateTime.weekday(.abbreviated))
 
         return HStack(spacing: 12) {
-            VStack(spacing: 0) {
-                Text(session.scheduledDate.formatted(.dateTime.weekday(.abbreviated)))
-                    .font(TrailFont.meta)
-                    .foregroundStyle(.secondary)
-                Text("\(Calendar.current.component(.day, from: session.scheduledDate))")
-                    .font(TrailFont.title)
+            if isToday {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(Color.trailGreen)
+                    .frame(width: 3, height: 28)
+            } else {
+                Color.clear.frame(width: 3, height: 28)
             }
-            .frame(width: 36)
+
+            Text("\(weekday) \(day)")
+                .font(TrailFont.body)
+                .foregroundStyle(isToday ? Color.trailGreen : .secondary)
+                .fontWeight(isToday ? .semibold : .regular)
+                .frame(width: 52, alignment: .leading)
 
             Image(systemName: session.workoutType.iconName)
                 .font(.system(size: 14))
@@ -234,18 +244,14 @@ struct WeekView: View {
 
             trailingStatus(session: session, activity: activity, skipped: skipped)
         }
-        .padding(.horizontal, 10)
+        .padding(.horizontal, 8)
         .padding(.vertical, 8)
         .frame(minHeight: 44)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(isToday ? session.workoutType.swiftUIColor.opacity(0.10) : Color(.systemBackground))
-        )
+        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 10))
         .overlay(
             RoundedRectangle(cornerRadius: 10)
-                .strokeBorder(isToday ? session.workoutType.swiftUIColor.opacity(0.35) : .clear, lineWidth: 1)
+                .strokeBorder(isToday ? Color.trailGreen.opacity(0.25) : .clear, lineWidth: 1)
         )
-        .opacity(skipped ? 0.55 : 1.0)
     }
 
     @ViewBuilder
@@ -322,7 +328,6 @@ struct WeekView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .strokeBorder(.orange.opacity(0.3), lineWidth: 1)
             )
-            .padding(.bottom, 4)
         }
     }
 

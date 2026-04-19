@@ -41,9 +41,7 @@ struct ProgressDashboardView: View {
                             withAnimation(.easeOut(duration: 0.9)) {
                                 chartProgress = 1.0
                             }
-                            withAnimation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true)) {
-                                currentWeekPulse = 1.04
-                            }
+                            runCurrentWeekPulse()
                         }
                     }
                 } else {
@@ -220,6 +218,23 @@ struct ProgressDashboardView: View {
         }
     }
 
+    private func runCurrentWeekPulse() {
+        let cycles = 3
+        let cycleDuration = 1.8
+        for i in 0..<cycles {
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * cycleDuration) {
+                withAnimation(.easeInOut(duration: cycleDuration / 2)) {
+                    currentWeekPulse = 1.04
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + cycleDuration / 2) {
+                    withAnimation(.easeInOut(duration: cycleDuration / 2)) {
+                        currentWeekPulse = 1.0
+                    }
+                }
+            }
+        }
+    }
+
     private func weekDetailRow(
         _ entry: WeekMileageEntry,
         globalMaxMi: Double,
@@ -255,14 +270,15 @@ struct ProgressDashboardView: View {
                         }
                         if isRaceWeek {
                             Image(systemName: "flag.checkered")
-                                .font(.system(size: 11))
+                                .font(.system(size: 14))
                                 .foregroundStyle(Color.trailGreen)
-                                .offset(x: geo.size.width * plannedFraction * chartProgress + 4, y: -1)
+                                .offset(x: geo.size.width * plannedFraction + 4, y: -1)
                                 .opacity(chartProgress)
+                                .animation(.easeOut(duration: 0.3).delay(barDelay + 0.2), value: chartProgress)
                         }
                     }
                 }
-                .frame(height: 10)
+                .frame(height: isRaceWeek ? 14 : 10)
                 .animation(.easeOut(duration: 0.45).delay(barDelay), value: chartProgress)
 
                 VStack(alignment: .leading, spacing: 2) {
