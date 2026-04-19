@@ -1,10 +1,12 @@
-# Claude Design Prototyping Prompt — SWAP Training (Simplify branch)
+# Claude Design Prototyping Prompt — Training App (Simplify branch)
 
 Paste everything below the `---` line into Claude Design once you've connected the GitHub repo on branch `simplify`.
 
 ---
 
-You are prototyping UI for **SWAP Training**, a native iOS SwiftUI app for ultramarathon runners following the David & Megan Roche Champion Plan. Generate three high-fidelity mocks of the simplified interface. Pull live context from this repo (branch `simplify`): start with `DESIGN.md` and `PLAN.md` in the project root, then skim `TrainingApp/Sources/Views/Week/WeekView.swift`, `TrainingApp/Sources/Views/Progress/ProgressDashboardView.swift`, `TrainingApp/Sources/Views/Calendar/SessionDetailSheet.swift`, and `TrainingApp/Sources/Design/BrandKit.swift` for the exact structure we shipped.
+You are prototyping UI for a native iOS SwiftUI **endurance training app**. It helps runners follow any structured multi-week training plan — road marathons, trail ultras, mountain races, base blocks — by mapping the plan against a target race date and giving a daily view of what to do, how to recover, and how actual training (from Strava + Oura) compares to the plan. The app ships bundled plans (one is the Roche Champion Plan for 100K / 100-mile, another is a 10-week winter base plan) and is designed to accept more in the future, including user-imported plans. The UI must stay neutral to any single coach, author, or race distance.
+
+Generate three high-fidelity mocks of the simplified interface. Pull live context from this repo (branch `simplify`): start with `DESIGN.md` and `PLAN.md` in the project root, then skim `TrainingApp/Sources/Views/Week/WeekView.swift`, `TrainingApp/Sources/Views/Progress/ProgressDashboardView.swift`, `TrainingApp/Sources/Views/Calendar/SessionDetailSheet.swift`, and `TrainingApp/Sources/Design/BrandKit.swift` for the exact structure we shipped.
 
 ## Three Guiding Principles
 
@@ -14,7 +16,7 @@ You are prototyping UI for **SWAP Training**, a native iOS SwiftUI app for ultra
 
 ## Product Voice
 
-Calm, focused, coach-led. Feels like opening a trusted coach's notebook — not a data dashboard, not a gamified fitness app. Competitors are *Runna* (clean, dark, data-forward) and *Bear Notes* (restrained typography, editorial warmth). Avoid *TrainingPeaks* (dated, corporate).
+Calm, focused, coach-led — whichever coach or plan the user has loaded. Feels like opening a trusted training notebook, not a data dashboard and not a gamified fitness app. The design must work for any bundled plan (a long ultra build, a 10-week base block, a future marathon plan) without privileging one. Competitors are *Runna* (clean, dark, data-forward) and *Bear Notes* (restrained typography, editorial warmth). Avoid *TrainingPeaks* (dated, corporate).
 
 ## Typography — 5 tokens, 3 families
 
@@ -135,10 +137,11 @@ Rules:
 ║  ⏱  Easy effort, Z1/Z2                         ║
 ║                                                ║
 ║  Coach notes                                   ║  ← title in Geist Mono 20pt
-║  │ Three hour gradual build. First hour        ║  ← coach prose in Fraunces 16pt
-║  │ super chill, second hour you can flow a     ║     left Trail Green accent bar
-║  │ bit, last hour find rhythm if your body     ║
-║  │ allows. If it doesn't, easy is fine…        ║
+║  │ Multi-paragraph block of plan-authored      ║  ← coach prose in Fraunces 16pt
+║  │ prose: warm-up cues, effort description,    ║     left Trail Green accent bar
+║  │ rhythm notes, what to do if the body        ║
+║  │ pushes back. Verbatim from whichever plan   ║
+║  │ is loaded — not replaced or summarized.     ║
 ║                                                ║
 ║  💪  Strength          3/5 done                ║  ← strength section w/ per-exercise checkmarks
 ║  🔥  Heat              25 min sauna    [Log]   ║  ← heat section
@@ -176,9 +179,9 @@ Rules:
 
 Generate three mocks — produce them as standalone screens I can screenshot and compare to the built SwiftUI views:
 
-1. **Week tab mock** — Today = Thursday, Week 11 of 16. All 7 rows visible without scrolling. Low-readiness banner above the rows (today's session is Intervals; readiness 58). Include realistic workout types across the week.
-2. **Progress tab mock** — Capture a moment mid-animation: weeks 1–6 fully grown, week 7 at 60%, weeks 8+ still building, current-week bar (week 11) visibly scaled up, race-week flag already placed at its final position.
-3. **SessionDetailSheet mock** — Long Run day with real Champion Plan-style coach notes (3+ paragraphs), strength section showing 3/5 complete, heat section with 25-minute sauna, recovery row with Oura data, Strava plan-vs-actual comparison.
+1. **Week tab mock** — Today = Thursday, a mid-plan week (e.g. Week 11 of 16). All 7 rows visible without scrolling. Low-readiness banner above the rows (today's session is Intervals; readiness 58). Use a realistic mix of workout types across the week — the design must read well for any plan.
+2. **Progress tab mock** — Capture a moment mid-animation: first third of weeks fully grown, middle weeks still building, current week visibly scaled up, race-week flag already placed at its final position. Use plausible mileage that ramps then tapers — not specific to any single plan.
+3. **SessionDetailSheet mock** — Long Run day with a generic coach-notes block (3+ paragraphs of plausible prose: warm-up, effort description, rhythm cues, what to do if the body pushes back). Strength section showing 3/5 complete, heat section with 25-minute sauna, recovery row with Oura data, Strava plan-vs-actual comparison. Do not attribute notes to a specific coach or plan.
 
 Render each at iPhone 15/16 Pro dimensions (1179×2556 or equivalent canvas). Light mode first; include a dark-mode variant if capacity allows.
 
