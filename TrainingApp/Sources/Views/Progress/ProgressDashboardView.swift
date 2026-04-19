@@ -52,8 +52,9 @@ struct ProgressDashboardView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.vertical, 8)
         .background(Color.trailGreen)
+        .background(Color.trailGreen.ignoresSafeArea(edges: .top))
     }
 
     // MARK: - Content
@@ -61,7 +62,7 @@ struct ProgressDashboardView: View {
     private var content: some View {
         let entries = computeWeeklyEntries()
         return ScrollView {
-            VStack(spacing: 12) {
+            VStack(spacing: 10) {
                 focusedWeekCard(entries: entries)
                 TabView(selection: $selectedChartPage) {
                     mileageCard(entries: entries).tag(ChartPage.miles)
@@ -69,7 +70,7 @@ struct ProgressDashboardView: View {
                     timeCard(entries: entries).tag(ChartPage.time)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
-                .frame(height: 240)
+                .frame(height: 280)
                 raceCard(entries: entries)
             }
             .padding(.horizontal, 12)
@@ -151,9 +152,9 @@ struct ProgressDashboardView: View {
                 Spacer(minLength: 0)
             }
 
-            Divider().padding(.top, 12).padding(.bottom, 10)
+            Divider().padding(.top, 8).padding(.bottom, 8)
 
-            HStack(alignment: .top, spacing: 10) {
+            HStack(alignment: .top, spacing: 8) {
                 focusedStat(
                     label: "MILES",
                     primary: entry?.actualMi.map { String(format: "%.1f", $0) } ?? "—",
@@ -223,7 +224,7 @@ struct ProgressDashboardView: View {
                 rightValue: String(format: "%.1f mi", weeklyAvgMiles)
             )
             MileageChart(entries: entries, focusedWeek: $focusedWeek)
-                .frame(height: 142)
+                .frame(height: 180)
         }
         .padding(14)
         .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
@@ -248,7 +249,7 @@ struct ProgressDashboardView: View {
                 rightValue: "\(formatFt(weeklyAvgVert)) ft"
             )
             ElevationChart(entries: entries, focusedWeek: $focusedWeek)
-                .frame(height: 142)
+                .frame(height: 180)
         }
         .padding(14)
         .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
@@ -275,7 +276,7 @@ struct ProgressDashboardView: View {
                 rightValue: formatHours(weeklyAvgH)
             )
             TotalTimeChart(entries: entries, focusedWeek: $focusedWeek)
-                .frame(height: 142)
+                .frame(height: 180)
         }
         .padding(14)
         .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
@@ -318,7 +319,7 @@ struct ProgressDashboardView: View {
             let sessionsTotal = max(entries.reduce(0) { $0 + $1.totalSessions }, 1)
             let pct = Double(sessionsDone) / Double(sessionsTotal)
 
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 10) {
                 HStack(alignment: .top) {
                     Text(plan.name)
                         .font(.system(size: 18))
@@ -651,7 +652,7 @@ private struct MileageChart: View {
             if remH > 0 { Rectangle().fill(Color(.systemGray5)).frame(height: remH) }
             if actH > 0 {
                 Rectangle()
-                    .fill(entry.isCurrent ? Color.trailGreen : Color.trailGreen.opacity(0.55))
+                    .fill(Color.trailGreen)
                     .frame(height: actH)
             }
             if entry.isFuture && planH > 0 {

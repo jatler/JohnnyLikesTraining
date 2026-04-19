@@ -349,7 +349,7 @@ Every tab follows the same structure. Week is the golden reference — it leads 
 ### Rules
 
 - **Navigation bar hidden** on all tabs. Each tab renders its own header.
-- **Header band** is solid Trail Green, white text, `.padding(.horizontal, 16)`, `.padding(.vertical, 12)`. Title uses `TrailFont.tabHeading` (Fraunces 28pt, Medium).
+- **Header band** is solid Trail Green, white text, `.padding(.horizontal, 16)`, `.padding(.vertical, 12)`. Title uses `TrailFont.tabHeading` (Fraunces 28pt, Medium). The band extends **through the top safe area** (`.background(Color.trailGreen.ignoresSafeArea(edges: .top))`) so the pigment covers the status-bar strip — no white gap above the banner. Status-bar content (time, battery) renders white against green.
 - **Title inset:** on tabs whose body has rows with inset padding (e.g. Week), the header title and meta line are left-indented to align with the first content column below. The Week tab uses an 8pt inset (row-container 12 + row pad 12 − header pad 16 = 8).
 - **Meta line** directly under the title uses `TrailFont.data` (Geist Mono 13pt) UPPERCASE with `.tracking(0.5)`.
 - **Header stays pinned.** It is outside the ScrollView so it does not scroll away.
@@ -394,14 +394,21 @@ The Week tab establishes the refreshed row anatomy:
 - **Skipped row:** title gets `.strikethrough()`. Trailing slot shows "SKIPPED" label in error color (SF Pro 12pt semibold, uppercase, `.tracking(0.5)`).
 - **Rest day:** mileage line reads "Full recovery" in `TrailFont.data`.
 
-### Row Pattern — Other tabs (carry-over)
+### Row Pattern — Other tabs (Bold Day alignment)
 
-Strength, Stretch, and Heat rows inside day cards keep a lighter anatomy (they live inside a card, not as standalone rows):
+Strength, Stretch, and Heat day cards now follow the same Bold Day chrome as Week rows:
 
 - `HStack(alignment: .top, spacing: 12)`
-- Smaller inline icon badge: `Image(systemName:).frame(width:32, height:32).background(color.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))`
-- Text in a `VStack(alignment: .leading, spacing: 2)`
-- Day cards use `cornerRadius: 12`, today-highlighted with `.opacity(0.08)` tint + `.opacity(0.3)` stroke.
+- Icon badge **43×43, r15, 0.15-opacity tint** — identical to Week row workout badges. Icon glyph rendered at `.system(size: 20)` inside.
+- Text in a `VStack(alignment: .leading, spacing: 2)`.
+- Day cards use **`cornerRadius: 18`**, today-highlighted with `Color.trailGreenSubtle` fill + `Color.trailGreen.opacity(0.33)` stroke (mirrors the Week today row exactly).
+
+### Icon Badge System
+
+All icon badges across the app use **`cornerRadius: 15`** regardless of size — one radius across every tile slot to unify the visual family. Sizes:
+- **43×43** — primary row badges on Week / Strength / Stretch / Heat day cards, and the day-sheet summary card.
+- **32×32** — in-row activity badges (e.g., each entry in the day sheet's Activities list).
+- **24×24** — section-header chips inside cards (e.g., "LOGGED ACTIVITY" on Strava, "HEAT" / "STRENGTH" / "RECOVERY" labels). At this size, r15 reads nearly circular — intentional; keeps one system rather than mixing r6/r8/r15.
 
 ### Content Cards
 
@@ -431,12 +438,13 @@ Three charts render inside the Progress tab's paginated `TabView` (page dots alw
 
 | Chart | Green bar | Orange stack | Ghost/future | Accent |
 |-------|-----------|--------------|--------------|--------|
-| Miles | `actualMi` | — (cross-train moved out) | Current-week remainder + all future weeks in `Color(.systemGray5)` | Current week in Trail Green; completed weeks in Trail Green at 0.55 opacity |
+| Miles | `actualMi` | — (cross-train moved out) | Current-week remainder + all future weeks in `Color(.systemGray5)` | **All completed and current weeks render at full Trail Green** — no opacity taper for past bars (completed work is work, not faded history). Future weeks stay grey. |
 | Vert  | `elevationGainFt` | — | synthesized `plannedMi × 55 ft/mi` for current/future | Custom purple `Color(0.54, 0.42, 0.82)` current / 0.76, 0.71, 0.90 completed |
 | Time  | `runHours` | `crossTrainHours` stacked on top | `plannedHours = plannedMi / 6 mph` for current/future | Trail Green (runs) + orange (cross-train); `.orange.opacity(0.5)` for completed past weeks |
 
 ### Rules
 
+- **Chart height** 180pt (bumped from 142pt for legibility); TabView container 280pt.
 - Bar width 12pt; spacing auto-computed; y-axis 20pt (miles/time) or 28pt (vert, wider for "k" labels).
 - Y-axis labels at 9pt monospace, `.tertiary` — topmost tick hidden so the number doesn't clip the card edge.
 - Tap any bar → focuses that week. Tap animates with `withAnimation(.easeOut(0.22))`.
@@ -455,7 +463,7 @@ The per-session detail sheet presents as a custom-detent bottom sheet that leave
 
 ### Chrome
 
-- No in-sheet banner. First row of scroll content is a small right-aligned close button (xmark, 30×30 r10 squircle, `Color(.secondarySystemBackground)` fill, `.secondary` glyph).
+- No in-sheet banner, no in-sheet date row. First row of scroll content is a right-aligned close button only: `xmark` glyph on a **30pt Circle** with `Color(.secondarySystemBackground)` fill. The Week tab's green banner (visible above the sheet thanks to `BannerGapDetent`) is the contextual anchor.
 - Edit mode replaces the close button with a left-aligned "Cancel" text button and a right-aligned Trail Green "Save" capsule.
 
 ### Content cards
@@ -492,6 +500,18 @@ Month grid view reached from the Week tab's calendar-icon button. Cells are inte
 - **Skipped:** 0.5 opacity (only state-change kept).
 - Cells remain tappable → opens the Session Detail Sheet.
 - Rationale: at this zoom-out the week-by-week rhythm is what reads, not per-day detail. The sheet carries the per-day data.
+
+## Settings Tab
+
+The Settings tab uses a **Bold Day card layout** instead of iOS `List` chrome:
+
+- Trail Green header banner (extends through top safe area) with "Settings" in `TrailFont.tabHeading`.
+- `ScrollView` → `VStack(spacing: 18)` of grouped sections.
+- Each section is an 18pt-radius `Color(.systemBackground)` card with `Color(.separator).opacity(0.3)` 1pt border. **Section label sits outside the card**, above it: UPPERCASE in `TrailFont.data .tracking(0.5) .secondary`, inset 4pt.
+- Rows inside the card use consistent `.padding(.horizontal, 14).padding(.vertical, 12)` and are separated by `Divider().padding(.leading, 14)` for a clean list-within-card look.
+- Info rows: label in `TrailFont.body .secondary` on the left, value in `TrailFont.data .primary` on the right.
+- Button rows: `Button` wrapping an HStack (16pt leading icon in the row color, 24pt icon slot, `TrailFont.body` label). Destructive variants render in `.red`.
+- Grace-period banner (when present) is a standalone Yellow-bordered 18pt-radius card at the top of the scroll content.
 
 ## Navigation Patterns
 
@@ -585,3 +605,10 @@ Every list/section that can be empty needs:
 | 2026-04-19 | Multi-activity day aggregation | Doubles days were hidden: the Week row and day sheet only showed the single matched Strava activity. Added `StravaService.runActivities(on:)`; Week row sums miles across all runs on that date; day sheet renders every activity as its own row when the count is > 1. |
 | 2026-04-19 | Planned-distance range in day sheet | Day sheet was rendering a single `%.1f mi` value; Week rows show the coach's range (e.g. "8–14 mi"). Swapped the day sheet to `session.displayTargetRange` so the range reads identically everywhere. |
 | 2026-04-19 | Unified 18pt-radius chrome for Oura / Strava / Heat / Strength cards | Pre-redesign these lived on tinted `.opacity(0.06-0.08)` fills with 8–12pt radii — stood out from the Week/Progress Bold Day cards. Migrated all four to `Color(.systemBackground)` / 18pt radius / 0.3-separator 1pt border. Accent colors now live in the section label's icon badge (24×24 r6) only, not the full fill. |
+| 2026-04-20 | Tab banners extend through top safe area | White status-bar strip above every tab's green band looked unfinished. Wrapped the banner background with a second `Color.trailGreen.ignoresSafeArea(edges: .top)` layer so the pigment fills the status-bar zone. Content still respects the safe area — titles don't slide under the notch. |
+| 2026-04-20 | Day sheet date row removed; close button back to Circle | The UPPERCASE date line added in last session's critique duplicated the summary card's meta line (`WK 11 D1 · 8–14 MI`). Dropped it. Close button reverts to a circle — r10 squircle was competing with the workout badge's r15 squircle family; a circle reads as lightweight chrome, not a peer. |
+| 2026-04-20 | Miles chart: full Trail Green on every completed bar | Past-week bars were dimmed to 0.55 opacity; made completed work feel faded. Now every completed or current bar is full Trail Green. Future weeks stay `Color(.systemGray5)` so the forward-looking silhouette still reads. |
+| 2026-04-20 | Progress chart height 142 → 180pt | Bars at 142pt made week-to-week deltas hard to read. Bumped chart frame to 180pt and TabView container to 280pt; tightened focused-card Divider padding + outer VStack spacing to preserve the no-scroll one-page layout. |
+| 2026-04-20 | Unified icon badge system at r15 across the app | Previously mixed r6 (24×24 section chips), r8 (32×32 row badges), and r15 (43×43 workout badges). Collapsed to a single r15 radius at three sizes (43/32/24). The smaller tiles read nearly circular — intentional; one system beats three. |
+| 2026-04-20 | Strength tab day cards migrated to Bold Day chrome | Was 12pt-radius with 32×32 r8 badges and `.opacity(0.08)` today tint. Now 18pt-radius with 43×43 r15 badges and `Color.trailGreenSubtle` today tint + `Color.trailGreen.opacity(0.33)` today stroke — identical to Week row spec. |
+| 2026-04-20 | Settings tab: iOS List → Bold Day card layout | `List` chrome read as a different app surface. Converted to `ScrollView` of 18pt-radius cards with external UPPERCASE section labels; `Divider().padding(.leading, 14)` between rows for clean in-card separation. All existing actions and alerts preserved. |

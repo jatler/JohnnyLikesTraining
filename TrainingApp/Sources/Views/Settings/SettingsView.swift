@@ -18,24 +18,21 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                Text("Settings")
-                    .font(TrailFont.tabHeading)
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .frame(maxWidth: .infinity)
-                    .background(Color.trailGreen)
-
-                List {
-                    gracePeriodBanner
-                patreonSection
-                stravaSection
-                ouraSection
-                planSection
-                accountSection
-                aboutSection
-            }
+                header
+                ScrollView {
+                    VStack(spacing: 16) {
+                        gracePeriodBanner
+                        sectionCard(label: "PATREON") { patreonSection }
+                        sectionCard(label: "STRAVA") { stravaSection }
+                        sectionCard(label: "OURA") { ouraSection }
+                        sectionCard(label: "TRAINING PLAN") { planSection }
+                        sectionCard(label: "ACCOUNT") { accountSection }
+                        sectionCard(label: "ABOUT") { aboutSection }
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 14)
+                    .padding(.bottom, 20)
+                }
             }
             .toolbar(.hidden, for: .navigationBar)
             .alert("Error", isPresented: $showingError) {
@@ -46,340 +43,344 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: - Header
+
+    private var header: some View {
+        Text("Settings")
+            .font(TrailFont.tabHeading)
+            .foregroundStyle(.white)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(Color.trailGreen)
+            .background(Color.trailGreen.ignoresSafeArea(edges: .top))
+    }
+
+    // MARK: - Card chrome
+
+    @ViewBuilder
+    private func sectionCard<Content: View>(label: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .font(TrailFont.data).tracking(0.5)
+                .foregroundStyle(.secondary)
+                .padding(.leading, 4)
+            VStack(spacing: 0) {
+                content()
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
+            )
+        }
+    }
+
+    // MARK: - Row helpers
+
+    /// Info row where the value is a datum (count, version string, numeric — renders in mono).
+    private func infoRow(_ label: String, _ value: String) -> some View {
+        infoRowBase(label: label, value: value, valueFont: TrailFont.data)
+    }
+
+    /// Info row where the value is prose (race name, athlete name — renders in SF body).
+    private func infoRowText(_ label: String, _ value: String) -> some View {
+        infoRowBase(label: label, value: value, valueFont: TrailFont.body)
+    }
+
+    private func infoRowBase(label: String, value: String, valueFont: Font) -> some View {
+        HStack {
+            Text(label)
+                .font(TrailFont.body)
+                .foregroundStyle(.secondary)
+            Spacer()
+            Text(value)
+                .font(valueFont)
+                .foregroundStyle(.primary)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+    }
+
+    private func buttonRow(_ label: String, icon: String? = nil, color: Color = .primary, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 10) {
+                if let icon {
+                    Image(systemName: icon)
+                        .font(.system(size: 16))
+                        .foregroundStyle(color)
+                        .frame(width: 24)
+                }
+                Text(label)
+                    .font(TrailFont.body)
+                    .foregroundStyle(color)
+                Spacer()
+            }
+            .contentShape(Rectangle())
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func linkRow<Label: View>(_ label: String, icon: String = "arrow.up.right.square", destination: URL, @ViewBuilder leading: () -> Label) -> some View {
+        Link(destination: destination) {
+            HStack(spacing: 10) {
+                leading()
+                Text(label)
+                    .font(TrailFont.body)
+                    .foregroundStyle(.primary)
+                Spacer()
+                Image(systemName: icon)
+                    .font(TrailFont.meta)
+                    .foregroundStyle(.secondary)
+            }
+            .contentShape(Rectangle())
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+        }
+    }
+
+    private func divider() -> some View {
+        Divider().padding(.leading, 14)
+    }
+
     // MARK: - Grace Period Banner
 
     @ViewBuilder
     private var gracePeriodBanner: some View {
         if let daysLeft = patreon.gracePeriodDaysRemaining {
-            Section {
-                HStack(spacing: 12) {
-                    Image(systemName: "exclamationmark.triangle.fill")
+            HStack(spacing: 12) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.yellow)
+                    .font(.system(size: 20))
+                    .frame(width: 43, height: 43)
+                    .background(Color.yellow.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Your access expires in \(daysLeft) day\(daysLeft == 1 ? "" : "s")")
+                        .font(TrailFont.body)
+                    Link("Resubscribe on Patreon ↗", destination: BrandKit.patreonURL)
+                        .font(TrailFont.data)
                         .foregroundStyle(.yellow)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Your access expires in \(daysLeft) day\(daysLeft == 1 ? "" : "s")")
-                            .font(TrailFont.body)
-                        Link("Resubscribe on Patreon ↗", destination: BrandKit.patreonURL)
-                            .font(TrailFont.meta)
-                            .foregroundStyle(.yellow)
-                    }
                 }
-                .padding(.vertical, 4)
+                Spacer()
             }
+            .padding(14)
+            .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .strokeBorder(Color.yellow.opacity(0.4), lineWidth: 1)
+            )
         }
     }
 
     // MARK: - Patreon
 
+    @ViewBuilder
     private var patreonSection: some View {
-        Section {
-            if patreon.isConnected {
-                HStack {
-                    Label("SWAP Patreon", systemImage: "star.circle.fill")
+        if patreon.isConnected {
+            HStack {
+                HStack(spacing: 10) {
+                    Image(systemName: "star.circle.fill")
                         .foregroundStyle(Color.trailGreen)
-                    Spacer()
-                    Text("Connected")
-                        .font(TrailFont.body)
-                        .foregroundStyle(.green)
+                        .font(.system(size: 16))
+                    Text("SWAP Patreon").font(TrailFont.body)
                 }
+                Spacer()
+                Text("Connected").font(TrailFont.data).foregroundStyle(.green)
+            }
+            .padding(.horizontal, 14).padding(.vertical, 12)
 
-                if let lastVerified = patreon.lastVerifiedAt {
-                    HStack {
-                        Text("Last verified")
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text(lastVerified.formatted(.relative(presentation: .named)))
-                    }
-                    .font(TrailFont.body)
-                }
+            if let lastVerified = patreon.lastVerifiedAt {
+                divider()
+                infoRow("Last verified", lastVerified.formatted(.relative(presentation: .named)))
+            }
 
-                Button("Disconnect Patreon", role: .destructive) {
-                    showingDisconnectPatreon = true
-                }
+            divider()
+            buttonRow("Disconnect Patreon", color: .red) { showingDisconnectPatreon = true }
                 .alert("Disconnect Patreon?", isPresented: $showingDisconnectPatreon) {
                     Button("Cancel", role: .cancel) {}
                     Button("Disconnect", role: .destructive) { patreon.disconnect() }
                 } message: {
                     Text("You'll lose access to SWAP training plans.")
                 }
-            } else {
-                Button {
-                    connectPatreon()
-                } label: {
-                    HStack {
-                        Label("Connect Patreon", systemImage: "star.circle.fill")
-                            .foregroundStyle(Color.trailGreen)
-                        Spacer()
-                        Image(systemName: "arrow.up.right.square")
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-        } header: {
-            Text("Patreon")
-        } footer: {
-            if !patreon.isConnected {
-                Text("Connect your SWAP Patreon account to unlock all training plans.")
-            }
+        } else {
+            buttonRow("Connect Patreon", icon: "star.circle.fill", color: Color.trailGreen) { connectPatreon() }
         }
     }
 
     // MARK: - Strava
 
+    @ViewBuilder
     private var stravaSection: some View {
-        Section {
-            if strava.isConnected {
-                HStack {
-                    Image("PoweredByStrava")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(height: 16)
+        if strava.isConnected {
+            HStack {
+                Image("PoweredByStrava")
+                    .resizable().aspectRatio(contentMode: .fit).frame(height: 16)
+                Spacer()
+                Text("Connected").font(TrailFont.data).foregroundStyle(.green)
+            }
+            .padding(.horizontal, 14).padding(.vertical, 12)
+
+            if let name = strava.athleteName {
+                divider()
+                infoRowText("Athlete", name)
+            }
+            if let lastSync = strava.lastSyncDate {
+                divider()
+                infoRow("Last sync", lastSync.formatted(.relative(presentation: .named)))
+            }
+            divider()
+            Button { syncStrava() } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 16))
+                        .foregroundStyle(Color.trailGreen)
+                        .frame(width: 24)
+                    Text("Sync Activities").font(TrailFont.body)
                     Spacer()
-                    Text("Connected")
-                        .font(TrailFont.body)
-                        .foregroundStyle(.green)
+                    if strava.isSyncing { ProgressView() }
                 }
+                .contentShape(Rectangle())
+                .padding(.horizontal, 14).padding(.vertical, 12)
+            }
+            .buttonStyle(.plain)
+            .disabled(strava.isSyncing)
 
-                if let name = strava.athleteName {
-                    HStack {
-                        Text("Athlete")
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text(name)
-                    }
-                    .font(TrailFont.body)
-                }
-
-                if let lastSync = strava.lastSyncDate {
-                    HStack {
-                        Text("Last sync")
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text(lastSync.formatted(.relative(presentation: .named)))
-                    }
-                    .font(TrailFont.body)
-                }
-
-                Button {
-                    syncStrava()
-                } label: {
-                    HStack {
-                        Label("Sync Activities", systemImage: "arrow.clockwise")
-                        if strava.isSyncing {
-                            Spacer()
-                            ProgressView()
-                        }
-                    }
-                }
-                .disabled(strava.isSyncing)
-
-                Button("Disconnect Strava", role: .destructive) {
-                    showingDisconnectStrava = true
-                }
+            divider()
+            buttonRow("Disconnect Strava", color: .red) { showingDisconnectStrava = true }
                 .alert("Disconnect Strava?", isPresented: $showingDisconnectStrava) {
                     Button("Cancel", role: .cancel) {}
                     Button("Disconnect", role: .destructive) { Task { await strava.disconnect() } }
                 } message: {
                     Text("Your synced activities will be removed from the app.")
                 }
-            } else {
-                Button {
-                    connectStrava()
-                } label: {
-                    Image("ConnectWithStrava")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(height: 40)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                }
-                .listRowBackground(Color.clear)
+        } else {
+            Button { connectStrava() } label: {
+                Image("ConnectWithStrava")
+                    .resizable().aspectRatio(contentMode: .fit)
+                    .frame(height: 40)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 8)
             }
-        } header: {
-            Text("Strava")
-        } footer: {
-            if !strava.isConnected {
-                Text("Connect Strava to automatically import your runs and compare plan vs. actual.")
-            }
+            .buttonStyle(.plain)
         }
     }
 
     // MARK: - Oura
 
+    @ViewBuilder
     private var ouraSection: some View {
-        Section {
-            if oura.isConnected {
-                HStack {
-                    Image("OuraLogo")
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(height: 14)
-                        .foregroundStyle(.primary)
+        if oura.isConnected {
+            HStack {
+                Image("OuraLogo")
+                    .resizable().aspectRatio(contentMode: .fit).frame(height: 14)
+                Spacer()
+                Text("Connected").font(TrailFont.data).foregroundStyle(.green)
+            }
+            .padding(.horizontal, 14).padding(.vertical, 12)
+
+            if let lastSync = oura.lastSyncDate {
+                divider()
+                infoRow("Last sync", lastSync.formatted(.relative(presentation: .named)))
+            }
+            divider()
+            Button { syncOura() } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: "arrow.clockwise")
+                        .font(.system(size: 16))
+                        .foregroundStyle(Color.trailGreen)
+                        .frame(width: 24)
+                    Text("Sync Recovery Data").font(TrailFont.body)
                     Spacer()
-                    Text("Connected")
-                        .font(TrailFont.body)
-                        .foregroundStyle(.green)
+                    if oura.isSyncing { ProgressView() }
                 }
+                .contentShape(Rectangle())
+                .padding(.horizontal, 14).padding(.vertical, 12)
+            }
+            .buttonStyle(.plain)
+            .disabled(oura.isSyncing)
 
-                if let lastSync = oura.lastSyncDate {
-                    HStack {
-                        Text("Last sync")
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text(lastSync.formatted(.relative(presentation: .named)))
-                    }
-                    .font(TrailFont.body)
-                }
-
-                Button {
-                    syncOura()
-                } label: {
-                    HStack {
-                        Label("Sync Recovery Data", systemImage: "arrow.clockwise")
-                        if oura.isSyncing {
-                            Spacer()
-                            ProgressView()
-                        }
-                    }
-                }
-                .disabled(oura.isSyncing)
-
-                Button("Disconnect Oura", role: .destructive) {
-                    showingDisconnectOura = true
-                }
+            divider()
+            buttonRow("Disconnect Oura", color: .red) { showingDisconnectOura = true }
                 .alert("Disconnect Oura?", isPresented: $showingDisconnectOura) {
                     Button("Cancel", role: .cancel) {}
                     Button("Disconnect", role: .destructive) { oura.disconnect() }
                 } message: {
                     Text("Your recovery data will no longer sync.")
                 }
-            } else {
-                Button {
-                    connectOura()
-                } label: {
-                    HStack {
-                        Image("OuraLogo")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(height: 14)
-                            .foregroundStyle(.primary)
-                        Text("Connect")
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Image(systemName: "arrow.up.right.square")
-                            .foregroundStyle(.secondary)
-                    }
+        } else {
+            Button { connectOura() } label: {
+                HStack(spacing: 10) {
+                    Image("OuraLogo").resizable().aspectRatio(contentMode: .fit).frame(height: 14)
+                    Text("Connect").font(TrailFont.body).foregroundStyle(.secondary)
+                    Spacer()
+                    Image(systemName: "arrow.up.right.square")
+                        .font(TrailFont.meta)
+                        .foregroundStyle(.secondary)
                 }
+                .contentShape(Rectangle())
+                .padding(.horizontal, 14).padding(.vertical, 12)
             }
-        } header: {
-            Text("Oura")
-        } footer: {
-            if !oura.isConnected {
-                Text("Connect your Oura Ring to see readiness scores and get smart swap suggestions.")
-            }
+            .buttonStyle(.plain)
         }
     }
 
     // MARK: - Plan
 
+    @ViewBuilder
     private var planSection: some View {
-        Section("Training Plan") {
-            if planStore.hasPlan {
-                if let plan = planStore.activePlan {
-                    HStack {
-                        Text("Plan")
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text(plan.name)
-                            .font(TrailFont.body)
-                    }
-
-                    HStack {
-                        Text("Race Date")
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text(plan.raceDate.formatted(date: .abbreviated, time: .omitted))
-                            .font(TrailFont.body)
-                    }
-
-                    HStack {
-                        Text("Sessions")
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text("\(planStore.sessions.count)")
-                            .font(TrailFont.body)
-                    }
-                }
-
-                Button("Delete Plan", role: .destructive) {
-                    showingDeletePlan = true
-                }
+        if planStore.hasPlan {
+            if let plan = planStore.activePlan {
+                infoRowText("Plan", plan.name)
+                divider()
+                infoRow("Race Date", plan.raceDate.formatted(date: .abbreviated, time: .omitted))
+                divider()
+                infoRow("Sessions", "\(planStore.sessions.count)")
+                divider()
+            }
+            buttonRow("Delete Plan", color: .red) { showingDeletePlan = true }
                 .alert("Delete Training Plan?", isPresented: $showingDeletePlan) {
                     Button("Cancel", role: .cancel) {}
                     Button("Delete", role: .destructive) { planStore.clearPlan() }
                 } message: {
                     Text("This will permanently delete your plan and all associated swaps and skips.")
                 }
-            } else {
+        } else {
+            HStack {
                 Text("No active plan")
+                    .font(TrailFont.body)
                     .foregroundStyle(.secondary)
+                Spacer()
             }
+            .padding(.horizontal, 14).padding(.vertical, 12)
         }
     }
 
     // MARK: - Account
 
     private var accountSection: some View {
-        Section("Account") {
-            Button("Sign Out", role: .destructive) {
-                showingSignOutAlert = true
-            }
+        buttonRow("Sign Out", color: .red) { showingSignOutAlert = true }
             .alert("Sign Out?", isPresented: $showingSignOutAlert) {
                 Button("Cancel", role: .cancel) {}
-                Button("Sign Out", role: .destructive) {
-                    Task { try? await auth.signOut() }
-                }
+                Button("Sign Out", role: .destructive) { Task { try? await auth.signOut() } }
             } message: {
                 Text("You'll need to sign in again to access your training data.")
             }
-        }
     }
 
     // MARK: - About
 
     private var aboutSection: some View {
-        Section("About") {
-            HStack {
-                Text("Version")
-                Spacer()
-                Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.7")
-                    .foregroundStyle(.secondary)
-            }
-
-            Link(destination: URL(string: "https://johnnylikestraining.com/privacy.html")!) {
-                HStack {
-                    Text("Privacy Policy")
-                    Spacer()
-                    Image(systemName: "arrow.up.right.square")
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            Link(destination: URL(string: "https://johnnylikestraining.com/terms.html")!) {
-                HStack {
-                    Text("Terms of Service")
-                    Spacer()
-                    Image(systemName: "arrow.up.right.square")
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            Link(destination: URL(string: "mailto:atler.j@me.com")!) {
-                HStack {
-                    Text("Support")
-                    Spacer()
-                    Image(systemName: "envelope")
-                        .foregroundStyle(.secondary)
-                }
-            }
+        VStack(spacing: 0) {
+            infoRow("Version", Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.8")
+            divider()
+            linkRow("Privacy Policy", destination: URL(string: "https://johnnylikestraining.com/privacy.html")!) { EmptyView() }
+            divider()
+            linkRow("Terms of Service", destination: URL(string: "https://johnnylikestraining.com/terms.html")!) { EmptyView() }
+            divider()
+            linkRow("Support", icon: "envelope", destination: URL(string: "mailto:atler.j@me.com")!) { EmptyView() }
         }
     }
 

@@ -82,16 +82,13 @@ struct SessionDetailSheet: View {
 
     private var readOnlyHeader: some View {
         HStack {
-            Text(session.scheduledDate.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()).uppercased())
-                .font(TrailFont.data).tracking(0.5)
-                .foregroundStyle(.secondary)
             Spacer()
             Button { dismiss() } label: {
                 Image(systemName: "xmark")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(.secondary)
                     .frame(width: 30, height: 30)
-                    .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 10))
+                    .background(Color(.secondarySystemBackground), in: Circle())
             }
             .buttonStyle(.plain)
         }
@@ -188,7 +185,7 @@ struct SessionDetailSheet: View {
                 .font(.system(size: 18))
                 .foregroundStyle(Color.trailGreen)
                 .frame(width: 32, height: 32)
-                .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
+                .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
             VStack(alignment: .leading, spacing: 3) {
                 Text(activity.name)
                     .font(TrailFont.body)
@@ -432,7 +429,7 @@ struct SessionDetailSheet: View {
                         .font(.system(size: 14))
                         .foregroundStyle(Color.trailGreen)
                         .frame(width: 24, height: 24)
-                        .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 6))
+                        .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
                     Text("STRENGTH")
                         .font(TrailFont.data).tracking(0.5)
                         .foregroundStyle(.secondary)
@@ -493,7 +490,7 @@ struct SessionDetailSheet: View {
                         .font(.system(size: 14))
                         .foregroundStyle(.orange)
                         .frame(width: 24, height: 24)
-                        .background(Color.orange.opacity(0.15), in: RoundedRectangle(cornerRadius: 6))
+                        .background(Color.orange.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
                     Text("HEAT")
                         .font(TrailFont.data).tracking(0.5)
                         .foregroundStyle(.secondary)

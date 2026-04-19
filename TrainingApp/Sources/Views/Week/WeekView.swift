@@ -122,8 +122,9 @@ struct WeekView: View {
                 .padding(.leading, titleInset)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.vertical, 8)
         .background(Color.trailGreen)
+        .background(Color.trailGreen.ignoresSafeArea(edges: .top))
         .tint(.white)
     }
 

@@ -96,8 +96,9 @@ struct StrengthTemplateView: View {
                 .pickerStyle(.segmented)
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            .padding(.vertical, 8)
             .background(Color.trailGreen)
+            .background(Color.trailGreen.ignoresSafeArea(edges: .top))
 
             ScrollView {
                 VStack(spacing: 12) {
@@ -176,14 +177,14 @@ struct StrengthTemplateView: View {
                 strengthSessionRow(session)
             }
         }
-        .padding()
+        .padding(14)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(isToday ? Color.trailGreen.opacity(0.08) : Color(.systemBackground))
+            RoundedRectangle(cornerRadius: 18)
+                .fill(isToday ? Color.trailGreenSubtle : Color(.systemBackground))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(isToday ? Color.trailGreen.opacity(0.3) : Color(.separator).opacity(0.3), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(isToday ? Color.trailGreen.opacity(0.33) : Color(.separator).opacity(0.3), lineWidth: 1)
         )
         .contentShape(Rectangle())
         .onTapGesture {
@@ -204,10 +205,10 @@ struct StrengthTemplateView: View {
             .buttonStyle(.plain)
 
             Image(systemName: "dumbbell.fill")
-                .font(TrailFont.body)
+                .font(.system(size: 20))
                 .foregroundStyle(Color.trailGreen)
-                .frame(width: 32, height: 32)
-                .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
+                .frame(width: 43, height: 43)
+                .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(session.label)
@@ -314,14 +315,14 @@ struct StrengthTemplateView: View {
                     }
             }
         }
-        .padding()
+        .padding(14)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(isToday ? Color.trailGreen.opacity(0.08) : Color(.systemBackground))
+            RoundedRectangle(cornerRadius: 18)
+                .fill(isToday ? Color.trailGreenSubtle : Color(.systemBackground))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(isToday ? Color.trailGreen.opacity(0.3) : Color(.separator).opacity(0.3), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(isToday ? Color.trailGreen.opacity(0.33) : Color(.separator).opacity(0.3), lineWidth: 1)
         )
         .contentShape(Rectangle())
         .onTapGesture {
@@ -338,10 +339,10 @@ struct StrengthTemplateView: View {
                 .foregroundStyle(complete ? .green : .secondary.opacity(0.4))
 
             Image(systemName: "figure.flexibility")
-                .font(TrailFont.body)
+                .font(.system(size: 20))
                 .foregroundStyle(Color.trailGreen)
-                .frame(width: 32, height: 32)
-                .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
+                .frame(width: 43, height: 43)
+                .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(exercise.stretchName)
@@ -413,10 +414,10 @@ struct StrengthTemplateView: View {
                                 .foregroundStyle(complete ? .green : .secondary.opacity(0.4))
 
                             Image(systemName: "flame.fill")
-                                .font(TrailFont.body)
+                                .font(.system(size: 20))
                                 .foregroundStyle(.orange)
-                                .frame(width: 32, height: 32)
-                                .background(Color.orange.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
+                                .frame(width: 43, height: 43)
+                                .background(Color.orange.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
 
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(entry.session.sessionType.displayName)

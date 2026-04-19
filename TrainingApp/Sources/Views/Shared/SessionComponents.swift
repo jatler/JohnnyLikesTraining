@@ -78,7 +78,7 @@ enum SessionComponents {
                         .font(.system(size: 14))
                         .foregroundStyle(Color.trailGreen)
                         .frame(width: 24, height: 24)
-                        .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 6))
+                        .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
                     Text("LOGGED ACTIVITY")
                         .font(TrailFont.data).tracking(0.5)
                         .foregroundStyle(.secondary)
