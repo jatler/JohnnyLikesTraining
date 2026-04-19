@@ -10,6 +10,8 @@ struct ProgressDashboardView: View {
     @Environment(HeatStore.self) private var heatStore
 
     @State private var showingPlanSetup = false
+    @State private var chartProgress: CGFloat = 0
+    @State private var currentWeekPulse: CGFloat = 1.0
 
     var body: some View {
         NavigationStack {
@@ -17,7 +19,7 @@ struct ProgressDashboardView: View {
                 if planStore.hasPlan {
                     VStack(spacing: 0) {
                         Text("Progress")
-                            .font(TrailFont.dataLarge)
+                            .font(TrailFont.title)
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding()
@@ -33,6 +35,15 @@ struct ProgressDashboardView: View {
                             }
                             .padding()
                             .padding(.bottom, 20)
+                        }
+                        .onAppear {
+                            chartProgress = 0
+                            withAnimation(.easeOut(duration: 0.9)) {
+                                chartProgress = 1.0
+                            }
+                            withAnimation(.easeInOut(duration: 2.2).repeatForever(autoreverses: true)) {
+                                currentWeekPulse = 1.04
+                            }
                         }
                     }
                 } else {
@@ -73,7 +84,7 @@ struct ProgressDashboardView: View {
             HStack(spacing: 16) {
                 VStack(spacing: 2) {
                     Text("\(stats.completedSessions)")
-                        .font(TrailFont.dataBold)
+                        .font(TrailFont.data)
                         .foregroundStyle(Color.trailGreen)
                     Text("Done")
                         .font(TrailFont.meta)
@@ -81,7 +92,7 @@ struct ProgressDashboardView: View {
                 }
                 VStack(spacing: 2) {
                     Text("\(stats.missedSessions)")
-                        .font(TrailFont.dataBold)
+                        .font(TrailFont.data)
                         .foregroundStyle(.red.opacity(0.7))
                     Text("Missed")
                         .font(TrailFont.meta)
@@ -89,7 +100,7 @@ struct ProgressDashboardView: View {
                 }
                 VStack(spacing: 2) {
                     Text("\(stats.skippedSessions)")
-                        .font(TrailFont.dataBold)
+                        .font(TrailFont.data)
                         .foregroundStyle(.orange.opacity(0.7))
                     Text("Skipped")
                         .font(TrailFont.meta)
@@ -97,7 +108,7 @@ struct ProgressDashboardView: View {
                 }
                 VStack(spacing: 2) {
                     Text("\(stats.upcomingSessions)")
-                        .font(TrailFont.dataBold)
+                        .font(TrailFont.data)
                         .foregroundStyle(.secondary)
                     Text("Upcoming")
                         .font(TrailFont.meta)
@@ -119,7 +130,7 @@ struct ProgressDashboardView: View {
                     .stroke(color, style: StrokeStyle(lineWidth: 6, lineCap: .round))
                     .rotationEffect(.degrees(-90))
                 Text(String(format: "%.0f%%", value * 100))
-                    .font(TrailFont.dataBold)
+                    .font(TrailFont.data)
             }
             .frame(width: 60, height: 60)
 
@@ -140,7 +151,7 @@ struct ProgressDashboardView: View {
 
             if data.isEmpty {
                 Text("No data yet")
-                    .font(TrailFont.detail)
+                    .font(TrailFont.body)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, minHeight: 200)
             } else {
@@ -190,32 +201,45 @@ struct ProgressDashboardView: View {
     private var weeklyDetailList: some View {
         let data = computeWeeklyMileage()
         let globalMaxMi = data.map(\.plannedMi).max() ?? 1
+        let totalWeeks = max(data.count, 1)
+        let raceWeek = data.last?.week
 
         return VStack(alignment: .leading, spacing: 12) {
             Text("Week-by-Week")
                 .font(TrailFont.title)
 
-            ForEach(data) { entry in
-                weekDetailRow(entry, globalMaxMi: globalMaxMi)
+            ForEach(Array(data.enumerated()), id: \.element.id) { index, entry in
+                weekDetailRow(
+                    entry,
+                    globalMaxMi: globalMaxMi,
+                    staggerIndex: index,
+                    totalWeeks: totalWeeks,
+                    isRaceWeek: entry.week == raceWeek
+                )
             }
         }
     }
 
-    private func weekDetailRow(_ entry: WeekMileageEntry, globalMaxMi: Double) -> some View {
+    private func weekDetailRow(
+        _ entry: WeekMileageEntry,
+        globalMaxMi: Double,
+        staggerIndex: Int,
+        totalWeeks: Int,
+        isRaceWeek: Bool
+    ) -> some View {
         let isCurrent = planStore.currentWeekNumber == entry.week
         let scale = globalMaxMi > 0 ? globalMaxMi : 1
         let plannedFraction = entry.plannedMi / scale
         let actualFraction = entry.actualMi / scale
-        // XT bar width proportional to actual run hours
         let ctBarFraction = entry.runHours > 0
             ? (entry.crossTrainHours / entry.runHours) * actualFraction
             : 0
+        let barDelay = Double(staggerIndex) * 0.035
 
         return VStack(alignment: .leading, spacing: 3) {
-            // Mileage bar: planned (light) with actual (dark) on top
             HStack(spacing: 6) {
                 Text("W\(entry.week)")
-                    .font(TrailFont.metaBold)
+                    .font(TrailFont.meta)
                     .foregroundStyle(isCurrent ? Color.trailGreen : .secondary)
                     .frame(width: 28, alignment: .leading)
 
@@ -223,20 +247,27 @@ struct ProgressDashboardView: View {
                     ZStack(alignment: .leading) {
                         RoundedRectangle(cornerRadius: 3)
                             .fill(Color.trailGreen.opacity(0.15))
-                            .frame(width: geo.size.width * plannedFraction)
+                            .frame(width: geo.size.width * plannedFraction * chartProgress)
                         if entry.actualMi > 0 {
                             RoundedRectangle(cornerRadius: 3)
                                 .fill(Color.trailGreen)
-                                .frame(width: geo.size.width * actualFraction)
+                                .frame(width: geo.size.width * actualFraction * chartProgress)
+                        }
+                        if isRaceWeek {
+                            Image(systemName: "flag.checkered")
+                                .font(.system(size: 11))
+                                .foregroundStyle(Color.trailGreen)
+                                .offset(x: geo.size.width * plannedFraction * chartProgress + 4, y: -1)
+                                .opacity(chartProgress)
                         }
                     }
                 }
                 .frame(height: 10)
+                .animation(.easeOut(duration: 0.45).delay(barDelay), value: chartProgress)
 
-                // Stats to the right
                 VStack(alignment: .leading, spacing: 2) {
                     Label(String(format: "%.0f/%.0f mi", entry.actualMi, entry.plannedMi), systemImage: "point.topleft.down.to.point.bottomright.curvepath")
-                        .font(TrailFont.dataBold)
+                        .font(TrailFont.data)
                     if entry.elevationGainFt > 0 {
                         Label(String(format: "%.0f ft", entry.elevationGainFt), systemImage: "mountain.2.fill")
                             .font(TrailFont.data)
@@ -246,7 +277,6 @@ struct ProgressDashboardView: View {
                 .frame(width: 90, alignment: .leading)
             }
 
-            // Cross-training bar: proportional to actual run hours
             if entry.crossTrainHours > 0 {
                 HStack(spacing: 6) {
                     Spacer().frame(width: 28)
@@ -254,9 +284,10 @@ struct ProgressDashboardView: View {
                     GeometryReader { geo in
                         RoundedRectangle(cornerRadius: 3)
                             .fill(Color.orange.opacity(0.4))
-                            .frame(width: max(geo.size.width * ctBarFraction, 4))
+                            .frame(width: max(geo.size.width * ctBarFraction * chartProgress, 4 * chartProgress))
                     }
                     .frame(height: 10)
+                    .animation(.easeOut(duration: 0.45).delay(barDelay), value: chartProgress)
 
                     Label(String(format: "%.1fh", entry.crossTrainHours), systemImage: "bicycle")
                         .font(TrailFont.data)
@@ -268,6 +299,7 @@ struct ProgressDashboardView: View {
         .padding(.vertical, 4)
         .background(isCurrent ? Color.trailGreenSubtle : .clear)
         .clipShape(RoundedRectangle(cornerRadius: 4))
+        .scaleEffect(isCurrent ? currentWeekPulse : 1.0, anchor: .leading)
     }
 
     // MARK: - Race Readiness
@@ -294,7 +326,7 @@ struct ProgressDashboardView: View {
                 HStack(spacing: 24) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text("\(max(daysUntilRace, 0))")
-                            .font(TrailFont.dataLarge)
+                            .font(TrailFont.title)
                         Text("Days to Race")
                             .font(TrailFont.meta)
                             .foregroundStyle(.secondary)
@@ -302,7 +334,7 @@ struct ProgressDashboardView: View {
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text(String(format: "%.0f%%", stats.completionRate * 100))
-                            .font(TrailFont.dataLarge)
+                            .font(TrailFont.title)
                             .foregroundStyle(Color.trailGreen)
                         Text("Completion")
                             .font(TrailFont.meta)
@@ -312,7 +344,7 @@ struct ProgressDashboardView: View {
                     if let weekNum = planStore.currentWeekNumber {
                         VStack(alignment: .leading, spacing: 2) {
                             Text("\(weekNum)/\(planStore.totalWeeks)")
-                                .font(TrailFont.dataLarge)
+                                .font(TrailFont.title)
                             Text("Weeks")
                                 .font(TrailFont.meta)
                                 .foregroundStyle(.secondary)
@@ -321,7 +353,7 @@ struct ProgressDashboardView: View {
                 }
 
                 Text(readiness.message)
-                    .font(TrailFont.detail)
+                    .font(TrailFont.body)
                     .foregroundStyle(.secondary)
             }
         }
@@ -330,7 +362,7 @@ struct ProgressDashboardView: View {
 
     private func readinessBadge(_ level: RaceReadinessLevel) -> some View {
         Text(level.label)
-            .font(TrailFont.metaBold)
+            .font(TrailFont.meta)
             .foregroundStyle(.white)
             .padding(.horizontal, 10)
             .padding(.vertical, 4)
@@ -352,7 +384,7 @@ struct ProgressDashboardView: View {
                         .fontWeight(.medium)
                 }
             }
-            .font(TrailFont.detail)
+            .font(TrailFont.body)
             .foregroundStyle(.secondary)
         }
         .padding(.top, 16)
@@ -373,7 +405,7 @@ struct ProgressDashboardView: View {
                 .foregroundStyle(.secondary)
 
             Text("Create a training plan and complete some runs to see your progress.")
-                .font(TrailFont.detail)
+                .font(TrailFont.body)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)

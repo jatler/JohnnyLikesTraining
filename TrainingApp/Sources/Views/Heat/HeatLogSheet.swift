@@ -40,7 +40,7 @@ struct HeatLogSheet: View {
 
                     if selectedType != session.sessionType || duration != session.targetDurationMinutes {
                         Toggle("Apply to all weeks", isOn: $applyToAll)
-                            .font(TrailFont.detail)
+                            .font(TrailFont.body)
                             .tint(.orange)
                     }
 
@@ -81,7 +81,7 @@ struct HeatLogSheet: View {
                     .font(TrailFont.title)
 
                 Text("Week \(session.weekNumber) \u{2022} \(session.scheduledDate.formatted(.dateTime.weekday(.wide)))")
-                    .font(TrailFont.detail)
+                    .font(TrailFont.body)
                     .foregroundStyle(.secondary)
             }
 
@@ -98,7 +98,7 @@ struct HeatLogSheet: View {
     private var typePickerSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Type")
-                .font(TrailFont.detailBold)
+                .font(TrailFont.body)
                 .foregroundStyle(.secondary)
 
             Picker("Type", selection: $selectedType) {
@@ -114,12 +114,12 @@ struct HeatLogSheet: View {
     private var durationSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Duration")
-                .font(TrailFont.detailBold)
+                .font(TrailFont.body)
                 .foregroundStyle(.secondary)
 
             HStack {
                 Text("\(duration) min")
-                    .font(TrailFont.dataLarge)
+                    .font(TrailFont.title)
                     .foregroundStyle(.orange)
                     .frame(width: 100, alignment: .leading)
 

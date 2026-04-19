@@ -20,13 +20,11 @@
 		1C51CC95D337B05BF3093A96 /* ProgressionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1D2D3BC0E8B003565E5025D /* ProgressionEngine.swift */; };
 		275CADF1B33668F5B1D7353F /* StrengthStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5300AFFAABD6197E8F30D8 /* StrengthStore.swift */; };
 		2A2882EF65D9D87E33B384E3 /* StretchLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E80497D9A53018EEB5DDC9 /* StretchLog.swift */; };
-
 		314A48FC6E46199FB265D062 /* swap_6_week_6w.json in Resources */ = {isa = PBXBuildFile; fileRef = B67572F92E767F702F3E8237 /* swap_6_week_6w.json */; };
 		318F754953A5B84505A9ECBD /* OuraDaily.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38427D1E7D9E72609E2756A6 /* OuraDaily.swift */; };
 		340974BD8F3C6D08E7B5BFAC /* ProgressionEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C01F97738C00E24FC785ED9 /* ProgressionEngineTests.swift */; };
 		35359EE4B2B5913A17135A3B /* PatreonService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8A3791161DB378E435318CF /* PatreonService.swift */; };
 		37B726D9F8A5BF41AA7BCC4C /* ExerciseHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8903D44D8C5F1FCC00E5F9DA /* ExerciseHistoryView.swift */; };
-		38E21BCC2AE7689810BC810C /* TodayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD128F03DE17FF51C05DD6BB /* TodayView.swift */; };
 		39C0F0E80BC49A04136D8EC1 /* Fraunces-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9A7B5C389858A370B1F4C111 /* Fraunces-SemiBold.ttf */; };
 		428D482FC220B2EED7ED9E42 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5D0A2D62A393B66AB94F79 /* ContentView.swift */; };
 		43E4791D9B6E109B0387D570 /* Fraunces-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7F1D1B0C706F6397245A0BF0 /* Fraunces-Medium.ttf */; };
@@ -39,7 +37,6 @@
 		5B13DA79B4AC7453D868630B /* Fraunces-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 747D2F3B56EEE28598D1536A /* Fraunces-LightItalic.ttf */; };
 		5C6B00911C4B919BE7AA7B0E /* PlanEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F8ED3535E0F5907E9AE4267 /* PlanEditView.swift */; };
 		5F862E196FF0910C46CC6F36 /* PatreonGateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76EDCC53D92978C810161580 /* PatreonGateView.swift */; };
-
 		6F888519D7D6238904329600 /* SessionDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF23FA6E5F2C1983F9EF2ADA /* SessionDetailSheet.swift */; };
 		73B281FD62E689360910B786 /* champion_plan_100k.json in Resources */ = {isa = PBXBuildFile; fileRef = 2B21B45B9C3E88F085CD54AC /* champion_plan_100k.json */; };
 		74326E628177691CA8E40514 /* swap_50mile_12w.json in Resources */ = {isa = PBXBuildFile; fileRef = 43AD51FDF5F6406D076D2693 /* swap_50mile_12w.json */; };
@@ -79,6 +76,7 @@
 		E1963A5737DE23227CF28C39 /* SessionSkip.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE203E8195572E02039CA8A7 /* SessionSkip.swift */; };
 		E1B5DFAB2881392BD72E03D7 /* GeistMono-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BE39EF6B9313E979362B4DFA /* GeistMono-Regular.ttf */; };
 		E688C16BC8826DF7E7C0299E /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80616D13A59D3EE3E33D4BB0 /* Config.swift */; };
+		EAF3D040A8C02849A0D286A9 /* CompletionPulse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9505322259DE7B0D0FA76407 /* CompletionPulse.swift */; };
 		ECA172E1A515382BE4F35587 /* TrainingPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45B651E1F7E6BF915FDAD19D /* TrainingPlan.swift */; };
 		F01A1E8C6E3FCF41A197A9B2 /* TrainingPlanTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9CDAEB606327522B08C1277 /* TrainingPlanTemplate.swift */; };
 		F43D0DDC2380114E3655EA97 /* GeistMono-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 62A149729ECB7294CE4DE3A2 /* GeistMono-Medium.ttf */; };
@@ -115,7 +113,6 @@
 		28888F4CADF007802DC7B327 /* swap_50k_12w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_50k_12w.json; sourceTree = "<group>"; };
 		2B21B45B9C3E88F085CD54AC /* champion_plan_100k.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = champion_plan_100k.json; sourceTree = "<group>"; };
 		2BF1F9E0F6BDC1529AB3ECEB /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-
 		38427D1E7D9E72609E2756A6 /* OuraDaily.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OuraDaily.swift; sourceTree = "<group>"; };
 		3895561C0376F954DE01A693 /* StravaActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StravaActivity.swift; sourceTree = "<group>"; };
 		3922D09D3B1CE07E2DC0618A /* PlanSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanSetupView.swift; sourceTree = "<group>"; };
@@ -137,7 +134,6 @@
 		73F7D70B55AEC2E0E3D0A3F1 /* TrainingPlanStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlanStore.swift; sourceTree = "<group>"; };
 		747D2F3B56EEE28598D1536A /* Fraunces-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-LightItalic.ttf"; sourceTree = "<group>"; };
 		76EDCC53D92978C810161580 /* PatreonGateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatreonGateView.swift; sourceTree = "<group>"; };
-
 		7F1D1B0C706F6397245A0BF0 /* Fraunces-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-Medium.ttf"; sourceTree = "<group>"; };
 		80616D13A59D3EE3E33D4BB0 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		84A8563FB47BFB14F6BC6B82 /* StretchSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StretchSession.swift; sourceTree = "<group>"; };
@@ -149,6 +145,7 @@
 		8F993B088CB2456C7010C691 /* DistanceFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceFormatter.swift; sourceTree = "<group>"; };
 		918F92B620FAA4E228B0FEA8 /* ProgressDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressDashboardView.swift; sourceTree = "<group>"; };
 		9337955CF90D612D318CF4D3 /* PatreonVerificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatreonVerificationTests.swift; sourceTree = "<group>"; };
+		9505322259DE7B0D0FA76407 /* CompletionPulse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionPulse.swift; sourceTree = "<group>"; };
 		9A38A933814A196F882D4075 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9A7B5C389858A370B1F4C111 /* Fraunces-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-SemiBold.ttf"; sourceTree = "<group>"; };
 		9F87F3437D6620980FC04F13 /* TrainingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingApp.swift; sourceTree = "<group>"; };
@@ -165,7 +162,6 @@
 		C9E3334CD2A1CADF65CFCBC1 /* swap_200_mile_16w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_200_mile_16w.json; sourceTree = "<group>"; };
 		CC41AACC3D838045702D918B /* WorkoutType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutType.swift; sourceTree = "<group>"; };
 		CCB069788F05CECEBBE77DB1 /* PlanTemplateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanTemplateService.swift; sourceTree = "<group>"; };
-		CD128F03DE17FF51C05DD6BB /* TodayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayView.swift; sourceTree = "<group>"; };
 		D1D2D3BC0E8B003565E5025D /* ProgressionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionEngine.swift; sourceTree = "<group>"; };
 		D3B804FFEB9BCC2927068518 /* PlanCacheServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanCacheServiceTests.swift; sourceTree = "<group>"; };
 		D530D92A8022C6A3EDAAF7FC /* StretchDayDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StretchDayDetailView.swift; sourceTree = "<group>"; };
@@ -272,14 +268,6 @@
 			path = Shared;
 			sourceTree = "<group>";
 		};
-		510BB2D4CDD4CCC5591335D9 /* Today */ = {
-			isa = PBXGroup;
-			children = (
-				CD128F03DE17FF51C05DD6BB /* TodayView.swift */,
-			);
-			path = Today;
-			sourceTree = "<group>";
-		};
 		5F11213DB4AFEE7167EE2EA8 /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -293,7 +281,6 @@
 				44242B1A981CF5EC988BBB73 /* Shared */,
 				32CAB2D0659553250CDC6DB1 /* Strength */,
 				F03EDEBBBE5D286F7A2B225F /* Stretch */,
-				510BB2D4CDD4CCC5591335D9 /* Today */,
 				E219DEB298E9E41BC55A4D99 /* Week */,
 			);
 			path = Views;
@@ -346,6 +333,7 @@
 			isa = PBXGroup;
 			children = (
 				DEDB45B76A4FF654A550A7B1 /* BrandKit.swift */,
+				9505322259DE7B0D0FA76407 /* CompletionPulse.swift */,
 			);
 			path = Design;
 			sourceTree = "<group>";
@@ -590,6 +578,7 @@
 				0320FED4E3077437515CB210 /* AppleSignInSupport.swift in Sources */,
 				09774BD7EFE32B98FAA923B5 /* AuthService.swift in Sources */,
 				8219FFB2F7BB6FAEBC38FE8A /* BrandKit.swift in Sources */,
+				EAF3D040A8C02849A0D286A9 /* CompletionPulse.swift in Sources */,
 				E688C16BC8826DF7E7C0299E /* Config.swift in Sources */,
 				428D482FC220B2EED7ED9E42 /* ContentView.swift in Sources */,
 				0370DD343DBEEE8B5631A2B2 /* DistanceFormatter.swift in Sources */,
@@ -633,7 +622,6 @@
 				91F73DDAD65FB6A7B8DAB572 /* StretchSession.swift in Sources */,
 				74D59E0E891ACBFAB0FCBDF4 /* StretchStore.swift in Sources */,
 				4FEB95CBCCFD82F3BB85C43E /* SupabaseService.swift in Sources */,
-				38E21BCC2AE7689810BC810C /* TodayView.swift in Sources */,
 				81C19CA3CED21D9AD1984C4C /* TrainingApp.swift in Sources */,
 				ECA172E1A515382BE4F35587 /* TrainingPlan.swift in Sources */,
 				45A9B030933515CFFDBBC98B /* TrainingPlanStore.swift in Sources */,
@@ -736,7 +724,7 @@
 				CODE_SIGN_ENTITLEMENTS = Training.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = WHKX4QF56D;
 				DEV_SIGNIN_ALLOWED = NO;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -746,7 +734,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.6;
+				MARKETING_VERSION = 1.0.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jatler.Training;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
@@ -781,7 +769,7 @@
 				CODE_SIGN_ENTITLEMENTS = Training.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 7;
+				CURRENT_PROJECT_VERSION = 8;
 				DEVELOPMENT_TEAM = WHKX4QF56D;
 				DEV_SIGNIN_ALLOWED = NO;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -791,7 +779,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.6;
+				MARKETING_VERSION = 1.0.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jatler.Training;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;

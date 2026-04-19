@@ -72,7 +72,7 @@ struct PatreonGateView: View {
                 Text("SWAP Training Plans")
                     .font(TrailFont.title)
                 Text("Exclusive to SWAP Running Patrons")
-                    .font(TrailFont.detail)
+                    .font(TrailFont.body)
                     .foregroundStyle(.secondary)
                     .accessibilityHidden(true)
             }
@@ -96,7 +96,7 @@ struct PatreonGateView: View {
 
                 Link(destination: BrandKit.patreonURL) {
                     Text("Subscribe on Patreon ↗")
-                        .font(TrailFont.detail)
+                        .font(TrailFont.body)
                         .foregroundStyle(Color.trailGreen)
                 }
                 .accessibilityLabel("Subscribe to SWAP on Patreon - opens in browser")
@@ -119,7 +119,7 @@ struct PatreonGateView: View {
         VStack(spacing: 16) {
             Spacer()
             ProgressView("Checking your membership\u{2026}")
-                .font(TrailFont.detail)
+                .font(TrailFont.body)
                 .foregroundStyle(.secondary)
             Spacer()
         }
@@ -139,7 +139,7 @@ struct PatreonGateView: View {
                 Text("Patreon Connected")
                     .font(TrailFont.title)
                 Text("Account not subscribed at $5+/mo")
-                    .font(TrailFont.detail)
+                    .font(TrailFont.body)
                     .foregroundStyle(.secondary)
             }
 
@@ -163,7 +163,7 @@ struct PatreonGateView: View {
                     patreon.disconnect()
                 } label: {
                     Text("Try another account")
-                        .font(TrailFont.detail)
+                        .font(TrailFont.body)
                         .foregroundStyle(.secondary)
                 }
             }
@@ -180,7 +180,7 @@ struct PatreonGateView: View {
                 .padding(.top, 16)
 
             Text("Couldn't reach Patreon. Check your connection.")
-                .font(TrailFont.detail)
+                .font(TrailFont.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
 
@@ -202,7 +202,7 @@ struct PatreonGateView: View {
                     dismiss()
                 } label: {
                     Text("Continue anyway")
-                        .font(TrailFont.detail)
+                        .font(TrailFont.body)
                         .foregroundStyle(.secondary)
                 }
             }

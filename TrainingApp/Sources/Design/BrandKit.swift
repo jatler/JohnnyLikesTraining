@@ -11,19 +11,11 @@ extension Color {
 // MARK: - Typography
 
 enum TrailFont {
-    static let title      = Font.custom("Fraunces-Medium", size: 20, relativeTo: .headline)
-    static let titleBold  = Font.custom("Fraunces-SemiBold", size: 20, relativeTo: .headline)
-    static let body       = Font.system(size: 17, weight: .regular, design: .default)
-    static let bodyBold   = Font.system(size: 17, weight: .semibold, design: .default)
-    static let detail     = Font.system(size: 15, weight: .regular, design: .default)
-    static let detailBold = Font.system(size: 15, weight: .semibold, design: .default)
-    static let meta       = Font.system(size: 12, weight: .regular, design: .default)
-    static let metaBold   = Font.system(size: 12, weight: .semibold, design: .default)
-    static let coach      = Font.system(size: 15, weight: .regular, design: .default)
-    static let data       = Font.custom("GeistMono-Regular", size: 13, relativeTo: .caption)
-    static let dataBold   = Font.custom("GeistMono-Medium", size: 13, relativeTo: .caption)
-    static let dataLarge  = Font.custom("GeistMono-Medium", size: 24, relativeTo: .title)
-    static let dataHero   = Font.custom("GeistMono-Medium", size: 28, relativeTo: .largeTitle)
+    static let title = Font.custom("GeistMono-Medium", size: 20, relativeTo: .headline)
+    static let body  = Font.system(size: 17, weight: .regular, design: .default)
+    static let meta  = Font.system(size: 12, weight: .regular, design: .default)
+    static let coach = Font.custom("Fraunces-Medium", size: 16, relativeTo: .body)
+    static let data  = Font.custom("GeistMono-Regular", size: 13, relativeTo: .caption)
 }
 
 // MARK: - Brand Constants

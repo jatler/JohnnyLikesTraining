@@ -12,28 +12,28 @@ enum SessionComponents {
                         Image(systemName: score >= 85 ? "crown.fill" : "circle.fill")
                             .foregroundStyle(readinessColor(recovery.readinessLevel))
                         Text("Rdy").font(TrailFont.data).foregroundStyle(.secondary)
-                        Text("\(score)").font(TrailFont.dataBold)
+                        Text("\(score)").font(TrailFont.data)
                     }
                 }
                 if let sleep = recovery.sleepScore {
                     HStack(spacing: 3) {
                         Image(systemName: "moon.fill").foregroundStyle(.blue)
                         Text("Slp").font(TrailFont.data).foregroundStyle(.secondary)
-                        Text("\(sleep)").font(TrailFont.dataBold)
+                        Text("\(sleep)").font(TrailFont.data)
                     }
                 }
                 if let hrv = recovery.hrvAverage {
                     HStack(spacing: 3) {
                         Image(systemName: "waveform.path.ecg").foregroundStyle(.purple)
                         Text("HRV").font(TrailFont.data).foregroundStyle(.secondary)
-                        Text(String(format: "%.0f", hrv)).font(TrailFont.dataBold)
+                        Text(String(format: "%.0f", hrv)).font(TrailFont.data)
                     }
                 }
                 if let rhr = recovery.restingHr {
                     HStack(spacing: 3) {
                         Image(systemName: "heart.fill").foregroundStyle(.red)
                         Text("RHR").font(TrailFont.data).foregroundStyle(.secondary)
-                        Text("\(rhr)").font(TrailFont.dataBold)
+                        Text("\(rhr)").font(TrailFont.data)
                     }
                 }
                 Spacer()
@@ -72,11 +72,11 @@ enum SessionComponents {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(.green)
                     Text("Completed: \(activity.name)")
-                        .font(TrailFont.dataBold)
+                        .font(TrailFont.data)
                     Spacer()
                     if !activity.isRun {
                         Text(activity.activityTypeDisplay)
-                            .font(TrailFont.metaBold)
+                            .font(TrailFont.meta)
                             .foregroundStyle(.white)
                             .padding(.horizontal, 6)
                             .padding(.vertical, 2)
@@ -154,7 +154,7 @@ enum SessionComponents {
                 .foregroundStyle(.secondary)
 
             Text(actual)
-                .font(TrailFont.dataBold)
+                .font(TrailFont.data)
 
             if let planned {
                 Text("Plan: \(planned)")
@@ -164,7 +164,7 @@ enum SessionComponents {
 
             if let delta, abs(delta) >= 1 {
                 Text(String(format: "%+.0f%%", delta))
-                    .font(TrailFont.dataBold)
+                    .font(TrailFont.data)
                     .foregroundStyle(delta >= 0 ? .green : .orange)
             }
         }

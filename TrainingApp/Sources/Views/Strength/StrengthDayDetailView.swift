@@ -57,6 +57,7 @@ struct StrengthDayDetailView: View {
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: session.isComplete ? "checkmark.circle.fill" : "circle")
+                            .completionPulse(session.isComplete)
                         Text(session.isComplete ? "Done" : "Mark Done")
                             .font(TrailFont.meta)
                     }

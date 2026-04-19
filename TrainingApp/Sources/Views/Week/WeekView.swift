@@ -4,15 +4,11 @@ struct WeekView: View {
     @Environment(TrainingPlanStore.self) private var planStore
     @Environment(StravaService.self) private var strava
     @Environment(StrengthStore.self) private var strengthStore
-    @Environment(HeatStore.self) private var heatStore
-    @Environment(StretchStore.self) private var stretchStore
+    @Environment(OuraService.self) private var oura
 
     @State private var selectedWeek: Int = 1
     @State private var selectedSession: PlannedSession?
     @State private var hasInitialized = false
-    @State private var selectedStrengthDay: StrengthDaySelection?
-    @State private var selectedHeatSession: HeatSession?
-    @State private var selectedStretchDay: StretchDaySelection?
     @State private var showingPlanSetup = false
 
     var body: some View {
@@ -41,11 +37,14 @@ struct WeekView: View {
     private var weekContent: some View {
         VStack(spacing: 0) {
             weekNavigator
-
             weekSummaryBar
 
             ScrollView {
-                LazyVStack(spacing: 12) {
+                LazyVStack(spacing: 6) {
+                    if let todaySession = todaySession {
+                        readinessBanner(for: todaySession)
+                    }
+
                     let sessions = planStore.sessions(for: selectedWeek)
                         .filter { $0.workoutType != .strength }
                     ForEach(sessions) { session in
@@ -53,8 +52,8 @@ struct WeekView: View {
                             .onTapGesture { selectedSession = session }
                     }
                 }
-                .padding()
-                .padding(.bottom, 20)
+                .padding(.horizontal)
+                .padding(.vertical, 8)
             }
         }
         .frame(maxHeight: .infinity)
@@ -67,15 +66,6 @@ struct WeekView: View {
         .sheet(item: $selectedSession) { session in
             SessionDetailSheet(session: session)
         }
-        .sheet(item: $selectedStrengthDay) { selection in
-            StrengthDayDetailView(weekNumber: selection.weekNumber, dayOfWeek: selection.dayOfWeek)
-        }
-        .sheet(item: $selectedHeatSession) { session in
-            HeatLogSheet(session: session)
-        }
-        .sheet(item: $selectedStretchDay) { selection in
-            StretchDayDetailView(weekNumber: selection.weekNumber, dayOfWeek: selection.dayOfWeek)
-        }
     }
 
     // MARK: - Week Navigator
@@ -84,7 +74,7 @@ struct WeekView: View {
         VStack(alignment: .leading, spacing: 4) {
             HStack {
                 Text("Week \(selectedWeek)")
-                    .font(TrailFont.dataLarge)
+                    .font(TrailFont.title)
                     .foregroundStyle(.white)
 
                 Spacer()
@@ -118,14 +108,15 @@ struct WeekView: View {
                     .foregroundStyle(.white.opacity(0.85))
 
                 if planStore.currentWeekNumber == selectedWeek {
-                    Text("Current Week")
+                    Text("Current")
                         .font(TrailFont.meta)
                         .foregroundStyle(.white)
                         .fontWeight(.semibold)
                 }
             }
         }
-        .padding()
+        .padding(.horizontal)
+        .padding(.vertical, 10)
         .background(Color.trailGreen)
         .tint(.white)
     }
@@ -138,7 +129,7 @@ struct WeekView: View {
         return "\(start) \u{2013} \(end)"
     }
 
-    // MARK: - Week Summary Bar
+    // MARK: - Week Summary Bar (runs-only)
 
     private var weekSummaryBar: some View {
         let calendar = Calendar.current
@@ -148,7 +139,6 @@ struct WeekView: View {
         let plannedMi = trackableRuns.compactMap(\.targetDistanceMi).reduce(0, +)
         let skipped = trackableRuns.filter { planStore.isSkipped($0.id) }.count
 
-        // Count ALL running activities: matched + unmatched in week date range (matches Progress tab)
         var actualMi: Double = 0
         var runsDone = 0
         var countedActivityIds: Set<Int64> = []
@@ -173,57 +163,20 @@ struct WeekView: View {
             }
         }
 
-        // Cross-training hours
-        var crossTrainSeconds = 0
-        for session in weekSessions {
-            if let activity = strava.activity(for: session.id), activity.isCrossTraining {
-                crossTrainSeconds += activity.movingTimeSeconds
-            }
-        }
-        let crossTrainHours = Double(crossTrainSeconds) / 3600.0
-
-        let weekStrengthDates = Set(
-            strengthStore.sessions
-                .filter { $0.weekNumber == selectedWeek }
-                .map { calendar.startOfDay(for: $0.scheduledDate) }
-        )
-        let strengthDone = weekStrengthDates.filter { date in
-            strengthStore.isDayComplete(on: date, stravaActivities: strava.activities)
-        }.count
-
-        let weekStretchDates = Set(
-            stretchStore.sessions
-                .filter { $0.weekNumber == selectedWeek }
-                .map { calendar.startOfDay(for: $0.scheduledDate) }
-        )
-        let stretchDone = weekStretchDates.filter { stretchStore.isAllComplete(on: $0) }.count
-
-        let weekHeat = heatStore.sessions(for: selectedWeek)
-        let heatDone = weekHeat.filter { heatStore.isComplete($0.id) }.count
-
-        let totalItems = trackableRuns.count + weekStrengthDates.count + weekStretchDates.count + weekHeat.count
-        let totalDone = runsDone + strengthDone + stretchDone + heatDone
-
-        return HStack(spacing: 12) {
-            Label(String(format: "%.1f mi planned", plannedMi), systemImage: "target")
+        return HStack(spacing: 10) {
+            Label(String(format: "%.1f planned", plannedMi), systemImage: "target")
                 .font(TrailFont.data)
 
             if actualMi > 0 {
-                Label(String(format: "%.1f mi done", actualMi), systemImage: "checkmark.circle")
+                Label(String(format: "%.1f done", actualMi), systemImage: "checkmark.circle")
                     .font(TrailFont.data)
                     .foregroundStyle(.green)
             }
 
-            if crossTrainHours > 0 {
-                Label(String(format: "%.1fh XT", crossTrainHours), systemImage: "figure.mixed.cardio")
-                    .font(TrailFont.data)
-                    .foregroundStyle(.orange)
-            }
-
             Spacer()
 
-            if totalDone > 0 {
-                Text("\(totalDone)/\(totalItems) done")
+            if runsDone > 0 {
+                Text("\(runsDone)/\(trackableRuns.count) runs")
                     .font(TrailFont.data)
                     .foregroundStyle(.green)
             }
@@ -234,168 +187,143 @@ struct WeekView: View {
             }
         }
         .padding(.horizontal)
-        .padding(.vertical, 8)
+        .padding(.vertical, 6)
         .background(.bar)
     }
 
-    // MARK: - Session Row
+    // MARK: - Session Row (≤48pt tall)
 
     private func sessionRow(_ session: PlannedSession) -> some View {
         let skipped = planStore.isSkipped(session.id)
         let isToday = Calendar.current.isDateInToday(session.scheduledDate)
         let activity = strava.activity(for: session.id)
-        let overridden = planStore.isOverridden(session.id)
-        let daySessions = strengthStore.sessions(for: session.scheduledDate)
-        let dayHeat = heatStore.sessions(for: session.scheduledDate)
-        let dayStretch = stretchStore.sessions(for: session.scheduledDate)
 
-        return HStack(alignment: .top, spacing: 12) {
-            VStack(spacing: 2) {
+        return HStack(spacing: 12) {
+            VStack(spacing: 0) {
                 Text(session.scheduledDate.formatted(.dateTime.weekday(.abbreviated)))
                     .font(TrailFont.meta)
                     .foregroundStyle(.secondary)
                 Text("\(Calendar.current.component(.day, from: session.scheduledDate))")
                     .font(TrailFont.title)
             }
-            .frame(width: 40)
+            .frame(width: 36)
 
             Image(systemName: session.workoutType.iconName)
-                .font(TrailFont.body)
+                .font(.system(size: 14))
                 .foregroundStyle(session.workoutType.swiftUIColor)
-                .frame(width: 32, height: 32)
+                .frame(width: 28, height: 28)
                 .background(session.workoutType.swiftUIColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
 
-            VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 6) {
-                    Text(session.workoutType.displayName)
-                        .font(TrailFont.title)
-                        .strikethrough(skipped)
+            HStack(spacing: 6) {
+                Text(session.workoutType.displayName)
+                    .font(TrailFont.title)
+                    .strikethrough(skipped)
+                    .lineLimit(1)
 
-                    if overridden {
-                        Image(systemName: "pencil.circle.fill")
-                            .font(TrailFont.meta)
-                            .foregroundStyle(.orange)
-                    }
-                }
-
-                if let mi = session.targetDistanceMi {
+                if let mi = session.targetDistanceMi, session.workoutType != .rest {
+                    Text("·")
+                        .font(TrailFont.data)
+                        .foregroundStyle(.tertiary)
                     Text(String(format: "%.1f mi", mi))
                         .font(TrailFont.data)
                         .foregroundStyle(.secondary)
                 }
-
-                if let pace = session.targetPaceDescription, !pace.isEmpty {
-                    Text(pace)
-                        .font(TrailFont.data)
-                        .foregroundStyle(.tertiary)
-                        .lineLimit(1)
-                }
-
-                if !daySessions.isEmpty || !dayHeat.isEmpty || !dayStretch.isEmpty {
-                    HStack(spacing: 8) {
-                        if !daySessions.isEmpty {
-                            let completed = strengthStore.completedCount(for: session.scheduledDate)
-                            let total = daySessions.count
-                            let allDone = completed == total
-
-                            HStack(spacing: 3) {
-                                Image(systemName: "dumbbell.fill")
-                                if allDone {
-                                    Image(systemName: "checkmark.circle.fill")
-                                } else {
-                                    Text("\(completed)/\(total)")
-                                }
-                            }
-                            .font(TrailFont.meta)
-                            .foregroundStyle(allDone ? .green : Color.trailGreen)
-                        }
-
-                        if let heat = dayHeat.first {
-                            Button {
-                                selectedHeatSession = heat
-                            } label: {
-                                let done = heatStore.isComplete(heat.id)
-                                HStack(spacing: 3) {
-                                    Image(systemName: "flame.fill")
-                                    if done {
-                                        Image(systemName: "checkmark.circle.fill")
-                                    } else {
-                                        Text("\(heat.targetDurationMinutes)m")
-                                    }
-                                }
-                                .font(TrailFont.meta)
-                                .foregroundStyle(done ? .green : .orange)
-                            }
-                            .buttonStyle(.plain)
-                        }
-
-                        if !dayStretch.isEmpty {
-                            Button {
-                                selectedStretchDay = StretchDaySelection(
-                                    weekNumber: session.weekNumber,
-                                    dayOfWeek: session.dayOfWeek
-                                )
-                            } label: {
-                                let completed = stretchStore.completedCount(for: session.scheduledDate)
-                                let total = dayStretch.count
-                                let allDone = completed == total
-
-                                HStack(spacing: 3) {
-                                    Image(systemName: "figure.flexibility")
-                                    if allDone {
-                                        Image(systemName: "checkmark.circle.fill")
-                                    } else {
-                                        Text("\(completed)/\(total)")
-                                    }
-                                }
-                                .font(TrailFont.meta)
-                                .foregroundStyle(allDone ? .green : Color.trailGreen)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .lineLimit(1)
-                    .padding(.top, 2)
-                }
             }
 
-            Spacer()
+            Spacer(minLength: 4)
 
-            if let activity {
-                VStack(alignment: .trailing, spacing: 2) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                    if activity.isRun {
-                        Text(String(format: "%.1f mi", activity.distanceMi))
-                            .font(TrailFont.data)
-                            .foregroundStyle(.green)
-                    } else {
-                        Text(activity.activityTypeDisplay)
-                            .font(TrailFont.data)
-                            .foregroundStyle(.green)
-                    }
-                }
-            } else if skipped {
-                Text("Skipped")
-                    .font(TrailFont.meta)
-                    .foregroundStyle(.red)
-                    .fontWeight(.semibold)
-            }
-
-            Image(systemName: "chevron.right")
-                .font(TrailFont.meta)
-                .foregroundStyle(.quaternary)
+            trailingStatus(session: session, activity: activity, skipped: skipped)
         }
-        .padding(12)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 8)
+        .frame(minHeight: 44)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(isToday ? session.workoutType.swiftUIColor.opacity(0.08) : Color(.systemBackground))
+            RoundedRectangle(cornerRadius: 10)
+                .fill(isToday ? session.workoutType.swiftUIColor.opacity(0.10) : Color(.systemBackground))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(isToday ? session.workoutType.swiftUIColor.opacity(0.3) : .clear, lineWidth: 1)
+            RoundedRectangle(cornerRadius: 10)
+                .strokeBorder(isToday ? session.workoutType.swiftUIColor.opacity(0.35) : .clear, lineWidth: 1)
         )
-        .opacity(skipped ? 0.6 : 1.0)
+        .opacity(skipped ? 0.55 : 1.0)
+    }
+
+    @ViewBuilder
+    private func trailingStatus(session: PlannedSession, activity: StravaActivity?, skipped: Bool) -> some View {
+        if let activity {
+            HStack(spacing: 4) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 14))
+                    .foregroundStyle(.green)
+                if activity.isRun {
+                    Text(String(format: "%.1f", activity.distanceMi))
+                        .font(TrailFont.data)
+                        .foregroundStyle(.green)
+                }
+            }
+        } else if skipped {
+            Text("Skipped")
+                .font(TrailFont.meta)
+                .foregroundStyle(.red)
+                .fontWeight(.semibold)
+        } else {
+            Image(systemName: "chevron.right")
+                .font(.system(size: 12))
+                .foregroundStyle(.quaternary)
+        }
+    }
+
+    // MARK: - Readiness banner (ported from former Today tab)
+
+    private var todaySession: PlannedSession? {
+        let today = Calendar.current.startOfDay(for: Date())
+        return planStore.sessions(for: selectedWeek)
+            .first { Calendar.current.isDate($0.scheduledDate, inSameDayAs: today) }
+    }
+
+    @ViewBuilder
+    private func readinessBanner(for session: PlannedSession) -> some View {
+        if let today = oura.todayReadiness(),
+           today.readinessLevel == .low,
+           session.workoutType != .easy,
+           session.workoutType != .rest,
+           session.workoutType != .recovery,
+           !planStore.isSkipped(session.id),
+           let easyDay = planStore.nearestEasyDay(for: session) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(spacing: 6) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                    Text("Low readiness (\(today.readinessScore ?? 0))")
+                        .font(TrailFont.body)
+                        .fontWeight(.semibold)
+                }
+
+                Text("Swap today's \(session.workoutType.displayName) with \(easyDay.scheduledDate.formatted(.dateTime.weekday(.wide)))'s \(easyDay.workoutType.displayName)?")
+                    .font(TrailFont.body)
+                    .foregroundStyle(.secondary)
+
+                Button {
+                    planStore.swapSessions(session, with: easyDay, reason: "Low readiness (\(today.readinessScore ?? 0))")
+                    if let planId = planStore.activePlan?.id {
+                        strengthStore.refreshFromPlannedSessions(planStore.sessions, planId: planId)
+                    }
+                } label: {
+                    Label("Swap to \(easyDay.workoutType.displayName)", systemImage: "arrow.left.arrow.right.circle.fill")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .tint(.orange)
+                .controlSize(.small)
+            }
+            .padding(10)
+            .background(.orange.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .strokeBorder(.orange.opacity(0.3), lineWidth: 1)
+            )
+            .padding(.bottom, 4)
+        }
     }
 
     // MARK: - Empty State
@@ -413,7 +341,7 @@ struct WeekView: View {
                 .foregroundStyle(.secondary)
 
             Text("Create a training plan to see your weekly schedule.")
-                .font(TrailFont.detail)
+                .font(TrailFont.body)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
@@ -436,6 +364,5 @@ struct WeekView: View {
         .environment(TrainingPlanStore())
         .environment(StravaService())
         .environment(StrengthStore())
-        .environment(HeatStore())
-        .environment(StretchStore())
+        .environment(OuraService())
 }

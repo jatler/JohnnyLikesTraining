@@ -50,7 +50,7 @@ struct StretchDayDetailView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("\(completed)/\(total) stretches done")
-                    .font(TrailFont.detailBold)
+                    .font(TrailFont.body)
 
                 ProgressView(value: Double(completed), total: Double(total))
                     .tint(Color.trailGreen)
@@ -81,6 +81,7 @@ struct StretchDayDetailView: View {
                     Image(systemName: complete ? "checkmark.circle.fill" : "circle")
                         .font(.title3)
                         .foregroundStyle(complete ? .green : .secondary.opacity(0.4))
+                        .completionPulse(complete)
                 }
 
                 VStack(alignment: .leading, spacing: 2) {
@@ -90,7 +91,7 @@ struct StretchDayDetailView: View {
                         .foregroundStyle(complete ? .secondary : .primary)
 
                     Text(prescriptionText(session))
-                        .font(TrailFont.detail)
+                        .font(TrailFont.body)
                         .foregroundStyle(.secondary)
                 }
 
@@ -98,7 +99,7 @@ struct StretchDayDetailView: View {
 
                 if session.isBilateral {
                     Text("Bilateral")
-                        .font(TrailFont.metaBold)
+                        .font(TrailFont.meta)
                         .foregroundStyle(.secondary)
                         .padding(.horizontal, 6)
                         .padding(.vertical, 2)

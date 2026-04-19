@@ -15,55 +15,40 @@
 
 ## Typography
 
-Three font families, strict separation of concerns.
+Three font families, five tokens. No aliases, no size variants.
 
 ### Font Families
 
-| Font          | Role                  | Weights used             |
-|---------------|-----------------------|--------------------------|
-| Fraunces      | Section labels only   | Medium (500), SemiBold (600) |
-| SF Pro (system) | All body/UI text    | Regular (400), SemiBold (600) |
-| Geist Mono    | Stats, data, tab headers, activity titles | Regular (400), Medium (500) |
+| Font          | Role                                     | Weights used    |
+|---------------|------------------------------------------|-----------------|
+| Geist Mono    | Tab titles, section headers, data/stats  | Regular, Medium |
+| SF Pro (system) | Body UI copy, metadata, captions       | Regular, Semibold (inline) |
+| Fraunces      | Coach voice (prose only)                 | Medium          |
 
 ### iOS Token Reference (`TrailFont.*`)
 
-| Token       | Font            | Size | Weight | Usage                                              |
-|-------------|-----------------|------|--------|----------------------------------------------------|
-| `title`     | Fraunces        | 20pt | 500    | Section labels: "Coach notes", "Strength", "Heat"  |
-| `titleBold` | Fraunces        | 20pt | 600    | Emphasized section labels                          |
-| `body`      | SF Pro          | 17pt | 400    | Exercise names, workout descriptions               |
-| `bodyBold`  | SF Pro          | 17pt | 600    | Emphasized body text                               |
-| `detail`    | SF Pro          | 15pt | 400    | Descriptions, pace text, week/day labels           |
-| `detailBold`| SF Pro          | 15pt | 600    | Form labels, sub-section headers                   |
-| `meta`      | SF Pro          | 12pt | 400    | Dates, counts, badges, attribution                 |
-| `metaBold`  | SF Pro          | 12pt | 600    | Emphasized metadata, badge labels                  |
-| `coach`     | SF Pro          | 15pt | 400    | Coach notes text (readable, not decorative)        |
-| `data`      | Geist Mono      | 13pt | 400    | Inline stats: pace, distance, HR, elevation, Oura scores, prescriptions |
-| `dataBold`  | Geist Mono      | 13pt | 500    | Emphasized stats: Strava titles, comparison values, deltas |
-| `dataLarge` | Geist Mono      | 24pt | 500    | Tab headers ("Today", "Week 11"), activity type titles ("Long Run"), hero stat callouts |
-| `dataHero`  | Geist Mono      | 28pt | 500    | App title on sign-in screen                        |
+| Token    | Font           | Size | Weight | Usage                                                              |
+|----------|----------------|------|--------|--------------------------------------------------------------------|
+| `title`  | Geist Mono     | 20pt | 500    | Tab titles, section headers, workout-type names, week numbers      |
+| `body`   | SF Pro         | 17pt | 400    | Primary UI text: exercise names, descriptions, form copy           |
+| `meta`   | SF Pro         | 12pt | 400    | Metadata: dates, badges, counts, attribution, small captions       |
+| `coach`  | Fraunces       | 16pt | 500    | Coach notes prose only — the one place serif voice is allowed       |
+| `data`   | Geist Mono     | 13pt | 400    | Inline stats: distance, pace, HR, elevation, Oura scores, sets×reps |
+
+When a variant needs emphasis, apply `.fontWeight(.semibold)` inline at the call site — do not add a new token.
 
 ### When to Use Each Font
 
-**Fraunces (serif, for labels only):**
-- Section labels that name a category: "Coach notes", "Strength", "Stretches", "Heat", "Race Readiness"
-- Day names in week view session rows (the date number)
-- Plan names
+**Geist Mono (`title`, `data`):**
+- Tab titles ("Week 11", "Progress"), section headers ("Coach notes", "Strength"), workout-type names ("Long Run", "Tempo")
+- All numerical values: distances, paces, durations, HR, elevation, scores, prescriptions
 
-**SF Pro (system sans-serif, for all readable text):**
-- Exercise and workout names in lists
-- Coach notes body text
-- Descriptions, prescriptions (as prose)
-- Form labels and input text
-- All metadata: dates, badges, attribution, "Connected", "Last sync"
+**SF Pro (`body`, `meta`):**
+- Primary UI text and descriptions (body)
+- All small labels, badges, counts, timestamps (meta)
 
-**Geist Mono (monospace, for data and headers):**
-- Tab headers: "Today", "Week 11", "Progress", "Strength & More", "Settings"
-- Activity type titles: "Long Run", "Tempo", "Easy", "Intervals"
-- All numerical values: distances (8.2 mi), paces (7:42/mi), durations (1:03:27), HR (152 bpm), elevation (+485 ft), Oura scores (Readiness 82), reps/weight (3x10 @ 45 lbs)
-- Strava activity titles: "Completed: Morning Run"
-- Hero stat callouts: days to race, completion %, week counts
-- Prescriptions as data: "3x10s", "45s hold", "25 min"
+**Fraunces (`coach`):**
+- Coach notes prose **only**. Serif voice carries the "coach's notebook" feeling; anywhere else it would compete with the monospace + sans system.
 
 ### Rules
 
@@ -72,9 +57,8 @@ Three font families, strict separation of concerns.
 - `.font(.title2)` and `.font(.title3)` are allowed ONLY on SF Symbol `Image` views.
 - No inline `Font.custom()` or `Font.system()` calls outside BrandKit.swift. All font access goes through `TrailFont.*`.
 - Use `.strikethrough()` for completed/skipped items, not opacity reduction.
-- Navigation bar titles are hidden on all tab views. Each tab renders its own header using `TrailFont.dataLarge`.
-- Fraunces is for labels only, never body text, never stats, never notes.
-- Coach notes use SF Pro, not Fraunces. Readability over decoration.
+- Navigation bar titles are hidden on all tab views. Each tab renders its own header using `TrailFont.title`.
+- Fraunces is used **only** for `coach`. Not for headers, labels, stats, or generic body copy.
 
 ### Website
 

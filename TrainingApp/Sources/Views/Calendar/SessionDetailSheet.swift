@@ -7,7 +7,6 @@ struct SessionDetailSheet: View {
     @Environment(OuraService.self) private var oura
     @Environment(StrengthStore.self) private var strengthStore
     @Environment(HeatStore.self) private var heatStore
-    @Environment(StretchStore.self) private var stretchStore
     @Environment(\.dismiss) private var dismiss
 
     @State private var showingSwapTargets = false
@@ -103,8 +102,6 @@ struct SessionDetailSheet: View {
 
             strengthSection
 
-            stretchSection
-
             heatSection
 
             if let recovery = dayRecovery {
@@ -138,7 +135,7 @@ struct SessionDetailSheet: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("Workout Type")
-                    .font(TrailFont.detailBold)
+                    .font(TrailFont.body)
                     .foregroundStyle(.secondary)
 
                 Picker("Type", selection: $editWorkoutType) {
@@ -151,7 +148,7 @@ struct SessionDetailSheet: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("Distance (miles)")
-                    .font(TrailFont.detailBold)
+                    .font(TrailFont.body)
                     .foregroundStyle(.secondary)
 
                 TextField("e.g. 8.0", text: $editDistanceMi)
@@ -161,7 +158,7 @@ struct SessionDetailSheet: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("Effort / Pace")
-                    .font(TrailFont.detailBold)
+                    .font(TrailFont.body)
                     .foregroundStyle(.secondary)
 
                 TextField("e.g. Easy effort, Z1/Z2", text: $editPace)
@@ -196,7 +193,7 @@ struct SessionDetailSheet: View {
             }
 
             Toggle("Apply to all \(dayOfWeekName)s", isOn: $propagateToSameDay)
-                .font(TrailFont.detail)
+                .font(TrailFont.body)
 
             if isOverridden {
                 Button {
@@ -237,7 +234,7 @@ struct SessionDetailSheet: View {
                 }
 
                 Text("Week \(session.weekNumber) \u{2022} Day \(session.dayOfWeek)")
-                    .font(TrailFont.detail)
+                    .font(TrailFont.body)
                     .foregroundStyle(.secondary)
             }
 
@@ -265,14 +262,14 @@ struct SessionDetailSheet: View {
             Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
                 .foregroundStyle(.secondary)
             Text(String(format: "%.1f mi", mi))
-                .font(TrailFont.dataBold)
+                .font(TrailFont.data)
         }
         .opacity(isSkipped ? 0.5 : 1)
     }
 
     private func paceRow(_ pace: String) -> some View {
         Label(pace, systemImage: "gauge.with.needle")
-            .font(TrailFont.detail)
+            .font(TrailFont.body)
             .foregroundStyle(.secondary)
             .opacity(isSkipped ? 0.5 : 1)
     }
@@ -280,7 +277,7 @@ struct SessionDetailSheet: View {
     private func notesSection(_ notes: String) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text("Coach notes")
-                .font(TrailFont.detailBold)
+                .font(TrailFont.body)
                 .foregroundStyle(.secondary)
             Text(notes)
                 .font(TrailFont.body)
@@ -299,7 +296,7 @@ struct SessionDetailSheet: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Label("Strength", systemImage: "dumbbell.fill")
-                        .font(TrailFont.detailBold)
+                        .font(TrailFont.body)
                         .foregroundStyle(Color.trailGreen)
 
                     Spacer()
@@ -326,6 +323,7 @@ struct SessionDetailSheet: View {
                             Image(systemName: s.isComplete ? "checkmark.circle.fill" : "circle")
                                 .font(TrailFont.meta)
                                 .foregroundStyle(s.isComplete ? AnyShapeStyle(Color.green) : AnyShapeStyle(.quaternary))
+                                .completionPulse(s.isComplete)
                         }
                         .buttonStyle(.plain)
 
@@ -344,65 +342,6 @@ struct SessionDetailSheet: View {
     }
 
     @ViewBuilder
-    private var stretchSection: some View {
-        let daySessions = stretchStore.sessions(for: session.scheduledDate)
-
-        if !daySessions.isEmpty {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Label("Stretches", systemImage: "figure.flexibility")
-                        .font(TrailFont.detailBold)
-                        .foregroundStyle(Color.trailGreen)
-
-                    Spacer()
-
-                    let completed = stretchStore.completedCount(for: session.scheduledDate)
-                    let total = daySessions.count
-
-                    if completed > 0 {
-                        Text("\(completed)/\(total) done")
-                            .font(TrailFont.meta)
-                            .foregroundStyle(.green)
-                    }
-                }
-
-                ForEach(daySessions) { s in
-                    HStack(spacing: 8) {
-                        let complete = stretchStore.isComplete(s.id)
-
-                        Image(systemName: complete ? "checkmark.circle.fill" : "circle")
-                            .font(TrailFont.meta)
-                            .foregroundStyle(complete ? .green : Color.secondary.opacity(0.3))
-
-                        Text(s.stretchName)
-                            .font(TrailFont.meta)
-                            .foregroundStyle(complete ? .secondary : .primary)
-
-                        Spacer()
-
-                        if s.isBilateral {
-                            Text("L+R")
-                                .font(TrailFont.metaBold)
-                                .foregroundStyle(.secondary)
-                                .padding(.horizontal, 5)
-                                .padding(.vertical, 1)
-                                .background(Color.secondary.opacity(0.15), in: Capsule())
-                        }
-
-                        Text("\(s.prescribedSets)×\(s.prescribedHoldSeconds)s")
-                            .font(TrailFont.meta)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
-            .padding(12)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.trailGreen.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
-            .opacity(isSkipped ? 0.5 : 1)
-        }
-    }
-
-    @ViewBuilder
     private var heatSection: some View {
         let heatSessions = heatStore.sessions(for: session.scheduledDate)
 
@@ -410,7 +349,7 @@ struct SessionDetailSheet: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Label("Heat", systemImage: "flame.fill")
-                        .font(TrailFont.detailBold)
+                        .font(TrailFont.body)
                         .foregroundStyle(.orange)
 
                     Spacer()
@@ -515,7 +454,7 @@ struct SessionDetailSheet: View {
     private var swapTargetsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Select a day to swap with:")
-                .font(TrailFont.detailBold)
+                .font(TrailFont.body)
                 .foregroundStyle(.secondary)
 
             let targets = planStore.sessions(for: session.weekNumber)
@@ -536,7 +475,7 @@ struct SessionDetailSheet: View {
 
                         VStack(alignment: .leading) {
                             Text(target.scheduledDate.formatted(.dateTime.weekday(.wide)))
-                                .font(TrailFont.detailBold)
+                                .font(TrailFont.body)
                             Text(target.workoutType.displayName)
                                 .font(TrailFont.meta)
                                 .foregroundStyle(.secondary)

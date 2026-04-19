@@ -13,11 +13,11 @@ struct SignInView: View {
 
             VStack(spacing: 8) {
                 Text("JohnnyLikesTraining")
-                    .font(TrailFont.dataHero)
+                    .font(TrailFont.title)
                     .foregroundStyle(Color.trailGreen)
 
-                Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.6")")
-                    .font(TrailFont.detail)
+                Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.7")")
+                    .font(TrailFont.body)
                     .foregroundStyle(.secondary)
             }
 

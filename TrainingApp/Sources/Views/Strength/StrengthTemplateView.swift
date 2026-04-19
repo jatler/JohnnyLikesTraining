@@ -84,7 +84,7 @@ struct StrengthTemplateView: View {
         VStack(spacing: 0) {
             VStack(spacing: 12) {
                 Text("Strength & More")
-                    .font(TrailFont.dataLarge)
+                    .font(TrailFont.title)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -127,7 +127,7 @@ struct StrengthTemplateView: View {
             if weekDays.isEmpty {
                 VStack(spacing: 8) {
                     Text("No strength sessions this week")
-                        .font(TrailFont.detail)
+                        .font(TrailFont.body)
                         .foregroundStyle(.tertiary)
                 }
                 .padding(.top, 20)
@@ -198,6 +198,7 @@ struct StrengthTemplateView: View {
                 Image(systemName: session.isComplete ? "checkmark.circle.fill" : "circle")
                     .font(.title3)
                     .foregroundStyle(session.isComplete ? .green : .secondary.opacity(0.4))
+                    .completionPulse(session.isComplete)
             }
             .buttonStyle(.plain)
 
@@ -251,7 +252,7 @@ struct StrengthTemplateView: View {
             } else {
                 VStack(spacing: 16) {
                     Text("No stretches yet.")
-                        .font(TrailFont.detail)
+                        .font(TrailFont.body)
                         .foregroundStyle(.tertiary)
 
                     if let plan = planStore.activePlan {
@@ -460,7 +461,7 @@ struct StrengthTemplateView: View {
                 }
             } else {
                 Text("No heat sessions scheduled")
-                    .font(TrailFont.detail)
+                    .font(TrailFont.body)
                     .foregroundStyle(.tertiary)
             }
 
@@ -525,7 +526,7 @@ struct StrengthTemplateView: View {
                             .foregroundStyle(.secondary)
 
                         Text("Strength workouts will appear here once you activate a training plan with coach-prescribed strength sessions.")
-                            .font(TrailFont.detail)
+                            .font(TrailFont.body)
                             .foregroundStyle(.tertiary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 40)

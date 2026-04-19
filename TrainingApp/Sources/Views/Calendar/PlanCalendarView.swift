@@ -88,7 +88,7 @@ struct PlanCalendarView: View {
 
             ForEach(0..<7, id: \.self) { i in
                 Text(dayLabels[i])
-                    .font(TrailFont.metaBold)
+                    .font(TrailFont.meta)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
             }
@@ -115,7 +115,7 @@ struct PlanCalendarView: View {
         let date = sessions.first?.scheduledDate ?? Date()
 
         return Text(date.formatted(.dateTime.month(.wide).year()))
-            .font(TrailFont.detailBold)
+            .font(TrailFont.body)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.top, week == planStore.allWeekNumbers.first ? 0 : 12)
             .padding(.bottom, 4)
@@ -141,7 +141,7 @@ struct PlanCalendarView: View {
 
         return HStack(spacing: 4) {
             Text("W\(weekNumber)")
-                .font(TrailFont.metaBold)
+                .font(TrailFont.meta)
                 .foregroundStyle(isCurrentWeek ? .blue : .secondary)
                 .frame(width: 32)
 
@@ -272,7 +272,7 @@ struct PlanCalendarView: View {
                 .foregroundStyle(.secondary)
 
             Text("Create a training plan to see your full schedule.")
-                .font(TrailFont.detail)
+                .font(TrailFont.body)
                 .foregroundStyle(.tertiary)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
