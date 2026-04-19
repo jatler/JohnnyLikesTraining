@@ -84,7 +84,7 @@ struct StrengthTemplateView: View {
         VStack(spacing: 0) {
             VStack(spacing: 12) {
                 Text("Strength & More")
-                    .font(TrailFont.title)
+                    .font(TrailFont.tabHeading)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -95,7 +95,8 @@ struct StrengthTemplateView: View {
                 }
                 .pickerStyle(.segmented)
             }
-            .padding()
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
             .background(Color.trailGreen)
 
             ScrollView {

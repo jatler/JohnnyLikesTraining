@@ -27,28 +27,32 @@ Three font families, five tokens. No aliases, no size variants.
 
 ### iOS Token Reference (`TrailFont.*`)
 
-| Token    | Font           | Size | Weight | Usage                                                              |
-|----------|----------------|------|--------|--------------------------------------------------------------------|
-| `title`  | Geist Mono     | 20pt | 500    | Tab titles, section headers, workout-type names, week numbers      |
-| `body`   | SF Pro         | 17pt | 400    | Primary UI text: exercise names, descriptions, form copy           |
-| `meta`   | SF Pro         | 12pt | 400    | Metadata: dates, badges, counts, attribution, small captions       |
-| `coach`  | Fraunces       | 16pt | 500    | Coach notes prose only — the one place serif voice is allowed       |
-| `data`   | Geist Mono     | 13pt | 400    | Inline stats: distance, pace, HR, elevation, Oura scores, sets×reps |
+| Token         | Font           | Size | Weight | Usage                                                              |
+|---------------|----------------|------|--------|--------------------------------------------------------------------|
+| `tabHeading`  | Fraunces       | 28pt | 500    | Top-of-tab display titles: "Week 11", "Progress", "Strength", "Settings" — the first thing you see on each tab |
+| `title`       | Geist Mono     | 20pt | 500    | In-tab section headers, workout-type names, numeric dates          |
+| `body`        | SF Pro         | 17pt | 400    | Primary UI text: exercise names, descriptions, form copy           |
+| `meta`        | SF Pro         | 12pt | 400    | Metadata: dates, badges, counts, attribution, small captions       |
+| `coach`       | Fraunces       | 16pt | 500    | Coach notes prose only — the one place serif voice is allowed       |
+| `data`        | Geist Mono     | 13pt | 400    | Inline stats: distance, pace, HR, elevation, Oura scores, sets×reps |
 
 When a variant needs emphasis, apply `.fontWeight(.semibold)` inline at the call site — do not add a new token.
 
 ### When to Use Each Font
 
+**Fraunces (`tabHeading`, `coach`):**
+- Tab display headings ("Week 11", "Progress", "Strength & More", "Settings") — sets the warm, editorial personality at each tab's entry point.
+- Coach notes prose (`coach`) — the only place serif runs as body text.
+
 **Geist Mono (`title`, `data`):**
-- Tab titles ("Week 11", "Progress"), section headers ("Coach notes", "Strength"), workout-type names ("Long Run", "Tempo")
-- All numerical values: distances, paces, durations, HR, elevation, scores, prescriptions
+- In-tab section headers ("Week 12 done", "Heat", weekday/numeric date columns) and workout-type names ("Long Run", "Tempo") — rendered as-is (title case).
+- All numerical values: distances, paces, durations, HR, elevation, scores, prescriptions.
+- Uppercase is reserved for short meta/pill strings — the date range under the Week title ("MAR 30 – APR 5"), the "TODAY" / "SKIPPED" status tags, and the weekday abbreviation in the date column ("MON"). Those use `data` with `.tracking(0.5)`. Longer content strings stay in natural case.
 
 **SF Pro (`body`, `meta`):**
 - Primary UI text and descriptions (body)
 - All small labels, badges, counts, timestamps (meta)
-
-**Fraunces (`coach`):**
-- Coach notes prose **only**. Serif voice carries the "coach's notebook" feeling; anywhere else it would compete with the monospace + sans system.
+- Pill labels ("TODAY", "SKIPPED") — uppercase, semibold, `.tracking(0.5)`.
 
 ### Rules
 
@@ -57,8 +61,8 @@ When a variant needs emphasis, apply `.fontWeight(.semibold)` inline at the call
 - `.font(.title2)` and `.font(.title3)` are allowed ONLY on SF Symbol `Image` views.
 - No inline `Font.custom()` or `Font.system()` calls outside BrandKit.swift. All font access goes through `TrailFont.*`.
 - Use `.strikethrough()` for completed/skipped items, not opacity reduction.
-- Navigation bar titles are hidden on all tab views. Each tab renders its own header using `TrailFont.title`.
-- Fraunces is used **only** for `coach`. Not for headers, labels, stats, or generic body copy.
+- Navigation bar titles are hidden on all tab views. Each tab renders its own header using `TrailFont.tabHeading` inside a solid Trail Green band.
+- Fraunces is used for `tabHeading` and `coach` **only**. Not for in-card section labels, stats, or generic body copy.
 
 ### Website
 
@@ -192,14 +196,16 @@ Each workout type has a dedicated color for instant recognition.
 - **Website grid:** Max width 800px, single column editorial. Asymmetric hero with generous whitespace.
 - **Border radius:**
 
-| Element          | iOS    | Web         | Token    |
-|------------------|--------|-------------|----------|
-| Small containers | 6pt    | 4px         | sm       |
-| Icon backgrounds | 8-10pt | 8px         | md       |
-| Cards            | 12pt   | 12px        | lg       |
-| Phone frame      | 32pt   | 32px        | -        |
-| Inline badges    | Capsule| 9999px      | full     |
-| Progress bars    | 3pt    | 3px         | -        |
+| Element             | iOS    | Web         | Token    |
+|---------------------|--------|-------------|----------|
+| Small containers    | 6pt    | 4px         | sm       |
+| Icon badges (card)  | 8pt    | 8px         | md       |
+| Icon badges (Week)  | 15pt   | —           | -        |
+| Day cards           | 12pt   | 12px        | lg       |
+| Week tab rows       | 18pt   | —           | -        |
+| Phone frame         | 32pt   | 32px        | -        |
+| Inline badges/pills | Capsule| 9999px      | full     |
+| Progress bars       | 3pt    | 3px         | -        |
 
 ## Motion
 
@@ -312,24 +318,22 @@ Text(coachNote)
 
 ## Tab Layout Pattern
 
-Every tab follows the same structure. Today and Week are the golden references.
+Every tab follows the same structure. Week is the golden reference — it leads on the Bold Day hierarchy refresh (2026-04-19).
 
 ### Anatomy of a Tab
 
 ```
 ┌─────────────────────────────┐
-│ Title          [actions]    │  ← Fixed header: TrailFont.dataLarge, .background(.bar)
-│ subtitle (optional)         │
-├─────────────────────────────┤
-│ Summary bar (optional)      │  ← Fixed: stats in TrailFont.data, .background(.bar)
+│ ▓▓ TAB TITLE    [actions] ▓▓│  ← Trail Green band: Fraunces 28pt "tabHeading"
+│ ▓▓ SUBTITLE / META       ▓▓│    Meta line below in Geist Mono UPPERCASE (data token)
 ├─────────────────────────────┤
 │                             │
-│   Scrollable content        │  ← ScrollView with .padding() and 12pt card spacing
+│   Scrollable content        │  ← ScrollView, 12pt padding, 10pt row gap
 │   ┌───────────────────┐     │
-│   │ Card (.regularMat)│     │
+│   │ Row (18pt radius) │     │
 │   └───────────────────┘     │
 │   ┌───────────────────┐     │
-│   │ Card              │     │
+│   │ Row               │     │
 │   └───────────────────┘     │
 │                             │
 └─────────────────────────────┘
@@ -338,44 +342,59 @@ Every tab follows the same structure. Today and Week are the golden references.
 ### Rules
 
 - **Navigation bar hidden** on all tabs. Each tab renders its own header.
-- **Header** uses `TrailFont.dataLarge` (Geist Mono 24pt), left-aligned, with `.padding()` and `.background(.bar)`.
+- **Header band** is solid Trail Green, white text, `.padding(.horizontal, 16)`, `.padding(.vertical, 12)`. Title uses `TrailFont.tabHeading` (Fraunces 28pt, Medium).
+- **Title inset:** on tabs whose body has rows with inset padding (e.g. Week), the header title and meta line are left-indented to align with the first content column below. The Week tab uses an 8pt inset (row-container 12 + row pad 12 − header pad 16 = 8).
+- **Meta line** directly under the title uses `TrailFont.data` (Geist Mono 13pt) UPPERCASE with `.tracking(0.5)`.
 - **Header stays pinned.** It is outside the ScrollView so it does not scroll away.
-- **Summary bar** (Week, Progress) sits between header and scroll content, also `.background(.bar)`.
-- **Scroll content** uses `.padding()` with `VStack(spacing: 12)` or `LazyVStack(spacing: 12)`.
-- **Cards** use `.regularMaterial` with `cornerRadius: 12`. Colored cards use `.opacity(0.06)` tint.
-- **Section labels** inside cards use `TrailFont.title` (Fraunces 20pt).
-- **All stats** use `TrailFont.data` or `TrailFont.dataBold` (Geist Mono 13pt).
-- **Trailing chevron** (`chevron.right` in `.quaternary`) on tappable rows.
+- **No summary bar** below the header on the Week tab — removed in the Bold Day refresh; summary info lives inside the content cards or is surfaced through the Progress tab instead.
+- **Scroll content** uses `LazyVStack(spacing: 10)` or `VStack(spacing: 12)` with `.padding(.horizontal, 12)` and `.padding(.vertical, 12)`.
+- **Rows** are `cornerRadius: 18`, `Color(.systemBackground)` fill with a `Color(.separator).opacity(0.3)` hairline border.
+- **Section labels** inside content use `TrailFont.title` (Geist Mono 20pt). Workout-type names render as-is (title case) — no uppercase, no tracking. Uppercase is reserved for status pills and meta strings.
+- **All stats** use `TrailFont.data` (Geist Mono 13pt).
+- **Trailing edge** on Week rows is one of: green "TODAY" pill (today), checkmark + actual distance (completed), red "SKIPPED" label (skipped), or empty (upcoming). No trailing chevron — the whole row is tappable and opens the detail sheet; an empty trailing slot lets the week's data breathe.
 - **Top alignment** (`HStack(alignment: .top)`) on multi-line rows so icons, dates, and titles align to the first line.
 
 ### Per-Tab Implementation
 
-| Tab       | Header          | Summary bar | Content style           |
-|-----------|-----------------|-------------|-------------------------|
-| Today     | (none, activity title serves as header) | — | VStack(spacing: 20), cards with coach notes |
-| Week      | "Week N" + date range + "Current Week" | Mileage stats bar | LazyVStack(spacing: 12), session rows |
-| Progress  | "Progress" | — | VStack(spacing: 24), material cards |
-| Strength  | "Strength & More" + segmented picker | — | VStack(spacing: 20), day sections |
-| Settings  | "Settings" | — | List with sections |
+| Tab       | Header                                | Summary bar | Content style                                    |
+|-----------|---------------------------------------|-------------|--------------------------------------------------|
+| Week      | "Week N" (Fraunces 28) + UPPERCASE date range meta, chevrons + calendar icon on right | — (removed) | `LazyVStack(spacing: 10)`, Bold-Day session rows |
+| Progress  | "Progress" (Fraunces 28)              | — | `VStack(spacing: 12)`, week-by-week list          |
+| Strength  | "Strength & More" (Fraunces 28) + segmented picker | — | `VStack(spacing: 12)`, day cards                 |
+| Settings  | "Settings" (Fraunces 28)              | — | Grouped `List` with sections                     |
 
-### Row Pattern (shared across all tabs)
+### Row Pattern — Week tab (Bold Day)
 
-Every tappable list item follows the same anatomy:
+The Week tab establishes the refreshed row anatomy:
 
 ```
-┌─────────────────────────────────────────────────────┐
-│ [icon badge 32x32]  Title (TrailFont.title)    [>]  │
-│                     Subtitle (TrailFont.data)        │
-│                     Status badges (TrailFont.meta)   │
-└─────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────┐
+│ ┃ MON  [icon 43×43]   Long Run             [>]  16–20 │
+│ ┃ 30   r15 0.15 tint  8–10 pace                   mi  │
+└────────────────────────────────────────────────────────┘
+   ↑    ↑                ↑
+   │    │                title title-case, TrailFont.title — no uppercase, no tracking
+   │    badge: 43×43, radius 15, hue.opacity(0.15) fill, icon 20pt in hue
+   date column: 42pt wide, TrailFont.data (MON) stacked over TrailFont.title (30), Geist Mono throughout, .secondary on every row
 ```
 
-- `HStack(alignment: .top, spacing: 12)` for top alignment
-- Icon badge: `Image(systemName:).frame(width:32, height:32).background(color.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))`
+- Row: `minHeight 67pt`, `cornerRadius 18pt`, internal padding 12pt × 12pt.
+- Row gap: `LazyVStack(spacing: 10)`.
+- Date column → badge gap: 9pt. Badge → title gap: 14pt.
+- **Date column color:** grey on every row — weekday in `TrailFont.data` at 0.75 opacity, number in `TrailFont.title` at medium weight, both `.secondary`. Do NOT tint today's date green; today's identity lives entirely in the accent bar, tint, and "TODAY" pill so the date text can stay quiet.
+- **Today row:** 0.07 Trail Green tint background + 0.33 Trail Green stroke + 4pt-wide Trail Green accent bar flush against the left edge (inside the 18pt radius). Trailing slot shows a Trail Green "TODAY" capsule pill (SF Pro 12pt semibold, uppercase, `.tracking(0.5)`, white on green, 10×4 padding).
+- **Completed row:** trailing slot shows a success checkmark stacked over actual distance (e.g. "7.1 mi") in `TrailFont.data`, right-aligned.
+- **Skipped row:** title gets `.strikethrough()`. Trailing slot shows "SKIPPED" label in error color (SF Pro 12pt semibold, uppercase, `.tracking(0.5)`).
+- **Rest day:** mileage line reads "Full recovery" in `TrailFont.data`.
+
+### Row Pattern — Other tabs (carry-over)
+
+Strength, Stretch, and Heat rows inside day cards keep a lighter anatomy (they live inside a card, not as standalone rows):
+
+- `HStack(alignment: .top, spacing: 12)`
+- Smaller inline icon badge: `Image(systemName:).frame(width:32, height:32).background(color.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))`
 - Text in a `VStack(alignment: .leading, spacing: 2)`
-- Data values (distance, pace, prescriptions) in `TrailFont.data`
-- Trailing chevron for tappable rows
-- Current day/week highlight: `.opacity(0.08)` tinted background + `.opacity(0.3)` stroke border
+- Day cards use `cornerRadius: 12`, today-highlighted with `.opacity(0.08)` tint + `.opacity(0.3)` stroke.
 
 ### Content Cards
 
@@ -405,7 +424,7 @@ Every tappable list item follows the same anatomy:
 - Tap a card or row to open a `.sheet` with full detail.
 - Tap a circle to toggle completion inline (no sheet needed).
 - Long-press for edit/destructive actions (context menu).
-- Use `chevron.right` in `.quaternary` at trailing edge to signal tappability.
+- Tappability is communicated by the row's card shape and tint, not a trailing chevron. The Week tab uses no trailing chevrons on upcoming rows; Strength/Stretch/Heat day cards keep their existing affordances.
 
 ### Progressive Disclosure
 
@@ -465,3 +484,6 @@ Every list/section that can be empty needs:
 | 2026-04-04 | Geist Mono for tab headers        | Tab titles, activity names, and stats all in monospace for data-forward feel |
 | 2026-04-04 | Hidden navigation bars            | System SF navigation titles removed, replaced with custom TrailFont headers |
 | 2026-04-04 | Fraunces for section labels only  | Serif reserved for "Coach notes", "Strength", "Heat" labels, not body or data |
+| 2026-04-19 | Bold Day Week tab refresh         | Added `tabHeading` token (Fraunces 28pt Medium) for tab display titles; removed the Week summary bar; new row anatomy at 18pt radius with 43×43 r15 badges, "TODAY" pill, and a Trail Green accent bar on today's row. Tightens visual hierarchy and lets the day itself carry the weight. |
+| 2026-04-19 | Week row polish: quiet content, structural signals | Dropped forced UPPERCASE + `.tracking(0.3)` on workout titles (shouted at 20pt Geist Mono); made the date column `.secondary` on every row including today. Today's identity is now fully carried by the accent bar + tint + "TODAY" pill, so the content (dates, titles) stays calm. |
+| 2026-04-19 | Removed "Current Week" meta + trailing chevrons on Week tab | "Current Week" was redundant alongside the implicit "you landed on this tab" context. Trailing chevrons on upcoming rows added noise without information — the row's card shape already signals tappability. Empty trailing slots let the date + mileage breathe. |

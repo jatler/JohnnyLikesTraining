@@ -37,16 +37,15 @@ struct WeekView: View {
     private var weekContent: some View {
         VStack(spacing: 0) {
             weekNavigator
-            weekSummaryBar
 
             if let todaySession = todaySession {
                 readinessBanner(for: todaySession)
-                    .padding(.horizontal)
-                    .padding(.top, 8)
+                    .padding(.horizontal, 12)
+                    .padding(.top, 12)
             }
 
             ScrollView {
-                LazyVStack(spacing: 14) {
+                LazyVStack(spacing: 10) {
                     let sessions = planStore.sessions(for: selectedWeek)
                         .filter { $0.workoutType != .strength }
                     ForEach(sessions) { session in
@@ -54,8 +53,8 @@ struct WeekView: View {
                             .onTapGesture { selectedSession = session }
                     }
                 }
-                .padding(.horizontal)
-                .padding(.vertical, 8)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 12)
             }
         }
         .frame(maxHeight: .infinity)
@@ -73,15 +72,20 @@ struct WeekView: View {
     // MARK: - Week Navigator
 
     private var weekNavigator: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack {
+        // Inset title + meta line 8pt so their left edge aligns with the date column
+        // in the rows below (rows container pad 12 + row pad X 12 = 24, minus header pad 16 = 8).
+        let titleInset: CGFloat = 8
+
+        return VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .firstTextBaseline) {
                 Text("Week \(selectedWeek)")
-                    .font(TrailFont.title)
+                    .font(TrailFont.tabHeading)
                     .foregroundStyle(.white)
+                    .padding(.leading, titleInset)
 
                 Spacer()
 
-                HStack(spacing: 16) {
+                HStack(spacing: 14) {
                     Button {
                         if selectedWeek > 1 { selectedWeek -= 1 }
                     } label: {
@@ -99,26 +103,20 @@ struct WeekView: View {
                     NavigationLink {
                         PlanCalendarView()
                     } label: {
-                        Image(systemName: "calendar.badge.clock")
+                        Image(systemName: "calendar")
                     }
                 }
             }
 
-            HStack(spacing: 8) {
-                Text(weekDateRange)
-                    .font(TrailFont.meta)
-                    .foregroundStyle(.white.opacity(0.85))
-
-                if planStore.currentWeekNumber == selectedWeek {
-                    Text("Current Week")
-                        .font(TrailFont.meta)
-                        .foregroundStyle(.white)
-                        .fontWeight(.semibold)
-                }
-            }
+            Text(weekDateRange)
+                .font(TrailFont.data)
+                .foregroundStyle(.white.opacity(0.85))
+                .textCase(.uppercase)
+                .tracking(0.5)
+                .padding(.leading, titleInset)
         }
-        .padding(.horizontal)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
         .background(Color.trailGreen)
         .tint(.white)
     }
@@ -131,70 +129,7 @@ struct WeekView: View {
         return "\(start) \u{2013} \(end)"
     }
 
-    // MARK: - Week Summary Bar (runs-only)
-
-    private var weekSummaryBar: some View {
-        let calendar = Calendar.current
-        let weekSessions = planStore.sessions(for: selectedWeek)
-        let sessions = weekSessions.filter { $0.workoutType != .strength }
-        let trackableRuns = sessions.filter { $0.workoutType != .rest }
-        let plannedMi = trackableRuns.compactMap(\.targetDistanceMi).reduce(0, +)
-        let skipped = trackableRuns.filter { planStore.isSkipped($0.id) }.count
-
-        var actualMi: Double = 0
-        var runsDone = 0
-        var countedActivityIds: Set<Int64> = []
-
-        for session in weekSessions {
-            if let activity = strava.activity(for: session.id), activity.isRun {
-                actualMi += activity.distanceMi
-                runsDone += 1
-                countedActivityIds.insert(activity.stravaId)
-            }
-        }
-
-        if let firstDate = weekSessions.first?.scheduledDate,
-           let lastDate = weekSessions.last?.scheduledDate {
-            for activity in strava.activities where activity.isRun && !countedActivityIds.contains(activity.stravaId) {
-                if activity.activityDate >= calendar.startOfDay(for: firstDate),
-                   activity.activityDate < calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: lastDate))! {
-                    actualMi += activity.distanceMi
-                    runsDone += 1
-                    countedActivityIds.insert(activity.stravaId)
-                }
-            }
-        }
-
-        return HStack(spacing: 10) {
-            Label(String(format: "%.1f planned", plannedMi), systemImage: "target")
-                .font(TrailFont.body)
-                .fontWeight(.semibold)
-
-            if actualMi > 0 {
-                Label(String(format: "%.1f done", actualMi), systemImage: "checkmark.circle")
-                    .font(TrailFont.data)
-                    .foregroundStyle(.green)
-            }
-
-            Spacer()
-
-            if runsDone > 0 {
-                Text("\(runsDone)/\(trackableRuns.count) runs")
-                    .font(TrailFont.data)
-                    .foregroundStyle(.green)
-            }
-            if skipped > 0 {
-                Text("\(skipped) skipped")
-                    .font(TrailFont.data)
-                    .foregroundStyle(.red)
-            }
-        }
-        .padding(.horizontal)
-        .padding(.vertical, 6)
-        .background(.bar)
-    }
-
-    // MARK: - Session Row (≤48pt tall)
+    // MARK: - Session Row (Bold Day layout)
 
     private func sessionRow(_ session: PlannedSession) -> some View {
         let skipped = planStore.isSkipped(session.id)
@@ -203,86 +138,115 @@ struct WeekView: View {
         let day = Calendar.current.component(.day, from: session.scheduledDate)
         let weekday = session.scheduledDate.formatted(.dateTime.weekday(.abbreviated))
         let rangeText = session.displayTargetRange
+        let hue = session.workoutType.swiftUIColor
 
-        return HStack(spacing: 10) {
+        return ZStack(alignment: .leading) {
+            // Today left accent bar (runs full row height)
             if isToday {
-                RoundedRectangle(cornerRadius: 2)
+                Rectangle()
                     .fill(Color.trailGreen)
-                    .frame(width: 3, height: 40)
-            } else {
-                Color.clear.frame(width: 3, height: 40)
+                    .frame(width: 4)
             }
 
-            VStack(spacing: 0) {
-                Text(weekday)
-                    .font(TrailFont.meta)
-                    .foregroundStyle(isToday ? Color.trailGreen : .secondary)
-                    .fontWeight(isToday ? .semibold : .regular)
-                Text("\(day)")
-                    .font(TrailFont.title)
-                    .foregroundStyle(isToday ? Color.trailGreen : .primary)
-            }
-            .frame(width: 36)
-
-            Image(systemName: session.workoutType.iconName)
-                .font(.system(size: 14))
-                .foregroundStyle(session.workoutType.swiftUIColor)
-                .frame(width: 28, height: 28)
-                .background(session.workoutType.swiftUIColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 8))
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(session.workoutType.displayName)
-                    .font(TrailFont.body)
-                    .strikethrough(skipped)
-                    .lineLimit(1)
-
-                if let rangeText {
-                    Text(rangeText)
+            HStack(spacing: 0) {
+                // Date column: day abbrev + numeric date, two lines, Geist Mono.
+                // Date stays grey on every row — today's identity is carried by the
+                // accent bar, tint, and "TODAY" pill instead.
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(weekday.uppercased())
                         .font(TrailFont.data)
+                        .tracking(0.5)
                         .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                        .opacity(0.75)
+                    Text(String(format: "%02d", day))
+                        .font(TrailFont.title)
+                        .fontWeight(.medium)
+                        .foregroundStyle(.secondary)
                 }
+                .frame(width: 42, alignment: .leading)
+
+                Spacer().frame(width: 9)
+
+                // Workout type badge (43x43, radius 15, 15% tint)
+                Image(systemName: session.workoutType.iconName)
+                    .font(.system(size: 20))
+                    .foregroundStyle(hue)
+                    .frame(width: 43, height: 43)
+                    .background(hue.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
+
+                Spacer().frame(width: 14)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(session.workoutType.displayName)
+                        .font(.system(size: 18))
+                        .strikethrough(skipped)
+                        .lineLimit(1)
+
+                    if let rangeText {
+                        Text(rangeText)
+                            .font(TrailFont.data)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    } else if session.workoutType == .rest {
+                        Text("Full recovery")
+                            .font(TrailFont.data)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                Spacer(minLength: 4)
+
+                trailingStatus(session: session, activity: activity, skipped: skipped, isToday: isToday)
             }
-
-            Spacer(minLength: 4)
-
-            trailingStatus(session: session, activity: activity, skipped: skipped)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 12)
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 10)
-        .frame(minHeight: 60)
-        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 10))
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .strokeBorder(isToday ? Color.trailGreen.opacity(0.25) : .clear, lineWidth: 1)
+        .frame(minHeight: 67)
+        .background(
+            isToday ? Color.trailGreen.opacity(0.07) : Color(.systemBackground),
+            in: RoundedRectangle(cornerRadius: 18)
         )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(
+                    isToday ? Color.trailGreen.opacity(0.33) : Color(.separator).opacity(0.3),
+                    lineWidth: 1
+                )
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 18))
     }
 
     @ViewBuilder
-    private func trailingStatus(session: PlannedSession, activity: StravaActivity?, skipped: Bool) -> some View {
+    private func trailingStatus(session: PlannedSession, activity: StravaActivity?, skipped: Bool, isToday: Bool) -> some View {
         if let activity {
-            HStack(spacing: 6) {
+            VStack(alignment: .trailing, spacing: 2) {
                 Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 16))
+                    .font(.system(size: 18))
                     .foregroundStyle(.green)
                 if activity.isRun {
                     Text(String(format: "%.1f mi", activity.distanceMi))
                         .font(TrailFont.data)
+                        .fontWeight(.medium)
                         .foregroundStyle(.green)
-                        .frame(width: 56, alignment: .leading)
-                } else {
-                    Color.clear.frame(width: 56, height: 1)
                 }
             }
         } else if skipped {
             Text("Skipped")
                 .font(TrailFont.meta)
-                .foregroundStyle(.red)
                 .fontWeight(.semibold)
-        } else {
-            Image(systemName: "chevron.right")
-                .font(.system(size: 12))
-                .foregroundStyle(.quaternary)
+                .foregroundStyle(.red)
+                .textCase(.uppercase)
+                .tracking(0.5)
+        } else if isToday {
+            Text("Today")
+                .font(TrailFont.meta)
+                .fontWeight(.semibold)
+                .foregroundStyle(.white)
+                .textCase(.uppercase)
+                .tracking(0.5)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(Color.trailGreen, in: Capsule())
         }
     }
 

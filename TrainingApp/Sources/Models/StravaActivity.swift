@@ -5,6 +5,15 @@ struct StravaActivity: Codable, Identifiable {
     let userId: UUID
     let stravaId: Int64
     var activityDate: Date
+    /// Wall-clock start time in the activity's own timezone, decoded from Strava's
+    /// `start_date_local` (which they emit as a UTC-marked ISO-8601 string even though
+    /// the hours/minutes are local). Always interpret this `Date` with a **UTC calendar**
+    /// to recover the local-to-the-activity day and time. Nil for rows imported before
+    /// this field was added; callers should fall back to `activityDate`.
+    var startDateLocal: Date?
+    /// IANA timezone id where the activity was recorded (e.g. "America/Los_Angeles"),
+    /// extracted from Strava's `timezone` string like "(GMT-08:00) America/Los_Angeles".
+    var timeZoneIdentifier: String?
     var name: String
     var distanceKm: Double
     var movingTimeSeconds: Int
@@ -22,6 +31,8 @@ struct StravaActivity: Codable, Identifiable {
         case userId = "user_id"
         case stravaId = "strava_id"
         case activityDate = "activity_date"
+        case startDateLocal = "start_date_local"
+        case timeZoneIdentifier = "time_zone_identifier"
         case name
         case distanceKm = "distance_km"
         case movingTimeSeconds = "moving_time_seconds"
@@ -33,6 +44,14 @@ struct StravaActivity: Codable, Identifiable {
         case activityType = "activity_type"
         case matchedSessionId = "matched_session_id"
         case syncedAt = "synced_at"
+    }
+
+    /// Calendar day the activity was recorded on, in the activity's own timezone.
+    /// Falls back to `activityDate` (UTC) for legacy rows with no `startDateLocal`.
+    var localCalendarDay: Date {
+        var utcCalendar = Calendar(identifier: .gregorian)
+        utcCalendar.timeZone = TimeZone(identifier: "UTC") ?? .current
+        return utcCalendar.startOfDay(for: startDateLocal ?? activityDate)
     }
 
     var isRun: Bool {

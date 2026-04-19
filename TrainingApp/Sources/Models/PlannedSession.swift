@@ -63,6 +63,12 @@ struct PlannedSession: Codable, Identifiable {
             .joined(separator: "\n")
 
         if targetDistanceMi != nil {
+            // Intervals split their mileage across warm-up / work / cool-down
+            // segments in the notes, so the first parsed "N-M mi" range is the
+            // warm-up alone. Use the template's aggregate target instead.
+            if workoutType == .intervals, let mi = targetDistanceMi {
+                return "\(Self.formatSingle(mi)) mi"
+            }
             if let range = Self.firstRange(in: text, unitPattern: "mi(?:les?)?") {
                 return "\(range) mi"
             }

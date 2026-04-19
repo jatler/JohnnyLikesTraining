@@ -201,15 +201,28 @@ final class TrainingPlanStore {
         let dateB = sessions[indexB].scheduledDate
         let dayB = sessions[indexB].dayOfWeek
 
-        // Swap the primary sessions
-        sessions[indexA].scheduledDate = dateB
-        sessions[indexA].dayOfWeek = dayB
-        sessions[indexB].scheduledDate = dateA
-        sessions[indexB].dayOfWeek = dayA
+        // Swap the coaching payload between the two sessions but leave their
+        // scheduledDate / id alone. This keeps any Strava activity (matched
+        // via session UUID) pinned to the day it was actually recorded on,
+        // while the planned workout content moves between days.
+        let workoutTypeA = sessions[indexA].workoutType
+        let distanceA = sessions[indexA].targetDistanceKm
+        let paceA = sessions[indexA].targetPaceDescription
+        let notesA = sessions[indexA].notes
 
-        // Also swap any strength sessions on the same days so they stay
-        // paired with their run. Strength sessions share (weekNumber, dayOfWeek)
-        // with the run they accompany.
+        sessions[indexA].workoutType = sessions[indexB].workoutType
+        sessions[indexA].targetDistanceKm = sessions[indexB].targetDistanceKm
+        sessions[indexA].targetPaceDescription = sessions[indexB].targetPaceDescription
+        sessions[indexA].notes = sessions[indexB].notes
+
+        sessions[indexB].workoutType = workoutTypeA
+        sessions[indexB].targetDistanceKm = distanceA
+        sessions[indexB].targetPaceDescription = paceA
+        sessions[indexB].notes = notesA
+
+        // Strength sessions are conceptually paired with the run *workout*, so
+        // they follow the workout content to its new day. Move by date/day —
+        // same approach as before.
         var movedStrengthIds: [UUID] = []
         for i in sessions.indices {
             guard sessions[i].workoutType == .strength else { continue }
@@ -579,16 +592,26 @@ final class TrainingPlanStore {
 
         do {
             try await supabase.from("planned_sessions")
-                .update(SessionDateUpdate(scheduledDate: sessionA.scheduledDate, dayOfWeek: sessionA.dayOfWeek))
+                .update(SessionFieldUpdate(
+                    workoutType: sessionA.workoutType,
+                    targetDistanceKm: sessionA.targetDistanceKm,
+                    targetPaceDescription: sessionA.targetPaceDescription,
+                    notes: sessionA.notes
+                ))
                 .eq("id", value: sessionA.id)
                 .execute()
 
             try await supabase.from("planned_sessions")
-                .update(SessionDateUpdate(scheduledDate: sessionB.scheduledDate, dayOfWeek: sessionB.dayOfWeek))
+                .update(SessionFieldUpdate(
+                    workoutType: sessionB.workoutType,
+                    targetDistanceKm: sessionB.targetDistanceKm,
+                    targetPaceDescription: sessionB.targetPaceDescription,
+                    notes: sessionB.notes
+                ))
                 .eq("id", value: sessionB.id)
                 .execute()
 
-            // Also persist date changes for any strength sessions that moved
+            // Strength sessions still move by date when their paired run swaps.
             for session in movedStrength {
                 try await supabase.from("planned_sessions")
                     .update(SessionDateUpdate(scheduledDate: session.scheduledDate, dayOfWeek: session.dayOfWeek))
@@ -596,8 +619,8 @@ final class TrainingPlanStore {
                     .execute()
             }
         } catch {
-            print("Failed to update session dates after swap: \(error)")
-            lastError = "Swap saved but failed to update session dates."
+            print("Failed to persist session swap: \(error)")
+            lastError = "Swap saved but failed to update session content."
         }
     }
 

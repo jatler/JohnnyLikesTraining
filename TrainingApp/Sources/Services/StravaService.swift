@@ -284,7 +284,10 @@ final class StravaService {
         var newlyMatched: [StravaActivity] = []
         for i in activities.indices {
             if activities[i].matchedSessionId != nil { continue }
-            let actDate = Calendar.current.startOfDay(for: activities[i].activityDate)
+            // Match by the activity's *local* calendar day (the timezone where it
+            // was recorded), so a run logged in LA lands on that LA calendar day
+            // even if the user is currently in a different timezone.
+            let actDate = activities[i].localCalendarDay
             let sameDaySessions = sessions.filter {
                 Calendar.current.isDate($0.scheduledDate, inSameDayAs: actDate)
             }
@@ -332,7 +335,7 @@ final class StravaService {
     }
 
     func activities(on date: Date) -> [StravaActivity] {
-        activities.filter { Calendar.current.isDate($0.activityDate, inSameDayAs: date) }
+        activities.filter { Calendar.current.isDate($0.localCalendarDay, inSameDayAs: date) }
     }
 
     // MARK: - Load from Supabase
@@ -406,16 +409,19 @@ struct StravaAPIActivity: Decodable {
     let elapsedTime: Int
     let type: String
     let startDate: Date
+    let startDateLocal: Date?
+    let timezone: String?
     let averageHeartrate: Double?
     let totalElevationGain: Double?
     let averageSpeed: Double?
     let map: StravaMap?
 
     enum CodingKeys: String, CodingKey {
-        case id, name, distance, type, map
+        case id, name, distance, type, map, timezone
         case movingTime = "moving_time"
         case elapsedTime = "elapsed_time"
         case startDate = "start_date"
+        case startDateLocal = "start_date_local"
         case averageHeartrate = "average_heartrate"
         case totalElevationGain = "total_elevation_gain"
         case averageSpeed = "average_speed"
@@ -428,11 +434,16 @@ struct StravaAPIActivity: Decodable {
             return (1000.0 / speed) / 60.0
         }
 
+        // Strava emits timezone as "(GMT-08:00) America/Los_Angeles" — grab the IANA half.
+        let tzIdentifier = timezone?.split(separator: " ").last.map(String.init)
+
         return StravaActivity(
             id: UUID(),
             userId: userId,
             stravaId: id,
             activityDate: startDate,
+            startDateLocal: startDateLocal,
+            timeZoneIdentifier: tzIdentifier,
             name: name,
             distanceKm: distanceKm,
             movingTimeSeconds: movingTime,

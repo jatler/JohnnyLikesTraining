@@ -19,10 +19,12 @@ struct SettingsView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 Text("Settings")
-                    .font(TrailFont.title)
+                    .font(TrailFont.tabHeading)
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding()
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .frame(maxWidth: .infinity)
                     .background(Color.trailGreen)
 
                 List {

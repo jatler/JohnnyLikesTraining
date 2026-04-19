@@ -16,6 +16,8 @@ enum TrailFont {
     static let meta  = Font.system(size: 12, weight: .regular, design: .default)
     static let coach = Font.custom("Fraunces-Medium", size: 16, relativeTo: .body)
     static let data  = Font.custom("GeistMono-Regular", size: 13, relativeTo: .caption)
+    // Tab-level display heading: Fraunces for dynamic tab titles (Week 11, Progress, Strength, Settings).
+    static let tabHeading = Font.custom("Fraunces-Medium", size: 28, relativeTo: .largeTitle)
 }
 
 // MARK: - Brand Constants
