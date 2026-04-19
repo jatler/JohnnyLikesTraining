@@ -200,7 +200,6 @@ struct WeekView: View {
         let skipped = planStore.isSkipped(session.id)
         let isToday = Calendar.current.isDateInToday(session.scheduledDate)
         let activity = strava.activity(for: session.id)
-        let isCompleted = activity != nil
         let day = Calendar.current.component(.day, from: session.scheduledDate)
         let weekday = session.scheduledDate.formatted(.dateTime.weekday(.abbreviated))
         let rangeText = session.displayTargetRange
@@ -213,17 +212,6 @@ struct WeekView: View {
             } else {
                 Color.clear.frame(width: 3, height: 40)
             }
-
-            Group {
-                if isCompleted {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 20))
-                        .foregroundStyle(Color.trailGreen)
-                } else {
-                    Color.clear
-                }
-            }
-            .frame(width: 24)
 
             VStack(spacing: 0) {
                 Text(weekday)
@@ -272,16 +260,26 @@ struct WeekView: View {
 
     @ViewBuilder
     private func trailingStatus(session: PlannedSession, activity: StravaActivity?, skipped: Bool) -> some View {
-        if let activity, activity.isRun {
-            Text(String(format: "%.1f mi", activity.distanceMi))
-                .font(TrailFont.data)
-                .foregroundStyle(.green)
+        if let activity {
+            HStack(spacing: 6) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 16))
+                    .foregroundStyle(.green)
+                if activity.isRun {
+                    Text(String(format: "%.1f mi", activity.distanceMi))
+                        .font(TrailFont.data)
+                        .foregroundStyle(.green)
+                        .frame(width: 56, alignment: .leading)
+                } else {
+                    Color.clear.frame(width: 56, height: 1)
+                }
+            }
         } else if skipped {
             Text("Skipped")
                 .font(TrailFont.meta)
                 .foregroundStyle(.red)
                 .fontWeight(.semibold)
-        } else if activity == nil {
+        } else {
             Image(systemName: "chevron.right")
                 .font(.system(size: 12))
                 .foregroundStyle(.quaternary)
