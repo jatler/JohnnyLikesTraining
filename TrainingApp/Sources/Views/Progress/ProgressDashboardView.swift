@@ -233,7 +233,6 @@ struct ProgressDashboardView: View {
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
-        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
     }
 
     // MARK: - Elevation Card
@@ -259,7 +258,6 @@ struct ProgressDashboardView: View {
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
-        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
     }
 
     // MARK: - Time Card
@@ -287,7 +285,6 @@ struct ProgressDashboardView: View {
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
-        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
     }
 
     private func formatHours(_ value: Double) -> String {
@@ -448,37 +445,44 @@ struct ProgressDashboardView: View {
             var elevationM: Double = 0
             var runSeconds = 0
             var runsDone = 0
+            var crossTrainSeconds = 0
             var countedActivityIds: Set<Int64> = []
 
+            // Step 1 — matched activities (runs and cross-training both live off session matches).
             for session in weekSessions {
-                if let activity = strava.activity(for: session.id), activity.isRun {
+                guard let activity = strava.activity(for: session.id) else { continue }
+                if activity.isRun {
                     actualKm += activity.distanceKm
                     runSeconds += activity.movingTimeSeconds
                     elevationM += activity.elevationGainM ?? 0
                     runsDone += 1
                     countedActivityIds.insert(activity.stravaId)
+                } else if activity.isCrossTraining {
+                    crossTrainSeconds += activity.movingTimeSeconds
+                    countedActivityIds.insert(activity.stravaId)
                 }
             }
 
+            // Step 2 — unmatched activities in the week's local-calendar date range.
+            // Picks up doubles days + cross-training that wasn't auto-matched to a session
+            // (e.g., a bonus bike ride on a day without a planned cross-train slot).
             if let firstDate = weekSessions.first?.scheduledDate,
                let lastDate = weekSessions.last?.scheduledDate {
                 let start = calendar.startOfDay(for: firstDate)
                 let end = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: lastDate))!
-                for activity in strava.activities where activity.isRun && !countedActivityIds.contains(activity.stravaId) {
-                    if activity.activityDate >= start && activity.activityDate < end {
+                for activity in strava.activities where !countedActivityIds.contains(activity.stravaId) {
+                    let day = activity.localCalendarDay
+                    guard day >= start && day < end else { continue }
+                    if activity.isRun {
                         actualKm += activity.distanceKm
                         runSeconds += activity.movingTimeSeconds
                         elevationM += activity.elevationGainM ?? 0
                         runsDone += 1
                         countedActivityIds.insert(activity.stravaId)
+                    } else if activity.isCrossTraining {
+                        crossTrainSeconds += activity.movingTimeSeconds
+                        countedActivityIds.insert(activity.stravaId)
                     }
-                }
-            }
-
-            var crossTrainSeconds = 0
-            for session in weekSessions {
-                if let activity = strava.activity(for: session.id), activity.isCrossTraining {
-                    crossTrainSeconds += activity.movingTimeSeconds
                 }
             }
 

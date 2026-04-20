@@ -221,6 +221,7 @@ struct WeekView: View {
                 )
         )
         .clipShape(RoundedRectangle(cornerRadius: 18))
+        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
     }
 
     @ViewBuilder
@@ -310,6 +311,7 @@ struct WeekView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .strokeBorder(.orange.opacity(0.3), lineWidth: 1)
             )
+            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
         }
     }
 
