@@ -109,6 +109,7 @@ struct ProgressDashboardView: View {
                                   lineWidth: 1)
             )
             .clipShape(RoundedRectangle(cornerRadius: 18))
+            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
             .opacity(isFuture ? 0.65 : 1)
             .contentShape(Rectangle())
             .gesture(
@@ -232,6 +233,7 @@ struct ProgressDashboardView: View {
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
+        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
     }
 
     // MARK: - Elevation Card
@@ -257,6 +259,7 @@ struct ProgressDashboardView: View {
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
+        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
     }
 
     // MARK: - Time Card
@@ -284,6 +287,7 @@ struct ProgressDashboardView: View {
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
+        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
     }
 
     private func formatHours(_ value: Double) -> String {
@@ -376,6 +380,7 @@ struct ProgressDashboardView: View {
                 RoundedRectangle(cornerRadius: 18)
                     .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
             )
+            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
         }
     }
 
@@ -737,7 +742,7 @@ private struct ElevationChart: View {
 
         if entry.isFuture {
             Rectangle().fill(Color(.systemGray5)).frame(height: plannedH)
-        } else {
+                } else {
             VStack(spacing: 0) {
                 if entry.isCurrent && plannedH > actualH {
                     Rectangle().fill(Color(.systemGray5)).frame(height: plannedH - actualH)
@@ -746,7 +751,7 @@ private struct ElevationChart: View {
                     Rectangle().fill(entry.isCurrent ? purple : purpleLight).frame(height: actualH)
                 }
             }
-        }
+            }
     }
 
     private func niceMax(for entries: [WeekProgressEntry]) -> Double {

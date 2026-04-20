@@ -74,6 +74,7 @@ struct SettingsView: View {
                 RoundedRectangle(cornerRadius: 18)
                     .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
             )
+            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
         }
     }
 

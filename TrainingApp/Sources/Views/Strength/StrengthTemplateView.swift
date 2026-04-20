@@ -186,6 +186,7 @@ struct StrengthTemplateView: View {
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(isToday ? Color.trailGreen.opacity(0.33) : Color(.separator).opacity(0.3), lineWidth: 1)
         )
+        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
         .contentShape(Rectangle())
         .onTapGesture {
             selectedSession = daySessions.first
@@ -324,6 +325,7 @@ struct StrengthTemplateView: View {
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(isToday ? Color.trailGreen.opacity(0.33) : Color(.separator).opacity(0.3), lineWidth: 1)
         )
+        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
         .contentShape(Rectangle())
         .onTapGesture {
             if let week = planStore.currentWeekNumber {

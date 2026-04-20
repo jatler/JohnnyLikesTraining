@@ -172,6 +172,7 @@ struct SessionDetailSheet: View {
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
+        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
     }
 
     @ViewBuilder
@@ -241,6 +242,7 @@ struct SessionDetailSheet: View {
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
+        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
     }
 
     // MARK: - Edit Form
@@ -416,6 +418,7 @@ struct SessionDetailSheet: View {
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
+        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
     }
 
     @ViewBuilder
@@ -475,6 +478,7 @@ struct SessionDetailSheet: View {
                 RoundedRectangle(cornerRadius: 18)
                     .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
             )
+            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
             .opacity(isSkipped ? 0.5 : 1)
         }
     }
@@ -536,6 +540,7 @@ struct SessionDetailSheet: View {
                 RoundedRectangle(cornerRadius: 18)
                     .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
             )
+            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
             .opacity(isSkipped ? 0.5 : 1)
         }
     }
@@ -678,11 +683,11 @@ struct SessionDetailSheet: View {
 
 // MARK: - Custom Detent
 
-/// Pops the day sheet just below the Week tab's green banner, leaving the banner visible
-/// with a ~12pt gap. Tuned against the `tabHeading` (Fraunces 28pt) title + mono meta line
-/// (~51pt content) plus 12pt vertical padding on each side = ~75pt banner + 12pt gap.
+/// Pops the day sheet so its top edge aligns with the bottom of the Week tab's green banner.
+/// Tuned against the `tabHeading` (Fraunces 28pt, line ~34pt) + 4pt spacing + mono meta line
+/// (~16pt) + 8pt vertical padding on each side = ~70pt banner in content area.
 private struct BannerGapDetent: CustomPresentationDetent {
     static func height(in context: Context) -> CGFloat? {
-        context.maxDetentValue - 87
+        context.maxDetentValue - 70
     }
 }
