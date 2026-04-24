@@ -445,6 +445,7 @@ struct StrengthTemplateView: View {
                         RoundedRectangle(cornerRadius: 12)
                             .strokeBorder(highlighted ? Color.orange.opacity(0.3) : Color(.separator).opacity(0.3), lineWidth: 1)
                     )
+                    .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
                     .contentShape(Rectangle())
                     .onTapGesture {
                         selectedHeatSession = entry.session

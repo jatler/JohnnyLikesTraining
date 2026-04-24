@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct ProgressDashboardView: View {
     @Environment(TrainingPlanStore.self) private var planStore
@@ -7,6 +8,7 @@ struct ProgressDashboardView: View {
     @Environment(StrengthStore.self) private var strengthStore
     @Environment(StretchStore.self) private var stretchStore
     @Environment(HeatStore.self) private var heatStore
+    @Environment(AuthService.self) private var auth
 
     @State private var showingPlanSetup = false
     @State private var focusedWeek: Int = 1
@@ -15,6 +17,14 @@ struct ProgressDashboardView: View {
     private enum ChartPage: Int, CaseIterable, Identifiable {
         case miles, vert, time
         var id: Int { rawValue }
+    }
+
+    init() {
+        // Global UIPageControl tint — affects every page-style TabView in the app.
+        // WeekView's TabView uses indexDisplayMode: .never so it's invisible there. If a
+        // future surface enables page dots, it'll inherit this black-on-grey tint.
+        UIPageControl.appearance().currentPageIndicatorTintColor = UIColor.label
+        UIPageControl.appearance().pageIndicatorTintColor = UIColor.systemGray3
     }
 
     var body: some View {
@@ -69,13 +79,25 @@ struct ProgressDashboardView: View {
                     elevationCard(entries: entries).tag(ChartPage.vert)
                     timeCard(entries: entries).tag(ChartPage.time)
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .frame(height: 280)
+                .tabViewStyle(.page(indexDisplayMode: .always))
+                .frame(height: 278)
                 raceCard(entries: entries)
             }
             .padding(.horizontal, 12)
-            .padding(.vertical, 14)
-            .padding(.bottom, 20)
+            .padding(.vertical, 12)
+        }
+        .refreshable { await sync() }
+        .tint(Color.trailGreen)
+    }
+
+    private func sync() async {
+        guard let userId = auth.currentUserId else { return }
+        if strava.isConnected {
+            await strava.loadActivities(userId: userId)
+            strava.autoMatchActivities(sessions: planStore.sessions)
+        }
+        if oura.isConnected {
+            await oura.loadDailyData(userId: userId)
         }
     }
 
@@ -109,7 +131,7 @@ struct ProgressDashboardView: View {
                                   lineWidth: 1)
             )
             .clipShape(RoundedRectangle(cornerRadius: 18))
-            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
+            .shadow(color: Color.black.opacity(0.12), radius: 6, x: 0, y: 2)
             .opacity(isFuture ? 0.65 : 1)
             .contentShape(Rectangle())
             .gesture(
@@ -159,20 +181,21 @@ struct ProgressDashboardView: View {
                 focusedStat(
                     label: "MILES",
                     primary: entry?.actualMi.map { String(format: "%.1f", $0) } ?? "—",
-                    primaryColor: isCurrent ? Color.trailGreen : .primary,
+                    primaryColor: entry?.actualMi != nil ? Color.trailGreen : .secondary,
                     secondary: "/\(String(format: "%.1f", entry?.plannedMi ?? 0)) mi"
-                )
-                focusedStat(
-                    label: "CROSS-TRAIN",
-                    primary: entry?.crossTrainHours.map { String(format: "%.1f", $0) } ?? "—",
-                    primaryColor: .orange,
-                    secondary: "hr"
                 )
                 focusedStat(
                     label: "VERT",
                     primary: entry?.elevationGainFt.map { formatFt($0) } ?? "—",
-                    primaryColor: Color(red: 0.54, green: 0.42, blue: 0.82),
-                    secondary: "ft"
+                    primaryColor: entry?.elevationGainFt != nil ? Color(red: 0.54, green: 0.42, blue: 0.82) : .secondary,
+                    secondary: "ft",
+                    alignment: .center
+                )
+                focusedStat(
+                    label: "CROSS-TRAIN",
+                    primary: entry?.crossTrainHours.map { String(format: "%.1f", $0) } ?? "—",
+                    primaryColor: entry?.crossTrainHours != nil ? .orange : .secondary,
+                    secondary: "hr"
                 )
             }
         }
@@ -180,8 +203,8 @@ struct ProgressDashboardView: View {
         .padding(.vertical, 12)
     }
 
-    private func focusedStat(label: String, primary: String, primaryColor: Color, secondary: String) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
+    private func focusedStat(label: String, primary: String, primaryColor: Color, secondary: String, alignment: Alignment = .leading) -> some View {
+        VStack(alignment: alignment.horizontal, spacing: 3) {
             Text(label)
                 .font(TrailFont.data).tracking(0.4)
                 .foregroundStyle(.secondary)
@@ -196,7 +219,7 @@ struct ProgressDashboardView: View {
             .lineLimit(1)
             .minimumScaleFactor(0.7)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: alignment)
     }
 
     private func phaseLabel(for entry: WeekProgressEntry) -> String {
@@ -214,77 +237,95 @@ struct ProgressDashboardView: View {
 
     private func mileageCard(entries: [WeekProgressEntry]) -> some View {
         let elapsed = entries.filter { !$0.isFuture }
+        let completedOnly = entries.filter { !$0.isFuture && !$0.isCurrent }
         let completedMilesTotal = elapsed.reduce(0.0) { $0 + ($1.actualMi ?? 0) }
-        let weeklyAvgMiles = elapsed.isEmpty ? 0 : completedMilesTotal / Double(elapsed.count)
+        let avgMilesBase = completedOnly.reduce(0.0) { $0 + ($1.actualMi ?? 0) }
+        let weeklyAvgMiles = completedOnly.isEmpty ? 0 : avgMilesBase / Double(completedOnly.count)
 
         return VStack(alignment: .leading, spacing: 8) {
             chartHeader(
                 leftLabel: "01 · TOTAL MILES",
-                leftValue: "\(Int(completedMilesTotal)) mi",
+                leftNumber: "\(Int(completedMilesTotal))",
+                leftUnit: "mi",
                 rightLabel: "WEEKLY AVG",
-                rightValue: String(format: "%.1f mi", weeklyAvgMiles)
+                rightNumber: String(format: "%.1f", weeklyAvgMiles),
+                rightUnit: "mi"
             )
             MileageChart(entries: entries, focusedWeek: $focusedWeek)
                 .frame(height: 180)
         }
-        .padding(14)
+        .padding(12)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
         .overlay(
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
+        .shadow(color: Color.black.opacity(0.12), radius: 6, x: 0, y: 2)
     }
 
     // MARK: - Elevation Card
 
     private func elevationCard(entries: [WeekProgressEntry]) -> some View {
         let elapsed = entries.filter { !$0.isFuture }
+        let completedOnly = entries.filter { !$0.isFuture && !$0.isCurrent }
         let completedVertTotal = elapsed.reduce(0.0) { $0 + ($1.elevationGainFt ?? 0) }
-        let weeklyAvgVert = elapsed.isEmpty ? 0 : completedVertTotal / Double(elapsed.count)
+        let avgVertBase = completedOnly.reduce(0.0) { $0 + ($1.elevationGainFt ?? 0) }
+        let weeklyAvgVert = completedOnly.isEmpty ? 0 : avgVertBase / Double(completedOnly.count)
 
         return VStack(alignment: .leading, spacing: 8) {
             chartHeader(
                 leftLabel: "02 · TOTAL VERT",
-                leftValue: "\(formatFt(completedVertTotal)) ft",
+                leftNumber: "\(formatFt(completedVertTotal))",
+                leftUnit: "ft",
                 rightLabel: "WEEKLY AVG",
-                rightValue: "\(formatFt(weeklyAvgVert)) ft"
+                rightNumber: "\(formatFt(weeklyAvgVert))",
+                rightUnit: "ft"
             )
             ElevationChart(entries: entries, focusedWeek: $focusedWeek)
                 .frame(height: 180)
         }
-        .padding(14)
+        .padding(12)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
         .overlay(
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
+        .shadow(color: Color.black.opacity(0.12), radius: 6, x: 0, y: 2)
     }
 
     // MARK: - Time Card
 
     private func timeCard(entries: [WeekProgressEntry]) -> some View {
         let elapsed = entries.filter { !$0.isFuture }
+        let completedOnly = entries.filter { !$0.isFuture && !$0.isCurrent }
         let totalRunH = elapsed.reduce(0.0) { $0 + ($1.runHours ?? 0) }
         let totalCtH = elapsed.reduce(0.0) { $0 + ($1.crossTrainHours ?? 0) }
         let totalH = totalRunH + totalCtH
-        let weeklyAvgH = elapsed.isEmpty ? 0 : totalH / Double(elapsed.count)
+        let avgBaseH = completedOnly.reduce(0.0) { $0 + ($1.runHours ?? 0) + ($1.crossTrainHours ?? 0) }
+        let weeklyAvgH = completedOnly.isEmpty ? 0 : avgBaseH / Double(completedOnly.count)
 
         return VStack(alignment: .leading, spacing: 8) {
             chartHeader(
                 leftLabel: "03 · TOTAL TIME",
-                leftValue: formatHours(totalH),
+                leftNumber: formatHoursNumber(totalH),
+                leftUnit: "hr",
                 rightLabel: "WEEKLY AVG",
-                rightValue: formatHours(weeklyAvgH)
+                rightNumber: formatHoursNumber(weeklyAvgH),
+                rightUnit: "hr"
             )
             TotalTimeChart(entries: entries, focusedWeek: $focusedWeek)
                 .frame(height: 180)
         }
-        .padding(14)
+        .padding(12)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
         .overlay(
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
+        .shadow(color: Color.black.opacity(0.12), radius: 6, x: 0, y: 2)
     }
 
     private func formatHours(_ value: Double) -> String {
@@ -292,21 +333,46 @@ struct ProgressDashboardView: View {
         return String(format: "%.1f hr", value)
     }
 
-    private func chartHeader(leftLabel: String, leftValue: String, rightLabel: String, rightValue: String) -> some View {
+    private func formatHoursNumber(_ value: Double) -> String {
+        if value >= 10 { return String(format: "%.0f", value) }
+        return String(format: "%.1f", value)
+    }
+
+    private func chartHeader(
+        leftLabel: String, leftNumber: String, leftUnit: String,
+        rightLabel: String, rightNumber: String, rightUnit: String
+    ) -> some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(leftLabel).font(TrailFont.data).tracking(0.5).foregroundStyle(.secondary)
-                Text(leftValue).font(TrailFont.data).foregroundStyle(.secondary)
+                (Text(leftNumber).font(TrailFont.data).fontWeight(.medium).foregroundStyle(.primary)
+                 + Text(" \(leftUnit)").font(TrailFont.data).foregroundStyle(.secondary))
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 2) {
                 Text(rightLabel).font(TrailFont.data).tracking(0.5).foregroundStyle(.secondary)
-                Text(rightValue).font(TrailFont.data).foregroundStyle(.secondary)
+                (Text(rightNumber).font(TrailFont.data).fontWeight(.medium).foregroundStyle(.primary)
+                 + Text(" \(rightUnit)").font(TrailFont.data).foregroundStyle(.secondary))
             }
         }
     }
 
     // MARK: - Race Card
+
+    private func sessionCountPill(count: Int, label: String, systemImage: String, tint: Color) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: systemImage)
+                .font(.system(size: 12))
+                .foregroundStyle(tint)
+            Text("\(count)")
+                .font(TrailFont.data)
+                .fontWeight(.semibold)
+                .foregroundStyle(.primary)
+            Text(label)
+                .font(TrailFont.meta)
+                .foregroundStyle(.secondary)
+        }
+    }
 
     @ViewBuilder
     private func raceCard(entries: [WeekProgressEntry]) -> some View {
@@ -319,6 +385,8 @@ struct ProgressDashboardView: View {
             let sessionsDone = entries.reduce(0) { $0 + $1.sessionsCompleted }
             let sessionsTotal = max(entries.reduce(0) { $0 + $1.totalSessions }, 1)
             let pct = Double(sessionsDone) / Double(sessionsTotal)
+            let swappedCount = planStore.swaps.count
+            let skippedCount = planStore.skips.count
 
             VStack(alignment: .leading, spacing: 10) {
                 HStack(alignment: .top) {
@@ -344,21 +412,9 @@ struct ProgressDashboardView: View {
                 Divider()
 
                 VStack(alignment: .leading, spacing: 6) {
-                    HStack {
-                        Text("SESSIONS")
-                            .font(TrailFont.data).tracking(0.5)
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        HStack(spacing: 0) {
-                            Text("\(sessionsDone)")
-                                .font(TrailFont.data)
-                                .fontWeight(.medium)
-                                .foregroundStyle(.primary)
-                            Text("/\(sessionsTotal)")
-                                .font(TrailFont.data)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
+                    Text("SESSIONS")
+                        .font(TrailFont.data).tracking(0.5)
+                        .foregroundStyle(.secondary)
                     GeometryReader { geo in
                         ZStack(alignment: .leading) {
                             RoundedRectangle(cornerRadius: 3)
@@ -369,6 +425,29 @@ struct ProgressDashboardView: View {
                         }
                     }
                     .frame(height: 6)
+
+                    HStack(spacing: 14) {
+                        sessionCountPill(
+                            count: sessionsDone,
+                            label: "done",
+                            systemImage: "checkmark.circle.fill",
+                            tint: Color.trailGreen
+                        )
+                        sessionCountPill(
+                            count: swappedCount,
+                            label: "swapped",
+                            systemImage: "arrow.left.arrow.right.circle.fill",
+                            tint: .orange
+                        )
+                        sessionCountPill(
+                            count: skippedCount,
+                            label: "skipped",
+                            systemImage: "minus.circle.fill",
+                            tint: .secondary
+                        )
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.top, 2)
                 }
             }
             .padding(14)
@@ -540,7 +619,7 @@ struct ProgressDashboardView: View {
                 week: weekNum,
                 rangeLabel: rangeLabel(from: firstDate, to: lastDate),
                 plannedMi: plannedMi,
-                actualMi: (isFuture || (actualMi == 0 && !isCurrent && lastDate > today)) ? nil : actualMi,
+                actualMi: isFuture ? nil : (actualMi > 0 ? actualMi : nil),
                 runHours: isFuture ? nil : (runHours > 0 ? runHours : nil),
                 crossTrainHours: isFuture ? nil : (crossTrainHours > 0 ? crossTrainHours : nil),
                 elevationGainFt: isFuture ? nil : (elevationFt > 0 ? elevationFt : nil),
@@ -866,4 +945,5 @@ private struct TotalTimeChart: View {
         .environment(StrengthStore())
         .environment(StretchStore())
         .environment(HeatStore())
+        .environment(AuthService())
 }

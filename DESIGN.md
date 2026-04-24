@@ -444,12 +444,52 @@ Three charts render inside the Progress tab's paginated `TabView` (page dots alw
 
 ### Rules
 
-- **Chart height** 180pt (bumped from 142pt for legibility); TabView container 280pt.
+- **Chart height** 180pt (bumped from 142pt for legibility); TabView container 296pt (280pt chart + 16pt dot strip).
+- **Page dots** always shown (`.tabViewStyle(.page(indexDisplayMode: .always))`); active dot tinted Trail Green, inactive `UIColor.secondaryLabel` at 30% alpha, via `UIPageControl.appearance()` in the view's `init`. The appearance setter is global — keep in mind if another surface ever enables page dots.
 - Bar width 12pt; spacing auto-computed; y-axis 20pt (miles/time) or 28pt (vert, wider for "k" labels).
 - Y-axis labels at 9pt monospace, `.tertiary` — topmost tick hidden so the number doesn't clip the card edge.
 - Tap any bar → focuses that week. Tap animates with `withAnimation(.easeOut(0.22))`.
 - Focused week's bar label renders in the chart accent color and semibold; current-week label is always accent-colored too.
 - Cross-training lives on the **Time** chart only — not stacked on Miles, per 2026-04-19 decision: miles and hours are different units and shouldn't be summed visually.
+
+## Banners (Week tab)
+
+Stacked above the session list inside `weekContent`, two alert banners share a single chrome spec. Both sit below the green banner and above the horizontal `TabView` of week rows, each with 12pt horizontal + 12pt top padding.
+
+### Shared chrome
+
+- `RoundedRectangle(cornerRadius: 10)` container (banner tier — separate from 18pt content cards).
+- 10pt internal padding.
+- 1pt accent stroke at `.opacity(0.3)`; fill at `.opacity(0.08)`.
+- Shadow: `Color.black.opacity(0.08)`, radius 3, y 1.
+- Leading SF Symbol rendered at default body size (no `.title2` or other size modifier) so icons across stacked banners match.
+
+### Readiness banner
+
+- Trigger: Oura today readiness `.low` **and** today's session is not easy/rest/recovery **and** not skipped.
+- Accent: `.orange` (stroke + title icon).
+- Content: warning-triangle icon, "Low readiness (score)" headline in `TrailFont.body` semibold, swap prompt in `TrailFont.body` secondary, orange "Swap to [day]" bordered button.
+
+### Tuesday podcast banner
+
+- Trigger: `Calendar.current.component(.weekday, from: Date()) == 3` (Tuesday — when SWAP drops a new episode).
+- Accent: `Color.trailGreen` (stroke + leading icon).
+- Content: `headphones` SF Symbol, "Happy Tuesday! It's Tuesday!" in `TrailFont.body` primary, "Listen to the latest SWAP podcast" in `TrailFont.meta` secondary.
+- Wrapped in `Link` to `https://open.spotify.com/show/3AaJYZngimocFf8aztKTcO`.
+- On a low-readiness Tuesday both banners stack; readiness wins eye-first (actionable).
+
+## Pull-to-refresh
+
+`.refreshable { await sync() }` on:
+- Each week page's inner `ScrollView` in `WeekView` (so the gesture works on every week tab, not just the current one).
+- The main `ScrollView` in `ProgressDashboardView`.
+
+`sync()` logic (same on both surfaces):
+1. `guard let userId = auth.currentUserId else { return }`
+2. If `strava.isConnected`: `await strava.loadActivities(userId:)` then `strava.autoMatchActivities(sessions:)`.
+3. If `oura.isConnected`: `await oura.loadDailyData(userId:)`.
+
+Spinner is tinted `Color.trailGreen` via `.tint()` on the `ScrollView`. Native iOS chrome — no custom spinner view.
 
 ## Session Detail Sheet (Day sheet)
 
@@ -612,3 +652,8 @@ Every list/section that can be empty needs:
 | 2026-04-20 | Unified icon badge system at r15 across the app | Previously mixed r6 (24×24 section chips), r8 (32×32 row badges), and r15 (43×43 workout badges). Collapsed to a single r15 radius at three sizes (43/32/24). The smaller tiles read nearly circular — intentional; one system beats three. |
 | 2026-04-20 | Strength tab day cards migrated to Bold Day chrome | Was 12pt-radius with 32×32 r8 badges and `.opacity(0.08)` today tint. Now 18pt-radius with 43×43 r15 badges and `Color.trailGreenSubtle` today tint + `Color.trailGreen.opacity(0.33)` today stroke — identical to Week row spec. |
 | 2026-04-20 | Settings tab: iOS List → Bold Day card layout | `List` chrome read as a different app surface. Converted to `ScrollView` of 18pt-radius cards with external UPPERCASE section labels; `Divider().padding(.leading, 14)` between rows for clean in-card separation. All existing actions and alerts preserved. |
+| 2026-04-20 | Focused-week MILES number always Trail Green | The MILES stat on the focused-week card only turned green on the current week; past weeks rendered in `.primary`. CROSS-TRAIN (orange) and VERT (purple) were already fixed-color, so MILES was the odd one out. Locked to Trail Green whenever there's a value; falls back to `.secondary` when the value is "—" so empty weeks don't look green-for-nothing. |
+| 2026-04-20 | Progress chart TabView shows page dots | Was `indexDisplayMode: .never` — nothing signaled the three charts were swipeable. Switched to `.always` and tinted the active dot Trail Green via `UIPageControl.appearance()` (with inactive at `UIColor.secondaryLabel` 0.3 alpha). TabView container bumped 280 → 296pt so the 16pt dot strip doesn't crop the chart. Global `UIPageControl.appearance()` side-effect is documented inline on the view's `init()`. |
+| 2026-04-20 | Race card: X/Y replaced with done / swapped / skipped pills | Raw `X/Y` header over the progress bar showed completion but hid swap/skip counts entirely. Replaced the header counter with three inline pills below the progress bar — `checkmark.circle.fill` + count + "done" (Trail Green), `arrow.left.arrow.right.circle.fill` + "swapped" (orange), `minus.circle.fill` + "skipped" (secondary). Pills use SF Symbol 12pt + `TrailFont.data` for the count + `TrailFont.meta` for the label; no pill backdrop to keep the race card calm. Swap count is per event (A↔B = 1). |
+| 2026-04-24 | Tuesday podcast banner restored | The `simplify` redesign deleted `TodayView.swift` and with it the Tuesday-only "Happy Tuesday! It's Tuesday!" podcast CTA. Restored into `WeekView` below the readiness banner with the same 10pt / 0.08 fill / 0.3 stroke banner chrome. Subtitle now `TrailFont.meta` `.secondary` (Geist Mono was wrong for prose); icon drops `.font(.title2)` to match readiness icon sizing when both banners stack. |
+| 2026-04-24 | Pull-to-refresh restored on Week + Progress | The `simplify` redesign lost the `.refreshable` handler that used to live on `TodayView`. Wired to each week page's `ScrollView` in `WeekView` and to the Progress content `ScrollView`. Shared `sync()` runs `strava.loadActivities` + `autoMatchActivities` + `oura.loadDailyData` when connected. Spinner tinted Trail Green via `.tint()` on each scroll view. |

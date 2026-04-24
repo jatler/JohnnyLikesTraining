@@ -55,10 +55,11 @@ struct SessionDetailSheet: View {
                 }
             }
             .padding(.horizontal, 12)
+            .padding(.top, 16)
             .padding(.bottom, 20)
         }
         .presentationDetents([.custom(BannerGapDetent.self)])
-        .presentationDragIndicator(.hidden)
+        .presentationDragIndicator(.visible)
         .sheet(item: $selectedStrengthDay) { selection in
             StrengthDayDetailView(weekNumber: selection.weekNumber, dayOfWeek: selection.dayOfWeek)
         }
@@ -88,9 +89,11 @@ struct SessionDetailSheet: View {
 
     private var readOnlyContent: some View {
         let coachText = session.verbatimCoachNotesForDisplay
+        let pace = session.targetPaceDescription?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let paceRedundant = pace.map { coachText.lowercased().contains($0.lowercased()) } ?? true
 
         return VStack(alignment: .leading, spacing: 12) {
-            summaryCard
+            summaryCard(pace: (pace != nil && !pace!.isEmpty && !paceRedundant) ? pace : nil)
 
             if !coachText.isEmpty {
                 notesSection(coachText)
@@ -196,115 +199,83 @@ struct SessionDetailSheet: View {
         return String(format: "%d:%02d/mi", m, s)
     }
 
-    /// Mirror of `WeekView.sessionRow` — same date column, same 43×43 r15 badge, same trailing
-     /// status logic. Keeps the day sheet visually identical to the row the user just tapped.
-    private var summaryCard: some View {
-        let isToday = Calendar.current.isDateInToday(session.scheduledDate)
-        let day = Calendar.current.component(.day, from: session.scheduledDate)
-        let weekday = session.scheduledDate.formatted(.dateTime.weekday(.abbreviated))
-        let rangeText = session.displayTargetRange
-        let hue = session.workoutType.swiftUIColor
-
-        return ZStack(alignment: .leading) {
-            if isToday {
-                Rectangle()
-                    .fill(Color.trailGreen)
-                    .frame(width: 4)
-            }
-
-            HStack(spacing: 0) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(weekday.uppercased())
-                        .font(TrailFont.data)
-                        .tracking(0.5)
-                        .foregroundStyle(.secondary)
-                        .opacity(0.75)
-                    Text(String(format: "%02d", day))
-                        .font(TrailFont.title)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.secondary)
-                }
-                .frame(width: 42, alignment: .leading)
-
-                Spacer().frame(width: 9)
-
-                Image(systemName: session.workoutType.iconName)
-                    .font(.system(size: 20))
-                    .foregroundStyle(hue)
-                    .frame(width: 43, height: 43)
-                    .background(hue.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
-
-                Spacer().frame(width: 14)
-
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(session.workoutType.displayName)
-                        .font(.system(size: 18))
-                        .strikethrough(isSkipped)
-                        .lineLimit(1)
-
-                    if let rangeText {
-                        Text(rangeText)
-                            .font(TrailFont.data)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    } else if session.workoutType == .rest {
-                        Text("Full recovery")
-                            .font(TrailFont.data)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-
-                Spacer(minLength: 4)
-
-                summaryTrailing(isToday: isToday)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 12)
+    /// Summary-card meta line: "WK 11 D1 · 8–14 MI" (range omitted when plan has none).
+    private var metaLine: String {
+        var parts = ["WK \(session.weekNumber) D\(session.dayOfWeek)"]
+        if let range = session.displayTargetRange {
+            parts.append(range.uppercased())
         }
-        .frame(minHeight: 67)
-        .background(
-            isToday ? Color.trailGreen.opacity(0.07) : Color(.systemBackground),
-            in: RoundedRectangle(cornerRadius: 18)
-        )
+        return parts.joined(separator: " · ")
+    }
+
+    private func summaryCard(pace: String?) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            workoutHeader
+            if let pace {
+                HStack(spacing: 6) {
+                    Image(systemName: "gauge.with.needle")
+                        .foregroundStyle(.secondary)
+                    Text(pace).font(TrailFont.data).foregroundStyle(.secondary)
+                }
+                .opacity(isSkipped ? 0.5 : 1)
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
         .overlay(
             RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(
-                    isToday ? Color.trailGreen.opacity(0.33) : Color(.separator).opacity(0.3),
-                    lineWidth: 1
-                )
+                .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 18))
         .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
     }
 
-    @ViewBuilder
-    private func summaryTrailing(isToday: Bool) -> some View {
-        if isSkipped {
-            Text("SKIPPED")
-                .font(.system(size: 12, weight: .semibold))
-                .tracking(0.5)
-                .foregroundStyle(.white)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-                .background(Color.red.opacity(0.8), in: Capsule())
-        } else if !dayRunActivities.isEmpty {
-            VStack(alignment: .trailing, spacing: 2) {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 18))
-                    .foregroundStyle(.green)
-                Text(String(format: "%.1f mi", dayTotalMiles))
-                    .font(TrailFont.data)
-                    .fontWeight(.medium)
-                    .foregroundStyle(.green)
+    private var workoutHeader: some View {
+        HStack(spacing: 14) {
+            Image(systemName: session.workoutType.iconName)
+                .font(.system(size: 20))
+                .foregroundStyle(session.workoutType.swiftUIColor)
+                .frame(width: 43, height: 43)
+                .background(session.workoutType.swiftUIColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
+
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: 6) {
+                    Text(session.workoutType.displayName)
+                        .font(.system(size: 18))
+                        .strikethrough(isSkipped)
+                        .opacity(isSkipped ? 0.5 : 1)
+
+                    if isOverridden {
+                        Image(systemName: "pencil.circle.fill")
+                            .font(TrailFont.meta)
+                            .foregroundStyle(.orange)
+                    }
+                }
+                Text(metaLine)
+                    .font(TrailFont.data).tracking(0.5)
+                    .foregroundStyle(.secondary)
             }
-        } else if isToday {
-            Text("TODAY")
-                .font(.system(size: 12, weight: .semibold))
-                .tracking(0.5)
-                .foregroundStyle(.white)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 4)
-                .background(Color.trailGreen, in: Capsule())
+
+            Spacer()
+
+            if isSkipped {
+                Text("SKIPPED")
+                    .font(.system(size: 12, weight: .semibold))
+                    .tracking(0.5)
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(Color.red.opacity(0.8), in: Capsule())
+            } else if !dayRunActivities.isEmpty {
+                HStack(spacing: 6) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(Color.trailGreen)
+                        .font(.title3)
+                    Text(String(format: "%.1f mi", dayTotalMiles))
+                        .font(TrailFont.data)
+                        .fontWeight(.medium)
+                }
+            }
         }
     }
 
@@ -679,11 +650,24 @@ struct SessionDetailSheet: View {
 
 // MARK: - Custom Detent
 
+/// PreferenceKey used by the host tab (WeekView) to measure its green banner's content-area
+/// height. The measurement is written into `BannerGapDetent.bannerHeight` so the day sheet
+/// sizes to leave the banner fully visible with no fudge factor.
+struct BannerHeightKey: PreferenceKey {
+    static var defaultValue: CGFloat = 70  // conservative fallback before first layout
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
 /// Pops the day sheet so its top edge aligns with the bottom of the Week tab's green banner.
-/// Tuned against the `tabHeading` (Fraunces 28pt, line ~34pt) + 4pt spacing + mono meta line
-/// (~16pt) + 8pt vertical padding on each side = ~70pt banner in content area.
-private struct BannerGapDetent: CustomPresentationDetent {
+/// Banner height is measured at runtime by `WeekView` via `BannerHeightKey` and written here
+/// before the sheet presents, so the sheet clears the banner exactly — no font-metric guesses.
+struct BannerGapDetent: CustomPresentationDetent {
+    /// Set by the host view on preference change; read by `height(in:)` when the sheet presents.
+    nonisolated(unsafe) static var bannerHeight: CGFloat = 70
+
     static func height(in context: Context) -> CGFloat? {
-        context.maxDetentValue - 70
+        context.maxDetentValue - bannerHeight
     }
 }

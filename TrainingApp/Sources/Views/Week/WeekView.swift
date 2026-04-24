@@ -5,6 +5,7 @@ struct WeekView: View {
     @Environment(StravaService.self) private var strava
     @Environment(StrengthStore.self) private var strengthStore
     @Environment(OuraService.self) private var oura
+    @Environment(AuthService.self) private var auth
 
     @State private var selectedWeek: Int = 1
     @State private var selectedSession: PlannedSession?
@@ -44,6 +45,10 @@ struct WeekView: View {
                     .padding(.top, 12)
             }
 
+            tuesdayBanner
+                .padding(.horizontal, 12)
+                .padding(.top, 12)
+
             TabView(selection: $selectedWeek) {
                 ForEach(planStore.allWeekNumbers, id: \.self) { week in
                     ScrollView {
@@ -58,12 +63,17 @@ struct WeekView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 12)
                     }
+                    .refreshable { await sync() }
+                    .tint(Color.trailGreen)
                     .tag(week)
                 }
             }
             .tabViewStyle(.page(indexDisplayMode: .never))
         }
         .frame(maxHeight: .infinity)
+        .onPreferenceChange(BannerHeightKey.self) { height in
+            BannerGapDetent.bannerHeight = height
+        }
         .onAppear {
             if !hasInitialized {
                 selectedWeek = planStore.currentWeekNumber ?? 1
@@ -126,6 +136,11 @@ struct WeekView: View {
         .background(Color.trailGreen)
         .background(Color.trailGreen.ignoresSafeArea(edges: .top))
         .tint(.white)
+        .background(
+            GeometryReader { geo in
+                Color.clear.preference(key: BannerHeightKey.self, value: geo.size.height)
+            }
+        )
     }
 
     private var weekDateRange: String {
@@ -262,6 +277,51 @@ struct WeekView: View {
         }
     }
 
+    // MARK: - Sync (pull-to-refresh)
+
+    private func sync() async {
+        guard let userId = auth.currentUserId else { return }
+        if strava.isConnected {
+            await strava.loadActivities(userId: userId)
+            strava.autoMatchActivities(sessions: planStore.sessions)
+        }
+        if oura.isConnected {
+            await oura.loadDailyData(userId: userId)
+        }
+    }
+
+    // MARK: - Tuesday podcast banner
+
+    @ViewBuilder
+    private var tuesdayBanner: some View {
+        if Calendar.current.component(.weekday, from: Date()) == 3 {
+            Link(destination: URL(string: "https://open.spotify.com/show/3AaJYZngimocFf8aztKTcO")!) {
+                HStack(spacing: 12) {
+                    Image(systemName: "headphones")
+                        .foregroundStyle(Color.trailGreen)
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Happy Tuesday! It's Tuesday!")
+                            .font(TrailFont.body)
+                            .foregroundStyle(.primary)
+                        Text("Listen to the latest SWAP podcast")
+                            .font(TrailFont.meta)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Spacer()
+                }
+                .padding(10)
+                .background(Color.trailGreen.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .strokeBorder(Color.trailGreen.opacity(0.3), lineWidth: 1)
+                )
+                .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
+            }
+        }
+    }
+
     // MARK: - Readiness banner (ported from former Today tab)
 
     private var todaySession: PlannedSession? {
@@ -354,4 +414,5 @@ struct WeekView: View {
         .environment(StravaService())
         .environment(StrengthStore())
         .environment(OuraService())
+        .environment(AuthService())
 }
