@@ -86,15 +86,24 @@ final class StrengthStore {
     }
 
     /// Refresh coach notes from planned sessions without resetting completion state.
+    /// Preserves user-added sessions (those whose `plannedSessionId` isn't backed by
+    /// a current `PlannedSession`).
     func refreshFromPlannedSessions(_ plannedSessions: [PlannedSession], planId: UUID) {
         let strengthPlanned = plannedSessions.filter { $0.workoutType == .strength }
+        let plannedIds = Set(strengthPlanned.map(\.id))
         let existingByPlannedId = Dictionary(
-            uniqueKeysWithValues: sessions.compactMap { s in
-                (s.plannedSessionId, s)
-            }
-        )
+            grouping: sessions,
+            by: { $0.plannedSessionId }
+        ).compactMapValues { $0.first }
 
         var updated: [StrengthSession] = []
+
+        // Preserve user-added sessions (their plannedSessionId is a placeholder UUID
+        // that doesn't appear in the current plan's strength sessions).
+        let userAdded = sessions.filter { !plannedIds.contains($0.plannedSessionId) }
+        updated.append(contentsOf: userAdded)
+
+        // Sync coach-prescribed sessions.
         for planned in strengthPlanned {
             if let existing = existingByPlannedId[planned.id] {
                 var session = existing
@@ -117,6 +126,43 @@ final class StrengthStore {
 
         sessions = updated
         saveToCache()
+        Task { await persistAllSessions() }
+    }
+
+    // MARK: - User-added strength sessions
+
+    /// Add a strength session on a specific day across every week of the plan.
+    /// Mirrors `HeatStore.addDay`. Sessions get a fresh placeholder `plannedSessionId`
+    /// so they're preserved across `refreshFromPlannedSessions` calls.
+    func addDay(
+        dayOfWeek: Int,
+        coachNotes: String,
+        planId: UUID,
+        planStartDate: Date,
+        totalWeeks: Int
+    ) {
+        let calendar = Calendar.current
+        var newSessions: [StrengthSession] = []
+
+        for week in 1...totalWeeks {
+            let dayOffset = (week - 1) * 7 + (dayOfWeek - 1)
+            guard let date = calendar.date(byAdding: .day, value: dayOffset, to: planStartDate) else { continue }
+
+            newSessions.append(StrengthSession(
+                id: UUID(),
+                planId: planId,
+                plannedSessionId: UUID(),   // placeholder — marks this as user-added
+                scheduledDate: date,
+                weekNumber: week,
+                dayOfWeek: dayOfWeek,
+                coachNotes: coachNotes,
+                isComplete: false
+            ))
+        }
+
+        sessions.append(contentsOf: newSessions)
+        saveToCache()
+        Task { await persistAllSessions() }
     }
 
     // MARK: - Toggle Completion
@@ -204,8 +250,7 @@ final class StrengthStore {
         guard !isOffline else { return }
         do {
             try await supabase.from("strength_sessions")
-                .update(session)
-                .eq("id", value: session.id)
+                .upsert(session)
                 .execute()
         } catch {
             print("Failed to persist session update to Supabase: \(error)")

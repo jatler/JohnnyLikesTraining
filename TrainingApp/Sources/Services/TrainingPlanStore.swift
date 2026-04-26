@@ -12,6 +12,11 @@ final class TrainingPlanStore {
     private(set) var isLoading = false
     var lastError: String?
 
+    /// Swaps awaiting confirmation from Supabase. Persisted in PlanCacheService;
+    /// drained at the top of `loadPlan` so a fresh server fetch can't clobber
+    /// unsynced state.
+    private(set) var pendingSwaps: [PendingSwap] = PlanCacheService.loadPendingSwaps()
+
     private let supabase = SupabaseService.shared.client
 
     var hasPlan: Bool { activePlan != nil }
@@ -19,6 +24,10 @@ final class TrainingPlanStore {
     private func saveToCache() {
         guard let plan = activePlan else { return }
         PlanCacheService.save(plan: plan, sessions: sessions, skips: skips, swaps: swaps, overrides: overrides)
+    }
+
+    private func savePendingSwapsToCache() {
+        PlanCacheService.savePendingSwaps(pendingSwaps)
     }
 
     // MARK: - Computed Helpers
@@ -256,8 +265,106 @@ final class TrainingPlanStore {
 
         let updatedA = sessions[indexA]
         let updatedB = sessions[indexB]
-        let movedStrength = sessions.filter { movedStrengthIds.contains($0.id) }
-        Task { await persistSwap(swap, sessionA: updatedA, sessionB: updatedB, movedStrength: movedStrength) }
+        let movedStrengthSessions = sessions.filter { movedStrengthIds.contains($0.id) }
+
+        // Enqueue first, then attempt persistence. If the persist task fails or
+        // the app is killed mid-write, the swap survives in pendingSwaps and is
+        // replayed at the next loadPlan — preventing the fresh Supabase fetch
+        // from clobbering the local cache with stale (pre-swap) workout fields.
+        let pending = PendingSwap(
+            swap: swap,
+            sessionAUpdate: snapshot(updatedA),
+            sessionBUpdate: snapshot(updatedB),
+            strengthMoves: movedStrengthSessions.map {
+                StrengthDateMove(sessionId: $0.id, scheduledDate: $0.scheduledDate, dayOfWeek: $0.dayOfWeek)
+            }
+        )
+        pendingSwaps.append(pending)
+        savePendingSwapsToCache()
+
+        Task { await persistPendingSwap(pending) }
+    }
+
+    private func snapshot(_ session: PlannedSession) -> SessionFieldSnapshot {
+        SessionFieldSnapshot(
+            sessionId: session.id,
+            workoutType: session.workoutType,
+            targetDistanceKm: session.targetDistanceKm,
+            targetPaceDescription: session.targetPaceDescription,
+            notes: session.notes
+        )
+    }
+
+    /// Try to push a single PendingSwap to Supabase. On success, dequeue it.
+    /// On failure (offline, network, transient error), leave it queued so
+    /// `replayPendingSwaps()` picks it up at the next loadPlan.
+    private func persistPendingSwap(_ pending: PendingSwap) async {
+        guard !isOffline else { return }
+        do {
+            try await pushSwapToSupabase(pending)
+            removePending(pending.swap.id)
+        } catch {
+            print("Failed to persist swap (will retry): \(error)")
+            lastError = "Swap saved locally. Will sync when online."
+        }
+    }
+
+    private func removePending(_ swapId: UUID) {
+        pendingSwaps.removeAll { $0.swap.id == swapId }
+        savePendingSwapsToCache()
+    }
+
+    /// Drain `pendingSwaps` against Supabase. Called at the top of `loadPlan`
+    /// so that the upcoming fetch sees a server state consistent with the
+    /// local cache. Failed swaps stay queued for the next attempt.
+    func replayPendingSwaps() async {
+        guard !isOffline, !pendingSwaps.isEmpty else { return }
+        let snapshot = pendingSwaps
+        for pending in snapshot {
+            do {
+                try await pushSwapToSupabase(pending)
+                removePending(pending.swap.id)
+            } catch {
+                print("Failed to replay pending swap \(pending.swap.id): \(error)")
+                // Keep in queue; try again next loadPlan.
+            }
+        }
+    }
+
+    /// Idempotent push: upserts the SessionSwap row and updates both planned
+    /// sessions plus any moved strength sessions. Throws on any failure so the
+    /// caller can decide whether to retry or surface the error.
+    private func pushSwapToSupabase(_ pending: PendingSwap) async throws {
+        try await supabase.from("session_swaps")
+            .upsert(pending.swap)
+            .execute()
+
+        try await supabase.from("planned_sessions")
+            .update(SessionFieldUpdate(
+                workoutType: pending.sessionAUpdate.workoutType,
+                targetDistanceKm: pending.sessionAUpdate.targetDistanceKm,
+                targetPaceDescription: pending.sessionAUpdate.targetPaceDescription,
+                notes: pending.sessionAUpdate.notes
+            ))
+            .eq("id", value: pending.sessionAUpdate.sessionId)
+            .execute()
+
+        try await supabase.from("planned_sessions")
+            .update(SessionFieldUpdate(
+                workoutType: pending.sessionBUpdate.workoutType,
+                targetDistanceKm: pending.sessionBUpdate.targetDistanceKm,
+                targetPaceDescription: pending.sessionBUpdate.targetPaceDescription,
+                notes: pending.sessionBUpdate.notes
+            ))
+            .eq("id", value: pending.sessionBUpdate.sessionId)
+            .execute()
+
+        for move in pending.strengthMoves {
+            try await supabase.from("planned_sessions")
+                .update(SessionDateUpdate(scheduledDate: move.scheduledDate, dayOfWeek: move.dayOfWeek))
+                .eq("id", value: move.sessionId)
+                .execute()
+        }
     }
 
     // MARK: - Skip / Unskip
@@ -417,6 +524,11 @@ final class TrainingPlanStore {
 
         guard !isOffline else { return }
 
+        // Drain any swaps that didn't persist on a previous run before we
+        // fetch — otherwise the fetch would clobber local cache with stale
+        // (pre-swap) workout fields.
+        await replayPendingSwaps()
+
         // Then sync from Supabase in foreground
         do {
             let plans: [TrainingPlan] = try await supabase
@@ -522,6 +634,7 @@ final class TrainingPlanStore {
         skips = []
         swaps = []
         overrides = []
+        pendingSwaps = []
         PlanCacheService.clear()
 
         guard !isOffline else { return }
@@ -573,55 +686,6 @@ final class TrainingPlanStore {
             print("Failed to persist date update to Supabase: \(error)")
             lastError = "Failed to save date update."
 }
-    }
-
-    private func persistSwap(
-        _ swap: SessionSwap,
-        sessionA: PlannedSession,
-        sessionB: PlannedSession,
-        movedStrength: [PlannedSession] = []
-    ) async {
-        guard !isOffline else { return }
-        do {
-            try await supabase.from("session_swaps").insert(swap).execute()
-        } catch {
-            print("Failed to insert swap record: \(error)")
-            lastError = "Failed to save swap record."
-            return
-        }
-
-        do {
-            try await supabase.from("planned_sessions")
-                .update(SessionFieldUpdate(
-                    workoutType: sessionA.workoutType,
-                    targetDistanceKm: sessionA.targetDistanceKm,
-                    targetPaceDescription: sessionA.targetPaceDescription,
-                    notes: sessionA.notes
-                ))
-                .eq("id", value: sessionA.id)
-                .execute()
-
-            try await supabase.from("planned_sessions")
-                .update(SessionFieldUpdate(
-                    workoutType: sessionB.workoutType,
-                    targetDistanceKm: sessionB.targetDistanceKm,
-                    targetPaceDescription: sessionB.targetPaceDescription,
-                    notes: sessionB.notes
-                ))
-                .eq("id", value: sessionB.id)
-                .execute()
-
-            // Strength sessions still move by date when their paired run swaps.
-            for session in movedStrength {
-                try await supabase.from("planned_sessions")
-                    .update(SessionDateUpdate(scheduledDate: session.scheduledDate, dayOfWeek: session.dayOfWeek))
-                    .eq("id", value: session.id)
-                    .execute()
-            }
-        } catch {
-            print("Failed to persist session swap: \(error)")
-            lastError = "Swap saved but failed to update session content."
-        }
     }
 
     private func persistSkip(_ skip: SessionSkip) async {

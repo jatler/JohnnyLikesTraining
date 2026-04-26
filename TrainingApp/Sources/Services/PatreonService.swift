@@ -13,6 +13,14 @@ final class PatreonService {
     /// Non-nil when patron_status has lapsed but the 7-day grace window is still open.
     private(set) var gracePeriodDaysRemaining: Int?
 
+    /// Access-token expiry, exposed for the debug observability panel.
+    /// Backed by Keychain — stays in sync without an extra @Observable field.
+    var tokenExpiresAt: Date? {
+        guard let raw = KeychainService.get(.patreonExpiresAt),
+              let ts = Double(raw) else { return nil }
+        return Date(timeIntervalSince1970: ts)
+    }
+
     private var authSession: ASWebAuthenticationSession?
     private var pendingOAuthState: String?
 

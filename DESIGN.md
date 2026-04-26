@@ -123,14 +123,14 @@ Each workout type has a dedicated color for instant recognition.
 
 | Type        | Color             | Icon                      |
 |-------------|-------------------|---------------------------|
-| Easy        | `.green`          | `figure.walk`             |
+| Easy        | `.green`          | `figure.run`              |
 | Tempo       | `.orange`         | `gauge.with.needle.fill`  |
 | Intervals   | `.red`            | `bolt.fill`               |
-| Long Run    | `.blue`           | `figure.run`              |
+| Long Run    | `.blue`           | `mountain.2.fill`         |
 | Recovery    | `.mint`           | `leaf.fill`               |
 | Rest        | `.gray`           | `bed.double.fill`         |
 | Race        | `.purple`         | `flag.checkered`          |
-| Cross Train | `.yellow`         | `figure.mixed.cardio`     |
+| Cross Train | `.yellow`         | `bicycle`                 |
 | Strength    | Trail Green       | `dumbbell.fill`           |
 
 ### Semantic Colors
@@ -231,6 +231,14 @@ Colored card (status sections):
 ```
 
 Use `.regularMaterial` for data cards. Use `.bar` for sticky headers. Use color `.opacity(0.06)` for tinted backgrounds. Use `.opacity(0.15)` for tinted borders via `.strokeBorder()`.
+
+**Shadow token** — every elevated surface (Bold Day rows, Progress focused-week + chart cards, settings cards, day-sheet content cards) uses a single shadow:
+
+```swift
+.shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
+```
+
+No other shadow values are allowed. The system used to mix `radius: 6 / opacity 0.12` on Progress and `radius: 3 / opacity 0.08` on Week — collapsed to one as of 2026-04-25.
 
 ### Completion Indicators
 
@@ -388,8 +396,8 @@ The Week tab establishes the refreshed row anatomy:
 - Row: `minHeight 67pt`, `cornerRadius 18pt`, internal padding 12pt × 12pt.
 - Row gap: `LazyVStack(spacing: 10)`.
 - Date column → badge gap: 9pt. Badge → title gap: 14pt.
-- **Date column color:** grey on every row — weekday in `TrailFont.data` at 0.75 opacity, number in `TrailFont.title` at medium weight, both `.secondary`. Do NOT tint today's date green; today's identity lives entirely in the accent bar, tint, and "TODAY" pill so the date text can stay quiet.
-- **Today row:** 0.07 Trail Green tint background + 0.33 Trail Green stroke + 4pt-wide Trail Green accent bar flush against the left edge (inside the 18pt radius). Trailing slot shows a Trail Green "TODAY" capsule pill (SF Pro 12pt semibold, uppercase, `.tracking(0.5)`, white on green, 10×4 padding).
+- **Date column color:** grey on every row — weekday in `TrailFont.data` at 0.75 opacity, number in `TrailFont.title` at medium weight, both `.secondary`. Do NOT tint today's date green; today's identity lives entirely in the row tint, stroke, and "TODAY" pill so the date text can stay quiet.
+- **Today row:** 0.07 Trail Green tint background + 0.33 Trail Green stroke. Trailing slot shows a Trail Green "TODAY" capsule pill (SF Pro 12pt semibold, uppercase, `.tracking(0.5)`, white on green, 10×4 padding). No left accent bar — tint + stroke + pill carry the today identity.
 - **Completed row:** trailing slot shows a success checkmark stacked over actual distance (e.g. "7.1 mi") in `TrailFont.data`, right-aligned.
 - **Skipped row:** title gets `.strikethrough()`. Trailing slot shows "SKIPPED" label in error color (SF Pro 12pt semibold, uppercase, `.tracking(0.5)`).
 - **Rest day:** mileage line reads "Full recovery" in `TrailFont.data`.
@@ -630,7 +638,7 @@ Every list/section that can be empty needs:
 | 2026-04-04 | Geist Mono for tab headers        | Tab titles, activity names, and stats all in monospace for data-forward feel |
 | 2026-04-04 | Hidden navigation bars            | System SF navigation titles removed, replaced with custom TrailFont headers |
 | 2026-04-04 | Fraunces for section labels only  | Serif reserved for "Coach notes", "Strength", "Heat" labels, not body or data |
-| 2026-04-19 | Bold Day Week tab refresh         | Added `tabHeading` token (Fraunces 28pt Medium) for tab display titles; removed the Week summary bar; new row anatomy at 18pt radius with 43×43 r15 badges, "TODAY" pill, and a Trail Green accent bar on today's row. Tightens visual hierarchy and lets the day itself carry the weight. |
+| 2026-04-19 | Bold Day Week tab refresh         | Added `tabHeading` token (Fraunces 28pt Medium) for tab display titles; removed the Week summary bar; new row anatomy at 18pt radius with 43×43 r15 badges and "TODAY" pill. Tightens visual hierarchy and lets the day itself carry the weight. |
 | 2026-04-19 | Week row polish: quiet content, structural signals | Dropped forced UPPERCASE + `.tracking(0.3)` on workout titles (shouted at 20pt Geist Mono); made the date column `.secondary` on every row including today. Today's identity is now fully carried by the accent bar + tint + "TODAY" pill, so the content (dates, titles) stays calm. |
 | 2026-04-19 | Removed "Current Week" meta + trailing chevrons on Week tab | "Current Week" was redundant alongside the implicit "you landed on this tab" context. Trailing chevrons on upcoming rows added noise without information — the row's card shape already signals tappability. Empty trailing slots let the date + mileage breathe. |
 | 2026-04-19 | Bold Day Progress refresh         | Rewrote Progress tab around focused-week card + stacked-bar mileage chart + elevation chart + race card. Swipe/tap navigates weeks. Header subtitle = training plan name (no "Week N / N" pill). |
@@ -657,3 +665,5 @@ Every list/section that can be empty needs:
 | 2026-04-20 | Race card: X/Y replaced with done / swapped / skipped pills | Raw `X/Y` header over the progress bar showed completion but hid swap/skip counts entirely. Replaced the header counter with three inline pills below the progress bar — `checkmark.circle.fill` + count + "done" (Trail Green), `arrow.left.arrow.right.circle.fill` + "swapped" (orange), `minus.circle.fill` + "skipped" (secondary). Pills use SF Symbol 12pt + `TrailFont.data` for the count + `TrailFont.meta` for the label; no pill backdrop to keep the race card calm. Swap count is per event (A↔B = 1). |
 | 2026-04-24 | Tuesday podcast banner restored | The `simplify` redesign deleted `TodayView.swift` and with it the Tuesday-only "Happy Tuesday! It's Tuesday!" podcast CTA. Restored into `WeekView` below the readiness banner with the same 10pt / 0.08 fill / 0.3 stroke banner chrome. Subtitle now `TrailFont.meta` `.secondary` (Geist Mono was wrong for prose); icon drops `.font(.title2)` to match readiness icon sizing when both banners stack. |
 | 2026-04-24 | Pull-to-refresh restored on Week + Progress | The `simplify` redesign lost the `.refreshable` handler that used to live on `TodayView`. Wired to each week page's `ScrollView` in `WeekView` and to the Progress content `ScrollView`. Shared `sync()` runs `strava.loadActivities` + `autoMatchActivities` + `oura.loadDailyData` when connected. Spinner tinted Trail Green via `.tint()` on each scroll view. |
+| 2026-04-25 | Strength tab Bold Day rebuild + tab polish pass | Strength tab rebuilt around flat Bold-Day rows mirroring Week (one row per session, 42pt date column, 43×43 r15 hue badge, today tint + TODAY pill, glassy summary bar pinned below the green band). Title moved to "Strength + Heat", segmented picker pulled out of the green band onto white. Source-of-truth shifted to `planStore` via `refreshFromPlannedSessions` on appear so coach-prescribed sessions like Mountain Legs surface immediately. Added `StrengthStore.addDay(...)` + sheet for user-added strength days. Fixed "Failed to save session update" alert by switching `persistSessionUpdate` to `.upsert()` and persisting after `refreshFromPlannedSessions`. Bumped all four tab banners +10pt vertical (`.padding(.vertical, 8)` → `13`) for breathing room. Removed the 4pt Trail Green left accent bar on today's row across Week + Strength — tint + stroke + TODAY pill already mark today; the bar added weight without information. Workout icons refreshed: Easy → `figure.run`, Long Run → `mountain.2`, Cross Train → `bicycle`. |
+| 2026-04-25 | Interface-craft critique pass | (1) Removed leftover today-row 4pt accent bar from Progress focused-week card so the design system's "tint + stroke + pill carries today" rule holds everywhere. (2) Heat rows now honor `HeatType.iconName` + `.color` (sauna = orange flame, hot tub = cyan drop, heat suit = red runner) — was hardcoded `flame.fill` / `.orange` regardless of session type, throwing away data the model already carries. (3) Strength rows split coach notes into title + detail (e.g. `"Mountain Legs"` + `"3x10 step-ups, 3x10 calf raises"`) so the row matches Week / Stretch / Heat's two-line anatomy instead of reading as a lone label. (4) Unified shadow token to `radius: 3, y: 1, opacity 0.08` across every elevated surface; Progress chart + focused-week cards used to ride a heavier `radius: 6, y: 2, opacity 0.12` shadow. (5) Replaced `Font.custom("GeistMono-Medium", size: 22)` escape hatch in Progress's WK number with `TrailFont.bigNumber`. (6) Strength tab vertical rhythm: picker now `.padding(.vertical, 8)` to match the summary bar instead of asymmetric `.top, 12` / `.bottom, 4`. (7) "Add X on Another Day" buttons across Strength / Stretch / Heat got `.padding(.top, 12)` so they read as discrete actions, not a bonus row. (8) Long-run icon switched to outline `mountain.2` (was `.fill`) to match the visual weight of `figure.run` and `bicycle` at 20pt. |

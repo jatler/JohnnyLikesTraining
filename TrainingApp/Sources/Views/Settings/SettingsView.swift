@@ -14,6 +14,7 @@ struct SettingsView: View {
     @State private var showingDeletePlan = false
     @State private var errorMessage: String?
     @State private var showingError = false
+    @State private var showingPatreonGatePreview = false
 
     var body: some View {
         NavigationStack {
@@ -23,6 +24,9 @@ struct SettingsView: View {
                     VStack(spacing: 16) {
                         gracePeriodBanner
                         sectionCard(label: "PATREON") { patreonSection }
+                        if DevSignIn.isAllowed {
+                            sectionCard(label: "PATREON DEBUG") { patreonDebugSection }
+                        }
                         sectionCard(label: "STRAVA") { stravaSection }
                         sectionCard(label: "OURA") { ouraSection }
                         sectionCard(label: "TRAINING PLAN") { planSection }
@@ -46,14 +50,24 @@ struct SettingsView: View {
     // MARK: - Header
 
     private var header: some View {
-        Text("Settings")
-            .font(TrailFont.tabHeading)
-            .foregroundStyle(.white)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .background(Color.trailGreen)
-            .background(Color.trailGreen.ignoresSafeArea(edges: .top))
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Settings")
+                .font(TrailFont.tabHeading)
+                .foregroundStyle(.white)
+
+            // Hidden spacer line so the green band height matches Week / Progress /
+            // Strength (all of which carry a meta line below the title).
+            Text(" ")
+                .font(TrailFont.data)
+                .tracking(0.5)
+                .foregroundStyle(.clear)
+                .accessibilityHidden(true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 13)
+        .background(Color.trailGreen)
+        .background(Color.trailGreen.ignoresSafeArea(edges: .top))
     }
 
     // MARK: - Card chrome
@@ -209,6 +223,66 @@ struct SettingsView: View {
                 }
         } else {
             buttonRow("Connect Patreon", icon: "star.circle.fill", color: Color.trailGreen) { connectPatreon() }
+        }
+    }
+
+    // MARK: - Patreon Debug
+    //
+    // Visible only on Debug builds (or Release with DEV_SIGNIN_ALLOWED=YES).
+    // Surfaces the entitlement state during a live demo to David & Megan and
+    // gives a one-tap "force re-verify" that hits the Patreon identity API.
+
+    @ViewBuilder
+    private var patreonDebugSection: some View {
+        infoRow("Connected", patreon.isConnected ? "yes" : "no")
+        divider()
+        infoRow("isPatron", patreon.isPatron ? "yes" : "no")
+        divider()
+        infoRow(
+            "Last verified",
+            patreon.lastVerifiedAt?.formatted(.relative(presentation: .named)) ?? "never"
+        )
+        divider()
+        infoRow(
+            "Token expires",
+            patreon.tokenExpiresAt.map { $0.formatted(.relative(presentation: .named)) } ?? "—"
+        )
+        divider()
+        infoRow(
+            "Grace period",
+            patreon.gracePeriodDaysRemaining.map { "\($0)d remaining" } ?? "—"
+        )
+        divider()
+        Button { forceReverify() } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "arrow.clockwise")
+                    .font(.system(size: 16))
+                    .foregroundStyle(Color.trailGreen)
+                    .frame(width: 24)
+                Text("Force re-verify").font(TrailFont.body)
+                Spacer()
+                if patreon.isVerifying { ProgressView() }
+            }
+            .contentShape(Rectangle())
+            .padding(.horizontal, 14).padding(.vertical, 12)
+        }
+        .buttonStyle(.plain)
+        .disabled(!patreon.isConnected || patreon.isVerifying)
+
+        divider()
+        buttonRow("Show Patreon Gate", icon: "rectangle.on.rectangle", color: Color.trailGreen) {
+            showingPatreonGatePreview = true
+        }
+        .sheet(isPresented: $showingPatreonGatePreview) { PatreonGateView() }
+    }
+
+    private func forceReverify() {
+        Task {
+            do { try await patreon.verifyMembership() }
+            catch {
+                errorMessage = error.localizedDescription
+                showingError = true
+            }
         }
     }
 
@@ -376,7 +450,7 @@ struct SettingsView: View {
 
     private var aboutSection: some View {
         VStack(spacing: 0) {
-            infoRow("Version", Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.8")
+            infoRow("Version", Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.9")
             divider()
             linkRow("Privacy Policy", destination: URL(string: "https://johnnylikestraining.com/privacy.html")!) { EmptyView() }
             divider()

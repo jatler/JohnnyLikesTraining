@@ -62,7 +62,7 @@ struct ProgressDashboardView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
-        .padding(.vertical, 8)
+        .padding(.vertical, 13)
         .background(Color.trailGreen)
         .background(Color.trailGreen.ignoresSafeArea(edges: .top))
     }
@@ -118,20 +118,13 @@ struct ProgressDashboardView: View {
             ))
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(isCurrent ? Color.trailGreenSubtle : Color(.systemBackground))
-            .overlay(alignment: .leading) {
-                if isCurrent {
-                    Rectangle()
-                        .fill(Color.trailGreen)
-                        .frame(width: 4)
-                }
-            }
             .overlay(
                 RoundedRectangle(cornerRadius: 18)
                     .strokeBorder(isCurrent ? Color.trailGreen.opacity(0.33) : Color(.separator).opacity(0.3),
                                   lineWidth: 1)
             )
             .clipShape(RoundedRectangle(cornerRadius: 18))
-            .shadow(color: Color.black.opacity(0.12), radius: 6, x: 0, y: 2)
+            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
             .opacity(isFuture ? 0.65 : 1)
             .contentShape(Rectangle())
             .gesture(
@@ -159,7 +152,7 @@ struct ProgressDashboardView: View {
                         .font(TrailFont.data).tracking(0.5)
                         .foregroundStyle(.secondary)
                     Text(String(format: "%02d", entry?.week ?? 0))
-                        .font(.custom("GeistMono-Medium", size: 22, relativeTo: .title2))
+                        .font(TrailFont.bigNumber)
                         .foregroundStyle(.secondary)
                 }
                 .frame(width: 38, alignment: .leading)
@@ -261,7 +254,7 @@ struct ProgressDashboardView: View {
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
-        .shadow(color: Color.black.opacity(0.12), radius: 6, x: 0, y: 2)
+        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
     }
 
     // MARK: - Elevation Card
@@ -292,7 +285,7 @@ struct ProgressDashboardView: View {
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
-        .shadow(color: Color.black.opacity(0.12), radius: 6, x: 0, y: 2)
+        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
     }
 
     // MARK: - Time Card
@@ -325,7 +318,7 @@ struct ProgressDashboardView: View {
             RoundedRectangle(cornerRadius: 18)
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
-        .shadow(color: Color.black.opacity(0.12), radius: 6, x: 0, y: 2)
+        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
     }
 
     private func formatHours(_ value: Double) -> String {
@@ -386,7 +379,10 @@ struct ProgressDashboardView: View {
             let sessionsTotal = max(entries.reduce(0) { $0 + $1.totalSessions }, 1)
             let pct = Double(sessionsDone) / Double(sessionsTotal)
             let swappedCount = planStore.swaps.count
-            let skippedCount = planStore.skips.count
+            // Inferred + explicit skips, computed across all weeks. Replaces the
+            // old explicit-only count so a missed run counts even without the
+            // user tapping "skip".
+            let skippedCount = entries.reduce(0) { $0 + $1.sessionsSkipped }
 
             VStack(alignment: .leading, spacing: 10) {
                 HStack(alignment: .top) {
@@ -513,6 +509,7 @@ struct ProgressDashboardView: View {
             let runSeconds: Int
             let runsDone: Int
             let crossTrainSeconds: Int
+            let sessionsSkipped: Int
         }
 
         let rawWeeks: [RawWeek] = planStore.allWeekNumbers.map { weekNum in
@@ -565,6 +562,25 @@ struct ProgressDashboardView: View {
                 }
             }
 
+            // Step 3 — infer skipped sessions.
+            //
+            // A trackable run that's already in the past with neither a
+            // matched Strava activity NOR any activity on its scheduled day
+            // (covers doubles where the user ran but mismatched) AND no
+            // explicit user skip → counts as a skipped workout. Combined
+            // with explicit user skips below for the per-week total.
+            let sessionsSkipped: Int = trackableRuns.reduce(0) { acc, session in
+                let day = calendar.startOfDay(for: session.scheduledDate)
+                guard day <= today else { return acc }
+                if planStore.isSkipped(session.id) { return acc + 1 }
+                if strava.activity(for: session.id) != nil { return acc }
+                let hasActivityOnDay = strava.activities.contains { activity in
+                    activity.localCalendarDay == day
+                        && (activity.isRun || activity.isCrossTraining)
+                }
+                return hasActivityOnDay ? acc : acc + 1
+            }
+
             return RawWeek(
                 weekNum: weekNum,
                 weekSessions: weekSessions,
@@ -574,7 +590,8 @@ struct ProgressDashboardView: View {
                 elevationM: elevationM,
                 runSeconds: runSeconds,
                 runsDone: runsDone,
-                crossTrainSeconds: crossTrainSeconds
+                crossTrainSeconds: crossTrainSeconds,
+                sessionsSkipped: sessionsSkipped
             )
         }
 
@@ -624,6 +641,7 @@ struct ProgressDashboardView: View {
                 crossTrainHours: isFuture ? nil : (crossTrainHours > 0 ? crossTrainHours : nil),
                 elevationGainFt: isFuture ? nil : (elevationFt > 0 ? elevationFt : nil),
                 sessionsCompleted: completedItems,
+                sessionsSkipped: raw.sessionsSkipped,
                 totalSessions: totalItems,
                 isCurrent: isCurrent,
                 isFuture: isFuture
@@ -655,6 +673,10 @@ struct WeekProgressEntry: Identifiable, Equatable {
     let crossTrainHours: Double?
     let elevationGainFt: Double?
     let sessionsCompleted: Int
+    /// Trackable runs in past days with no matching Strava activity (and no
+    /// other activity on the day) plus any sessions the user explicitly
+    /// skipped. Surfaced in the race card "skipped" pill.
+    let sessionsSkipped: Int
     let totalSessions: Int
     let isCurrent: Bool
     let isFuture: Bool

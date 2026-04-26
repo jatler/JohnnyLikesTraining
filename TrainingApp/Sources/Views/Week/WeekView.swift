@@ -132,7 +132,7 @@ struct WeekView: View {
                 .padding(.leading, titleInset)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 8)
+        .padding(.vertical, 13)
         .background(Color.trailGreen)
         .background(Color.trailGreen.ignoresSafeArea(edges: .top))
         .tint(.white)
@@ -162,67 +162,58 @@ struct WeekView: View {
         let rangeText = session.displayTargetRange
         let hue = session.workoutType.swiftUIColor
 
-        return ZStack(alignment: .leading) {
-            // Today left accent bar (runs full row height)
-            if isToday {
-                Rectangle()
-                    .fill(Color.trailGreen)
-                    .frame(width: 4)
+        return HStack(spacing: 0) {
+            // Date column: day abbrev + numeric date, two lines, Geist Mono.
+            // Date stays grey on every row — today's identity is carried by the
+            // tint + stroke + "TODAY" pill.
+            VStack(alignment: .leading, spacing: 4) {
+                Text(weekday.uppercased())
+                    .font(TrailFont.data)
+                    .tracking(0.5)
+                    .foregroundStyle(.secondary)
+                    .opacity(0.75)
+                Text(String(format: "%02d", day))
+                    .font(TrailFont.title)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.secondary)
             }
+            .frame(width: 42, alignment: .leading)
 
-            HStack(spacing: 0) {
-                // Date column: day abbrev + numeric date, two lines, Geist Mono.
-                // Date stays grey on every row — today's identity is carried by the
-                // accent bar, tint, and "TODAY" pill instead.
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(weekday.uppercased())
+            Spacer().frame(width: 9)
+
+            // Workout type badge (43x43, radius 15, 15% tint)
+            Image(systemName: session.workoutType.iconName)
+                .font(.system(size: 20))
+                .foregroundStyle(hue)
+                .frame(width: 43, height: 43)
+                .background(hue.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
+
+            Spacer().frame(width: 14)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(session.workoutType.displayName)
+                    .font(.system(size: 18))
+                    .strikethrough(skipped)
+                    .lineLimit(1)
+
+                if let rangeText {
+                    Text(rangeText)
                         .font(TrailFont.data)
-                        .tracking(0.5)
                         .foregroundStyle(.secondary)
-                        .opacity(0.75)
-                    Text(String(format: "%02d", day))
-                        .font(TrailFont.title)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.secondary)
-                }
-                .frame(width: 42, alignment: .leading)
-
-                Spacer().frame(width: 9)
-
-                // Workout type badge (43x43, radius 15, 15% tint)
-                Image(systemName: session.workoutType.iconName)
-                    .font(.system(size: 20))
-                    .foregroundStyle(hue)
-                    .frame(width: 43, height: 43)
-                    .background(hue.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
-
-                Spacer().frame(width: 14)
-
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(session.workoutType.displayName)
-                        .font(.system(size: 18))
-                        .strikethrough(skipped)
                         .lineLimit(1)
-
-                    if let rangeText {
-                        Text(rangeText)
-                            .font(TrailFont.data)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    } else if session.workoutType == .rest {
-                        Text("Full recovery")
-                            .font(TrailFont.data)
-                            .foregroundStyle(.secondary)
-                    }
+                } else if session.workoutType == .rest {
+                    Text("Full recovery")
+                        .font(TrailFont.data)
+                        .foregroundStyle(.secondary)
                 }
-
-                Spacer(minLength: 4)
-
-                trailingStatus(session: session, activity: activity, skipped: skipped, isToday: isToday)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 12)
+
+            Spacer(minLength: 4)
+
+            trailingStatus(session: session, activity: activity, skipped: skipped, isToday: isToday)
         }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 12)
         .frame(minHeight: 67)
         .background(
             isToday ? Color.trailGreen.opacity(0.07) : Color(.systemBackground),

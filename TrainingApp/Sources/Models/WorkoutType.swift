@@ -44,14 +44,14 @@ enum WorkoutType: String, Codable, CaseIterable, Identifiable {
 
     var iconName: String {
         switch self {
-        case .easy: "figure.walk"
+        case .easy: "figure.run"
         case .tempo: "gauge.with.needle.fill"
         case .intervals: "bolt.fill"
-        case .longRun: "figure.run"
+        case .longRun: "mountain.2"
         case .recovery: "leaf.fill"
         case .rest: "bed.double.fill"
         case .race: "flag.checkered"
-        case .crossTrain: "figure.mixed.cardio"
+        case .crossTrain: "bicycle"
         case .strength: "dumbbell.fill"
         }
     }

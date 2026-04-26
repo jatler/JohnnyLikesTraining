@@ -33,6 +33,7 @@
 		4FEB95CBCCFD82F3BB85C43E /* SupabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4A6D8A749283F165620F1C8 /* SupabaseService.swift */; };
 		543078FF31454D5FD7F648B1 /* LocalCacheService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8ADAD3D34B51A5F9879C3200 /* LocalCacheService.swift */; };
 		54581A03989F155A85C0F2E6 /* swap_100mile_12w.json in Resources */ = {isa = PBXBuildFile; fileRef = 17A72BB26AE3ECD8E43F6F2F /* swap_100mile_12w.json */; };
+		5773F6F736710A3238BFBAEF /* PendingSwap.swift in Sources */ = {isa = PBXBuildFile; fileRef = A98D857A910A6C8E66D69313 /* PendingSwap.swift */; };
 		5A65C86A30E9432549A86497 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 011590607C69E2FCB2E332C7 /* Supabase */; };
 		5B13DA79B4AC7453D868630B /* Fraunces-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 747D2F3B56EEE28598D1536A /* Fraunces-LightItalic.ttf */; };
 		5C6B00911C4B919BE7AA7B0E /* PlanEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F8ED3535E0F5907E9AE4267 /* PlanEditView.swift */; };
@@ -151,6 +152,7 @@
 		9F87F3437D6620980FC04F13 /* TrainingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingApp.swift; sourceTree = "<group>"; };
 		A07FB0277BBF278D299540D8 /* StrengthTemplateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrengthTemplateView.swift; sourceTree = "<group>"; };
 		A24E9F554D1C8B6CFDDC436A /* swap_100k_16w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_100k_16w.json; sourceTree = "<group>"; };
+		A98D857A910A6C8E66D69313 /* PendingSwap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingSwap.swift; sourceTree = "<group>"; };
 		AA46B6C9B4227B13C53E5123 /* swap_lower_volume_ultra_12w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_lower_volume_ultra_12w.json; sourceTree = "<group>"; };
 		B4A6D8A749283F165620F1C8 /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
 		B4CD0A46894A328DDC0FE678 /* PlannedSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlannedSession.swift; sourceTree = "<group>"; };
@@ -401,6 +403,7 @@
 				6BCB459B05BE989CD56A6A76 /* HeatLog.swift */,
 				E0286457F30EDCC873DAA7BC /* HeatSession.swift */,
 				38427D1E7D9E72609E2756A6 /* OuraDaily.swift */,
+				A98D857A910A6C8E66D69313 /* PendingSwap.swift */,
 				B4CD0A46894A328DDC0FE678 /* PlannedSession.swift */,
 				5A2CDF8B4AC1F14A2F3AE63B /* SessionOverride.swift */,
 				EE203E8195572E02039CA8A7 /* SessionSkip.swift */,
@@ -593,6 +596,7 @@
 				A49A52EEDFEFF45B719A8233 /* OuraService.swift in Sources */,
 				5F862E196FF0910C46CC6F36 /* PatreonGateView.swift in Sources */,
 				35359EE4B2B5913A17135A3B /* PatreonService.swift in Sources */,
+				5773F6F736710A3238BFBAEF /* PendingSwap.swift in Sources */,
 				084A2112A895BB3DF1798AB7 /* PlanCacheService.swift in Sources */,
 				1B8213915BFA541F5519E418 /* PlanCalendarView.swift in Sources */,
 				5C6B00911C4B919BE7AA7B0E /* PlanEditView.swift in Sources */,
@@ -724,7 +728,7 @@
 				CODE_SIGN_ENTITLEMENTS = Training.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = WHKX4QF56D;
 				DEV_SIGNIN_ALLOWED = NO;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -734,7 +738,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.8;
+				MARKETING_VERSION = 1.0.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jatler.Training;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
@@ -769,7 +773,7 @@
 				CODE_SIGN_ENTITLEMENTS = Training.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 9;
+				CURRENT_PROJECT_VERSION = 10;
 				DEVELOPMENT_TEAM = WHKX4QF56D;
 				DEV_SIGNIN_ALLOWED = NO;
 				GENERATE_INFOPLIST_FILE = NO;
@@ -779,7 +783,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.8;
+				MARKETING_VERSION = 1.0.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jatler.Training;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;

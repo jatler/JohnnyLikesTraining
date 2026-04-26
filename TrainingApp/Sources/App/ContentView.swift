@@ -22,9 +22,18 @@ struct MainTabView: View {
     @Environment(TrainingPlanStore.self) private var planStore
     @Environment(StravaService.self) private var strava
     @Environment(OuraService.self) private var oura
+    @Environment(PatreonService.self) private var patreon
     @Environment(StrengthStore.self) private var strengthStore
     @Environment(HeatStore.self) private var heatStore
     @Environment(StretchStore.self) private var stretchStore
+
+    /// True while a non-patron, non-grace, non-dev-bypass user is using the app.
+    /// Gate stays presented until `isPatron` flips true (or grace period starts).
+    private var shouldShowPatreonGate: Bool {
+        !patreon.isPatron
+            && patreon.gracePeriodDaysRemaining == nil
+            && !DevSignIn.isAllowed
+    }
 
     var body: some View {
         TabView {
@@ -49,8 +58,26 @@ struct MainTabView: View {
                 }
         }
         .tint(Color.trailGreen)
+        .sheet(isPresented: Binding(
+            get: { shouldShowPatreonGate },
+            // Drag-to-dismiss is a no-op: the gate stays visible until the
+            // user becomes a patron (or hits the grace window). The sheet
+            // re-evaluates against `shouldShowPatreonGate` on every state
+            // change, so SwiftUI handles the actual dismissal automatically.
+            set: { _ in }
+        )) {
+            PatreonGateView()
+        }
         .task {
             guard let userId = auth.currentUserId else { return }
+
+            // Refresh patron status if the cached verification is older than
+            // 7 days. Without this the gate would never re-evaluate after a
+            // membership lapse until the user manually disconnected.
+            if patreon.isConnected {
+                try? await patreon.verifyMembershipIfStale()
+            }
+
             if !planStore.hasPlan {
                 await planStore.loadPlan(userId: userId)
             }
@@ -148,6 +175,7 @@ struct MainTabView: View {
         .environment(TrainingPlanStore())
         .environment(StravaService())
         .environment(OuraService())
+        .environment(PatreonService())
         .environment(StrengthStore())
         .environment(HeatStore())
         .environment(StretchStore())
