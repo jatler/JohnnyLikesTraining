@@ -378,7 +378,6 @@ struct ProgressDashboardView: View {
             let sessionsDone = entries.reduce(0) { $0 + $1.sessionsCompleted }
             let sessionsTotal = max(entries.reduce(0) { $0 + $1.totalSessions }, 1)
             let pct = Double(sessionsDone) / Double(sessionsTotal)
-            let swappedCount = planStore.swaps.count
             // Inferred + explicit skips, computed across all weeks. Replaces the
             // old explicit-only count so a missed run counts even without the
             // user tapping "skip".
@@ -428,12 +427,6 @@ struct ProgressDashboardView: View {
                             label: "done",
                             systemImage: "checkmark.circle.fill",
                             tint: Color.trailGreen
-                        )
-                        sessionCountPill(
-                            count: swappedCount,
-                            label: "swapped",
-                            systemImage: "arrow.left.arrow.right.circle.fill",
-                            tint: .orange
                         )
                         sessionCountPill(
                             count: skippedCount,
@@ -542,13 +535,23 @@ struct ProgressDashboardView: View {
             // Step 2 — unmatched activities in the week's local-calendar date range.
             // Picks up doubles days + cross-training that wasn't auto-matched to a session
             // (e.g., a bonus bike ride on a day without a planned cross-train slot).
+            // Day-equality goes through `isOnLocalDay` to avoid the timezone shift.
             if let firstDate = weekSessions.first?.scheduledDate,
                let lastDate = weekSessions.last?.scheduledDate {
-                let start = calendar.startOfDay(for: firstDate)
-                let end = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: lastDate))!
+                let weekDays: [Date] = {
+                    let start = calendar.startOfDay(for: firstDate)
+                    let end = calendar.startOfDay(for: lastDate)
+                    var out: [Date] = []
+                    var d = start
+                    while d <= end {
+                        out.append(d)
+                        guard let next = calendar.date(byAdding: .day, value: 1, to: d) else { break }
+                        d = next
+                    }
+                    return out
+                }()
                 for activity in strava.activities where !countedActivityIds.contains(activity.stravaId) {
-                    let day = activity.localCalendarDay
-                    guard day >= start && day < end else { continue }
+                    guard weekDays.contains(where: { activity.isOnLocalDay($0) }) else { continue }
                     if activity.isRun {
                         actualKm += activity.distanceKm
                         runSeconds += activity.movingTimeSeconds
@@ -575,7 +578,7 @@ struct ProgressDashboardView: View {
                 if planStore.isSkipped(session.id) { return acc + 1 }
                 if strava.activity(for: session.id) != nil { return acc }
                 let hasActivityOnDay = strava.activities.contains { activity in
-                    activity.localCalendarDay == day
+                    activity.isOnLocalDay(session.scheduledDate)
                         && (activity.isRun || activity.isCrossTraining)
                 }
                 return hasActivityOnDay ? acc : acc + 1

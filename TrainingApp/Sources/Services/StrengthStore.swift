@@ -86,22 +86,34 @@ final class StrengthStore {
     }
 
     /// Refresh coach notes from planned sessions without resetting completion state.
-    /// Preserves user-added sessions (those whose `plannedSessionId` isn't backed by
-    /// a current `PlannedSession`).
+    /// Preserves user-added sessions (`plannedSessionId == nil`) and orphaned sessions
+    /// (whose `plannedSessionId` is no longer a row in `planned_sessions`). Orphans are
+    /// nulled out so the FK constraint on `strength_sessions.planned_session_id`
+    /// doesn't reject the next upsert.
     func refreshFromPlannedSessions(_ plannedSessions: [PlannedSession], planId: UUID) {
         let strengthPlanned = plannedSessions.filter { $0.workoutType == .strength }
         let plannedIds = Set(strengthPlanned.map(\.id))
-        let existingByPlannedId = Dictionary(
-            grouping: sessions,
-            by: { $0.plannedSessionId }
-        ).compactMapValues { $0.first }
+        let existingByPlannedId: [UUID: StrengthSession] = Dictionary(
+            grouping: sessions.compactMap { s -> (UUID, StrengthSession)? in
+                guard let pid = s.plannedSessionId else { return nil }
+                return (pid, s)
+            },
+            by: { $0.0 }
+        ).compactMapValues { $0.first?.1 }
 
         var updated: [StrengthSession] = []
 
-        // Preserve user-added sessions (their plannedSessionId is a placeholder UUID
-        // that doesn't appear in the current plan's strength sessions).
-        let userAdded = sessions.filter { !plannedIds.contains($0.plannedSessionId) }
-        updated.append(contentsOf: userAdded)
+        // Preserve user-added (plannedSessionId == nil) AND orphaned sessions
+        // (stale UUID no longer in the plan). Null out the stale UUIDs so the FK
+        // constraint on planned_session_id doesn't reject the upsert.
+        for session in sessions {
+            if let pid = session.plannedSessionId, plannedIds.contains(pid) {
+                continue   // will be re-emitted in the loop below
+            }
+            var cleaned = session
+            cleaned.plannedSessionId = nil
+            updated.append(cleaned)
+        }
 
         // Sync coach-prescribed sessions.
         for planned in strengthPlanned {
@@ -132,8 +144,9 @@ final class StrengthStore {
     // MARK: - User-added strength sessions
 
     /// Add a strength session on a specific day across every week of the plan.
-    /// Mirrors `HeatStore.addDay`. Sessions get a fresh placeholder `plannedSessionId`
-    /// so they're preserved across `refreshFromPlannedSessions` calls.
+    /// Mirrors `HeatStore.addDay`. User-added sessions have `plannedSessionId = nil`
+    /// since there's no backing `PlannedSession` — sending a random UUID here would
+    /// violate the `planned_session_id` foreign key on Supabase.
     func addDay(
         dayOfWeek: Int,
         coachNotes: String,
@@ -151,7 +164,7 @@ final class StrengthStore {
             newSessions.append(StrengthSession(
                 id: UUID(),
                 planId: planId,
-                plannedSessionId: UUID(),   // placeholder — marks this as user-added
+                plannedSessionId: nil,   // user-added — no FK target
                 scheduledDate: date,
                 weekNumber: week,
                 dayOfWeek: dayOfWeek,
@@ -241,8 +254,11 @@ final class StrengthStore {
                 try await supabase.from("strength_sessions").upsert(sessions).execute()
             }
         } catch {
+            // Background bulk-sync failure — not user-actionable. The local cache still
+            // holds the truth and the next user-initiated mutation (toggleComplete →
+            // persistSessionUpdate) will surface a real alert if persistence is broken.
+            // Don't pop a "Failed to save strength sessions" alert on every tab visit.
             print("Failed to persist strength sessions to Supabase: \(error)")
-            lastError = "Failed to save strength sessions."
         }
     }
 

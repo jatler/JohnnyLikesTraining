@@ -48,10 +48,36 @@ struct StravaActivity: Codable, Identifiable {
 
     /// Calendar day the activity was recorded on, in the activity's own timezone.
     /// Falls back to `activityDate` (UTC) for legacy rows with no `startDateLocal`.
+    ///
+    /// **Important:** the returned `Date` is a UTC midnight that *encodes* the local-to-
+    /// the-activity y/m/d. Comparing it to other Dates via `Calendar.current.isDate(_:inSameDayAs:)`
+    /// will silently shift the day by ±1 in any timezone west or east of UTC. Use
+    /// `localYMD` or `isOnLocalDay(_:)` for safe day comparisons.
     var localCalendarDay: Date {
         var utcCalendar = Calendar(identifier: .gregorian)
         utcCalendar.timeZone = TimeZone(identifier: "UTC") ?? .current
         return utcCalendar.startOfDay(for: startDateLocal ?? activityDate)
+    }
+
+    /// (year, month, day) of when the activity took place, in the timezone where it was
+    /// recorded. Use this for day-equality comparisons against session dates — it sidesteps
+    /// the timezone-shift bug that `localCalendarDay` invites when callers compare via
+    /// `Calendar.current`.
+    var localYMD: (year: Int, month: Int, day: Int) {
+        var utcCal = Calendar(identifier: .gregorian)
+        utcCal.timeZone = TimeZone(identifier: "UTC") ?? .current
+        let c = utcCal.dateComponents([.year, .month, .day], from: startDateLocal ?? activityDate)
+        return (c.year ?? 0, c.month ?? 0, c.day ?? 0)
+    }
+
+    /// True when this activity falls on the same local-calendar day as `date` (interpreted
+    /// in the user's current calendar). The activity is interpreted in the timezone where
+    /// it was recorded, so a run done at 11pm in LA still matches a Tuesday session even
+    /// if the user is currently in Tokyo.
+    func isOnLocalDay(_ date: Date) -> Bool {
+        let act = localYMD
+        let ses = Calendar.current.dateComponents([.year, .month, .day], from: date)
+        return act.year == ses.year && act.month == ses.month && act.day == ses.day
     }
 
     var isRun: Bool {

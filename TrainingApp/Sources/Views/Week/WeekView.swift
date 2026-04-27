@@ -63,6 +63,10 @@ struct WeekView: View {
                         .padding(.horizontal, 12)
                         .padding(.vertical, 12)
                     }
+                    // .always so pull-to-refresh works even when the week has few rows
+                    // and the content doesn't fill the viewport. Without this, short
+                    // weeks silently swallow the down-swipe gesture.
+                    .scrollBounceBehavior(.always)
                     .refreshable { await sync() }
                     .tint(Color.trailGreen)
                     .tag(week)

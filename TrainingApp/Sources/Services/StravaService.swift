@@ -286,11 +286,12 @@ final class StravaService {
             if activities[i].matchedSessionId != nil { continue }
             // Match by the activity's *local* calendar day (the timezone where it
             // was recorded), so a run logged in LA lands on that LA calendar day
-            // even if the user is currently in a different timezone.
-            let actDate = activities[i].localCalendarDay
-            let sameDaySessions = sessions.filter {
-                Calendar.current.isDate($0.scheduledDate, inSameDayAs: actDate)
-            }
+            // even if the user is currently in a different timezone. Using
+            // `isOnLocalDay` here instead of `Calendar.current.isDate(...)` against
+            // `localCalendarDay` — the latter silently shifts the day by ±1 because
+            // `localCalendarDay` encodes the activity's y/m/d as a UTC midnight.
+            let activity = activities[i]
+            let sameDaySessions = sessions.filter { activity.isOnLocalDay($0.scheduledDate) }
             let match: PlannedSession?
             if activities[i].isRun {
                 match = sameDaySessions.first { $0.workoutType != .strength && $0.workoutType != .crossTrain }
@@ -335,7 +336,7 @@ final class StravaService {
     }
 
     func activities(on date: Date) -> [StravaActivity] {
-        activities.filter { Calendar.current.isDate($0.localCalendarDay, inSameDayAs: date) }
+        activities.filter { $0.isOnLocalDay(date) }
     }
 
     /// All running activities (Run, TrailRun, VirtualRun) on a given calendar day
