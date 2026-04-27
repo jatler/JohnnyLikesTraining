@@ -281,15 +281,27 @@ final class StravaService {
     // MARK: - Auto-Match
 
     func autoMatchActivities(sessions: [PlannedSession]) {
-        var newlyMatched: [StravaActivity] = []
+        let sessionsById = Dictionary(uniqueKeysWithValues: sessions.map { ($0.id, $0) })
+        var changed: [StravaActivity] = []
         for i in activities.indices {
-            if activities[i].matchedSessionId != nil { continue }
+            let originalMatchId = activities[i].matchedSessionId
+            // Validate any existing match — the prior code path used
+            // `Calendar.current.isDate(_:inSameDayAs:)` against `localCalendarDay`
+            // (a UTC-encoded midnight) which silently shifted matches by ±1 day for
+            // users in non-UTC timezones. Stale wrong matches need to be cleared so
+            // the new isOnLocalDay logic re-matches correctly.
+            if let matchedId = originalMatchId,
+               let matchedSession = sessionsById[matchedId],
+               activities[i].isOnLocalDay(matchedSession.scheduledDate) {
+                continue   // existing match is still correct
+            }
+
+            // Either no match yet, or the current match is wrong — re-evaluate.
+            activities[i].matchedSessionId = nil
+
             // Match by the activity's *local* calendar day (the timezone where it
             // was recorded), so a run logged in LA lands on that LA calendar day
-            // even if the user is currently in a different timezone. Using
-            // `isOnLocalDay` here instead of `Calendar.current.isDate(...)` against
-            // `localCalendarDay` — the latter silently shifts the day by ±1 because
-            // `localCalendarDay` encodes the activity's y/m/d as a UTC midnight.
+            // even if the user is currently in a different timezone.
             let activity = activities[i]
             let sameDaySessions = sessions.filter { activity.isOnLocalDay($0.scheduledDate) }
             let match: PlannedSession?
@@ -304,19 +316,18 @@ final class StravaService {
             }
             if let match {
                 activities[i].matchedSessionId = match.id
-                newlyMatched.append(activities[i])
+            }
+
+            if activities[i].matchedSessionId != originalMatchId {
+                changed.append(activities[i])
             }
         }
 
-        // Save updated matches to local cache
-        if !newlyMatched.isEmpty {
+        // Save updated matches to local cache + Supabase
+        if !changed.isEmpty {
             saveToCache()
-        }
-
-        // Persist newly matched activities to Supabase
-        if !newlyMatched.isEmpty {
             Task {
-                for activity in newlyMatched {
+                for activity in changed {
                     do {
                         try await supabase.from("strava_activities")
                             .upsert(activity, onConflict: "strava_id")
