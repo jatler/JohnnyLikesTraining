@@ -13,6 +13,15 @@ final class PatreonService {
     /// Non-nil when patron_status has lapsed but the 7-day grace window is still open.
     private(set) var gracePeriodDaysRemaining: Int?
 
+    /// Master switch for the Patreon paywall. Off by default so the app is
+    /// usable without any Patreon setup; flipped on in Settings once the
+    /// integration is ready to gate users.
+    var isRequired: Bool {
+        didSet { UserDefaults.standard.set(isRequired, forKey: Self.isRequiredKey) }
+    }
+
+    private static let isRequiredKey = "patreon_integration_required"
+
     /// Access-token expiry, exposed for the debug observability panel.
     /// Backed by Keychain — stays in sync without an extra @Observable field.
     var tokenExpiresAt: Date? {
@@ -27,6 +36,7 @@ final class PatreonService {
     // MARK: - Init
 
     init() {
+        isRequired = UserDefaults.standard.bool(forKey: Self.isRequiredKey)
         isConnected = KeychainService.get(.patreonAccessToken) != nil
         isPatron = KeychainService.get(.patreonIsPatron) == "true"
         if let raw = KeychainService.get(.patreonLastVerifiedAt),

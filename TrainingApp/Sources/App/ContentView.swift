@@ -27,43 +27,44 @@ struct MainTabView: View {
     @Environment(HeatStore.self) private var heatStore
     @Environment(StretchStore.self) private var stretchStore
 
-    /// True while a non-patron, non-grace, non-dev-bypass user is using the app.
-    /// Gate stays presented until `isPatron` flips true (or grace period starts).
+    private enum Tab: Hashable { case week, progress, strength, settings }
+    @State private var selectedTab: Tab = .week
+
+    /// True while a non-patron, non-grace, non-dev-bypass user is using the app
+    /// AND the Patreon integration is enabled. Settings tab is always exempt so
+    /// the user can disconnect/disable Patreon even when the gate would fire.
     private var shouldShowPatreonGate: Bool {
-        !patreon.isPatron
+        patreon.isRequired
+            && !patreon.isPatron
             && patreon.gracePeriodDaysRemaining == nil
             && !DevSignIn.isAllowed
+            && selectedTab != .settings
     }
 
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             WeekView()
-                .tabItem {
-                    Label("Week", systemImage: "calendar")
-                }
+                .tabItem { Label("Week", systemImage: "calendar") }
+                .tag(Tab.week)
 
             ProgressDashboardView()
-                .tabItem {
-                    Label("Progress", systemImage: "chart.bar.fill")
-                }
+                .tabItem { Label("Progress", systemImage: "chart.bar.fill") }
+                .tag(Tab.progress)
 
             StrengthTemplateView()
-                .tabItem {
-                    Label("Strength", systemImage: "dumbbell.fill")
-                }
+                .tabItem { Label("Strength", systemImage: "dumbbell.fill") }
+                .tag(Tab.strength)
 
             SettingsView()
-                .tabItem {
-                    Label("Settings", systemImage: "gearshape")
-                }
+                .tabItem { Label("Settings", systemImage: "gearshape") }
+                .tag(Tab.settings)
         }
         .tint(Color.trailGreen)
         .sheet(isPresented: Binding(
             get: { shouldShowPatreonGate },
             // Drag-to-dismiss is a no-op: the gate stays visible until the
-            // user becomes a patron (or hits the grace window). The sheet
-            // re-evaluates against `shouldShowPatreonGate` on every state
-            // change, so SwiftUI handles the actual dismissal automatically.
+            // user becomes a patron, hits the grace window, or navigates to
+            // Settings. SwiftUI re-evaluates on every state change.
             set: { _ in }
         )) {
             PatreonGateView()

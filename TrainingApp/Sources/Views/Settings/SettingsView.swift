@@ -195,7 +195,20 @@ struct SettingsView: View {
 
     @ViewBuilder
     private var patreonSection: some View {
+        @Bindable var patreon = patreon
+        Toggle(isOn: $patreon.isRequired) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Require Patreon").font(TrailFont.body)
+                Text("Gate the app behind a SWAP $5+ membership")
+                    .font(TrailFont.meta)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .tint(Color.trailGreen)
+        .padding(.horizontal, 14).padding(.vertical, 12)
+
         if patreon.isConnected {
+            divider()
             HStack {
                 HStack(spacing: 10) {
                     Image(systemName: "star.circle.fill")
@@ -222,6 +235,7 @@ struct SettingsView: View {
                     Text("You'll lose access to SWAP training plans.")
                 }
         } else {
+            divider()
             buttonRow("Connect Patreon", icon: "star.circle.fill", color: Color.trailGreen) { connectPatreon() }
         }
     }
