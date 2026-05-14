@@ -113,8 +113,9 @@ struct HeatLogSheet: View {
                 // Burst animation on first appearance — same one-shot pattern
                 // as the Week tab. CompletionCelebrationStore prevents a
                 // replay on subsequent sheet opens or row appearances.
+                // magnitude = 20 → Week-tab-sized grow (~2.4×).
                 CompleteStatus(
-                    magnitude: 1.0,
+                    magnitude: 20,
                     label: "",
                     sessionId: session.id,
                     baseSize: 22
@@ -122,6 +123,7 @@ struct HeatLogSheet: View {
                 Text("\(log.actualDurationMinutes) min")
                     .font(TrailFont.data)
                     .fontWeight(.medium)
+                    .foregroundStyle(Color.trailGreen)
             }
         }
     }

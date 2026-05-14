@@ -296,6 +296,7 @@ struct SessionDetailSheet: View {
                     Text(String(format: "%.1f mi", dayTotalMiles))
                         .font(TrailFont.data)
                         .fontWeight(.medium)
+                        .foregroundStyle(Color.trailGreen)
                 }
             } else if isManuallyComplete {
                 Image(systemName: "checkmark.circle.fill")

@@ -271,6 +271,15 @@ struct WeekView: View {
                     sessionId: session.id
                 )
             }
+        } else if planStore.isManuallyComplete(session.id) {
+            // User pressed Mark Done in the detail sheet without a Strava match.
+            // Same burst-on-first-appearance as the Strava-match path so manual
+            // completion feels like the same celebration. No mileage label.
+            CompleteStatus(
+                magnitude: 20,
+                label: "",
+                sessionId: session.id
+            )
         } else if skipped {
             Text("Skipped")
                 .font(TrailFont.meta)

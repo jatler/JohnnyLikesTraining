@@ -144,9 +144,10 @@ private struct SessionDetail: View {
             // Burst animation on first appearance, same as the Week tab.
             // CompletionCelebrationStore keeps the burst one-shot — second
             // visit to the sheet (or the row outside) shows the filled
-            // checked state directly.
+            // checked state directly. magnitude = 20 produces a Week-tab-sized
+            // grow (~2.4×) since strength has no mileage to scale against.
             CompleteStatus(
-                magnitude: 1.0,
+                magnitude: 20,
                 label: "",
                 sessionId: session.id,
                 baseSize: 22

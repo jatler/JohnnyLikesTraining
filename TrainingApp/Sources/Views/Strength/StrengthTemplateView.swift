@@ -517,10 +517,11 @@ struct StrengthTemplateView: View {
         case .done:
             if let celebrationId {
                 // Strength + heat rows: full burst animation, played once per
-                // session via CompletionCelebrationStore. magnitude = 1.0 keeps
-                // the burst subtle since there's no natural mileage metric.
+                // session via CompletionCelebrationStore. magnitude = 20 so the
+                // peak scale matches a typical Week-tab long run (~2.4× grow),
+                // since strength/heat have no natural mileage to scale against.
                 CompleteStatus(
-                    magnitude: 1.0,
+                    magnitude: 20,
                     label: "",
                     sessionId: celebrationId,
                     baseSize: 18
