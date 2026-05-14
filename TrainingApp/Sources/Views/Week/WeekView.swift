@@ -106,8 +106,21 @@ struct WeekView: View {
                 Spacer()
 
                 HStack(spacing: 0) {
+                    NavigationLink {
+                        PlanCalendarView()
+                    } label: {
+                        Image(systemName: "calendar")
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                    }
+
                     Button {
-                        if selectedWeek > 1 { selectedWeek -= 1 }
+                        // withAnimation so chevron taps mirror the TabView's
+                        // page-style swipe — without it the week change is
+                        // instant while a swipe slides smoothly.
+                        if selectedWeek > 1 {
+                            withAnimation { selectedWeek -= 1 }
+                        }
                     } label: {
                         Image(systemName: "chevron.left")
                             .frame(width: 44, height: 44)
@@ -116,21 +129,15 @@ struct WeekView: View {
                     .disabled(selectedWeek <= 1)
 
                     Button {
-                        if selectedWeek < planStore.totalWeeks { selectedWeek += 1 }
+                        if selectedWeek < planStore.totalWeeks {
+                            withAnimation { selectedWeek += 1 }
+                        }
                     } label: {
                         Image(systemName: "chevron.right")
                             .frame(width: 44, height: 44)
                             .contentShape(Rectangle())
                     }
                     .disabled(selectedWeek >= planStore.totalWeeks)
-
-                    NavigationLink {
-                        PlanCalendarView()
-                    } label: {
-                        Image(systemName: "calendar")
-                            .frame(width: 44, height: 44)
-                            .contentShape(Rectangle())
-                    }
                 }
             }
 
@@ -247,7 +254,7 @@ struct WeekView: View {
             // where multiple Strava runs land on one scheduled session.
             let dayRuns = strava.runActivities(on: session.scheduledDate)
             let dayMiles = dayRuns.reduce(0.0) { $0 + $1.distanceMi }
-            RunCompleteStatus(miles: dayMiles)
+            RunCompleteStatus(miles: dayMiles, sessionId: session.id)
         } else if skipped {
             Text("Skipped")
                 .font(TrailFont.meta)
@@ -411,34 +418,56 @@ struct WeekView: View {
 /// `CompletionParams.burst`. Plays once when the row first appears.
 private struct RunCompleteStatus: View {
     let miles: Double
+    let sessionId: UUID
     @State private var trigger: Int = 0
-    @State private var milesLabelVisible: Bool = false
+    @State private var milesLabelVisible: Bool
+    private let alreadyCelebrated: Bool
     private let params = CompletionParams.burst
 
+    init(miles: Double, sessionId: UUID) {
+        self.miles = miles
+        self.sessionId = sessionId
+        // Consult the celebration store at view init so the dot can render
+        // its filled+checked state immediately on first appearance for
+        // already-celebrated sessions. Without this, swiping back to a week
+        // whose completions have already been seen would replay the burst.
+        let celebrated = CompletionCelebrationStore.shared.contains(sessionId)
+        self.alreadyCelebrated = celebrated
+        _milesLabelVisible = State(initialValue: celebrated)
+    }
+
     var body: some View {
-        VStack(alignment: .trailing, spacing: 2) {
+        // VStack spacing matches the left-column session VStack (spacing: 3),
+        // and the dot's outer frame is sized to the displayName's line height
+        // (~22pt for system size:18) so the "16.1 mi" baseline lines up with
+        // the coach-notes range ("8-14 mi") in the row to its left.
+        VStack(alignment: .trailing, spacing: 3) {
             MilesCompletionDot(
                 miles: miles,
                 variant: .burst,
                 params: params,
                 trigger: trigger,
-                baseSize: 18
+                baseSize: 18,
+                initiallyCompleted: alreadyCelebrated
             )
+            .frame(height: 22)
             if miles > 0 {
                 Text(String(format: "%.1f mi", miles))
                     .font(TrailFont.data)
                     .fontWeight(.medium)
-                    .foregroundStyle(.green)
+                    .foregroundStyle(Color.trailGreen)
                     .opacity(milesLabelVisible ? 1 : 0)
             }
         }
         .onAppear {
+            guard !alreadyCelebrated else { return }
             guard trigger == 0 else { return }
             trigger = 1
             DispatchQueue.main.asyncAfter(deadline: .now() + params.totalDuration) {
                 withAnimation(.easeOut(duration: 0.25)) {
                     milesLabelVisible = true
                 }
+                CompletionCelebrationStore.shared.mark(sessionId)
             }
         }
     }

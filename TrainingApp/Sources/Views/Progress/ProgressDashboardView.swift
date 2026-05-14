@@ -82,7 +82,9 @@ struct ProgressDashboardView: View {
                 // Native page dots hidden — we render our own below the card
                 // so they sit outside the shadow and can be tinted per-page.
                 .tabViewStyle(.page(indexDisplayMode: .never))
-                .frame(height: 248)
+                // +8pt to compensate for the 4pt vertical margin each card now
+                // claims for its shadow.
+                .frame(height: 256)
                 chartPageDots
                 raceCard(entries: entries)
             }
@@ -301,6 +303,12 @@ struct ProgressDashboardView: View {
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
+        // TabView page-style clips at the page bounds, so a shadow rendered
+        // at the card edge gets cropped and looks different from the
+        // session-row / focused-week / race cards elsewhere. The 4pt margin
+        // gives all four shadow sides room to render fully.
+        .padding(.horizontal, 4)
+        .padding(.vertical, 4)
     }
 
     // MARK: - Elevation Card
@@ -332,6 +340,8 @@ struct ProgressDashboardView: View {
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
+        .padding(.horizontal, 4)
+        .padding(.vertical, 4)
     }
 
     // MARK: - Time Card
@@ -365,6 +375,8 @@ struct ProgressDashboardView: View {
                 .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
         )
         .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
+        .padding(.horizontal, 4)
+        .padding(.vertical, 4)
     }
 
     private func formatHours(_ value: Double) -> String {

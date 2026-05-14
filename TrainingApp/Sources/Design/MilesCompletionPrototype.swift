@@ -90,12 +90,37 @@ struct MilesCompletionDot: View {
     let params: CompletionParams
     let trigger: Int          // bump to replay
     var baseSize: CGFloat = 22
+    /// When true, the dot renders in its post-animation final state (filled
+    /// circle with white check) at first appearance and the trigger-based
+    /// animation is skipped. Used by the Week tab so that swiping between
+    /// already-celebrated weeks doesn't replay the burst.
+    var initiallyCompleted: Bool = false
 
-    @State private var scale: CGFloat = 1.0
-    @State private var fillProgress: Double = 0.0
-    @State private var checkScale: CGFloat = 0.4
-    @State private var checkOpacity: Double = 0.0
+    @State private var scale: CGFloat
+    @State private var fillProgress: Double
+    @State private var checkScale: CGFloat
+    @State private var checkOpacity: Double
     @State private var rings: [RingState] = []
+
+    init(
+        miles: Double,
+        variant: CompletionVariant,
+        params: CompletionParams,
+        trigger: Int,
+        baseSize: CGFloat = 22,
+        initiallyCompleted: Bool = false
+    ) {
+        self.miles = miles
+        self.variant = variant
+        self.params = params
+        self.trigger = trigger
+        self.baseSize = baseSize
+        self.initiallyCompleted = initiallyCompleted
+        _scale = State(initialValue: 1.0)
+        _fillProgress = State(initialValue: initiallyCompleted ? 1.0 : 0.0)
+        _checkScale = State(initialValue: initiallyCompleted ? 1.0 : 0.4)
+        _checkOpacity = State(initialValue: initiallyCompleted ? 1.0 : 0.0)
+    }
 
     private var peakScale: Double {
         let cap = max(params.milesCap, 0.01)

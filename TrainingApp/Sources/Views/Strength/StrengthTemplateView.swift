@@ -139,25 +139,16 @@ struct StrengthTemplateView: View {
     }
 
     private var header: some View {
-        // Mirror WeekView's weekNavigator (Week N + chevrons + date range), but
-        // restore the Strength tab's identity with a small "STRENGTH" eyebrow
-        // above so users can tell the two screens apart at a glance — they share
-        // green header chrome and the same chevron pattern.
-        let titleInset: CGFloat = 8
+        // Two-line green bar — matches Week / Progress / Settings vertical
+        // height. Title "Strength + Heat" stays as the tab's identity; week
+        // selector + date range share line two so the bar doesn't grow.
         let total = planStore.totalWeeks
 
         return VStack(alignment: .leading, spacing: 4) {
-            Text("STRENGTH")
-                .font(TrailFont.data)
-                .tracking(0.5)
-                .foregroundStyle(.white.opacity(0.85))
-                .padding(.leading, titleInset)
-
             HStack(alignment: .firstTextBaseline) {
-                Text("Week \(selectedWeek)")
+                Text("Strength + Heat")
                     .font(TrailFont.tabHeading)
                     .foregroundStyle(.white)
-                    .padding(.leading, titleInset)
 
                 Spacer()
 
@@ -186,12 +177,13 @@ struct StrengthTemplateView: View {
                 }
             }
 
-            Text(weekDateRange(for: selectedWeek))
+            // "WEEK 04 · MAR 4 — MAR 10" — keeps the week indicator and the
+            // date range on a single line so the bar stays two lines tall.
+            Text(weekLine(for: selectedWeek))
                 .font(TrailFont.data)
                 .foregroundStyle(.white.opacity(0.85))
                 .textCase(.uppercase)
                 .tracking(0.5)
-                .padding(.leading, titleInset)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
@@ -199,6 +191,13 @@ struct StrengthTemplateView: View {
         .background(Color.trailGreen)
         .background(Color.trailGreen.ignoresSafeArea(edges: .top))
         .tint(.white)
+    }
+
+    private func weekLine(for week: Int) -> String {
+        let range = weekDateRange(for: week)
+        let label = String(format: "Week %02d", week)
+        if range.isEmpty { return label }
+        return "\(label) \u{00B7} \(range)"
     }
 
     private var segmentedPicker: some View {
