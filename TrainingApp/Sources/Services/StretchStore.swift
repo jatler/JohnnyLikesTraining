@@ -237,15 +237,15 @@ final class StretchStore {
         guard !isOffline else { return }
 
         Task {
-            do {
+            let result = await SupabaseService.shared.execute(table: "stretch_logs", operation: "delete") {
                 try await supabase.from("stretch_logs")
                     .delete()
                     .eq("id", value: log.id)
                     .execute()
-            } catch {
-                print("Failed to delete stretch log from Supabase: \(error)")
-            lastError = "Failed to delete stretch log."
-}
+            }
+            if case .failure(let err) = result, !err.isRetryable {
+                lastError = err.userFacing
+            }
         }
     }
 
@@ -307,7 +307,8 @@ final class StretchStore {
         defer { isLoading = false }
         guard !isOffline else { return }
 
-        do {
+        let result = await SupabaseService.shared.execute(table: "stretch_templates", operation: "select") {
+            () -> (StretchTemplate?, [StretchTemplateExercise], [StretchSession], [StretchLog]) in
             let templates: [StretchTemplate] = try await supabase
                 .from("stretch_templates")
                 .select()
@@ -316,10 +317,11 @@ final class StretchStore {
                 .execute()
                 .value
 
-            guard let tmpl = templates.first else { return }
-            template = tmpl
+            guard let tmpl = templates.first else {
+                return (nil, [], [], [])
+            }
 
-            exercises = try await supabase
+            let loadedExercises: [StretchTemplateExercise] = try await supabase
                 .from("stretch_template_exercises")
                 .select()
                 .eq("template_id", value: tmpl.id)
@@ -327,7 +329,7 @@ final class StretchStore {
                 .execute()
                 .value
 
-            sessions = try await supabase
+            let loadedSessions: [StretchSession] = try await supabase
                 .from("stretch_sessions")
                 .select()
                 .eq("plan_id", value: planId)
@@ -335,9 +337,10 @@ final class StretchStore {
                 .execute()
                 .value
 
-            if !sessions.isEmpty {
-                let sessionIds = sessions.map { $0.id.uuidString }
-                logs = try await supabase
+            var loadedLogs: [StretchLog] = []
+            if !loadedSessions.isEmpty {
+                let sessionIds = loadedSessions.map { $0.id.uuidString }
+                loadedLogs = try await supabase
                     .from("stretch_logs")
                     .select()
                     .in("session_id", values: sessionIds)
@@ -345,9 +348,20 @@ final class StretchStore {
                     .execute()
                     .value
             }
+            return (tmpl, loadedExercises, loadedSessions, loadedLogs)
+        }
+        switch result {
+        case .success(let (loadedTemplate, loadedExercises, loadedSessions, loadedLogs)):
+            guard let loadedTemplate else { return }
+            template = loadedTemplate
+            exercises = loadedExercises
+            sessions = loadedSessions
+            logs = loadedLogs
             saveToCache()
-        } catch {
-            lastError = "Failed to load stretch data."
+        case .failure(let err):
+            if !err.isRetryable {
+                lastError = err.userFacing
+            }
         }
     }
 
@@ -391,47 +405,59 @@ final class StretchStore {
 
     private func persistTemplate() async {
         guard !isOffline, let template else { return }
-        do {
-            try await supabase.from("stretch_templates").upsert(template).execute()
+        let result = await SupabaseService.shared.execute(table: "stretch_templates", operation: "upsert") {
+            () -> Void in
+            try await supabase.from("stretch_templates")
+                .upsert(template, onConflict: "id")
+                .execute()
             if !exercises.isEmpty {
-                try await supabase.from("stretch_template_exercises").upsert(exercises).execute()
+                try await supabase.from("stretch_template_exercises")
+                    .upsert(exercises, onConflict: "id")
+                    .execute()
             }
             if !sessions.isEmpty {
-                try await supabase.from("stretch_sessions").upsert(sessions).execute()
+                try await supabase.from("stretch_sessions")
+                    .upsert(sessions, onConflict: "id")
+                    .execute()
             }
-        } catch {
-            print("Failed to persist stretch template to Supabase: \(error)")
-            lastError = "Failed to save stretch template."
-}
+        }
+        if case .failure(let err) = result, !err.isRetryable {
+            lastError = err.userFacing
+        }
     }
 
     private func persistExerciseUpdate(_ exercise: StretchTemplateExercise) async {
         guard !isOffline else { return }
-        do {
+        let result = await SupabaseService.shared.execute(table: "stretch_template_exercises", operation: "update") {
             try await supabase.from("stretch_template_exercises")
                 .update(exercise)
                 .eq("id", value: exercise.id)
                 .execute()
-        } catch {
-            print("Failed to persist stretch exercise update to Supabase: \(error)")
-            lastError = "Failed to save stretch exercise update."
-}
+        }
+        if case .failure(let err) = result, !err.isRetryable {
+            lastError = err.userFacing
+        }
     }
 
     private func persistNewExercise(_ exercise: StretchTemplateExercise) async {
         guard !isOffline else { return }
-        do {
+        let result = await SupabaseService.shared.execute(table: "stretch_template_exercises", operation: "insert") {
             try await supabase.from("stretch_template_exercises").insert(exercise).execute()
+        }
+        switch result {
+        case .success:
             await persistAllSessions()
-        } catch {
-            print("Failed to persist new stretch exercise to Supabase: \(error)")
-            lastError = "Failed to save new stretch exercise."
-}
+        case .failure(let err):
+            if !err.isRetryable {
+                lastError = err.userFacing
+            }
+        }
     }
 
     private func persistExerciseDelete(_ exercise: StretchTemplateExercise) async {
         guard !isOffline else { return }
-        do {
+        let result = await SupabaseService.shared.execute(table: "stretch_template_exercises", operation: "delete") {
+            () -> Void in
             try await supabase.from("stretch_template_exercises")
                 .delete()
                 .eq("id", value: exercise.id)
@@ -441,31 +467,31 @@ final class StretchStore {
                 .delete()
                 .eq("template_exercise_id", value: exercise.id)
                 .execute()
-        } catch {
-            print("Failed to delete stretch exercise from Supabase: \(error)")
-            lastError = "Failed to delete stretch exercise."
-}
+        }
+        if case .failure(let err) = result, !err.isRetryable {
+            lastError = err.userFacing
+        }
     }
 
     private func persistAllSessions() async {
-        guard !isOffline, let planId = template?.planId else { return }
-        do {
-            if !sessions.isEmpty {
-                try await supabase.from("stretch_sessions").upsert(sessions).execute()
-            }
-        } catch {
-            print("Failed to persist stretch sessions to Supabase: \(error)")
-            lastError = "Failed to save stretch sessions."
+        guard !isOffline, template?.planId != nil, !sessions.isEmpty else { return }
+        let result = await SupabaseService.shared.execute(table: "stretch_sessions", operation: "upsert") {
+            try await supabase.from("stretch_sessions")
+                .upsert(sessions, onConflict: "id")
+                .execute()
+        }
+        if case .failure(let err) = result, !err.isRetryable {
+            lastError = err.userFacing
         }
     }
 
     private func persistLog(_ log: StretchLog) async {
         guard !isOffline else { return }
-        do {
+        let result = await SupabaseService.shared.execute(table: "stretch_logs", operation: "insert") {
             try await supabase.from("stretch_logs").insert(log).execute()
-        } catch {
-            print("Failed to persist stretch log to Supabase: \(error)")
-            lastError = "Failed to save stretch log."
-}
+        }
+        if case .failure(let err) = result, !err.isRetryable {
+            lastError = err.userFacing
+        }
     }
 }

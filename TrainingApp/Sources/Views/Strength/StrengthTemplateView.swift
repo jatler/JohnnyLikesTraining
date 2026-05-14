@@ -18,14 +18,16 @@ struct StrengthTemplateView: View {
     @State private var stretchToDelete: StretchTemplateExercise?
     @State private var selectedSegment: StrengthTabSegment = .strength
     @State private var showingAddStrengthDay = false
+    @State private var selectedWeek: Int = 1
+    @State private var hasInitializedWeek = false
 
     private let dayAbbrev = ["", "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
     private let dayNames = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
     enum StrengthTabSegment: String, CaseIterable {
         case strength = "Strength"
-        case stretch = "Stretch"
         case heat = "Heat"
+        case stretch = "Stretch"
     }
 
     private enum RowState { case done, today, upcoming, skipped }
@@ -103,41 +105,100 @@ struct StrengthTemplateView: View {
         VStack(spacing: 0) {
             header
             segmentedPicker
-            summaryBar
-            ScrollView {
-                LazyVStack(spacing: 10) {
-                    switch selectedSegment {
-                    case .strength: strengthRows
-                    case .stretch:  stretchRows
-                    case .heat:     heatRows
+            summaryBar(for: selectedWeek)
+            // Week-paginated content — same pattern as WeekView. Each week is its
+            // own ScrollView so the swipe gesture is owned by the TabView and
+            // doesn't fight per-row scroll.
+            TabView(selection: $selectedWeek) {
+                ForEach(planStore.allWeekNumbers, id: \.self) { week in
+                    ScrollView {
+                        LazyVStack(spacing: 10) {
+                            switch selectedSegment {
+                            case .strength: strengthRows(for: week)
+                            case .stretch:  stretchRows(for: week)
+                            case .heat:     heatRows(for: week)
+                            }
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 12)
+                        .padding(.bottom, 20)
                     }
+                    .tag(week)
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 12)
-                .padding(.bottom, 20)
             }
+            .tabViewStyle(.page(indexDisplayMode: .never))
         }
-        .onAppear(perform: syncStrengthFromPlan)
+        .onAppear {
+            if !hasInitializedWeek {
+                selectedWeek = planStore.currentWeekNumber ?? planStore.allWeekNumbers.first ?? 1
+                hasInitializedWeek = true
+            }
+            syncStrengthFromPlan()
+        }
         .onChange(of: planStore.allWeekNumbers) { _, _ in syncStrengthFromPlan() }
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Strength + Heat")
-                .font(TrailFont.tabHeading)
-                .foregroundStyle(.white)
+        // Mirror WeekView's weekNavigator (Week N + chevrons + date range), but
+        // restore the Strength tab's identity with a small "STRENGTH" eyebrow
+        // above so users can tell the two screens apart at a glance — they share
+        // green header chrome and the same chevron pattern.
+        let titleInset: CGFloat = 8
+        let total = planStore.totalWeeks
 
-            Text(weekDateRange)
+        return VStack(alignment: .leading, spacing: 4) {
+            Text("STRENGTH")
+                .font(TrailFont.data)
+                .tracking(0.5)
+                .foregroundStyle(.white.opacity(0.85))
+                .padding(.leading, titleInset)
+
+            HStack(alignment: .firstTextBaseline) {
+                Text("Week \(selectedWeek)")
+                    .font(TrailFont.tabHeading)
+                    .foregroundStyle(.white)
+                    .padding(.leading, titleInset)
+
+                Spacer()
+
+                HStack(spacing: 0) {
+                    Button {
+                        if selectedWeek > 1 {
+                            withAnimation { selectedWeek -= 1 }
+                        }
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .disabled(selectedWeek <= 1)
+
+                    Button {
+                        if selectedWeek < total {
+                            withAnimation { selectedWeek += 1 }
+                        }
+                    } label: {
+                        Image(systemName: "chevron.right")
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .disabled(selectedWeek >= total)
+                }
+            }
+
+            Text(weekDateRange(for: selectedWeek))
                 .font(TrailFont.data)
                 .foregroundStyle(.white.opacity(0.85))
                 .textCase(.uppercase)
                 .tracking(0.5)
+                .padding(.leading, titleInset)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
         .padding(.vertical, 13)
         .background(Color.trailGreen)
         .background(Color.trailGreen.ignoresSafeArea(edges: .top))
+        .tint(.white)
     }
 
     private var segmentedPicker: some View {
@@ -151,8 +212,7 @@ struct StrengthTemplateView: View {
         .padding(.vertical, 8)
     }
 
-    private var weekDateRange: String {
-        let week = planStore.currentWeekNumber ?? 1
+    private func weekDateRange(for week: Int) -> String {
         let weekSessions = planStore.sessions(for: week)
         guard let first = weekSessions.first?.scheduledDate,
               let last  = weekSessions.last?.scheduledDate else {
@@ -170,8 +230,8 @@ struct StrengthTemplateView: View {
         strengthStore.refreshFromPlannedSessions(planStore.sessions, planId: planId)
     }
 
-    private var summaryBar: some View {
-        let (planned, done) = currentSegmentCounts()
+    private func summaryBar(for week: Int) -> some View {
+        let (planned, done) = currentSegmentCounts(for: week)
         return HStack(spacing: 10) {
             Image(systemName: "chart.bar.fill")
                 .font(.system(size: 12))
@@ -202,8 +262,7 @@ struct StrengthTemplateView: View {
         }
     }
 
-    private func currentSegmentCounts() -> (planned: Int, done: Int) {
-        let week = planStore.currentWeekNumber ?? 1
+    private func currentSegmentCounts(for week: Int) -> (planned: Int, done: Int) {
         switch selectedSegment {
         case .strength:
             let s = strengthStore.sessions(for: week)
@@ -227,8 +286,7 @@ struct StrengthTemplateView: View {
 
     // MARK: - Segment Rows
 
-    private var strengthRows: some View {
-        let week = planStore.currentWeekNumber ?? 1
+    private func strengthRows(for week: Int) -> some View {
         let sessions = strengthStore.sessions(for: week).sorted { $0.dayOfWeek < $1.dayOfWeek }
 
         return Group {
@@ -308,8 +366,7 @@ struct StrengthTemplateView: View {
         .padding(.top, 12)
     }
 
-    private var stretchRows: some View {
-        let week = planStore.currentWeekNumber ?? 1
+    private func stretchRows(for week: Int) -> some View {
         let days = stretchStore.daysWithExercises
 
         return Group {
@@ -367,9 +424,8 @@ struct StrengthTemplateView: View {
         }
     }
 
-    private var heatRows: some View {
+    private func heatRows(for week: Int) -> some View {
         let entries = heatDaysFromSessions()
-        let week = planStore.currentWeekNumber ?? 1
 
         return Group {
             if entries.isEmpty {

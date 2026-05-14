@@ -142,15 +142,15 @@ final class TrainingPlanStore {
         guard !isOffline else { return }
 
         Task {
-            do {
+            let result = await SupabaseService.shared.execute(table: "training_plans", operation: "update") {
                 try await supabase.from("training_plans")
                     .update(PlanNameUpdate(name: name))
                     .eq("id", value: plan.id)
                     .execute()
-            } catch {
-                print("Failed to persist race name to Supabase: \(error)")
-                lastError = "Failed to save race name."
-}
+            }
+            if case .failure(let err) = result, !err.isRetryable {
+                lastError = err.userFacing
+            }
         }
     }
 
@@ -185,15 +185,15 @@ final class TrainingPlanStore {
         guard !isOffline else { return }
         if let oldId = oldPlanId {
             Task {
-                do {
+                let result = await SupabaseService.shared.execute(table: "training_plans", operation: "delete") {
                     try await supabase.from("training_plans")
                         .delete()
                         .eq("id", value: oldId)
                         .execute()
-                } catch {
-                    print("Failed to delete old plan from Supabase: \(error)")
-                    lastError = "Failed to delete old plan."
-}
+                }
+                if case .failure(let err) = result, !err.isRetryable {
+                    lastError = err.userFacing
+                }
             }
         }
     }
@@ -296,16 +296,25 @@ final class TrainingPlanStore {
     }
 
     /// Try to push a single PendingSwap to Supabase. On success, dequeue it.
-    /// On failure (offline, network, transient error), leave it queued so
-    /// `replayPendingSwaps()` picks it up at the next loadPlan.
+    /// On retryable failure (network/timeout/5xx) leave it queued — silent;
+    /// `replayPendingSwaps()` picks it up at the next loadPlan. On non-retryable
+    /// failure (RLS denial, validation), surface the real PostgREST message so
+    /// the user knows what's wrong — the bogus "Will sync when online" alert
+    /// when actually online was the bug here.
     private func persistPendingSwap(_ pending: PendingSwap) async {
         guard !isOffline else { return }
         do {
             try await pushSwapToSupabase(pending)
             removePending(pending.swap.id)
         } catch {
-            print("Failed to persist swap (will retry): \(error)")
-            lastError = "Swap saved locally. Will sync when online."
+            let err = PersistenceError.from(error, table: "session_swaps", operation: "upsert")
+            print(err.description)
+            if err.isAuthFailure {
+                SupabaseService.shared.onAuthFailure?()
+            } else if !err.isRetryable {
+                lastError = err.userFacing
+            }
+            // Retryable failures: swap stays in pendingSwaps for retry — no alert.
         }
     }
 
@@ -336,7 +345,7 @@ final class TrainingPlanStore {
     /// caller can decide whether to retry or surface the error.
     private func pushSwapToSupabase(_ pending: PendingSwap) async throws {
         try await supabase.from("session_swaps")
-            .upsert(pending.swap)
+            .upsert(pending.swap, onConflict: "id")
             .execute()
 
         try await supabase.from("planned_sessions")
@@ -391,15 +400,15 @@ final class TrainingPlanStore {
         guard !isOffline else { return }
 
         Task {
-            do {
+            let result = await SupabaseService.shared.execute(table: "session_skips", operation: "delete") {
                 try await supabase.from("session_skips")
                     .delete()
                     .eq("id", value: skip.id)
                     .execute()
-            } catch {
-                print("Failed to delete skip from Supabase: \(error)")
-                lastError = "Failed to delete skip."
-}
+            }
+            if case .failure(let err) = result, !err.isRetryable {
+                lastError = err.userFacing
+            }
         }
     }
 
@@ -495,15 +504,15 @@ final class TrainingPlanStore {
 
         Task {
             await persistSessionFieldUpdate(sessions[sessionIndex])
-            do {
+            let result = await SupabaseService.shared.execute(table: "session_overrides", operation: "delete") {
                 try await supabase.from("session_overrides")
                     .delete()
                     .eq("id", value: overrideId)
                     .execute()
-            } catch {
-                print("Failed to delete override from Supabase: \(error)")
-                lastError = "Failed to delete override."
-}
+            }
+            if case .failure(let err) = result, !err.isRetryable {
+                lastError = err.userFacing
+            }
         }
     }
 
@@ -640,15 +649,15 @@ final class TrainingPlanStore {
         guard !isOffline else { return }
         if let oldId = oldPlanId {
             Task {
-                do {
+                let result = await SupabaseService.shared.execute(table: "training_plans", operation: "delete") {
                     try await supabase.from("training_plans")
                         .delete()
                         .eq("id", value: oldId)
                         .execute()
-                } catch {
-                    print("Failed to delete plan from Supabase: \(error)")
-                    lastError = "Failed to delete plan."
-}
+                }
+                if case .failure(let err) = result, !err.isRetryable {
+                    lastError = err.userFacing
+                }
             }
         }
     }
@@ -659,18 +668,18 @@ final class TrainingPlanStore {
 
     private func persistNewPlan() async {
         guard !isOffline, let plan = activePlan else { return }
-        do {
+        let result = await SupabaseService.shared.execute(table: "training_plans", operation: "insert") { () -> Void in
             try await supabase.from("training_plans").insert(plan).execute()
             try await supabase.from("planned_sessions").insert(sessions).execute()
-        } catch {
-            print("Failed to persist new plan to Supabase: \(error)")
-            lastError = "Failed to save new plan."
-}
+        }
+        if case .failure(let err) = result, !err.isRetryable {
+            lastError = err.userFacing
+        }
     }
 
     private func persistDateUpdate() async {
         guard !isOffline, let plan = activePlan else { return }
-        do {
+        let result = await SupabaseService.shared.execute(table: "training_plans", operation: "update") { () -> Void in
             try await supabase.from("training_plans")
                 .update(PlanDateUpdate(raceDate: plan.raceDate, planStartDate: plan.planStartDate))
                 .eq("id", value: plan.id)
@@ -682,35 +691,35 @@ final class TrainingPlanStore {
                     .eq("id", value: session.id)
                     .execute()
             }
-        } catch {
-            print("Failed to persist date update to Supabase: \(error)")
-            lastError = "Failed to save date update."
-}
+        }
+        if case .failure(let err) = result, !err.isRetryable {
+            lastError = err.userFacing
+        }
     }
 
     private func persistSkip(_ skip: SessionSkip) async {
         guard !isOffline else { return }
-        do {
+        let result = await SupabaseService.shared.execute(table: "session_skips", operation: "insert") {
             try await supabase.from("session_skips").insert(skip).execute()
-        } catch {
-            print("Failed to persist skip to Supabase: \(error)")
-            lastError = "Failed to save skip."
-}
+        }
+        if case .failure(let err) = result, !err.isRetryable {
+            lastError = err.userFacing
+        }
     }
 
     private func persistOverride(_ override: SessionOverride) async {
         guard !isOffline else { return }
-        do {
+        let result = await SupabaseService.shared.execute(table: "session_overrides", operation: "insert") {
             try await supabase.from("session_overrides").insert(override).execute()
-        } catch {
-            print("Failed to persist override to Supabase: \(error)")
-            lastError = "Failed to save override."
-}
+        }
+        if case .failure(let err) = result, !err.isRetryable {
+            lastError = err.userFacing
+        }
     }
 
     private func persistSessionFieldUpdate(_ session: PlannedSession) async {
         guard !isOffline else { return }
-        do {
+        let result = await SupabaseService.shared.execute(table: "planned_sessions", operation: "update") {
             try await supabase.from("planned_sessions")
                 .update(SessionFieldUpdate(
                     workoutType: session.workoutType,
@@ -720,10 +729,10 @@ final class TrainingPlanStore {
                 ))
                 .eq("id", value: session.id)
                 .execute()
-        } catch {
-            print("Failed to persist session update to Supabase: \(error)")
-            lastError = "Failed to save session update."
-}
+        }
+        if case .failure(let err) = result, !err.isRetryable {
+            lastError = err.userFacing
+        }
     }
 }
 

@@ -105,11 +105,13 @@ struct WeekView: View {
 
                 Spacer()
 
-                HStack(spacing: 14) {
+                HStack(spacing: 0) {
                     Button {
                         if selectedWeek > 1 { selectedWeek -= 1 }
                     } label: {
                         Image(systemName: "chevron.left")
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
                     }
                     .disabled(selectedWeek <= 1)
 
@@ -117,6 +119,8 @@ struct WeekView: View {
                         if selectedWeek < planStore.totalWeeks { selectedWeek += 1 }
                     } label: {
                         Image(systemName: "chevron.right")
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
                     }
                     .disabled(selectedWeek >= planStore.totalWeeks)
 
@@ -124,6 +128,8 @@ struct WeekView: View {
                         PlanCalendarView()
                     } label: {
                         Image(systemName: "calendar")
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
                     }
                 }
             }
@@ -241,17 +247,7 @@ struct WeekView: View {
             // where multiple Strava runs land on one scheduled session.
             let dayRuns = strava.runActivities(on: session.scheduledDate)
             let dayMiles = dayRuns.reduce(0.0) { $0 + $1.distanceMi }
-            VStack(alignment: .trailing, spacing: 2) {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 18))
-                    .foregroundStyle(.green)
-                if dayMiles > 0 {
-                    Text(String(format: "%.1f mi", dayMiles))
-                        .font(TrailFont.data)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.green)
-                }
-            }
+            RunCompleteStatus(miles: dayMiles)
         } else if skipped {
             Text("Skipped")
                 .font(TrailFont.meta)
@@ -276,12 +272,17 @@ struct WeekView: View {
 
     private func sync() async {
         guard let userId = auth.currentUserId else { return }
+        // Hit the upstream APIs, not just the Supabase cache. loadActivities /
+        // loadDailyData only re-read what's already on Supabase — they don't
+        // pull new runs/readiness from Strava or Oura. syncActivities /
+        // syncDaily talk to the source. merge:true so a transient API blip
+        // doesn't wipe what's already cached locally.
         if strava.isConnected {
-            await strava.loadActivities(userId: userId)
+            try? await strava.syncActivities(userId: userId, merge: true)
             strava.autoMatchActivities(sessions: planStore.sessions)
         }
         if oura.isConnected {
-            await oura.loadDailyData(userId: userId)
+            try? await oura.syncDaily(userId: userId, merge: true)
         }
     }
 
@@ -399,6 +400,46 @@ struct WeekView: View {
         }
         .sheet(isPresented: $showingPlanSetup) {
             PlanSetupView()
+        }
+    }
+}
+
+// MARK: - Run-complete trailing status
+
+/// Replaces the static checkmark + miles label with the miles-aware burst
+/// animation. Tuned in `MilesCompletionPrototype` and frozen in
+/// `CompletionParams.burst`. Plays once when the row first appears.
+private struct RunCompleteStatus: View {
+    let miles: Double
+    @State private var trigger: Int = 0
+    @State private var milesLabelVisible: Bool = false
+    private let params = CompletionParams.burst
+
+    var body: some View {
+        VStack(alignment: .trailing, spacing: 2) {
+            MilesCompletionDot(
+                miles: miles,
+                variant: .burst,
+                params: params,
+                trigger: trigger,
+                baseSize: 18
+            )
+            if miles > 0 {
+                Text(String(format: "%.1f mi", miles))
+                    .font(TrailFont.data)
+                    .fontWeight(.medium)
+                    .foregroundStyle(.green)
+                    .opacity(milesLabelVisible ? 1 : 0)
+            }
+        }
+        .onAppear {
+            guard trigger == 0 else { return }
+            trigger = 1
+            DispatchQueue.main.asyncAfter(deadline: .now() + params.totalDuration) {
+                withAnimation(.easeOut(duration: 0.25)) {
+                    milesLabelVisible = true
+                }
+            }
         }
     }
 }

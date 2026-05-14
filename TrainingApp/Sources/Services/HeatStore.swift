@@ -144,14 +144,14 @@ final class HeatStore {
         } else {
             Task {
                 for id in removedIds {
-                    do {
+                    let result = await SupabaseService.shared.execute(table: "heat_sessions", operation: "delete") {
                         try await supabase.from("heat_sessions")
                             .delete()
                             .eq("id", value: id)
                             .execute()
-                    } catch {
-                        print("Failed to delete heat session from Supabase: \(error)")
-                        lastError = "Failed to delete heat session."
+                    }
+                    if case .failure(let err) = result, !err.isRetryable {
+                        lastError = err.userFacing
                     }
                 }
             }
@@ -185,11 +185,13 @@ final class HeatStore {
 
     private func persistSessionUpdate(_ session: HeatSession) async {
         guard !isOffline else { return }
-        do {
-            try await supabase.from("heat_sessions").upsert(session).execute()
-        } catch {
-            print("Failed to persist heat session update: \(error)")
-            lastError = "Failed to save heat session."
+        let result = await SupabaseService.shared.execute(table: "heat_sessions", operation: "upsert") {
+            try await supabase.from("heat_sessions")
+                .upsert(session, onConflict: "id")
+                .execute()
+        }
+        if case .failure(let err) = result, !err.isRetryable {
+            lastError = err.userFacing
         }
     }
 
@@ -200,14 +202,14 @@ final class HeatStore {
         guard !isOffline else { return }
 
         Task {
-            do {
+            let result = await SupabaseService.shared.execute(table: "heat_logs", operation: "delete") {
                 try await supabase.from("heat_logs")
                     .delete()
                     .eq("id", value: log.id)
                     .execute()
-            } catch {
-                print("Failed to delete heat log from Supabase: \(error)")
-                lastError = "Failed to delete heat log."
+            }
+            if case .failure(let err) = result, !err.isRetryable {
+                lastError = err.userFacing
             }
         }
     }
@@ -219,8 +221,9 @@ final class HeatStore {
         defer { isLoading = false }
         guard !isOffline else { return }
 
-        do {
-            sessions = try await supabase
+        let result = await SupabaseService.shared.execute(table: "heat_sessions", operation: "select") {
+            () -> ([HeatSession], [HeatLog]) in
+            let loadedSessions: [HeatSession] = try await supabase
                 .from("heat_sessions")
                 .select()
                 .eq("plan_id", value: planId)
@@ -228,9 +231,10 @@ final class HeatStore {
                 .execute()
                 .value
 
-            if !sessions.isEmpty {
-                let sessionIds = sessions.map { $0.id.uuidString }
-                logs = try await supabase
+            var loadedLogs: [HeatLog] = []
+            if !loadedSessions.isEmpty {
+                let sessionIds = loadedSessions.map { $0.id.uuidString }
+                loadedLogs = try await supabase
                     .from("heat_logs")
                     .select()
                     .in("session_id", values: sessionIds)
@@ -238,9 +242,17 @@ final class HeatStore {
                     .execute()
                     .value
             }
+            return (loadedSessions, loadedLogs)
+        }
+        switch result {
+        case .success(let (loadedSessions, loadedLogs)):
+            sessions = loadedSessions
+            logs = loadedLogs
             saveToCache()
-        } catch {
-            lastError = "Failed to load heat data."
+        case .failure(let err):
+            if !err.isRetryable {
+                lastError = err.userFacing
+            }
         }
     }
 
@@ -275,24 +287,27 @@ final class HeatStore {
     // MARK: - Persistence
 
     private func persistAllSessions(planId: UUID) async {
-        guard !isOffline else { return }
-        do {
-            if !sessions.isEmpty {
-                try await supabase.from("heat_sessions").upsert(sessions).execute()
-            }
-        } catch {
-            print("Failed to persist heat sessions to Supabase: \(error)")
-            lastError = "Failed to save heat sessions."
+        guard !isOffline, !sessions.isEmpty else { return }
+        // Background bulk-sync — silent on retryable failure (cache holds truth).
+        // Surface only non-retryable PostgREST errors so the user knows when
+        // it's a real problem (RLS, constraint violation).
+        let result = await SupabaseService.shared.execute(table: "heat_sessions", operation: "upsert") {
+            try await supabase.from("heat_sessions")
+                .upsert(sessions, onConflict: "id")
+                .execute()
+        }
+        if case .failure(let err) = result, !err.isRetryable {
+            lastError = err.userFacing
         }
     }
 
     private func persistLog(_ log: HeatLog) async {
         guard !isOffline else { return }
-        do {
+        let result = await SupabaseService.shared.execute(table: "heat_logs", operation: "insert") {
             try await supabase.from("heat_logs").insert(log).execute()
-        } catch {
-            print("Failed to persist heat log to Supabase: \(error)")
-            lastError = "Failed to save heat log."
+        }
+        if case .failure(let err) = result, !err.isRetryable {
+            lastError = err.userFacing
         }
     }
 }

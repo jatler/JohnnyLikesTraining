@@ -70,6 +70,12 @@ struct MainTabView: View {
             PatreonGateView()
         }
         .task {
+            // Refresh the Supabase session before any per-store load. The SDK
+            // emits the persisted session as "current" at startup even when
+            // the access token is past expiry; without this refresh, every
+            // subsequent write 401s and surfaces as "Failed to save X."
+            await auth.refreshIfNeeded()
+
             guard let userId = auth.currentUserId else { return }
 
             // Refresh patron status if the cached verification is older than

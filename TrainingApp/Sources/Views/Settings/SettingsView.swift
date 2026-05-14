@@ -26,6 +26,7 @@ struct SettingsView: View {
                         sectionCard(label: "PATREON") { patreonSection }
                         if DevSignIn.isAllowed {
                             sectionCard(label: "PATREON DEBUG") { patreonDebugSection }
+                            sectionCard(label: "DESIGN LAB") { designLabSection }
                         }
                         sectionCard(label: "STRAVA") { stravaSection }
                         sectionCard(label: "OURA") { ouraSection }
@@ -238,6 +239,28 @@ struct SettingsView: View {
             divider()
             buttonRow("Connect Patreon", icon: "star.circle.fill", color: Color.trailGreen) { connectPatreon() }
         }
+    }
+
+    // MARK: - Design Lab
+
+    @ViewBuilder
+    private var designLabSection: some View {
+        NavigationLink {
+            MilesCompletionPrototype()
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(Color.trailGreen)
+                Text("Completion Pulse Lab")
+                    .font(TrailFont.body)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(TrailFont.meta)
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.vertical, 6)
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Patreon Debug
@@ -464,7 +487,7 @@ struct SettingsView: View {
 
     private var aboutSection: some View {
         VStack(spacing: 0) {
-            infoRow("Version", Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.9")
+            infoRow("Version", Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.10")
             divider()
             linkRow("Privacy Policy", destination: URL(string: "https://johnnylikestraining.com/privacy.html")!) { EmptyView() }
             divider()

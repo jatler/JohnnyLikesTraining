@@ -202,18 +202,26 @@ final class StrengthStore {
         defer { isLoading = false }
         guard !isOffline else { return }
 
-        do {
-            sessions = try await supabase
+        let result = await SupabaseService.shared.execute(table: "strength_sessions", operation: "select") {
+            try await supabase
                 .from("strength_sessions")
                 .select()
                 .eq("plan_id", value: planId)
                 .order("scheduled_date")
                 .execute()
-                .value
-
+                .value as [StrengthSession]
+        }
+        switch result {
+        case .success(let loaded):
+            sessions = loaded
             saveToCache()
-        } catch {
-            lastError = "Failed to load strength data."
+        case .failure(let err):
+            // Loads don't queue for retry — they happen on every app launch.
+            // Only surface non-retryable failures so the user knows when there's
+            // a real problem (RLS, schema mismatch) vs a network blip.
+            if !err.isRetryable {
+                lastError = err.userFacing
+            }
         }
     }
 
@@ -248,29 +256,26 @@ final class StrengthStore {
     // MARK: - Persistence
 
     private func persistAllSessions() async {
-        guard !isOffline else { return }
-        do {
-            if !sessions.isEmpty {
-                try await supabase.from("strength_sessions").upsert(sessions).execute()
-            }
-        } catch {
-            // Background bulk-sync failure — not user-actionable. The local cache still
-            // holds the truth and the next user-initiated mutation (toggleComplete →
-            // persistSessionUpdate) will surface a real alert if persistence is broken.
-            // Don't pop a "Failed to save strength sessions" alert on every tab visit.
-            print("Failed to persist strength sessions to Supabase: \(error)")
+        guard !isOffline, !sessions.isEmpty else { return }
+        // Background bulk-sync. Structured logging tells us exactly why if it
+        // fails; we never surface an alert on every tab visit. The cache holds
+        // local truth, and the next user-initiated mutation will retry.
+        _ = await SupabaseService.shared.execute(table: "strength_sessions", operation: "upsert") {
+            try await supabase.from("strength_sessions")
+                .upsert(sessions, onConflict: "id")
+                .execute()
         }
     }
 
     private func persistSessionUpdate(_ session: StrengthSession) async {
         guard !isOffline else { return }
-        do {
+        let result = await SupabaseService.shared.execute(table: "strength_sessions", operation: "upsert") {
             try await supabase.from("strength_sessions")
-                .upsert(session)
+                .upsert(session, onConflict: "id")
                 .execute()
-        } catch {
-            print("Failed to persist session update to Supabase: \(error)")
-            lastError = "Failed to save session update."
+        }
+        if case .failure(let err) = result, !err.isRetryable {
+            lastError = err.userFacing
         }
     }
 }

@@ -79,8 +79,11 @@ struct ProgressDashboardView: View {
                     elevationCard(entries: entries).tag(ChartPage.vert)
                     timeCard(entries: entries).tag(ChartPage.time)
                 }
-                .tabViewStyle(.page(indexDisplayMode: .always))
-                .frame(height: 278)
+                // Native page dots hidden — we render our own below the card
+                // so they sit outside the shadow and can be tinted per-page.
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .frame(height: 248)
+                chartPageDots
                 raceCard(entries: entries)
             }
             .padding(.horizontal, 12)
@@ -90,14 +93,51 @@ struct ProgressDashboardView: View {
         .tint(Color.trailGreen)
     }
 
+    /// Custom page indicator below the chart card. Each dot is tinted to match
+    /// the corresponding stat pill in the focused-week card above
+    /// (miles=trailGreen, vert=purple, time=orange). Grey when not selected.
+    private var chartPageDots: some View {
+        HStack(spacing: 8) {
+            ForEach(ChartPage.allCases) { page in
+                Circle()
+                    // systemGray2 over systemGray3: at arm's length the lighter
+                    // grey nearly vanished against the off-white background, so
+                    // users couldn't tell there were three pages until they
+                    // swiped. One step darker restores the affordance.
+                    .fill(page == selectedChartPage ? color(for: page) : Color(.systemGray2))
+                    .frame(width: 8, height: 8)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            selectedChartPage = page
+                        }
+                    }
+            }
+        }
+        // Vertical rhythm: 8pt above + 4pt below treats the dots as a
+        // proper "indicator sub-row" sitting beneath the card, not orphaned
+        // punctuation floating in the gap.
+        .padding(.top, 8)
+        .padding(.bottom, 4)
+    }
+
+    private func color(for page: ChartPage) -> Color {
+        switch page {
+        case .miles: return Color.trailGreen
+        case .vert:  return Color(red: 0.54, green: 0.42, blue: 0.82)
+        case .time:  return .orange
+        }
+    }
+
     private func sync() async {
         guard let userId = auth.currentUserId else { return }
+        // Pull from the source APIs, not just the Supabase cache — see WeekView.sync().
         if strava.isConnected {
-            await strava.loadActivities(userId: userId)
+            try? await strava.syncActivities(userId: userId, merge: true)
             strava.autoMatchActivities(sessions: planStore.sessions)
         }
         if oura.isConnected {
-            await oura.loadDailyData(userId: userId)
+            try? await oura.syncDaily(userId: userId, merge: true)
         }
     }
 
@@ -110,37 +150,43 @@ struct ProgressDashboardView: View {
         let canGoPrev = focusedWeek > (entries.first?.week ?? 1)
         let canGoNext = focusedWeek < (entries.last?.week ?? 1)
 
-        return focusedWeekCardContent(entry: entry, isCurrent: isCurrent)
-            .id(focusedWeek)
-            .transition(.asymmetric(
-                insertion: .move(edge: .trailing).combined(with: .opacity),
-                removal: .move(edge: .leading).combined(with: .opacity)
-            ))
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(isCurrent ? Color.trailGreenSubtle : Color(.systemBackground))
-            .overlay(
-                RoundedRectangle(cornerRadius: 18)
-                    .strokeBorder(isCurrent ? Color.trailGreen.opacity(0.33) : Color(.separator).opacity(0.3),
-                                  lineWidth: 1)
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 18))
-            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
-            .opacity(isFuture ? 0.65 : 1)
-            .contentShape(Rectangle())
-            .gesture(
-                DragGesture(minimumDistance: 24)
-                    .onEnded { value in
-                        if value.translation.width < 0, canGoNext {
-                            withAnimation(.easeOut(duration: 0.22)) {
-                                focusedWeek = min(focusedWeek + 1, entries.last?.week ?? focusedWeek)
-                            }
-                        } else if value.translation.width > 0, canGoPrev {
-                            withAnimation(.easeOut(duration: 0.22)) {
-                                focusedWeek = max(focusedWeek - 1, entries.first?.week ?? focusedWeek)
-                            }
+        // Card SHELL is static — background, border, shadow stay put on swipe.
+        // Only the INNER text content slides in/out via .id + .transition. This
+        // avoids the prior bug where the whole card (shadow included) animated
+        // and the week number appeared to "break" mid-transition.
+        return ZStack {
+            focusedWeekCardContent(entry: entry, isCurrent: isCurrent)
+                .id(focusedWeek)
+                .transition(.asymmetric(
+                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                    removal: .move(edge: .leading).combined(with: .opacity)
+                ))
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(isCurrent ? Color.trailGreenSubtle : Color(.systemBackground))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .strokeBorder(isCurrent ? Color.trailGreen.opacity(0.33) : Color(.separator).opacity(0.3),
+                              lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
+        .opacity(isFuture ? 0.65 : 1)
+        .contentShape(Rectangle())
+        .gesture(
+            DragGesture(minimumDistance: 24)
+                .onEnded { value in
+                    if value.translation.width < 0, canGoNext {
+                        withAnimation(.easeOut(duration: 0.22)) {
+                            focusedWeek = min(focusedWeek + 1, entries.last?.week ?? focusedWeek)
+                        }
+                    } else if value.translation.width > 0, canGoPrev {
+                        withAnimation(.easeOut(duration: 0.22)) {
+                            focusedWeek = max(focusedWeek - 1, entries.first?.week ?? focusedWeek)
                         }
                     }
-            )
+                }
+        )
     }
 
     @ViewBuilder
