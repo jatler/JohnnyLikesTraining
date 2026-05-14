@@ -249,12 +249,28 @@ struct WeekView: View {
 
     @ViewBuilder
     private func trailingStatus(session: PlannedSession, activity: StravaActivity?, skipped: Bool, isToday: Bool) -> some View {
-        if activity != nil {
-            // Sum miles across every run on this session's date — handles doubles days
-            // where multiple Strava runs land on one scheduled session.
-            let dayRuns = strava.runActivities(on: session.scheduledDate)
-            let dayMiles = dayRuns.reduce(0.0) { $0 + $1.distanceMi }
-            RunCompleteStatus(miles: dayMiles, sessionId: session.id)
+        if let activity {
+            if activity.isCrossTraining {
+                // Sum cross-training hours across every cross-train activity on
+                // this session's date — parallel to how runs aggregate miles.
+                let crossDay = strava.activities(on: session.scheduledDate).filter(\.isCrossTraining)
+                let hours = crossDay.reduce(0.0) { $0 + Double($1.movingTimeSeconds) } / 3600.0
+                CompleteStatus(
+                    magnitude: hours,
+                    label: String(format: "%.1f hr", hours),
+                    sessionId: session.id
+                )
+            } else {
+                // Default + run path: aggregate miles across every run on this
+                // session's date — handles doubles days where multiple Strava
+                // runs land on one scheduled session.
+                let dayMiles = strava.runActivities(on: session.scheduledDate).reduce(0.0) { $0 + $1.distanceMi }
+                CompleteStatus(
+                    magnitude: dayMiles,
+                    label: dayMiles > 0 ? String(format: "%.1f mi", dayMiles) : "",
+                    sessionId: session.id
+                )
+            }
         } else if skipped {
             Text("Skipped")
                 .font(TrailFont.meta)
@@ -416,16 +432,23 @@ struct WeekView: View {
 /// Replaces the static checkmark + miles label with the miles-aware burst
 /// animation. Tuned in `MilesCompletionPrototype` and frozen in
 /// `CompletionParams.burst`. Plays once when the row first appears.
-private struct RunCompleteStatus: View {
-    let miles: Double
+private struct CompleteStatus: View {
+    /// Used by the burst's peak-scale calculation — miles for runs, hours
+    /// for cross-train. Smaller magnitudes get smaller bursts; the cap is the
+    /// same so a 2-hour ride bursts about as hard as a 2-mile easy day.
+    let magnitude: Double
+    /// Pre-formatted readout shown beneath the dot ("16.1 mi" / "1.4 hr").
+    /// Empty string suppresses the label row entirely (e.g. unknown / zero).
+    let label: String
     let sessionId: UUID
     @State private var trigger: Int = 0
-    @State private var milesLabelVisible: Bool
+    @State private var labelVisible: Bool
     private let alreadyCelebrated: Bool
     private let params = CompletionParams.burst
 
-    init(miles: Double, sessionId: UUID) {
-        self.miles = miles
+    init(magnitude: Double, label: String, sessionId: UUID) {
+        self.magnitude = magnitude
+        self.label = label
         self.sessionId = sessionId
         // Consult the celebration store at view init so the dot can render
         // its filled+checked state immediately on first appearance for
@@ -433,17 +456,17 @@ private struct RunCompleteStatus: View {
         // whose completions have already been seen would replay the burst.
         let celebrated = CompletionCelebrationStore.shared.contains(sessionId)
         self.alreadyCelebrated = celebrated
-        _milesLabelVisible = State(initialValue: celebrated)
+        _labelVisible = State(initialValue: celebrated)
     }
 
     var body: some View {
         // VStack spacing matches the left-column session VStack (spacing: 3),
         // and the dot's outer frame is sized to the displayName's line height
-        // (~22pt for system size:18) so the "16.1 mi" baseline lines up with
+        // (~22pt for system size:18) so the readout baseline lines up with
         // the coach-notes range ("8-14 mi") in the row to its left.
         VStack(alignment: .trailing, spacing: 3) {
             MilesCompletionDot(
-                miles: miles,
+                miles: magnitude,
                 variant: .burst,
                 params: params,
                 trigger: trigger,
@@ -451,12 +474,12 @@ private struct RunCompleteStatus: View {
                 initiallyCompleted: alreadyCelebrated
             )
             .frame(height: 22)
-            if miles > 0 {
-                Text(String(format: "%.1f mi", miles))
+            if !label.isEmpty {
+                Text(label)
                     .font(TrailFont.data)
                     .fontWeight(.medium)
                     .foregroundStyle(Color.trailGreen)
-                    .opacity(milesLabelVisible ? 1 : 0)
+                    .opacity(labelVisible ? 1 : 0)
             }
         }
         .onAppear {
@@ -465,7 +488,7 @@ private struct RunCompleteStatus: View {
             trigger = 1
             DispatchQueue.main.asyncAfter(deadline: .now() + params.totalDuration) {
                 withAnimation(.easeOut(duration: 0.25)) {
-                    milesLabelVisible = true
+                    labelVisible = true
                 }
                 CompletionCelebrationStore.shared.mark(sessionId)
             }
