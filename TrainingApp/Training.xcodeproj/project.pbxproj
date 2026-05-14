@@ -60,6 +60,7 @@
 		921A51DCF553D7FC53574F9F /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 0F711C2ADA26F108C95B0FE4 /* Auth */; };
 		954A34C6625409E4D3FD985C /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE119AE0121335DC62EE5944 /* KeychainService.swift */; };
 		9C2A27A2D2E68576CCD068FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A38A933814A196F882D4075 /* Assets.xcassets */; };
+		9EBF11A7FCA1A33F00A45AC8 /* CompleteStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73B7D590079EAFA75E76C507 /* CompleteStatus.swift */; };
 		A470176531D4E464D5F726D8 /* winter_plan_10w.json in Resources */ = {isa = PBXBuildFile; fileRef = 628F12BE440D321D5582EB09 /* winter_plan_10w.json */; };
 		A49A52EEDFEFF45B719A8233 /* OuraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 152863264984F21AC0331C8B /* OuraService.swift */; };
 		A7429EE9101DC8EBF04E41AF /* swap_50k_12w.json in Resources */ = {isa = PBXBuildFile; fileRef = 28888F4CADF007802DC7B327 /* swap_50k_12w.json */; };
@@ -134,6 +135,7 @@
 		6BCB459B05BE989CD56A6A76 /* HeatLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatLog.swift; sourceTree = "<group>"; };
 		6C01F97738C00E24FC785ED9 /* ProgressionEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionEngineTests.swift; sourceTree = "<group>"; };
 		6CF3B44F0D3D1D7DFE4CFDA9 /* StretchStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StretchStore.swift; sourceTree = "<group>"; };
+		73B7D590079EAFA75E76C507 /* CompleteStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompleteStatus.swift; sourceTree = "<group>"; };
 		73F7D70B55AEC2E0E3D0A3F1 /* TrainingPlanStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlanStore.swift; sourceTree = "<group>"; };
 		747D2F3B56EEE28598D1536A /* Fraunces-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-LightItalic.ttf"; sourceTree = "<group>"; };
 		76EDCC53D92978C810161580 /* PatreonGateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatreonGateView.swift; sourceTree = "<group>"; };
@@ -269,6 +271,7 @@
 		44242B1A981CF5EC988BBB73 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				73B7D590079EAFA75E76C507 /* CompleteStatus.swift */,
 				554A6B40A55811F72EED9EB3 /* SessionComponents.swift */,
 			);
 			path = Shared;
@@ -587,6 +590,7 @@
 				0320FED4E3077437515CB210 /* AppleSignInSupport.swift in Sources */,
 				09774BD7EFE32B98FAA923B5 /* AuthService.swift in Sources */,
 				8219FFB2F7BB6FAEBC38FE8A /* BrandKit.swift in Sources */,
+				9EBF11A7FCA1A33F00A45AC8 /* CompleteStatus.swift in Sources */,
 				6832E4507441BF620169D07F /* CompletionCelebrationStore.swift in Sources */,
 				EAF3D040A8C02849A0D286A9 /* CompletionPulse.swift in Sources */,
 				E688C16BC8826DF7E7C0299E /* Config.swift in Sources */,

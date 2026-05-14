@@ -7,31 +7,54 @@ struct StretchDayDetailView: View {
     @Environment(StretchStore.self) private var stretchStore
     @Environment(\.dismiss) private var dismiss
 
-    private let dayNames = ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    @State private var showingSkipOptions = false
+    @State private var showingSwapTargets = false
+
+    private static let dayNames = ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    private static let weekdayShort = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+    private var daySessions: [StretchSession] {
+        stretchStore.sessions(for: weekNumber, dayOfWeek: dayOfWeek)
+    }
+
+    private var completedCount: Int {
+        daySessions.filter { stretchStore.isComplete($0.id) }.count
+    }
+
+    private var isDayComplete: Bool {
+        !daySessions.isEmpty && completedCount == daySessions.count
+    }
+
+    private var isDaySkipped: Bool {
+        stretchStore.isDaySkipped(weekNumber: weekNumber, dayOfWeek: dayOfWeek)
+    }
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 16) {
-                    let daySessions = stretchStore.sessions(for: weekNumber, dayOfWeek: dayOfWeek)
-
+                VStack(alignment: .leading, spacing: 12) {
                     if daySessions.isEmpty {
                         Text("No stretches for this day")
                             .foregroundStyle(.secondary)
                             .padding(.top, 40)
+                            .frame(maxWidth: .infinity)
                     } else {
-                        let completed = daySessions.filter { stretchStore.isComplete($0.id) }.count
-                        progressHeader(completed: completed, total: daySessions.count)
-
+                        summaryCard
+                        progressSection
                         ForEach(daySessions) { session in
                             stretchCard(session)
                         }
+                        actionsSection
+                        if showingSwapTargets {
+                            swapTargetsSection
+                        }
                     }
                 }
-                .padding()
+                .padding(.horizontal, 12)
+                .padding(.top, 16)
                 .padding(.bottom, 20)
             }
-            .navigationTitle("\(dayNames[dayOfWeek]) — Week \(weekNumber)")
+            .navigationTitle("\(Self.dayNames[dayOfWeek]) — Week \(weekNumber)")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
@@ -42,87 +65,213 @@ struct StretchDayDetailView: View {
         .presentationDetents([.large])
     }
 
-    private func progressHeader(completed: Int, total: Int) -> some View {
-        HStack(spacing: 12) {
+    // MARK: Summary
+
+    private var summaryCard: some View {
+        HStack(spacing: 14) {
             Image(systemName: "figure.flexibility")
-                .font(.title3)
-                .foregroundStyle(Color.trailGreen)
+                .font(.system(size: 20))
+                .foregroundStyle(.mint)
+                .frame(width: 43, height: 43)
+                .background(Color.mint.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text("\(completed)/\(total) stretches done")
-                    .font(TrailFont.body)
-
-                ProgressView(value: Double(completed), total: Double(total))
-                    .tint(Color.trailGreen)
+            VStack(alignment: .leading, spacing: 3) {
+                Text("Stretches")
+                    .font(.system(size: 18))
+                    .strikethrough(isDaySkipped)
+                    .opacity(isDaySkipped ? 0.5 : 1)
+                Text(metaLine)
+                    .font(TrailFont.data).tracking(0.5)
+                    .foregroundStyle(.secondary)
             }
 
-            if completed == total {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
-                    .font(.title3)
-            }
+            Spacer()
+
+            trailingStatus
         }
-        .padding()
-        .background(Color.trailGreen.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
+        .unifiedCard()
     }
+
+    @ViewBuilder
+    private var trailingStatus: some View {
+        if isDaySkipped {
+            Text("SKIPPED")
+                .font(.system(size: 12, weight: .semibold))
+                .tracking(0.5)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(Color.red.opacity(0.8), in: Capsule())
+        } else if isDayComplete {
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundStyle(Color.trailGreen)
+                .font(.title3)
+        }
+    }
+
+    private var metaLine: String {
+        let weekday = Self.weekdayShort[dayOfWeek].uppercased()
+        return "WK \(weekNumber) D\(dayOfWeek) · \(weekday) · \(daySessions.count) STRETCHES"
+    }
+
+    // MARK: Progress
+
+    private var progressSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("\(completedCount) of \(daySessions.count) done")
+                    .font(TrailFont.body)
+                Spacer()
+                Text("\(Int((Double(completedCount) / Double(max(daySessions.count, 1))) * 100))%")
+                    .font(TrailFont.data)
+                    .foregroundStyle(.secondary)
+            }
+            ProgressView(value: Double(completedCount), total: Double(max(daySessions.count, 1)))
+                .tint(Color.trailGreen)
+        }
+        .unifiedCard()
+        .opacity(isDaySkipped ? 0.5 : 1)
+    }
+
+    // MARK: Per-Stretch Card
 
     private func stretchCard(_ session: StretchSession) -> some View {
         let complete = stretchStore.isComplete(session.id)
 
-        return VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Button {
-                    if complete {
-                        stretchStore.removeLog(sessionId: session.id)
-                    } else {
-                        stretchStore.logCompletion(sessionId: session.id)
-                    }
-                } label: {
-                    Image(systemName: complete ? "checkmark.circle.fill" : "circle")
-                        .font(.title3)
-                        .foregroundStyle(complete ? .green : .secondary.opacity(0.4))
-                        .completionPulse(complete)
+        return HStack(alignment: .top, spacing: 12) {
+            Button {
+                if complete {
+                    stretchStore.removeLog(sessionId: session.id)
+                } else {
+                    stretchStore.logCompletion(sessionId: session.id)
                 }
+            } label: {
+                Image(systemName: complete ? "checkmark.circle.fill" : "circle")
+                    .font(.title3)
+                    .foregroundStyle(complete ? Color.trailGreen : Color.secondary.opacity(0.4))
+                    .completionPulse(complete)
+            }
+            .buttonStyle(.plain)
+            .disabled(isDaySkipped)
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(session.stretchName)
-                        .font(TrailFont.title)
-                        .strikethrough(complete)
-                        .foregroundStyle(complete ? .secondary : .primary)
+            VStack(alignment: .leading, spacing: 3) {
+                Text(session.stretchName)
+                    .font(.system(size: 18))
+                    .strikethrough(complete || isDaySkipped)
+                    .foregroundStyle(complete || isDaySkipped ? .secondary : .primary)
 
-                    Text(prescriptionText(session))
-                        .font(TrailFont.body)
-                        .foregroundStyle(.secondary)
-                }
+                Text(prescriptionText(session))
+                    .font(TrailFont.data)
+                    .foregroundStyle(.secondary)
 
-                Spacer()
-
-                if session.isBilateral {
-                    Text("Bilateral")
+                if let exercise = stretchStore.exercises.first(where: { $0.id == session.templateExerciseId }),
+                   let notes = exercise.notes, !notes.isEmpty {
+                    Text(notes)
                         .font(TrailFont.meta)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(.quaternary, in: Capsule())
+                        .foregroundStyle(.tertiary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.top, 2)
                 }
             }
 
-            if let exercise = stretchStore.exercises.first(where: { $0.id == session.templateExerciseId }),
-               let notes = exercise.notes, !notes.isEmpty {
-                Text(notes)
-                    .font(TrailFont.meta)
-                    .foregroundStyle(.tertiary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            Spacer()
 
+            if session.isBilateral {
+                Text("Bilateral")
+                    .font(TrailFont.meta)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(.quaternary, in: Capsule())
+            }
         }
-        .padding()
-        .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
+        .unifiedCard()
+        .opacity(isDaySkipped ? 0.5 : 1)
     }
 
     private func prescriptionText(_ session: StretchSession) -> String {
         let perSide = session.isBilateral ? " each side" : ""
         return "\(session.prescribedSets)×\(session.prescribedHoldSeconds)s hold\(perSide)"
+    }
+
+    // MARK: Actions
+
+    private var actionsSection: some View {
+        VStack(spacing: 12) {
+            if isDaySkipped {
+                Button {
+                    stretchStore.unskipDay(weekNumber: weekNumber, dayOfWeek: dayOfWeek)
+                } label: {
+                    Label("Restore", systemImage: "arrow.uturn.backward.circle")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .tint(.gray)
+            } else {
+                HStack(spacing: 8) {
+                    Button {
+                        showingSkipOptions = true
+                    } label: {
+                        Label("Skip", systemImage: "xmark.circle")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.gray)
+                    .confirmationDialog("Skip these stretches?", isPresented: $showingSkipOptions) {
+                        Button("Injury") { stretchStore.skipDay(weekNumber: weekNumber, dayOfWeek: dayOfWeek, reason: "Injury") }
+                        Button("Illness") { stretchStore.skipDay(weekNumber: weekNumber, dayOfWeek: dayOfWeek, reason: "Illness") }
+                        Button("Life / Schedule") { stretchStore.skipDay(weekNumber: weekNumber, dayOfWeek: dayOfWeek, reason: "Life") }
+                        Button("Skip (no reason)") { stretchStore.skipDay(weekNumber: weekNumber, dayOfWeek: dayOfWeek, reason: nil) }
+                        Button("Cancel", role: .cancel) {}
+                    }
+
+                    Button {
+                        withAnimation { showingSwapTargets.toggle() }
+                    } label: {
+                        Label("Swap", systemImage: "arrow.left.arrow.right")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.gray)
+                }
+            }
+        }
+    }
+
+    // MARK: Swap
+
+    private var swapTargetsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Move these stretches to:")
+                .font(TrailFont.body)
+                .foregroundStyle(.secondary)
+
+            ForEach(1...7, id: \.self) { day in
+                if day != dayOfWeek {
+                    Button {
+                        stretchStore.moveDay(weekNumber: weekNumber, fromDay: dayOfWeek, toDay: day)
+                        showingSwapTargets = false
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Image(systemName: "calendar")
+                                .foregroundStyle(.mint)
+                                .frame(width: 28)
+                            Text(Self.dayNames[day])
+                                .font(TrailFont.body)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(TrailFont.meta)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 12)
+                        .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
     }
 }
 

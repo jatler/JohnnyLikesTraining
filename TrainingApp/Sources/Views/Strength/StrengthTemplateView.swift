@@ -41,6 +41,10 @@ struct StrengthTemplateView: View {
         let hue: Color
         let icon: String
         let state: RowState
+        /// Drives the burst-on-complete animation when set. Strength + heat
+        /// rows carry their session UUID here; stretch days leave it nil and
+        /// fall back to a plain trailGreen check.
+        let celebrationId: UUID?
         let onTap: () -> Void
     }
 
@@ -249,8 +253,10 @@ struct StrengthTemplateView: View {
                         icon: "dumbbell.fill",
                         state: rowState(
                             isDone: session.isComplete,
+                            isSkipped: session.isSkipped,
                             scheduledDate: session.scheduledDate
                         ),
+                        celebrationId: session.id,
                         onTap: { selectedSession = session }
                     ))
                 }
@@ -329,6 +335,7 @@ struct StrengthTemplateView: View {
                     let title = exercises.first?.stretchName ?? "Stretches"
                     let detail = total > 0 ? "\(total) stretches · \(done)/\(total) done" : "\(exercises.count) stretches"
 
+                    let daySkipped = stretchStore.isDaySkipped(weekNumber: week, dayOfWeek: day)
                     boldDayRow(item: RowItem(
                         id: day,
                         dayOfWeek: day,
@@ -339,8 +346,10 @@ struct StrengthTemplateView: View {
                         icon: "figure.flexibility",
                         state: rowState(
                             isDone: total > 0 && done == total,
+                            isSkipped: daySkipped,
                             scheduledDate: scheduled
                         ),
+                        celebrationId: nil,
                         onTap: {
                             selectedStretchDay = StretchDaySelection(weekNumber: week, dayOfWeek: day)
                         }
@@ -389,7 +398,12 @@ struct StrengthTemplateView: View {
                         detail: "\(detailMin) min",
                         hue: entry.session.sessionType.color,
                         icon: entry.session.sessionType.iconName,
-                        state: rowState(isDone: isDone, scheduledDate: scheduled),
+                        state: rowState(
+                            isDone: isDone,
+                            isSkipped: heatStore.isSkipped(entry.session.id),
+                            scheduledDate: scheduled
+                        ),
+                        celebrationId: entry.session.id,
                         onTap: { selectedHeatSession = entry.session }
                     ))
                     .contextMenu {
@@ -467,7 +481,7 @@ struct StrengthTemplateView: View {
 
             Spacer(minLength: 4)
 
-            rowTrailing(state: item.state)
+            rowTrailing(state: item.state, celebrationId: item.celebrationId)
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 12)
@@ -490,12 +504,25 @@ struct StrengthTemplateView: View {
     }
 
     @ViewBuilder
-    private func rowTrailing(state: RowState) -> some View {
+    private func rowTrailing(state: RowState, celebrationId: UUID?) -> some View {
         switch state {
         case .done:
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 18))
-                .foregroundStyle(.green)
+            if let celebrationId {
+                // Strength + heat rows: full burst animation, played once per
+                // session via CompletionCelebrationStore. magnitude = 1.0 keeps
+                // the burst subtle since there's no natural mileage metric.
+                CompleteStatus(
+                    magnitude: 1.0,
+                    label: "",
+                    sessionId: celebrationId,
+                    baseSize: 18
+                )
+            } else {
+                // Stretch days (or any non-celebrating row): static check.
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 18))
+                    .foregroundStyle(Color.trailGreen)
+            }
         case .skipped:
             Text("Skipped")
                 .font(TrailFont.meta)
@@ -518,7 +545,8 @@ struct StrengthTemplateView: View {
         }
     }
 
-    private func rowState(isDone: Bool, scheduledDate: Date) -> RowState {
+    private func rowState(isDone: Bool, isSkipped: Bool = false, scheduledDate: Date) -> RowState {
+        if isSkipped { return .skipped }
         if isDone { return .done }
         if Calendar.current.isDateInToday(scheduledDate) { return .today }
         return .upcoming

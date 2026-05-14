@@ -48,23 +48,83 @@ struct ProgressDashboardView: View {
     // MARK: - Header
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Progress")
-                .font(TrailFont.tabHeading)
-                .foregroundStyle(.white)
+        // Two-line green bar matching Week / Strength: tabHeading + a single
+        // data-style sub-line so the vertical height lines up across tabs.
+        // Chevrons drive `focusedWeek`, paralleling the existing drag-to-swipe
+        // on the focused-week card so the user has both a tap and a swipe path.
+        let firstWeek = planStore.allWeekNumbers.first ?? 1
+        let lastWeek = planStore.allWeekNumbers.last ?? 1
 
-            if let templateName = planStore.currentTemplate?.name {
-                Text(templateName.uppercased())
-                    .font(TrailFont.data)
-                    .tracking(0.5)
-                    .foregroundStyle(.white.opacity(0.85))
+        return VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("Progress")
+                    .font(TrailFont.tabHeading)
+                    .foregroundStyle(.white)
+
+                Spacer()
+
+                HStack(spacing: 0) {
+                    Button {
+                        if focusedWeek > firstWeek {
+                            // Match the focused-week card's drag-end animation
+                            // (.easeOut 0.22) so chevron taps and swipes feel
+                            // like the same gesture.
+                            withAnimation(.easeOut(duration: 0.22)) {
+                                focusedWeek -= 1
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .disabled(focusedWeek <= firstWeek)
+
+                    Button {
+                        if focusedWeek < lastWeek {
+                            withAnimation(.easeOut(duration: 0.22)) {
+                                focusedWeek += 1
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "chevron.right")
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .disabled(focusedWeek >= lastWeek)
+                }
             }
+
+            Text(secondaryHeaderLine)
+                .font(TrailFont.data)
+                .tracking(0.5)
+                .foregroundStyle(.white.opacity(0.85))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
         .padding(.vertical, 13)
         .background(Color.trailGreen)
         .background(Color.trailGreen.ignoresSafeArea(edges: .top))
+        .tint(.white)
+    }
+
+    /// Sub-line under "Progress" in the header. Template name when present,
+    /// otherwise the focused-week date range — guarantees a non-empty line
+    /// so the bar height stays in sync with Week / Strength.
+    private var secondaryHeaderLine: String {
+        if let name = planStore.currentTemplate?.name {
+            return name.uppercased()
+        }
+        return weekDateRange(for: focusedWeek)
+    }
+
+    private func weekDateRange(for week: Int) -> String {
+        let sessions = planStore.sessions(for: week)
+        guard let first = sessions.first?.scheduledDate,
+              let last = sessions.last?.scheduledDate else { return "" }
+        let start = first.formatted(.dateTime.month(.abbreviated).day())
+        let end = last.formatted(.dateTime.month(.abbreviated).day())
+        return "\(start) \u{2013} \(end)"
     }
 
     // MARK: - Content
