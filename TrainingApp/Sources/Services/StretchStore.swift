@@ -215,6 +215,52 @@ final class StretchStore {
         Task { await persistExerciseDelete(exercise) }
     }
 
+    // MARK: - Skip / Unskip (day-level)
+
+    func skipDay(weekNumber: Int, dayOfWeek: Int, reason: String?) {
+        for i in sessions.indices where sessions[i].weekNumber == weekNumber && sessions[i].dayOfWeek == dayOfWeek {
+            sessions[i].isSkipped = true
+            sessions[i].skipReason = reason
+        }
+        saveToCache()
+        Task { await persistAllSessions() }
+    }
+
+    func unskipDay(weekNumber: Int, dayOfWeek: Int) {
+        for i in sessions.indices where sessions[i].weekNumber == weekNumber && sessions[i].dayOfWeek == dayOfWeek {
+            sessions[i].isSkipped = false
+            sessions[i].skipReason = nil
+        }
+        saveToCache()
+        Task { await persistAllSessions() }
+    }
+
+    func isDaySkipped(weekNumber: Int, dayOfWeek: Int) -> Bool {
+        let daySessions = sessions.filter { $0.weekNumber == weekNumber && $0.dayOfWeek == dayOfWeek }
+        guard !daySessions.isEmpty else { return false }
+        return daySessions.allSatisfy(\.isSkipped)
+    }
+
+    // MARK: - Move Day
+    //
+    // Move every stretch session for (weekNumber, fromDay) to (weekNumber, toDay).
+    // Sessions for `toDay` that already exist are left in place — the moved
+    // sessions are appended, so the target day ends up with both days' worth.
+
+    func moveDay(weekNumber: Int, fromDay: Int, toDay: Int) {
+        guard fromDay != toDay, (1...7).contains(toDay) else { return }
+        let delta = toDay - fromDay
+        let calendar = Calendar.current
+        for i in sessions.indices where sessions[i].weekNumber == weekNumber && sessions[i].dayOfWeek == fromDay {
+            if let newDate = calendar.date(byAdding: .day, value: delta, to: sessions[i].scheduledDate) {
+                sessions[i].dayOfWeek = toDay
+                sessions[i].scheduledDate = newDate
+            }
+        }
+        saveToCache()
+        Task { await persistAllSessions() }
+    }
+
     // MARK: - Log Completion
 
     func logCompletion(sessionId: UUID, notes: String? = nil) {

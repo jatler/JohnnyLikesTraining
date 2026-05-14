@@ -195,6 +195,72 @@ final class StrengthStore {
         Task { await persistSessionUpdate(sessions[index]) }
     }
 
+    // MARK: - Skip / Unskip
+
+    func skipSession(_ sessionId: UUID, reason: String?) {
+        guard let index = sessions.firstIndex(where: { $0.id == sessionId }) else { return }
+        sessions[index].isSkipped = true
+        sessions[index].skipReason = reason
+        saveToCache()
+        Task { await persistSessionUpdate(sessions[index]) }
+    }
+
+    func unskipSession(_ sessionId: UUID) {
+        guard let index = sessions.firstIndex(where: { $0.id == sessionId }) else { return }
+        sessions[index].isSkipped = false
+        sessions[index].skipReason = nil
+        saveToCache()
+        Task { await persistSessionUpdate(sessions[index]) }
+    }
+
+    func isSkipped(_ sessionId: UUID) -> Bool {
+        sessions.first(where: { $0.id == sessionId })?.isSkipped ?? false
+    }
+
+    // MARK: - Move to a Different Day
+    //
+    // Computes the new scheduled date by shifting the existing one by the
+    // signed day-of-week delta. Keeps the same week — strength swap is
+    // intra-week, just like cardio swap.
+
+    func moveToDay(_ sessionId: UUID, dayOfWeek newDay: Int) {
+        guard let index = sessions.firstIndex(where: { $0.id == sessionId }) else { return }
+        let oldDay = sessions[index].dayOfWeek
+        guard newDay != oldDay, (1...7).contains(newDay) else { return }
+        let delta = newDay - oldDay
+        let calendar = Calendar.current
+        guard let newDate = calendar.date(byAdding: .day, value: delta, to: sessions[index].scheduledDate) else { return }
+        sessions[index].dayOfWeek = newDay
+        sessions[index].scheduledDate = newDate
+        saveToCache()
+        Task { await persistSessionUpdate(sessions[index]) }
+    }
+
+    // MARK: - Edit Coach Notes
+
+    func updateCoachNotes(_ sessionId: UUID, notes: String) {
+        guard let index = sessions.firstIndex(where: { $0.id == sessionId }) else { return }
+        if sessions[index].originalCoachNotes == nil {
+            sessions[index].originalCoachNotes = sessions[index].coachNotes
+        }
+        sessions[index].coachNotes = notes
+        saveToCache()
+        Task { await persistSessionUpdate(sessions[index]) }
+    }
+
+    func resetToOriginal(_ sessionId: UUID) {
+        guard let index = sessions.firstIndex(where: { $0.id == sessionId }),
+              let original = sessions[index].originalCoachNotes else { return }
+        sessions[index].coachNotes = original
+        sessions[index].originalCoachNotes = nil
+        saveToCache()
+        Task { await persistSessionUpdate(sessions[index]) }
+    }
+
+    func isEdited(_ sessionId: UUID) -> Bool {
+        sessions.first(where: { $0.id == sessionId })?.originalCoachNotes != nil
+    }
+
     // MARK: - Load from Supabase
 
     func loadData(planId: UUID) async {

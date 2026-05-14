@@ -16,7 +16,7 @@ struct SignInView: View {
                     .font(TrailFont.title)
                     .foregroundStyle(Color.trailGreen)
 
-                Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.10")")
+                Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.1.0")")
                     .font(TrailFont.body)
                     .foregroundStyle(.secondary)
             }

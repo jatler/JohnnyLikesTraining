@@ -11,6 +11,8 @@ struct HeatSession: Codable, Identifiable {
     var targetDurationMinutes: Int
     var notes: String?
     var isTemplateOverride: Bool = false
+    var isSkipped: Bool = false
+    var skipReason: String?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -22,6 +24,8 @@ struct HeatSession: Codable, Identifiable {
         case targetDurationMinutes = "target_duration_minutes"
         case notes
         case isTemplateOverride = "is_template_override"
+        case isSkipped = "is_skipped"
+        case skipReason = "skip_reason"
     }
 
     init(from decoder: Decoder) throws {
@@ -35,9 +39,11 @@ struct HeatSession: Codable, Identifiable {
         targetDurationMinutes = try container.decode(Int.self, forKey: .targetDurationMinutes)
         notes = try container.decodeIfPresent(String.self, forKey: .notes)
         isTemplateOverride = try container.decodeIfPresent(Bool.self, forKey: .isTemplateOverride) ?? false
+        isSkipped = try container.decodeIfPresent(Bool.self, forKey: .isSkipped) ?? false
+        skipReason = try container.decodeIfPresent(String.self, forKey: .skipReason)
     }
 
-    init(id: UUID, planId: UUID, scheduledDate: Date, weekNumber: Int, dayOfWeek: Int, sessionType: HeatType, targetDurationMinutes: Int, notes: String? = nil, isTemplateOverride: Bool = false) {
+    init(id: UUID, planId: UUID, scheduledDate: Date, weekNumber: Int, dayOfWeek: Int, sessionType: HeatType, targetDurationMinutes: Int, notes: String? = nil, isTemplateOverride: Bool = false, isSkipped: Bool = false, skipReason: String? = nil) {
         self.id = id
         self.planId = planId
         self.scheduledDate = scheduledDate
@@ -47,6 +53,8 @@ struct HeatSession: Codable, Identifiable {
         self.targetDurationMinutes = targetDurationMinutes
         self.notes = notes
         self.isTemplateOverride = isTemplateOverride
+        self.isSkipped = isSkipped
+        self.skipReason = skipReason
     }
 }
 

@@ -1,4 +1,7 @@
 import SwiftUI
+#if canImport(UIKit)
+import UIKit
+#endif
 
 // MARK: - Brand Colors
 
@@ -29,4 +32,24 @@ enum BrandKit {
     static let coachCredit = "David & Megan Roche"
     static let tagline = "Train with David & Megan Roche."
     static let patreonURL = URL(string: "https://www.patreon.com/swap?utm_source=app&utm_medium=paywall")!
+}
+
+// MARK: - Unified Card Chrome
+//
+// The standard card surface used across every detail sheet (WeekView's
+// SessionDetailSheet, StrengthDayDetailView, HeatLogSheet, StretchDayDetailView).
+// One source of truth so the chrome stays consistent if the design tokens shift.
+
+extension View {
+    func unifiedCard(padding: CGFloat = 14) -> some View {
+        self
+            .padding(padding)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18)
+                    .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
+    }
 }

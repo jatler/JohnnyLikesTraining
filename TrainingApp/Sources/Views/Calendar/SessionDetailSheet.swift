@@ -141,14 +141,7 @@ struct SessionDetailSheet: View {
                 }
             }
         }
-        .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
-        )
-        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
+        .unifiedCard()
     }
 
     @ViewBuilder
@@ -220,14 +213,7 @@ struct SessionDetailSheet: View {
                 .opacity(isSkipped ? 0.5 : 1)
             }
         }
-        .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
-        )
-        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
+        .unifiedCard()
     }
 
     private var workoutHeader: some View {
@@ -378,14 +364,7 @@ struct SessionDetailSheet: View {
                 .fixedSize(horizontal: false, vertical: true)
                 .textSelection(.enabled)
         }
-        .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
-        .overlay(
-            RoundedRectangle(cornerRadius: 18)
-                .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
-        )
-        .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
+        .unifiedCard()
     }
 
     @ViewBuilder
@@ -438,14 +417,7 @@ struct SessionDetailSheet: View {
                     }
                 }
             }
-            .padding(14)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
-            .overlay(
-                RoundedRectangle(cornerRadius: 18)
-                    .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
+            .unifiedCard()
             .opacity(isSkipped ? 0.5 : 1)
         }
     }
@@ -500,14 +472,7 @@ struct SessionDetailSheet: View {
                     .buttonStyle(.plain)
                 }
             }
-            .padding(14)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
-            .overlay(
-                RoundedRectangle(cornerRadius: 18)
-                    .strokeBorder(Color(.separator).opacity(0.3), lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
+            .unifiedCard()
             .opacity(isSkipped ? 0.5 : 1)
         }
     }

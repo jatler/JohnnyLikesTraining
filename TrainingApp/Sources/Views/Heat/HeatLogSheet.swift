@@ -5,154 +5,329 @@ struct HeatLogSheet: View {
     @Environment(HeatStore.self) private var heatStore
     @Environment(\.dismiss) private var dismiss
 
-    @State private var selectedType: HeatType
-    @State private var duration: Int
-    @State private var notes = ""
-    @State private var applyToAll = false
+    @State private var isEditing = false
+    @State private var showingSkipOptions = false
+    @State private var showingSwapTargets = false
+    @State private var editSelectedType: HeatType
+    @State private var editDuration: Int
+    @State private var editNotes: String = ""
+    @State private var editApplyToAll = false
 
-    private var existingLog: HeatLog? {
-        heatStore.log(for: session.id)
-    }
+    private static let weekdayNames = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    private static let dayNames = ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
     init(session: HeatSession) {
         self.session = session
-        _selectedType = State(initialValue: session.sessionType)
-        _duration = State(initialValue: session.targetDurationMinutes)
+        _editSelectedType = State(initialValue: session.sessionType)
+        _editDuration = State(initialValue: session.targetDurationMinutes)
+    }
+
+    private var existingLog: HeatLog? { heatStore.log(for: session.id) }
+    private var isLogged: Bool { existingLog != nil }
+    private var isSkipped: Bool { heatStore.isSkipped(session.id) }
+    private var currentSession: HeatSession {
+        heatStore.sessions.first { $0.id == session.id } ?? session
     }
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 24) {
-                    headerSection
-
-                    typePickerSection
-
-                    durationSection
-
-                    if let notes = session.notes, !notes.isEmpty {
-                        notesDisplay(notes)
+                VStack(alignment: .leading, spacing: 12) {
+                    if isEditing {
+                        editHeader
+                        editForm
+                    } else {
+                        summaryCard
+                        if let notes = currentSession.notes, !notes.isEmpty {
+                            notesSection(notes)
+                        }
+                        actionsSection
+                        if showingSwapTargets {
+                            swapTargetsSection
+                        }
                     }
-
-                    TextField("Notes (optional)", text: $notes, axis: .vertical)
-                        .textFieldStyle(.roundedBorder)
-                        .lineLimit(2...3)
-
-                    if selectedType != session.sessionType || duration != session.targetDurationMinutes {
-                        Toggle("Apply to all weeks", isOn: $applyToAll)
-                            .font(TrailFont.body)
-                            .tint(.orange)
-                    }
-
-                    actionButtons
                 }
-                .padding()
+                .padding(.horizontal, 12)
+                .padding(.top, 16)
+                .padding(.bottom, 20)
             }
             .navigationTitle("Heat Session")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
                 }
             }
             .onAppear {
                 if let log = existingLog {
-                    selectedType = log.sessionType
-                    duration = log.actualDurationMinutes
-                    notes = log.notes ?? ""
+                    editSelectedType = log.sessionType
+                    editDuration = log.actualDurationMinutes
+                    editNotes = log.notes ?? ""
                 }
             }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.large])
     }
 
-    // MARK: - Sections
+    // MARK: Summary
 
-    private var headerSection: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "flame.fill")
-                .font(.title2)
-                .foregroundStyle(.orange)
-                .frame(width: 44, height: 44)
-                .background(.orange.opacity(0.15), in: RoundedRectangle(cornerRadius: 10))
+    private var summaryCard: some View {
+        let typeColor = currentSession.sessionType.color
+        let typeIcon = currentSession.sessionType.iconName
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Heat")
-                    .font(TrailFont.title)
+        return HStack(spacing: 14) {
+            Image(systemName: typeIcon)
+                .font(.system(size: 20))
+                .foregroundStyle(typeColor)
+                .frame(width: 43, height: 43)
+                .background(typeColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
 
-                Text("Week \(session.weekNumber) \u{2022} \(session.scheduledDate.formatted(.dateTime.weekday(.wide)))")
-                    .font(TrailFont.body)
+            VStack(alignment: .leading, spacing: 3) {
+                HStack(spacing: 6) {
+                    Text(currentSession.sessionType.displayName)
+                        .font(.system(size: 18))
+                        .strikethrough(isSkipped)
+                        .opacity(isSkipped ? 0.5 : 1)
+                    if currentSession.isTemplateOverride {
+                        Image(systemName: "pencil.circle.fill")
+                            .font(TrailFont.meta)
+                            .foregroundStyle(.orange)
+                    }
+                }
+                Text(metaLine)
+                    .font(TrailFont.data).tracking(0.5)
                     .foregroundStyle(.secondary)
             }
 
             Spacer()
 
-            if existingLog != nil {
+            trailingStatus
+        }
+        .unifiedCard()
+    }
+
+    @ViewBuilder
+    private var trailingStatus: some View {
+        if isSkipped {
+            Text("SKIPPED")
+                .font(.system(size: 12, weight: .semibold))
+                .tracking(0.5)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 4)
+                .background(Color.red.opacity(0.8), in: Capsule())
+        } else if let log = existingLog {
+            HStack(spacing: 6) {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
+                    .foregroundStyle(Color.trailGreen)
                     .font(.title3)
+                Text("\(log.actualDurationMinutes) min")
+                    .font(TrailFont.data)
+                    .fontWeight(.medium)
             }
+        } else {
+            Button {
+                heatStore.logSession(
+                    sessionId: session.id,
+                    durationMinutes: currentSession.targetDurationMinutes,
+                    sessionType: currentSession.sessionType,
+                    notes: nil
+                )
+            } label: {
+                Image(systemName: "circle")
+                    .font(.title3)
+                    .foregroundStyle(Color.secondary.opacity(0.4))
+            }
+            .buttonStyle(.plain)
         }
     }
 
-    private var typePickerSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Type")
-                .font(TrailFont.body)
-                .foregroundStyle(.secondary)
+    private var metaLine: String {
+        var parts = ["WK \(currentSession.weekNumber) D\(currentSession.dayOfWeek)"]
+        parts.append(Self.weekdayNames[currentSession.dayOfWeek].uppercased())
+        parts.append("\(currentSession.targetDurationMinutes) MIN")
+        return parts.joined(separator: " · ")
+    }
 
-            Picker("Type", selection: $selectedType) {
-                ForEach(HeatType.allCases) { type in
-                    Label(type.displayName, systemImage: type.iconName)
-                        .tag(type)
+    // MARK: Notes
+
+    private func notesSection(_ notes: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Coach notes")
+                .font(TrailFont.coach)
+                .foregroundStyle(.secondary)
+            Text(notes)
+                .font(TrailFont.body)
+                .foregroundStyle(isSkipped ? .secondary : .primary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+                .textSelection(.enabled)
+        }
+        .unifiedCard()
+    }
+
+    // MARK: Actions
+
+    private var actionsSection: some View {
+        VStack(spacing: 12) {
+            if isSkipped {
+                Button {
+                    heatStore.unskipSession(session.id)
+                } label: {
+                    Label("Restore", systemImage: "arrow.uturn.backward.circle")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .tint(.gray)
+            } else {
+                HStack(spacing: 8) {
+                    Button {
+                        showingSkipOptions = true
+                    } label: {
+                        Label("Skip", systemImage: "xmark.circle")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.gray)
+                    .confirmationDialog("Skip this heat session?", isPresented: $showingSkipOptions) {
+                        Button("Injury") { heatStore.skipSession(session.id, reason: "Injury") }
+                        Button("Illness") { heatStore.skipSession(session.id, reason: "Illness") }
+                        Button("Life / Schedule") { heatStore.skipSession(session.id, reason: "Life") }
+                        Button("Skip (no reason)") { heatStore.skipSession(session.id, reason: nil) }
+                        Button("Cancel", role: .cancel) {}
+                    }
+
+                    Button {
+                        withAnimation { showingSwapTargets.toggle() }
+                    } label: {
+                        Label("Swap", systemImage: "arrow.left.arrow.right")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.gray)
+
+                    Button {
+                        editSelectedType = currentSession.sessionType
+                        editDuration = existingLog?.actualDurationMinutes ?? currentSession.targetDurationMinutes
+                        editNotes = existingLog?.notes ?? ""
+                        editApplyToAll = false
+                        isEditing = true
+                    } label: {
+                        Label("Edit", systemImage: "pencil")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.gray)
                 }
             }
-            .pickerStyle(.segmented)
         }
     }
 
-    private var durationSection: some View {
+    // MARK: Swap
+
+    private var swapTargetsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Duration")
+            Text("Move to a different day:")
                 .font(TrailFont.body)
                 .foregroundStyle(.secondary)
 
-            HStack {
-                Text("\(duration) min")
-                    .font(TrailFont.title)
-                    .foregroundStyle(.orange)
-                    .frame(width: 100, alignment: .leading)
+            ForEach(1...7, id: \.self) { day in
+                if day != currentSession.dayOfWeek {
+                    Button {
+                        heatStore.moveToDay(session.id, dayOfWeek: day)
+                        showingSwapTargets = false
+                    } label: {
+                        HStack {
+                            Image(systemName: "calendar")
+                                .foregroundStyle(.orange)
+                                .frame(width: 28)
+                            Text(Self.dayNames[day])
+                                .font(TrailFont.body)
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(TrailFont.meta)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 12)
+                        .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
 
-                Slider(value: durationBinding, in: 5...60, step: 5)
+    // MARK: Edit
+
+    private var editHeader: some View {
+        HStack {
+            Button("Cancel") { isEditing = false }
+                .font(TrailFont.data).fontWeight(.semibold)
+                .foregroundStyle(.secondary)
+            Spacer()
+            Button("Save") { saveEdit() }
+                .font(TrailFont.data).fontWeight(.semibold)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(Color.trailGreen, in: Capsule())
+        }
+    }
+
+    private var editForm: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Edit Heat")
+                .font(TrailFont.title)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Type")
+                    .font(TrailFont.body)
+                    .foregroundStyle(.secondary)
+                Picker("Type", selection: $editSelectedType) {
+                    ForEach(HeatType.allCases) { type in
+                        Label(type.displayName, systemImage: type.iconName).tag(type)
+                    }
+                }
+                .pickerStyle(.segmented)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Duration")
+                    .font(TrailFont.body)
+                    .foregroundStyle(.secondary)
+                HStack {
+                    Text("\(editDuration) min")
+                        .font(TrailFont.title)
+                        .foregroundStyle(.orange)
+                        .frame(width: 100, alignment: .leading)
+                    Slider(value: durationBinding, in: 5...60, step: 5)
+                        .tint(.orange)
+                }
+                Text("Target: \(currentSession.targetDurationMinutes) min")
+                    .font(TrailFont.data)
+                    .foregroundStyle(.tertiary)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Notes")
+                    .font(TrailFont.body)
+                    .foregroundStyle(.secondary)
+                TextField("Notes (optional)", text: $editNotes, axis: .vertical)
+                    .textFieldStyle(.roundedBorder)
+                    .lineLimit(2...4)
+            }
+
+            if editSelectedType != currentSession.sessionType || editDuration != currentSession.targetDurationMinutes {
+                Toggle("Apply to all \(Self.dayNames[currentSession.dayOfWeek])s", isOn: $editApplyToAll)
+                    .font(TrailFont.body)
                     .tint(.orange)
             }
 
-            Text("Target: \(session.targetDurationMinutes) min")
-                .font(TrailFont.data)
-                .foregroundStyle(.tertiary)
-        }
-    }
-
-    private func notesDisplay(_ text: String) -> some View {
-        HStack(alignment: .top, spacing: 8) {
-            Image(systemName: "info.circle")
-                .foregroundStyle(.secondary)
-                .font(TrailFont.meta)
-            Text(text)
-                .font(TrailFont.meta)
-                .foregroundStyle(.secondary)
-        }
-        .padding(10)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(.quaternary.opacity(0.5), in: RoundedRectangle(cornerRadius: 8))
-    }
-
-    private var actionButtons: some View {
-        VStack(spacing: 12) {
-            if existingLog != nil {
-                Button {
+            if isLogged {
+                Button(role: .destructive) {
                     heatStore.deleteLog(session.id)
-                    dismiss()
+                    isEditing = false
                 } label: {
                     Label("Remove Log", systemImage: "trash")
                         .frame(maxWidth: .infinity)
@@ -160,55 +335,44 @@ struct HeatLogSheet: View {
                 .buttonStyle(.bordered)
                 .tint(.red)
             }
-
-            Button {
-                // Update the session itself if type or duration changed
-                if selectedType != session.sessionType || duration != session.targetDurationMinutes {
-                    if applyToAll {
-                        heatStore.updateAllSessions(
-                            dayOfWeek: session.dayOfWeek,
-                            sessionType: selectedType,
-                            durationMinutes: duration
-                        )
-                    } else {
-                        var updated = session
-                        updated.sessionType = selectedType
-                        updated.targetDurationMinutes = duration
-                        heatStore.updateSession(updated)
-                    }
-                }
-
-                // Log completion
-                if existingLog != nil {
-                    heatStore.deleteLog(session.id)
-                }
-                heatStore.logSession(
-                    sessionId: session.id,
-                    durationMinutes: duration,
-                    sessionType: selectedType,
-                    notes: notes.isEmpty ? nil : notes
-                )
-                dismiss()
-            } label: {
-                Label(
-                    existingLog != nil ? "Update Log" : "Log Session",
-                    systemImage: "checkmark.circle.fill"
-                )
-                .frame(maxWidth: .infinity)
-                .fontWeight(.semibold)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.orange)
         }
     }
 
-    // MARK: - Helpers
-
     private var durationBinding: Binding<Double> {
         Binding(
-            get: { Double(duration) },
-            set: { duration = Int($0) }
+            get: { Double(editDuration) },
+            set: { editDuration = Int($0) }
         )
+    }
+
+    private func saveEdit() {
+        let typeChanged = editSelectedType != currentSession.sessionType
+        let targetChanged = editDuration != currentSession.targetDurationMinutes
+
+        if typeChanged || targetChanged {
+            if editApplyToAll {
+                heatStore.updateAllSessions(
+                    dayOfWeek: currentSession.dayOfWeek,
+                    sessionType: editSelectedType,
+                    durationMinutes: editDuration
+                )
+            } else {
+                var updated = currentSession
+                updated.sessionType = editSelectedType
+                updated.targetDurationMinutes = editDuration
+                heatStore.updateSession(updated)
+            }
+        }
+
+        // Replace any existing log with the freshly edited values.
+        if isLogged { heatStore.deleteLog(session.id) }
+        heatStore.logSession(
+            sessionId: session.id,
+            durationMinutes: editDuration,
+            sessionType: editSelectedType,
+            notes: editNotes.isEmpty ? nil : editNotes
+        )
+        isEditing = false
     }
 }
 

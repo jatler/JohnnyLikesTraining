@@ -18,6 +18,11 @@ struct StrengthSession: Codable, Identifiable {
     var dayOfWeek: Int
     var coachNotes: String
     var isComplete: Bool
+    var isSkipped: Bool
+    var skipReason: String?
+    /// Snapshot of coachNotes before the first user edit. Populated by
+    /// `StrengthStore.updateCoachNotes` and consumed by `resetToOriginal`.
+    var originalCoachNotes: String?
 
     enum CodingKeys: String, CodingKey {
         case id
@@ -28,10 +33,14 @@ struct StrengthSession: Codable, Identifiable {
         case dayOfWeek = "day_of_week"
         case coachNotes = "coach_notes"
         case isComplete = "is_complete"
+        case isSkipped = "is_skipped"
+        case skipReason = "skip_reason"
+        case originalCoachNotes = "original_coach_notes"
     }
 
     init(id: UUID, planId: UUID, plannedSessionId: UUID?, scheduledDate: Date,
-         weekNumber: Int, dayOfWeek: Int, coachNotes: String, isComplete: Bool) {
+         weekNumber: Int, dayOfWeek: Int, coachNotes: String, isComplete: Bool,
+         isSkipped: Bool = false, skipReason: String? = nil, originalCoachNotes: String? = nil) {
         self.id = id
         self.planId = planId
         self.plannedSessionId = plannedSessionId
@@ -40,6 +49,9 @@ struct StrengthSession: Codable, Identifiable {
         self.dayOfWeek = dayOfWeek
         self.coachNotes = coachNotes
         self.isComplete = isComplete
+        self.isSkipped = isSkipped
+        self.skipReason = skipReason
+        self.originalCoachNotes = originalCoachNotes
     }
 
     init(from decoder: Decoder) throws {
@@ -52,11 +64,15 @@ struct StrengthSession: Codable, Identifiable {
         dayOfWeek = try c.decode(Int.self, forKey: .dayOfWeek)
         coachNotes = try c.decodeIfPresent(String.self, forKey: .coachNotes) ?? ""
         isComplete = try c.decodeIfPresent(Bool.self, forKey: .isComplete) ?? false
+        isSkipped = try c.decodeIfPresent(Bool.self, forKey: .isSkipped) ?? false
+        skipReason = try c.decodeIfPresent(String.self, forKey: .skipReason)
+        originalCoachNotes = try c.decodeIfPresent(String.self, forKey: .originalCoachNotes)
     }
 
     /// Custom encode to ALWAYS emit `planned_session_id` — as `null` when nil rather
     /// than omitting the key. PostgREST otherwise won't clear stale FK values on rows
     /// that already exist server-side, leaving the upsert FK constraint to keep failing.
+    /// Same reasoning applies to `skip_reason` and `original_coach_notes`.
     func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(id, forKey: .id)
@@ -67,6 +83,9 @@ struct StrengthSession: Codable, Identifiable {
         try c.encode(dayOfWeek, forKey: .dayOfWeek)
         try c.encode(coachNotes, forKey: .coachNotes)
         try c.encode(isComplete, forKey: .isComplete)
+        try c.encode(isSkipped, forKey: .isSkipped)
+        try c.encode(skipReason, forKey: .skipReason)
+        try c.encode(originalCoachNotes, forKey: .originalCoachNotes)
     }
 
     /// Short label extracted from the coach notes for display in compact views.
