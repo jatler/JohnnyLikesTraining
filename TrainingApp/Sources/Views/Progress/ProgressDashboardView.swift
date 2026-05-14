@@ -176,11 +176,11 @@ struct ProgressDashboardView: View {
                     }
             }
         }
-        // Vertical rhythm: 8pt above + 4pt below treats the dots as a
-        // proper "indicator sub-row" sitting beneath the card, not orphaned
-        // punctuation floating in the gap.
-        .padding(.top, 8)
-        .padding(.bottom, 4)
+        // Anchor the dots to the chart card above them, not the race card
+        // below: 0pt top + 12pt bottom (on top of the 10pt VStack spacing
+        // either side) reads as "belongs to the chart" instead of orphaned.
+        .padding(.top, 0)
+        .padding(.bottom, 12)
     }
 
     private func color(for page: ChartPage) -> Color {
