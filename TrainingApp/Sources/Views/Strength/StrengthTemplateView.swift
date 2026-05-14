@@ -705,16 +705,23 @@ private struct AddStrengthDaySheet: View {
 
     private let dayNames = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
-    private var availableDays: [Int] {
-        let usedDays = Set(strengthStore.sessions.map(\.dayOfWeek))
-        return (1...7).filter { !usedDays.contains($0) }
+    /// Today's day-of-week in the app's Monday-based convention (Mon=1 … Sun=7).
+    /// Calendar default has Sunday=1; remap so the picker defaults to today.
+    private var todayDayOfWeek: Int {
+        let weekday = Calendar.current.component(.weekday, from: Date())
+        return (weekday + 5) % 7 + 1
     }
 
     var body: some View {
         NavigationStack {
             Form {
+                // All seven days available — picking a day that already has a
+                // strength session adds another on top of it, which is valid
+                // (e.g. a hike on the same day as a lift). Previously the
+                // already-used days were filtered out, which meant Tuesday was
+                // unreachable once Mon/Wed/Fri were claimed by the template.
                 Picker("Day", selection: $selectedDay) {
-                    ForEach(availableDays, id: \.self) { day in
+                    ForEach(1...7, id: \.self) { day in
                         Text(dayNames[day]).tag(day)
                     }
                 }
@@ -732,13 +739,11 @@ private struct AddStrengthDaySheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Add") { addStrengthDay() }
-                        .disabled(availableDays.isEmpty || coachNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .disabled(coachNotes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
             .onAppear {
-                if let first = availableDays.first {
-                    selectedDay = first
-                }
+                selectedDay = todayDayOfWeek
             }
         }
     }

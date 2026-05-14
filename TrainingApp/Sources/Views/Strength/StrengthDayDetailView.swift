@@ -141,10 +141,16 @@ private struct SessionDetail: View {
                 .padding(.vertical, 4)
                 .background(Color.red.opacity(0.8), in: Capsule())
         } else if session.isComplete {
-            Image(systemName: "checkmark.circle.fill")
-                .foregroundStyle(Color.trailGreen)
-                .font(.title3)
-                .completionPulse(true)
+            // Burst animation on first appearance, same as the Week tab.
+            // CompletionCelebrationStore keeps the burst one-shot — second
+            // visit to the sheet (or the row outside) shows the filled
+            // checked state directly.
+            CompleteStatus(
+                magnitude: 1.0,
+                label: "",
+                sessionId: session.id,
+                baseSize: 22
+            )
         }
     }
 

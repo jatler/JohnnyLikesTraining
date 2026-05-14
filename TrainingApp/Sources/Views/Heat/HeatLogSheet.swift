@@ -110,10 +110,15 @@ struct HeatLogSheet: View {
                 .background(Color.red.opacity(0.8), in: Capsule())
         } else if let log = existingLog {
             HStack(spacing: 6) {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(Color.trailGreen)
-                    .font(.title3)
-                    .completionPulse(true)
+                // Burst animation on first appearance — same one-shot pattern
+                // as the Week tab. CompletionCelebrationStore prevents a
+                // replay on subsequent sheet opens or row appearances.
+                CompleteStatus(
+                    magnitude: 1.0,
+                    label: "",
+                    sessionId: session.id,
+                    baseSize: 22
+                )
                 Text("\(log.actualDurationMinutes) min")
                     .font(TrailFont.data)
                     .fontWeight(.medium)
