@@ -105,7 +105,6 @@ struct StrengthTemplateView: View {
         VStack(spacing: 0) {
             header
             segmentedPicker
-            summaryBar(for: selectedWeek)
             // Week-paginated content — same pattern as WeekView. Each week is its
             // own ScrollView so the swipe gesture is owned by the TabView and
             // doesn't fight per-row scroll.
@@ -227,60 +226,6 @@ struct StrengthTemplateView: View {
     private func syncStrengthFromPlan() {
         guard let planId = planStore.activePlan?.id else { return }
         strengthStore.refreshFromPlannedSessions(planStore.sessions, planId: planId)
-    }
-
-    private func summaryBar(for week: Int) -> some View {
-        let (planned, done) = currentSegmentCounts(for: week)
-        return HStack(spacing: 10) {
-            Image(systemName: "chart.bar.fill")
-                .font(.system(size: 12))
-                .foregroundStyle(.secondary)
-            Text("\(planned) sessions")
-                .font(TrailFont.data)
-                .foregroundStyle(.secondary)
-                .textCase(.uppercase)
-                .tracking(0.5)
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 12))
-                .foregroundStyle(.green)
-            Text("\(done) done")
-                .font(TrailFont.data)
-                .foregroundStyle(.green)
-            Spacer()
-            if planned > 0 {
-                Text("\(done)/\(planned)")
-                    .font(TrailFont.data)
-                    .foregroundStyle(.green)
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
-        .background(.regularMaterial)
-        .overlay(alignment: .bottom) {
-            Divider().opacity(0.4)
-        }
-    }
-
-    private func currentSegmentCounts(for week: Int) -> (planned: Int, done: Int) {
-        switch selectedSegment {
-        case .strength:
-            let s = strengthStore.sessions(for: week)
-            return (s.count, s.filter(\.isComplete).count)
-        case .stretch:
-            let days = stretchStore.daysWithExercises
-            var planned = 0, done = 0
-            for d in days {
-                let ses = stretchStore.sessions(for: week, dayOfWeek: d)
-                planned += ses.count
-                done += ses.filter { stretchStore.isComplete($0.id) }.count
-            }
-            return (planned, done)
-        case .heat:
-            let entries = heatDaysFromSessions()
-            let planned = entries.count
-            let done = entries.filter { heatStore.isComplete($0.session.id) }.count
-            return (planned, done)
-        }
     }
 
     // MARK: - Segment Rows
