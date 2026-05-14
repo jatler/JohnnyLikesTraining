@@ -28,6 +28,17 @@ struct SessionDetailSheet: View {
         planStore.isOverridden(session.id)
     }
 
+    private var isManuallyComplete: Bool {
+        planStore.isManuallyComplete(session.id)
+    }
+
+    /// True when the user has either matched a Strava activity to this session
+    /// or manually pressed Mark Done. The two sources both light up the same
+    /// green check in the trailing slot.
+    private var isComplete: Bool {
+        !dayRunActivities.isEmpty || isManuallyComplete
+    }
+
     private var matchedActivity: StravaActivity? {
         strava.activity(for: session.id)
     }
@@ -140,6 +151,18 @@ struct SessionDetailSheet: View {
                     Divider()
                 }
             }
+
+            // Strava brand attribution — required by Strava's brand guidelines
+            // whenever activity data is displayed. Mirrors the single-activity
+            // card in `SessionComponents.planVsActualSection`.
+            HStack {
+                Spacer()
+                Image("PoweredByStrava")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: 12)
+            }
+            .padding(.top, 4)
         }
         .unifiedCard()
     }
@@ -150,34 +173,46 @@ struct SessionDetailSheet: View {
         let pace: Double? = activity.distanceMi > 0
             ? (Double(activity.movingTimeSeconds) / 60.0) / activity.distanceMi
             : nil
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: "figure.run")
-                .font(.system(size: 18))
-                .foregroundStyle(Color.trailGreen)
-                .frame(width: 32, height: 32)
-                .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
-            VStack(alignment: .leading, spacing: 3) {
-                Text(activity.name)
-                    .font(TrailFont.body)
-                    .lineLimit(1)
-                HStack(spacing: 6) {
-                    Text(String(format: "%.1f mi", activity.distanceMi))
-                        .font(TrailFont.data)
-                    Text("·").foregroundStyle(.secondary)
-                    Text(formatDuration(activity.movingTimeSeconds))
-                        .font(TrailFont.data).foregroundStyle(.secondary)
-                    if let pace {
+        let url = URL(string: "https://www.strava.com/activities/\(activity.stravaId)")!
+
+        Link(destination: url) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "figure.run")
+                    .font(.system(size: 18))
+                    .foregroundStyle(Color.trailGreen)
+                    .frame(width: 32, height: 32)
+                    .background(Color.trailGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
+                VStack(alignment: .leading, spacing: 3) {
+                    HStack(spacing: 4) {
+                        Text(activity.name)
+                            .font(TrailFont.body)
+                            .lineLimit(1)
+                            .foregroundStyle(.primary)
+                        Image(systemName: "arrow.up.right.square")
+                            .font(.system(size: 11))
+                            .foregroundStyle(.secondary)
+                    }
+                    HStack(spacing: 6) {
+                        Text(String(format: "%.1f mi", activity.distanceMi))
+                            .font(TrailFont.data)
+                            .foregroundStyle(.primary)
                         Text("·").foregroundStyle(.secondary)
-                        Text(formatPace(pace))
+                        Text(formatDuration(activity.movingTimeSeconds))
                             .font(TrailFont.data).foregroundStyle(.secondary)
+                        if let pace {
+                            Text("·").foregroundStyle(.secondary)
+                            Text(formatPace(pace))
+                                .font(TrailFont.data).foregroundStyle(.secondary)
+                        }
                     }
                 }
+                Spacer()
+                Text(startTime.formatted(.dateTime.hour().minute()))
+                    .font(TrailFont.data)
+                    .foregroundStyle(.secondary)
             }
-            Spacer()
-            Text(startTime.formatted(.dateTime.hour().minute()))
-                .font(TrailFont.data)
-                .foregroundStyle(.secondary)
         }
+        .buttonStyle(.plain)
     }
 
     private func formatDuration(_ seconds: Int) -> String {
@@ -257,10 +292,16 @@ struct SessionDetailSheet: View {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(Color.trailGreen)
                         .font(.title3)
+                        .completionPulse(true)
                     Text(String(format: "%.1f mi", dayTotalMiles))
                         .font(TrailFont.data)
                         .fontWeight(.medium)
                 }
+            } else if isManuallyComplete {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(Color.trailGreen)
+                    .font(.title3)
+                    .completionPulse(true)
             }
         }
     }
@@ -491,6 +532,8 @@ struct SessionDetailSheet: View {
                 .buttonStyle(.bordered)
                 .tint(.gray)
             } else {
+                markDoneButton
+
                 HStack(spacing: 8) {
                     Button {
                         showingSkipOptions = true
@@ -532,6 +575,34 @@ struct SessionDetailSheet: View {
                     .tint(.gray)
                 }
             }
+        }
+    }
+
+    /// Primary completion CTA. Disabled when a Strava activity is matched —
+    /// completion is then implicit and the user shouldn't double-record.
+    @ViewBuilder
+    private var markDoneButton: some View {
+        if !dayRunActivities.isEmpty {
+            EmptyView()
+        } else if isManuallyComplete {
+            Button {
+                planStore.unmarkComplete(session.id)
+            } label: {
+                Label("Mark Incomplete", systemImage: "arrow.uturn.backward")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(.gray)
+        } else {
+            Button {
+                planStore.markComplete(session.id)
+            } label: {
+                Label("Mark Done", systemImage: "checkmark.circle.fill")
+                    .frame(maxWidth: .infinity)
+                    .fontWeight(.semibold)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(Color.trailGreen)
         }
     }
 

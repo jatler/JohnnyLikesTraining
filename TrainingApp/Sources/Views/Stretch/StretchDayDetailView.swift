@@ -30,39 +30,41 @@ struct StretchDayDetailView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
-                    if daySessions.isEmpty {
-                        Text("No stretches for this day")
-                            .foregroundStyle(.secondary)
-                            .padding(.top, 40)
-                            .frame(maxWidth: .infinity)
-                    } else {
-                        summaryCard
-                        progressSection
-                        ForEach(daySessions) { session in
-                            stretchCard(session)
-                        }
-                        actionsSection
-                        if showingSwapTargets {
-                            swapTargetsSection
-                        }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                if daySessions.isEmpty {
+                    emptyState
+                } else {
+                    summaryCard
+                    progressSection
+                    ForEach(daySessions) { session in
+                        stretchCard(session)
+                    }
+                    actionsSection
+                    if showingSwapTargets {
+                        swapTargetsSection
                     }
                 }
-                .padding(.horizontal, 12)
-                .padding(.top, 16)
-                .padding(.bottom, 20)
             }
-            .navigationTitle("\(Self.dayNames[dayOfWeek]) — Week \(weekNumber)")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
-                }
-            }
+            .padding(.horizontal, 12)
+            .padding(.top, 16)
+            .padding(.bottom, 20)
         }
-        .presentationDetents([.large])
+        .presentationDetents([.custom(BannerGapDetent.self)])
+        .presentationDragIndicator(.visible)
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "figure.flexibility")
+                .font(.system(size: 40))
+                .foregroundStyle(.tertiary)
+            Text("No stretches for this day")
+                .font(TrailFont.body)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 40)
     }
 
     // MARK: Summary
@@ -106,12 +108,12 @@ struct StretchDayDetailView: View {
             Image(systemName: "checkmark.circle.fill")
                 .foregroundStyle(Color.trailGreen)
                 .font(.title3)
+                .completionPulse(true)
         }
     }
 
     private var metaLine: String {
-        let weekday = Self.weekdayShort[dayOfWeek].uppercased()
-        return "WK \(weekNumber) D\(dayOfWeek) · \(weekday) · \(daySessions.count) STRETCHES"
+        "WK \(weekNumber) D\(dayOfWeek) · \(completedCount)/\(daySessions.count) STRETCHES"
     }
 
     // MARK: Progress
@@ -208,6 +210,8 @@ struct StretchDayDetailView: View {
                 .buttonStyle(.bordered)
                 .tint(.gray)
             } else {
+                markDoneButton
+
                 HStack(spacing: 8) {
                     Button {
                         showingSkipOptions = true
@@ -238,11 +242,35 @@ struct StretchDayDetailView: View {
         }
     }
 
+    @ViewBuilder
+    private var markDoneButton: some View {
+        if isDayComplete {
+            Button {
+                stretchStore.unmarkDayComplete(weekNumber: weekNumber, dayOfWeek: dayOfWeek)
+            } label: {
+                Label("Mark Incomplete", systemImage: "arrow.uturn.backward")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(.gray)
+        } else {
+            Button {
+                stretchStore.markDayComplete(weekNumber: weekNumber, dayOfWeek: dayOfWeek)
+            } label: {
+                Label("Mark All Done", systemImage: "checkmark.circle.fill")
+                    .frame(maxWidth: .infinity)
+                    .fontWeight(.semibold)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(Color.trailGreen)
+        }
+    }
+
     // MARK: Swap
 
     private var swapTargetsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Move these stretches to:")
+            Text("Select a day to swap with:")
                 .font(TrailFont.body)
                 .foregroundStyle(.secondary)
 
@@ -257,8 +285,13 @@ struct StretchDayDetailView: View {
                             Image(systemName: "calendar")
                                 .foregroundStyle(.mint)
                                 .frame(width: 28)
-                            Text(Self.dayNames[day])
-                                .font(TrailFont.body)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(Self.dayNames[day])
+                                    .font(TrailFont.body)
+                                Text(swapPreview(for: day))
+                                    .font(TrailFont.meta)
+                                    .foregroundStyle(.secondary)
+                            }
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .font(TrailFont.meta)
@@ -272,6 +305,12 @@ struct StretchDayDetailView: View {
                 }
             }
         }
+    }
+
+    private func swapPreview(for day: Int) -> String {
+        let existing = stretchStore.sessions(for: weekNumber, dayOfWeek: day)
+        guard !existing.isEmpty else { return "Empty" }
+        return "Has \(existing.count) stretch\(existing.count == 1 ? "" : "es")"
     }
 }
 

@@ -376,6 +376,28 @@ final class TrainingPlanStore {
         }
     }
 
+    // MARK: - Manual Completion
+
+    func markComplete(_ sessionId: UUID) {
+        guard let index = sessions.firstIndex(where: { $0.id == sessionId }) else { return }
+        guard !sessions[index].manuallyComplete else { return }
+        sessions[index].manuallyComplete = true
+        saveToCache()
+        Task { await persistSessionFieldUpdate(sessions[index]) }
+    }
+
+    func unmarkComplete(_ sessionId: UUID) {
+        guard let index = sessions.firstIndex(where: { $0.id == sessionId }) else { return }
+        guard sessions[index].manuallyComplete else { return }
+        sessions[index].manuallyComplete = false
+        saveToCache()
+        Task { await persistSessionFieldUpdate(sessions[index]) }
+    }
+
+    func isManuallyComplete(_ sessionId: UUID) -> Bool {
+        sessions.first(where: { $0.id == sessionId })?.manuallyComplete ?? false
+    }
+
     // MARK: - Skip / Unskip
 
     func skipSession(_ sessionId: UUID, reason: String? = nil) {

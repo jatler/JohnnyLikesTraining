@@ -276,6 +276,22 @@ final class StretchStore {
         Task { await persistLog(log) }
     }
 
+    /// Mark every stretch on `(weekNumber, dayOfWeek)` complete. Mirrors the
+    /// "Mark Done" button on the other detail sheets — one tap, day-level.
+    func markDayComplete(weekNumber: Int, dayOfWeek: Int) {
+        let daySessions = sessions(for: weekNumber, dayOfWeek: dayOfWeek)
+        for session in daySessions where !isComplete(session.id) {
+            logCompletion(sessionId: session.id)
+        }
+    }
+
+    func unmarkDayComplete(weekNumber: Int, dayOfWeek: Int) {
+        let daySessions = sessions(for: weekNumber, dayOfWeek: dayOfWeek)
+        for session in daySessions where isComplete(session.id) {
+            removeLog(sessionId: session.id)
+        }
+    }
+
     func removeLog(sessionId: UUID) {
         guard let log = logs.first(where: { $0.sessionId == sessionId }) else { return }
         logs.removeAll { $0.sessionId == sessionId }

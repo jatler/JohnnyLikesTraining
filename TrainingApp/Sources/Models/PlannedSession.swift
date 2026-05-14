@@ -11,6 +11,11 @@ struct PlannedSession: Codable, Identifiable {
     var targetPaceDescription: String?
     var notes: String?
     var sortOrder: Int
+    /// User explicitly marked this session complete via the detail sheet's Done
+    /// button. Defaults to false; OR'd with Strava-match detection to derive the
+    /// final completion state. Backed by `manually_complete` column added in the
+    /// 2026-05-14 migration.
+    var manuallyComplete: Bool = false
 
     var targetDistanceMi: Double? {
         targetDistanceKm.map { DistanceFormatter.miles(from: $0) }
@@ -48,6 +53,40 @@ struct PlannedSession: Codable, Identifiable {
         case targetPaceDescription = "target_pace_description"
         case notes
         case sortOrder = "sort_order"
+        case manuallyComplete = "manually_complete"
+    }
+
+    init(id: UUID, planId: UUID, weekNumber: Int, dayOfWeek: Int, scheduledDate: Date,
+         workoutType: WorkoutType, targetDistanceKm: Double?, targetPaceDescription: String?,
+         notes: String?, sortOrder: Int, manuallyComplete: Bool = false) {
+        self.id = id
+        self.planId = planId
+        self.weekNumber = weekNumber
+        self.dayOfWeek = dayOfWeek
+        self.scheduledDate = scheduledDate
+        self.workoutType = workoutType
+        self.targetDistanceKm = targetDistanceKm
+        self.targetPaceDescription = targetPaceDescription
+        self.notes = notes
+        self.sortOrder = sortOrder
+        self.manuallyComplete = manuallyComplete
+    }
+
+    /// decodeIfPresent on `manually_complete` so cached rows from before the
+    /// 2026-05-14 migration keep decoding cleanly.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        planId = try c.decode(UUID.self, forKey: .planId)
+        weekNumber = try c.decode(Int.self, forKey: .weekNumber)
+        dayOfWeek = try c.decode(Int.self, forKey: .dayOfWeek)
+        scheduledDate = try c.decode(Date.self, forKey: .scheduledDate)
+        workoutType = try c.decode(WorkoutType.self, forKey: .workoutType)
+        targetDistanceKm = try c.decodeIfPresent(Double.self, forKey: .targetDistanceKm)
+        targetPaceDescription = try c.decodeIfPresent(String.self, forKey: .targetPaceDescription)
+        notes = try c.decodeIfPresent(String.self, forKey: .notes)
+        sortOrder = try c.decode(Int.self, forKey: .sortOrder)
+        manuallyComplete = try c.decodeIfPresent(Bool.self, forKey: .manuallyComplete) ?? false
     }
 
     /// Best-effort display range parsed from verbatim coach text (notes + pace description).

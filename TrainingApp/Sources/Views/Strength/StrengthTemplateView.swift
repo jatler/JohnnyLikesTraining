@@ -139,6 +139,9 @@ struct StrengthTemplateView: View {
             syncStrengthFromPlan()
         }
         .onChange(of: planStore.allWeekNumbers) { _, _ in syncStrengthFromPlan() }
+        .onPreferenceChange(BannerHeightKey.self) { height in
+            BannerGapDetent.bannerHeight = height
+        }
     }
 
     private var header: some View {
@@ -194,6 +197,11 @@ struct StrengthTemplateView: View {
         .background(Color.trailGreen)
         .background(Color.trailGreen.ignoresSafeArea(edges: .top))
         .tint(.white)
+        .background(
+            GeometryReader { geo in
+                Color.clear.preference(key: BannerHeightKey.self, value: geo.size.height)
+            }
+        )
     }
 
     private func weekLine(for week: Int) -> String {

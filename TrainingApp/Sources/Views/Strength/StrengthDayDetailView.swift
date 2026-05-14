@@ -10,34 +10,37 @@ struct StrengthDayDetailView: View {
     private static let dayNames = ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 12) {
-                    let daySessions = strengthStore.sessions(for: weekNumber, dayOfWeek: dayOfWeek)
+        ScrollView {
+            VStack(spacing: 12) {
+                let daySessions = strengthStore.sessions(for: weekNumber, dayOfWeek: dayOfWeek)
 
-                    if daySessions.isEmpty {
-                        Text("No strength sessions for this day")
-                            .foregroundStyle(.secondary)
-                            .padding(.top, 40)
-                    } else {
-                        ForEach(daySessions) { session in
-                            SessionDetail(session: session)
-                        }
+                if daySessions.isEmpty {
+                    emptyState
+                } else {
+                    ForEach(daySessions) { session in
+                        SessionDetail(session: session)
                     }
                 }
-                .padding(.horizontal, 12)
-                .padding(.top, 16)
-                .padding(.bottom, 20)
             }
-            .navigationTitle("\(Self.dayNames[dayOfWeek]) — Week \(weekNumber)")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
-                }
-            }
+            .padding(.horizontal, 12)
+            .padding(.top, 16)
+            .padding(.bottom, 20)
         }
-        .presentationDetents([.large])
+        .presentationDetents([.custom(BannerGapDetent.self)])
+        .presentationDragIndicator(.visible)
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "dumbbell.fill")
+                .font(.system(size: 40))
+                .foregroundStyle(.tertiary)
+            Text("No strength sessions for this day")
+                .font(TrailFont.body)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 40)
     }
 }
 
@@ -55,10 +58,25 @@ private struct SessionDetail: View {
     @State private var isEditing = false
     @State private var editNotes: String = ""
 
-    private static let weekdayNames = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-
     private var isSkipped: Bool { strengthStore.isSkipped(session.id) }
     private var isEdited: Bool { strengthStore.isEdited(session.id) }
+
+    /// Parse a row-style headline out of `coachNotes` ("Mountain Legs: 3x10..."
+    /// → "Mountain Legs"). Matches the boldDayRow split so the detail sheet
+    /// echoes whatever the user tapped.
+    private var displayTitle: String {
+        let trimmed = session.coachNotes.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return "Strength" }
+        if let colonIdx = trimmed.firstIndex(of: ":") {
+            let head = String(trimmed[..<colonIdx]).trimmingCharacters(in: .whitespaces)
+            if !head.isEmpty, head.count <= 40 { return head }
+        }
+        if let dotIdx = trimmed.firstIndex(of: ".") {
+            let head = String(trimmed[..<dotIdx]).trimmingCharacters(in: .whitespaces)
+            if !head.isEmpty, head.count <= 40 { return head }
+        }
+        return "Strength"
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -90,7 +108,7 @@ private struct SessionDetail: View {
 
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
-                    Text("Strength")
+                    Text(displayTitle)
                         .font(.system(size: 18))
                         .strikethrough(isSkipped)
                         .opacity(isSkipped ? 0.5 : 1)
@@ -122,21 +140,16 @@ private struct SessionDetail: View {
                 .padding(.horizontal, 10)
                 .padding(.vertical, 4)
                 .background(Color.red.opacity(0.8), in: Capsule())
-        } else {
-            Button {
-                strengthStore.toggleComplete(session.id)
-            } label: {
-                Image(systemName: session.isComplete ? "checkmark.circle.fill" : "circle")
-                    .font(.title3)
-                    .foregroundStyle(session.isComplete ? Color.trailGreen : Color.secondary.opacity(0.4))
-                    .completionPulse(session.isComplete)
-            }
-            .buttonStyle(.plain)
+        } else if session.isComplete {
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundStyle(Color.trailGreen)
+                .font(.title3)
+                .completionPulse(true)
         }
     }
 
     private var metaLine: String {
-        "WK \(session.weekNumber) D\(session.dayOfWeek) · \(Self.weekdayNames[session.dayOfWeek].uppercased())"
+        "WK \(session.weekNumber) D\(session.dayOfWeek)"
     }
 
     // MARK: Notes
@@ -170,6 +183,8 @@ private struct SessionDetail: View {
                 .buttonStyle(.bordered)
                 .tint(.gray)
             } else {
+                markDoneButton
+
                 HStack(spacing: 8) {
                     Button {
                         showingSkipOptions = true
@@ -210,11 +225,35 @@ private struct SessionDetail: View {
         }
     }
 
+    @ViewBuilder
+    private var markDoneButton: some View {
+        if session.isComplete {
+            Button {
+                strengthStore.toggleComplete(session.id)
+            } label: {
+                Label("Mark Incomplete", systemImage: "arrow.uturn.backward")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(.gray)
+        } else {
+            Button {
+                strengthStore.toggleComplete(session.id)
+            } label: {
+                Label("Mark Done", systemImage: "checkmark.circle.fill")
+                    .frame(maxWidth: .infinity)
+                    .fontWeight(.semibold)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(Color.trailGreen)
+        }
+    }
+
     // MARK: Swap (move to different day)
 
     private var swapTargetsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Move to a different day:")
+            Text("Select a day to swap with:")
                 .font(TrailFont.body)
                 .foregroundStyle(.secondary)
 
@@ -228,8 +267,15 @@ private struct SessionDetail: View {
                             Image(systemName: "calendar")
                                 .foregroundStyle(Color.trailGreen)
                                 .frame(width: 28)
-                            Text(StrengthDayDetailView.dayName(for: day))
-                                .font(TrailFont.body)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(StrengthDayDetailView.dayName(for: day))
+                                    .font(TrailFont.body)
+                                if let preview = swapPreview(for: day) {
+                                    Text(preview)
+                                        .font(TrailFont.meta)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .font(TrailFont.meta)
@@ -243,6 +289,12 @@ private struct SessionDetail: View {
                 }
             }
         }
+    }
+
+    private func swapPreview(for day: Int) -> String? {
+        let existing = strengthStore.sessions(for: session.weekNumber, dayOfWeek: day)
+        guard !existing.isEmpty else { return "Empty" }
+        return "Also has \(existing.count) strength session\(existing.count == 1 ? "" : "s")"
     }
 
     // MARK: Edit

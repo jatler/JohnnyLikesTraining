@@ -30,43 +30,35 @@ struct HeatLogSheet: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
-                    if isEditing {
-                        editHeader
-                        editForm
-                    } else {
-                        summaryCard
-                        if let notes = currentSession.notes, !notes.isEmpty {
-                            notesSection(notes)
-                        }
-                        actionsSection
-                        if showingSwapTargets {
-                            swapTargetsSection
-                        }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+                if isEditing {
+                    editHeader
+                    editForm
+                } else {
+                    summaryCard
+                    if let notes = currentSession.notes, !notes.isEmpty {
+                        notesSection(notes)
+                    }
+                    actionsSection
+                    if showingSwapTargets {
+                        swapTargetsSection
                     }
                 }
-                .padding(.horizontal, 12)
-                .padding(.top, 16)
-                .padding(.bottom, 20)
             }
-            .navigationTitle("Heat Session")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
-                }
-            }
-            .onAppear {
-                if let log = existingLog {
-                    editSelectedType = log.sessionType
-                    editDuration = log.actualDurationMinutes
-                    editNotes = log.notes ?? ""
-                }
+            .padding(.horizontal, 12)
+            .padding(.top, 16)
+            .padding(.bottom, 20)
+        }
+        .presentationDetents([.custom(BannerGapDetent.self)])
+        .presentationDragIndicator(.visible)
+        .onAppear {
+            if let log = existingLog {
+                editSelectedType = log.sessionType
+                editDuration = log.actualDurationMinutes
+                editNotes = log.notes ?? ""
             }
         }
-        .presentationDetents([.large])
     }
 
     // MARK: Summary
@@ -121,32 +113,16 @@ struct HeatLogSheet: View {
                 Image(systemName: "checkmark.circle.fill")
                     .foregroundStyle(Color.trailGreen)
                     .font(.title3)
+                    .completionPulse(true)
                 Text("\(log.actualDurationMinutes) min")
                     .font(TrailFont.data)
                     .fontWeight(.medium)
             }
-        } else {
-            Button {
-                heatStore.logSession(
-                    sessionId: session.id,
-                    durationMinutes: currentSession.targetDurationMinutes,
-                    sessionType: currentSession.sessionType,
-                    notes: nil
-                )
-            } label: {
-                Image(systemName: "circle")
-                    .font(.title3)
-                    .foregroundStyle(Color.secondary.opacity(0.4))
-            }
-            .buttonStyle(.plain)
         }
     }
 
     private var metaLine: String {
-        var parts = ["WK \(currentSession.weekNumber) D\(currentSession.dayOfWeek)"]
-        parts.append(Self.weekdayNames[currentSession.dayOfWeek].uppercased())
-        parts.append("\(currentSession.targetDurationMinutes) MIN")
-        return parts.joined(separator: " · ")
+        "WK \(currentSession.weekNumber) D\(currentSession.dayOfWeek) · \(currentSession.targetDurationMinutes) MIN"
     }
 
     // MARK: Notes
@@ -180,6 +156,8 @@ struct HeatLogSheet: View {
                 .buttonStyle(.bordered)
                 .tint(.gray)
             } else {
+                markDoneButton
+
                 HStack(spacing: 8) {
                     Button {
                         showingSkipOptions = true
@@ -223,11 +201,40 @@ struct HeatLogSheet: View {
         }
     }
 
+    @ViewBuilder
+    private var markDoneButton: some View {
+        if isLogged {
+            Button {
+                heatStore.deleteLog(session.id)
+            } label: {
+                Label("Mark Incomplete", systemImage: "arrow.uturn.backward")
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .tint(.gray)
+        } else {
+            Button {
+                heatStore.logSession(
+                    sessionId: session.id,
+                    durationMinutes: currentSession.targetDurationMinutes,
+                    sessionType: currentSession.sessionType,
+                    notes: nil
+                )
+            } label: {
+                Label("Mark Done", systemImage: "checkmark.circle.fill")
+                    .frame(maxWidth: .infinity)
+                    .fontWeight(.semibold)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(Color.trailGreen)
+        }
+    }
+
     // MARK: Swap
 
     private var swapTargetsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Move to a different day:")
+            Text("Select a day to swap with:")
                 .font(TrailFont.body)
                 .foregroundStyle(.secondary)
 
@@ -239,10 +246,15 @@ struct HeatLogSheet: View {
                     } label: {
                         HStack {
                             Image(systemName: "calendar")
-                                .foregroundStyle(.orange)
+                                .foregroundStyle(currentSession.sessionType.color)
                                 .frame(width: 28)
-                            Text(Self.dayNames[day])
-                                .font(TrailFont.body)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(Self.dayNames[day])
+                                    .font(TrailFont.body)
+                                Text(swapPreview(for: day))
+                                    .font(TrailFont.meta)
+                                    .foregroundStyle(.secondary)
+                            }
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .font(TrailFont.meta)
@@ -336,6 +348,15 @@ struct HeatLogSheet: View {
                 .tint(.red)
             }
         }
+    }
+
+    private func swapPreview(for day: Int) -> String {
+        if let other = heatStore.sessions.first(where: {
+            $0.weekNumber == currentSession.weekNumber && $0.dayOfWeek == day
+        }) {
+            return "Has \(other.targetDurationMinutes) min \(other.sessionType.displayName.lowercased())"
+        }
+        return "Empty"
     }
 
     private var durationBinding: Binding<Double> {

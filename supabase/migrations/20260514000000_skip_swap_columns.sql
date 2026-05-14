@@ -16,3 +16,9 @@ alter table heat_sessions
 alter table stretch_sessions
     add column if not exists is_skipped boolean not null default false,
     add column if not exists skip_reason text;
+
+-- Cardio (planned_sessions) gains a manual completion flag so the Done button
+-- in SessionDetailSheet can mark a session complete independently of a Strava
+-- match. The UI OR's this with Strava-match detection.
+alter table planned_sessions
+    add column if not exists manually_complete boolean not null default false;

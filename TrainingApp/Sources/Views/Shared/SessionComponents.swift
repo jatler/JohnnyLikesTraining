@@ -168,7 +168,7 @@ enum SessionComponents {
 
     // MARK: - Comparison Cell
 
-    static func comparisonCell(title: String, actual: String, planned: String?, delta: Double?) -> some View {
+    static func comparisonCell(title: String, actual: String, planned: String?, delta: Double? = nil) -> some View {
         VStack(spacing: 4) {
             Text(title)
                 .font(TrailFont.meta)
@@ -181,12 +181,6 @@ enum SessionComponents {
                 Text("Plan: \(planned)")
                     .font(TrailFont.meta)
                     .foregroundStyle(.secondary)
-            }
-
-            if let delta, abs(delta) >= 1 {
-                Text(String(format: "%+.0f%%", delta))
-                    .font(TrailFont.data)
-                    .foregroundStyle(delta >= 0 ? .green : .orange)
             }
         }
         .frame(maxWidth: .infinity)
