@@ -197,9 +197,6 @@ struct PlanSetupView: View {
                         .foregroundStyle(Color.trailGreen)
                     }
                     .disabled(isConnectingPatreon)
-                    Text("We'll open Patreon in a new window.")
-                        .font(TrailFont.meta)
-                        .foregroundStyle(.secondary)
                 }
             }
         }
