@@ -18,7 +18,7 @@ enum WorkoutType: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .easy: "Easy"
         case .tempo: "Tempo"
-        case .intervals: "Intervals"
+        case .intervals: "Workout"
         case .longRun: "Long Run"
         case .recovery: "Recovery"
         case .rest: "Rest"
