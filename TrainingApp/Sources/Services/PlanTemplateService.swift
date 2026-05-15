@@ -6,9 +6,10 @@ final class PlanTemplateService {
 
     private init() {}
 
-    private let enabledTemplateIDs: Set<String> = [
-        "champion_100k",
-        "winter_plan_10w"
+    private let enabledTemplateIDs: [String] = [
+        "swap_6_week_6w",
+        "swap_base_building_12w",
+        "champion_100k"
     ]
 
     // MARK: - Available Templates
@@ -20,8 +21,7 @@ final class PlanTemplateService {
 
     private func loadBundledTemplates() -> [TrainingPlanTemplate] {
         let paths = Bundle.main.paths(forResourcesOfType: "json", inDirectory: nil)
-        var result: [TrainingPlanTemplate] = []
-        var seenIDs: Set<String> = []
+        var byID: [String: TrainingPlanTemplate] = [:]
 
         for path in paths {
             let url = URL(fileURLWithPath: path)
@@ -31,17 +31,16 @@ final class PlanTemplateService {
 
                 // Keep only reviewed/approved plan templates.
                 guard enabledTemplateIDs.contains(template.id) else { continue }
-                guard !seenIDs.contains(template.id) else { continue }
+                guard byID[template.id] == nil else { continue }
 
-                seenIDs.insert(template.id)
-                result.append(template)
+                byID[template.id] = template
             } catch {
                 // Ignore unrelated JSON resources or decode failures.
                 continue
             }
         }
 
-        return result.sorted { $0.name < $1.name }
+        return enabledTemplateIDs.compactMap { byID[$0] }
     }
 
     // MARK: - Load from Bundle
