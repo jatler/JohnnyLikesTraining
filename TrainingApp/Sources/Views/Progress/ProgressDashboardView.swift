@@ -1029,7 +1029,7 @@ private struct LollipopChart: View {
         let isFocused = entry.week == focusedWeek
 
         if let range = plannedRange?(entry) {
-            plannedOval(range: range, isActive: isFocused, entry: entry,
+            plannedOval(range: range, entry: entry,
                         chartHeight: chartHeight, cx: cx)
         }
 
@@ -1061,7 +1061,7 @@ private struct LollipopChart: View {
     }
 
     @ViewBuilder
-    private func plannedOval(range: (low: Double, high: Double), isActive: Bool,
+    private func plannedOval(range: (low: Double, high: Double),
                              entry: WeekProgressEntry,
                              chartHeight: CGFloat, cx: CGFloat) -> some View {
         let yHi = chartHeight - CGFloat(range.high / yMax) * chartHeight
@@ -1071,9 +1071,10 @@ private struct LollipopChart: View {
         // for hitting the prescribed range.
         let inRange = isInRange?(entry) ?? false
         let ovalColor = inRange ? highlightColor : LollipopChartConstants.ovalGrey
-        // Active (current or focused) weeks render at full opacity; everything
-        // else fades to 0.30 per spec §02.
-        let ovalOpacity = isActive ? 1.0 : LollipopChartConstants.ovalNonCurrentOpacity
+        // Oval shading is anchored to current-week status, NOT focused-week,
+        // so the planned range stays visually stable while the user swipes
+        // between weeks — only the lollipop reacts to focus.
+        let ovalOpacity = entry.isCurrent ? 1.0 : LollipopChartConstants.ovalNonCurrentOpacity
 
         Capsule()
             .fill(ovalColor.opacity(LollipopChartConstants.ovalFillOpacity))
