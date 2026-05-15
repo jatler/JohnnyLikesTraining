@@ -313,11 +313,6 @@ struct SessionDetailSheet: View {
 
     private var editForm: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Section {
-                Text("Edit Workout")
-                    .font(TrailFont.title)
-            }
-
             VStack(alignment: .leading, spacing: 8) {
                 Text("Workout Type")
                     .font(TrailFont.body)
