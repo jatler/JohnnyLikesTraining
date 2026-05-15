@@ -352,12 +352,12 @@ struct SessionDetailSheet: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("Coach notes")
-                    .font(TrailFont.title)
+                    .font(TrailFont.coach)
                     .foregroundStyle(.secondary)
 
                 TextField("Optional — full text from your plan is kept here",
                           text: $editNotes, axis: .vertical)
-                    .font(TrailFont.coach)
+                    .font(TrailFont.body)
                     .frame(minHeight: 80, alignment: .top)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 10)
@@ -392,7 +392,7 @@ struct SessionDetailSheet: View {
                 .font(TrailFont.coach)
                 .foregroundStyle(.secondary)
             Text(notes)
-                .font(TrailFont.coach)
+                .font(TrailFont.body)
                 .foregroundStyle(isSkipped ? .secondary : .primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
@@ -413,7 +413,7 @@ struct SessionDetailSheet: View {
                     .font(TrailFont.coach)
                     .foregroundStyle(.secondary)
                 Text(text)
-                    .font(TrailFont.coach)
+                    .font(TrailFont.body)
                     .foregroundStyle(.primary)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .fixedSize(horizontal: false, vertical: true)
@@ -432,11 +432,11 @@ struct SessionDetailSheet: View {
     private var athleteNotesEditor: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Athlete notes")
-                .font(TrailFont.title)
+                .font(TrailFont.coach)
                 .foregroundStyle(.secondary)
 
             TextField("How did it go?", text: $editAthleteNotes, axis: .vertical)
-                .font(TrailFont.coach)
+                .font(TrailFont.body)
                 .frame(minHeight: 60, alignment: .top)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
