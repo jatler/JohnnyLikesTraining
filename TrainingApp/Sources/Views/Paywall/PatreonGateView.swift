@@ -77,7 +77,7 @@ struct PatreonGateView: View {
                     .accessibilityHidden(true)
             }
 
-            Text("Connect your Patreon account to unlock all \(BrandKit.coachCredit) training plans, Oura integration, and the progression engine.")
+            Text("Connect your Patreon account to unlock all \(BrandKit.coachCredit) training plans.")
                 .font(TrailFont.body)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
