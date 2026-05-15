@@ -169,7 +169,7 @@ private struct SessionDetail: View {
                 .font(TrailFont.coach)
                 .foregroundStyle(.secondary)
             Text(session.coachNotes)
-                .font(TrailFont.body)
+                .font(TrailFont.coach)
                 .foregroundStyle(isSkipped ? .secondary : .primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
@@ -189,7 +189,7 @@ private struct SessionDetail: View {
                     .font(TrailFont.coach)
                     .foregroundStyle(.secondary)
                 Text(text)
-                    .font(TrailFont.body)
+                    .font(TrailFont.coach)
                     .foregroundStyle(.primary)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .fixedSize(horizontal: false, vertical: true)
@@ -211,7 +211,7 @@ private struct SessionDetail: View {
                 .foregroundStyle(.secondary)
 
             TextField("How did it go?", text: $editAthleteNotes, axis: .vertical)
-                .font(TrailFont.body)
+                .font(TrailFont.coach)
                 .frame(minHeight: 60, alignment: .top)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
@@ -385,26 +385,17 @@ private struct SessionDetail: View {
                     .font(TrailFont.body)
                     .foregroundStyle(.secondary)
 
-                ZStack(alignment: .topLeading) {
-                    if editNotes.isEmpty {
-                        Text("Describe the session — exercises, sets, reps")
-                            .foregroundStyle(.tertiary)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 14)
-                            .allowsHitTesting(false)
-                    }
-                    TextEditor(text: $editNotes)
-                        .font(TrailFont.body)
-                        .frame(minHeight: 220)
-                        .scrollContentBackground(.hidden)
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 6)
-                }
-                .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .strokeBorder(Color(.separator), lineWidth: 1)
-                )
+                TextField("Describe the session — exercises, sets, reps",
+                          text: $editNotes, axis: .vertical)
+                    .font(TrailFont.coach)
+                    .frame(minHeight: 80, alignment: .top)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
+                    .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .strokeBorder(Color(.separator), lineWidth: 1)
+                    )
             }
 
             athleteNotesEditor

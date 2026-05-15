@@ -17,7 +17,6 @@ struct SessionDetailSheet: View {
     @State private var editPace = ""
     @State private var editNotes = ""
     @State private var editAthleteNotes = ""
-    @State private var propagateToSameDay = false
     @State private var selectedStrengthDay: StrengthDaySelection?
     @State private var selectedHeatSession: HeatSession?
 
@@ -356,32 +355,20 @@ struct SessionDetailSheet: View {
                     .font(TrailFont.title)
                     .foregroundStyle(.secondary)
 
-                ZStack(alignment: .topLeading) {
-                    if editNotes.isEmpty {
-                        Text("Optional — full text from your plan is kept here")
-                            .foregroundStyle(.tertiary)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 14)
-                            .allowsHitTesting(false)
-                    }
-                    TextEditor(text: $editNotes)
-                        .font(TrailFont.body)
-                        .frame(minHeight: 260)
-                        .scrollContentBackground(.hidden)
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 6)
-                }
-                .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .strokeBorder(Color(.separator), lineWidth: 1)
-                )
+                TextField("Optional — full text from your plan is kept here",
+                          text: $editNotes, axis: .vertical)
+                    .font(TrailFont.coach)
+                    .frame(minHeight: 80, alignment: .top)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 10)
+                    .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .strokeBorder(Color(.separator), lineWidth: 1)
+                    )
             }
 
             athleteNotesEditor
-
-            Toggle("Apply to all \(dayOfWeekName)s", isOn: $propagateToSameDay)
-                .font(TrailFont.body)
 
             if isOverridden {
                 Button {
@@ -405,7 +392,7 @@ struct SessionDetailSheet: View {
                 .font(TrailFont.coach)
                 .foregroundStyle(.secondary)
             Text(notes)
-                .font(TrailFont.body)
+                .font(TrailFont.coach)
                 .foregroundStyle(isSkipped ? .secondary : .primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
@@ -426,7 +413,7 @@ struct SessionDetailSheet: View {
                     .font(TrailFont.coach)
                     .foregroundStyle(.secondary)
                 Text(text)
-                    .font(TrailFont.body)
+                    .font(TrailFont.coach)
                     .foregroundStyle(.primary)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .fixedSize(horizontal: false, vertical: true)
@@ -449,7 +436,7 @@ struct SessionDetailSheet: View {
                 .foregroundStyle(.secondary)
 
             TextField("How did it go?", text: $editAthleteNotes, axis: .vertical)
-                .font(TrailFont.body)
+                .font(TrailFont.coach)
                 .frame(minHeight: 60, alignment: .top)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
@@ -619,7 +606,6 @@ struct SessionDetailSheet: View {
                         editPace = session.targetPaceDescription ?? ""
                         editNotes = session.notes ?? ""
                         editAthleteNotes = session.athleteNotes ?? ""
-                        propagateToSameDay = false
                         isEditing = true
                     } label: {
                         Label("Edit", systemImage: "pencil")
@@ -713,10 +699,6 @@ struct SessionDetailSheet: View {
         session.scheduledDate.formatted(.dateTime.weekday(.wide).month(.abbreviated).day())
     }
 
-    private var dayOfWeekName: String {
-        session.scheduledDate.formatted(.dateTime.weekday(.wide))
-    }
-
     private func skipWithReason(_ reason: String?) {
         planStore.skipSession(session.id, reason: reason)
     }
@@ -730,8 +712,7 @@ struct SessionDetailSheet: View {
             distanceKm: distanceKm,
             paceDescription: editPace.isEmpty ? nil : editPace,
             notes: editNotes.isEmpty ? nil : editNotes,
-            reason: nil,
-            propagateToSameDay: propagateToSameDay
+            reason: nil
         )
         // Athlete notes save via a separate path so adding a journal entry
         // never trips the override system or the "edited" Reset button.
