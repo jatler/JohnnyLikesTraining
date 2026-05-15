@@ -30,15 +30,13 @@ struct MainTabView: View {
     private enum Tab: Hashable { case week, progress, strength, settings }
     @State private var selectedTab: Tab = .week
 
-    /// True while a non-patron, non-grace, non-dev-bypass user is using the app
-    /// AND the Patreon integration is enabled. Settings tab is always exempt so
-    /// the user can disconnect/disable Patreon even when the gate would fire.
     private var shouldShowPatreonGate: Bool {
-        patreon.isRequired
-            && !patreon.isPatron
-            && patreon.gracePeriodDaysRemaining == nil
-            && !DevSignIn.isAllowed
-            && selectedTab != .settings
+        PatreonService.shouldShowGate(
+            isRequired: patreon.isRequired,
+            isPatron: patreon.isPatron,
+            gracePeriodDaysRemaining: patreon.gracePeriodDaysRemaining,
+            isOnSettingsTab: selectedTab == .settings
+        )
     }
 
     var body: some View {

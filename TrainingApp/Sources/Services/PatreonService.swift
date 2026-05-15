@@ -22,6 +22,24 @@ final class PatreonService {
 
     private static let isRequiredKey = "patreon_integration_required"
 
+    /// Pure decision for the Patreon paywall sheet. Extracted as a static
+    /// function so it can be unit-tested without SwiftUI. The Settings tab is
+    /// always exempt so the user can disable Patreon when the gate would
+    /// otherwise trap them. Dev escape is intentionally NOT in this decision;
+    /// developers use the "Skip Patreon (Dev)" button inside the gate sheet so
+    /// the explicit `isRequired` toggle is authoritative in every build.
+    static func shouldShowGate(
+        isRequired: Bool,
+        isPatron: Bool,
+        gracePeriodDaysRemaining: Int?,
+        isOnSettingsTab: Bool
+    ) -> Bool {
+        isRequired
+            && !isPatron
+            && gracePeriodDaysRemaining == nil
+            && !isOnSettingsTab
+    }
+
     /// Access-token expiry, exposed for the debug observability panel.
     /// Backed by Keychain — stays in sync without an extra @Observable field.
     var tokenExpiresAt: Date? {
