@@ -6,6 +6,7 @@ struct PlanEditView: View {
     @Environment(HeatStore.self) private var heatStore
     @Environment(StretchStore.self) private var stretchStore
     @Environment(AuthService.self) private var auth
+    @Environment(PatreonService.self) private var patreon
     @Environment(\.dismiss) private var dismiss
 
     @State private var raceName: String
@@ -14,7 +15,15 @@ struct PlanEditView: View {
     @State private var showingReplaceConfirmation = false
 
     private let originalTemplateId: String?
-    private let templates = PlanTemplateService.shared.availableTemplates
+
+    private var templates: [TrainingPlanTemplate] {
+        let locked = PatreonService.arePremiumPlansLocked(
+            isRequired: patreon.isRequired,
+            isPatron: patreon.isPatron,
+            gracePeriodDaysRemaining: patreon.gracePeriodDaysRemaining
+        )
+        return PlanTemplateService.shared.availableTemplates(includesPatronOnly: !locked)
+    }
 
     init(plan: TrainingPlan, template: TrainingPlanTemplate?) {
         _raceName = State(initialValue: plan.name)

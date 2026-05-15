@@ -283,4 +283,5 @@ extension TrainingPlanTemplate: Hashable {
         .environment(StrengthStore())
         .environment(HeatStore())
         .environment(StretchStore())
+        .environment(PatreonService())
 }

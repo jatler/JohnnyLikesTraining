@@ -39,6 +39,13 @@ final class PlanTemplateService {
         patronOnlyTemplateIDs.contains(template.id)
     }
 
+    /// Lookup by ID across the full catalog. Used when restoring an active
+    /// plan's template — a plan created when the user was a patron must
+    /// still resolve its template even if Patreon access has since lapsed.
+    func template(withId id: String) -> TrainingPlanTemplate? {
+        bundledTemplates[id]
+    }
+
     private lazy var bundledTemplates: [String: TrainingPlanTemplate] = loadBundledTemplates()
 
     private func loadBundledTemplates() -> [String: TrainingPlanTemplate] {

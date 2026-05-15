@@ -67,7 +67,7 @@ final class TrainingPlanStore {
     var currentTemplate: TrainingPlanTemplate? {
         guard let sourceFile = activePlan?.sourceFileName else { return nil }
         let templateId = sourceFile.replacingOccurrences(of: ".json", with: "")
-        return PlanTemplateService.shared.availableTemplates.first { $0.id == templateId }
+        return PlanTemplateService.shared.template(withId: templateId)
     }
 
     func sessions(for date: Date) -> [PlannedSession] {
