@@ -487,7 +487,7 @@ struct SettingsView: View {
 
     private var aboutSection: some View {
         VStack(spacing: 0) {
-            infoRow("Version", Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.1.0")
+            infoRow("Version", Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.1.1")
             divider()
             linkRow("Privacy Policy", destination: URL(string: "https://johnnylikestraining.com/privacy.html")!) { EmptyView() }
             divider()
