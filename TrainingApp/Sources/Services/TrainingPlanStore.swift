@@ -348,12 +348,19 @@ final class TrainingPlanStore {
             .upsert(pending.swap, onConflict: "id")
             .execute()
 
+        // Preserve each session's existing athlete journal across the swap —
+        // athlete notes belong to the date the user experienced, not the
+        // workout being moved. Sending `nil` here would wipe them.
+        let athleteNotesA = sessions.first(where: { $0.id == pending.sessionAUpdate.sessionId })?.athleteNotes
+        let athleteNotesB = sessions.first(where: { $0.id == pending.sessionBUpdate.sessionId })?.athleteNotes
+
         try await supabase.from("planned_sessions")
             .update(SessionFieldUpdate(
                 workoutType: pending.sessionAUpdate.workoutType,
                 targetDistanceKm: pending.sessionAUpdate.targetDistanceKm,
                 targetPaceDescription: pending.sessionAUpdate.targetPaceDescription,
-                notes: pending.sessionAUpdate.notes
+                notes: pending.sessionAUpdate.notes,
+                athleteNotes: athleteNotesA
             ))
             .eq("id", value: pending.sessionAUpdate.sessionId)
             .execute()
@@ -363,7 +370,8 @@ final class TrainingPlanStore {
                 workoutType: pending.sessionBUpdate.workoutType,
                 targetDistanceKm: pending.sessionBUpdate.targetDistanceKm,
                 targetPaceDescription: pending.sessionBUpdate.targetPaceDescription,
-                notes: pending.sessionBUpdate.notes
+                notes: pending.sessionBUpdate.notes,
+                athleteNotes: athleteNotesB
             ))
             .eq("id", value: pending.sessionBUpdate.sessionId)
             .execute()
@@ -396,6 +404,23 @@ final class TrainingPlanStore {
 
     func isManuallyComplete(_ sessionId: UUID) -> Bool {
         sessions.first(where: { $0.id == sessionId })?.manuallyComplete ?? false
+    }
+
+    // MARK: - Athlete Notes
+    //
+    // The athlete journal — kept separate from `overrideSession` so adding a
+    // note doesn't trip the override system (no orange Reset button, no
+    // "edited" pill). Whitespace-only input persists as nil so an empty
+    // entry doesn't masquerade as a written note.
+
+    func updateAthleteNotes(_ sessionId: UUID, notes: String?) {
+        guard let index = sessions.firstIndex(where: { $0.id == sessionId }) else { return }
+        let trimmed = notes?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalized = (trimmed?.isEmpty ?? true) ? nil : trimmed
+        guard sessions[index].athleteNotes != normalized else { return }
+        sessions[index].athleteNotes = normalized
+        saveToCache()
+        Task { await persistSessionFieldUpdate(sessions[index]) }
     }
 
     // MARK: - Skip / Unskip
@@ -747,7 +772,8 @@ final class TrainingPlanStore {
                     workoutType: session.workoutType,
                     targetDistanceKm: session.targetDistanceKm,
                     targetPaceDescription: session.targetPaceDescription,
-                    notes: session.notes
+                    notes: session.notes,
+                    athleteNotes: session.athleteNotes
                 ))
                 .eq("id", value: session.id)
                 .execute()
@@ -789,11 +815,13 @@ private struct SessionFieldUpdate: Encodable {
     let targetDistanceKm: Double?
     let targetPaceDescription: String?
     let notes: String?
+    let athleteNotes: String?
 
     enum CodingKeys: String, CodingKey {
         case workoutType = "workout_type"
         case targetDistanceKm = "target_distance_km"
         case targetPaceDescription = "target_pace_description"
         case notes
+        case athleteNotes = "athlete_notes"
     }
 }

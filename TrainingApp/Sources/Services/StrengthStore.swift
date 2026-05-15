@@ -261,6 +261,21 @@ final class StrengthStore {
         sessions.first(where: { $0.id == sessionId })?.originalCoachNotes != nil
     }
 
+    // MARK: - Athlete Notes
+    //
+    // Whitespace-only input persists as nil so an empty entry doesn't read as
+    // a written note in the read-only view.
+
+    func updateAthleteNotes(_ sessionId: UUID, notes: String?) {
+        guard let index = sessions.firstIndex(where: { $0.id == sessionId }) else { return }
+        let trimmed = notes?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalized = (trimmed?.isEmpty ?? true) ? nil : trimmed
+        guard sessions[index].athleteNotes != normalized else { return }
+        sessions[index].athleteNotes = normalized
+        saveToCache()
+        Task { await persistSessionUpdate(sessions[index]) }
+    }
+
     // MARK: - Load from Supabase
 
     func loadData(planId: UUID) async {

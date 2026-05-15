@@ -16,6 +16,7 @@ struct SessionDetailSheet: View {
     @State private var editDistanceMi = ""
     @State private var editPace = ""
     @State private var editNotes = ""
+    @State private var editAthleteNotes = ""
     @State private var propagateToSameDay = false
     @State private var selectedStrengthDay: StrengthDaySelection?
     @State private var selectedHeatSession: HeatSession?
@@ -109,6 +110,8 @@ struct SessionDetailSheet: View {
             if !coachText.isEmpty {
                 notesSection(coachText)
             }
+
+            athleteNotesReadonly
 
             strengthSection
 
@@ -375,6 +378,8 @@ struct SessionDetailSheet: View {
                 )
             }
 
+            athleteNotesEditor
+
             Toggle("Apply to all \(dayOfWeekName)s", isOn: $propagateToSameDay)
                 .font(TrailFont.body)
 
@@ -407,6 +412,60 @@ struct SessionDetailSheet: View {
                 .textSelection(.enabled)
         }
         .unifiedCard()
+    }
+
+    /// Read-only athlete-notes card. Surfaces the journal entry alongside the
+    /// coach card so the user doesn't have to re-enter Edit to see what they
+    /// wrote. Hidden when there's nothing to show.
+    @ViewBuilder
+    private var athleteNotesReadonly: some View {
+        if let text = session.athleteNotes?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !text.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Athlete notes")
+                    .font(TrailFont.coach)
+                    .foregroundStyle(.secondary)
+                Text(text)
+                    .font(TrailFont.body)
+                    .foregroundStyle(.primary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .textSelection(.enabled)
+            }
+            .unifiedCard()
+        }
+    }
+
+    /// Edit-mode athlete-notes input. Saves through `updateAthleteNotes` (not
+    /// `overrideSession`), so adding a journal entry never marks the session
+    /// as overridden — it's a parallel field, not a deviation from the plan.
+    private var athleteNotesEditor: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Athlete notes")
+                .font(TrailFont.title)
+                .foregroundStyle(.secondary)
+
+            ZStack(alignment: .topLeading) {
+                if editAthleteNotes.isEmpty {
+                    Text("How did this session feel? What did you actually do?")
+                        .foregroundStyle(.tertiary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 14)
+                        .allowsHitTesting(false)
+                }
+                TextEditor(text: $editAthleteNotes)
+                    .font(TrailFont.body)
+                    .frame(minHeight: 140)
+                    .scrollContentBackground(.hidden)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 6)
+            }
+            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .strokeBorder(Color(.separator), lineWidth: 1)
+            )
+        }
     }
 
     @ViewBuilder
@@ -566,6 +625,7 @@ struct SessionDetailSheet: View {
                         editDistanceMi = session.targetDistanceMi.map { String(format: "%.1f", $0) } ?? ""
                         editPace = session.targetPaceDescription ?? ""
                         editNotes = session.notes ?? ""
+                        editAthleteNotes = session.athleteNotes ?? ""
                         propagateToSameDay = false
                         isEditing = true
                     } label: {
@@ -680,6 +740,9 @@ struct SessionDetailSheet: View {
             reason: nil,
             propagateToSameDay: propagateToSameDay
         )
+        // Athlete notes save via a separate path so adding a journal entry
+        // never trips the override system or the "edited" Reset button.
+        planStore.updateAthleteNotes(session.id, notes: editAthleteNotes)
         isEditing = false
         dismiss()
     }

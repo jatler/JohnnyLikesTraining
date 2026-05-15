@@ -57,6 +57,7 @@ private struct SessionDetail: View {
     @State private var showingSwapTargets = false
     @State private var isEditing = false
     @State private var editNotes: String = ""
+    @State private var editAthleteNotes: String = ""
 
     private var isSkipped: Bool { strengthStore.isSkipped(session.id) }
     private var isEdited: Bool { strengthStore.isEdited(session.id) }
@@ -88,6 +89,7 @@ private struct SessionDetail: View {
                 if !session.coachNotes.isEmpty {
                     notesSection
                 }
+                athleteNotesReadonly
                 actionsSection
                 if showingSwapTargets {
                     swapTargetsSection
@@ -176,6 +178,59 @@ private struct SessionDetail: View {
         .unifiedCard()
     }
 
+    /// Read-only athlete-notes card. Hidden when nothing's been written so the
+    /// summary stays tight for fresh sessions.
+    @ViewBuilder
+    private var athleteNotesReadonly: some View {
+        if let text = session.athleteNotes?.trimmingCharacters(in: .whitespacesAndNewlines),
+           !text.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Athlete notes")
+                    .font(TrailFont.coach)
+                    .foregroundStyle(.secondary)
+                Text(text)
+                    .font(TrailFont.body)
+                    .foregroundStyle(.primary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .textSelection(.enabled)
+            }
+            .unifiedCard()
+        }
+    }
+
+    /// Edit-mode athlete-notes input. Saves through `updateAthleteNotes`,
+    /// independent of `updateCoachNotes`, so a journal entry doesn't trip the
+    /// "edited" pencil + Reset-to-Original flow.
+    private var athleteNotesEditor: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Athlete notes")
+                .font(TrailFont.body)
+                .foregroundStyle(.secondary)
+
+            ZStack(alignment: .topLeading) {
+                if editAthleteNotes.isEmpty {
+                    Text("How did this session feel? What did you actually do?")
+                        .foregroundStyle(.tertiary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 14)
+                        .allowsHitTesting(false)
+                }
+                TextEditor(text: $editAthleteNotes)
+                    .font(TrailFont.body)
+                    .frame(minHeight: 140)
+                    .scrollContentBackground(.hidden)
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 6)
+            }
+            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .strokeBorder(Color(.separator), lineWidth: 1)
+            )
+        }
+    }
+
     // MARK: Actions
 
     private var actionsSection: some View {
@@ -220,6 +275,7 @@ private struct SessionDetail: View {
 
                     Button {
                         editNotes = session.coachNotes
+                        editAthleteNotes = session.athleteNotes ?? ""
                         isEditing = true
                     } label: {
                         Label("Edit", systemImage: "pencil")
@@ -314,6 +370,9 @@ private struct SessionDetail: View {
             Spacer()
             Button("Save") {
                 strengthStore.updateCoachNotes(session.id, notes: editNotes)
+                // Athlete notes save on a parallel path so a fresh journal
+                // entry doesn't mark the session as "edited."
+                strengthStore.updateAthleteNotes(session.id, notes: editAthleteNotes)
                 isEditing = false
             }
             .font(TrailFont.data).fontWeight(.semibold)
@@ -355,6 +414,8 @@ private struct SessionDetail: View {
                         .strokeBorder(Color(.separator), lineWidth: 1)
                 )
             }
+
+            athleteNotesEditor
 
             if isEdited {
                 Button {

@@ -16,6 +16,11 @@ struct PlannedSession: Codable, Identifiable {
     /// final completion state. Backed by `manually_complete` column added in the
     /// 2026-05-14 migration.
     var manuallyComplete: Bool = false
+    /// Athlete journal notes — how the session felt, what was actually done,
+    /// substitutions, energy levels. Distinct from `notes` (coach-prescribed)
+    /// and from the override system; a fresh entry doesn't mark the session
+    /// "edited." Backed by `athlete_notes` column added 2026-05-14.
+    var athleteNotes: String?
 
     var targetDistanceMi: Double? {
         targetDistanceKm.map { DistanceFormatter.miles(from: $0) }
@@ -54,11 +59,13 @@ struct PlannedSession: Codable, Identifiable {
         case notes
         case sortOrder = "sort_order"
         case manuallyComplete = "manually_complete"
+        case athleteNotes = "athlete_notes"
     }
 
     init(id: UUID, planId: UUID, weekNumber: Int, dayOfWeek: Int, scheduledDate: Date,
          workoutType: WorkoutType, targetDistanceKm: Double?, targetPaceDescription: String?,
-         notes: String?, sortOrder: Int, manuallyComplete: Bool = false) {
+         notes: String?, sortOrder: Int, manuallyComplete: Bool = false,
+         athleteNotes: String? = nil) {
         self.id = id
         self.planId = planId
         self.weekNumber = weekNumber
@@ -70,6 +77,7 @@ struct PlannedSession: Codable, Identifiable {
         self.notes = notes
         self.sortOrder = sortOrder
         self.manuallyComplete = manuallyComplete
+        self.athleteNotes = athleteNotes
     }
 
     /// decodeIfPresent on `manually_complete` so cached rows from before the
@@ -87,6 +95,7 @@ struct PlannedSession: Codable, Identifiable {
         notes = try c.decodeIfPresent(String.self, forKey: .notes)
         sortOrder = try c.decode(Int.self, forKey: .sortOrder)
         manuallyComplete = try c.decodeIfPresent(Bool.self, forKey: .manuallyComplete) ?? false
+        athleteNotes = try c.decodeIfPresent(String.self, forKey: .athleteNotes)
     }
 
     /// Numeric "N–M mi" range parsed from coach text, in miles. Mirrors
