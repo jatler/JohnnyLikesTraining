@@ -17,12 +17,11 @@ struct PlanEditView: View {
     private let originalTemplateId: String?
 
     private var templates: [TrainingPlanTemplate] {
-        let locked = PatreonService.arePremiumPlansLocked(
-            isRequired: patreon.isRequired,
-            isPatron: patreon.isPatron,
-            gracePeriodDaysRemaining: patreon.gracePeriodDaysRemaining
-        )
-        return PlanTemplateService.shared.availableTemplates(includesPatronOnly: !locked)
+        // Catalog is temporarily capped at the 3 free plans regardless of
+        // patron state. Flip to `!locked` (mirroring PlanSetupView) when
+        // the additional plans are ready to ship.
+        _ = patreon // keep the env dependency wired for the upcoming flip
+        return PlanTemplateService.shared.availableTemplates(includesPatronOnly: false)
     }
 
     init(plan: TrainingPlan, template: TrainingPlanTemplate?) {

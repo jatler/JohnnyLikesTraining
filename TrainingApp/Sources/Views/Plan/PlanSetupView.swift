@@ -27,7 +27,10 @@ struct PlanSetupView: View {
     }
 
     private var templates: [TrainingPlanTemplate] {
-        PlanTemplateService.shared.availableTemplates(includesPatronOnly: !premiumLocked)
+        // Catalog is temporarily capped at the 3 free plans regardless of
+        // patron state. Flip to `!premiumLocked` to re-enable the patron
+        // tier when the additional plans are ready to ship.
+        PlanTemplateService.shared.availableTemplates(includesPatronOnly: false)
     }
 
     private var planStartDate: Date? {
