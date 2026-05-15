@@ -201,33 +201,25 @@ private struct SessionDetail: View {
 
     /// Edit-mode athlete-notes input. Saves through `updateAthleteNotes`,
     /// independent of `updateCoachNotes`, so a journal entry doesn't trip the
-    /// "edited" pencil + Reset-to-Original flow.
+    /// "edited" pencil + Reset-to-Original flow. Auto-grows as the user types
+    /// via `TextField(axis: .vertical)`, with a 60pt min so the empty state
+    /// reads as "quick journal" rather than "homework assignment."
     private var athleteNotesEditor: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Athlete notes")
                 .font(TrailFont.body)
                 .foregroundStyle(.secondary)
 
-            ZStack(alignment: .topLeading) {
-                if editAthleteNotes.isEmpty {
-                    Text("How did this session feel? What did you actually do?")
-                        .foregroundStyle(.tertiary)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 14)
-                        .allowsHitTesting(false)
-                }
-                TextEditor(text: $editAthleteNotes)
-                    .font(TrailFont.body)
-                    .frame(minHeight: 140)
-                    .scrollContentBackground(.hidden)
-                    .padding(.horizontal, 4)
-                    .padding(.vertical, 6)
-            }
-            .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .strokeBorder(Color(.separator), lineWidth: 1)
-            )
+            TextField("How did it go?", text: $editAthleteNotes, axis: .vertical)
+                .font(TrailFont.body)
+                .frame(minHeight: 60, alignment: .top)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .strokeBorder(Color(.separator), lineWidth: 1)
+                )
         }
     }
 
