@@ -35,9 +35,10 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.jatler.Training
         SWIFT_VERSION: "5.9"
         MARKETING_VERSION: "1.1.1" # short version / CFBundleShortVersionString
-        CURRENT_PROJECT_VERSION: "13" # build / CFBundleVersion
+        CURRENT_PROJECT_VERSION: "14" # build / CFBundleVersion
         GENERATE_INFOPLIST_FILE: false
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: YES
         INFOPLIST_KEY_CFBundleDisplayName: "SWAP Training"
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: WHKX4QF56D
