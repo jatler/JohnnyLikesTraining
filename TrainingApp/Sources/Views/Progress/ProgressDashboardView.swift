@@ -867,10 +867,10 @@ private enum LollipopChartConstants {
     /// `textTertiary` token in the design handoff so the oval reads as a
     /// background reference, not a colored data series.
     static let ovalGrey = Color(red: 0.541, green: 0.518, blue: 0.471)
-    /// Past weeks fade their colors to this opacity. Current OR focused weeks
-    /// always render at full opacity — that pair-up is what makes the focus
-    /// state read clearly when the user swipes the focused-week card up top.
-    static let pastOpacity: Double = 0.55
+    /// Non-focused weeks fade their lollipops to this opacity. The focused
+    /// week renders at full opacity, so the gap (1.0 vs 0.40) is what
+    /// makes the focus state pop as the user swipes the focused-week card.
+    static let pastOpacity: Double = 0.40
 }
 
 /// One colored vertical contribution to a column's stack. Miles/Vert charts
