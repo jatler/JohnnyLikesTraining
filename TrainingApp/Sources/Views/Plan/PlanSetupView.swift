@@ -119,7 +119,7 @@ struct PlanSetupView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("New Plan")
-                        .font(.custom("Fraunces-Medium", size: 20, relativeTo: .headline))
+                        .font(.custom("Fraunces-SemiBold", size: 22, relativeTo: .headline))
                         .foregroundStyle(Color.primary)
                 }
             }
@@ -152,6 +152,13 @@ struct PlanSetupView: View {
 
     // MARK: - Inline Patreon block
 
+    /// Shared font for the primary action line across not-connected and
+    /// not-patron states. Same weight + size so the affordance reads as
+    /// one role regardless of where the user is in the unlock flow.
+    private var unlockActionFont: Font {
+        .system(size: 17, weight: .semibold)
+    }
+
     @ViewBuilder
     private var inlinePatreonBlock: some View {
         if patreon.isRequired {
@@ -168,9 +175,11 @@ struct PlanSetupView: View {
                     Text("Patreon connected — subscribe at $5+/mo to unlock the full SWAP catalog.")
                         .font(TrailFont.meta)
                         .foregroundStyle(.secondary)
-                    Link("Subscribe on Patreon \u{2197}", destination: BrandKit.patreonURL)
-                        .font(TrailFont.body)
-                        .foregroundStyle(Color.trailGreen)
+                    Link(destination: BrandKit.patreonURL) {
+                        Text("Subscribe on Patreon \u{2197}")
+                            .font(unlockActionFont)
+                            .foregroundStyle(Color.trailGreen)
+                    }
                 }
             } else {
                 VStack(alignment: .leading, spacing: 6) {
@@ -183,11 +192,14 @@ struct PlanSetupView: View {
                         HStack(spacing: 6) {
                             if isConnectingPatreon { ProgressView().controlSize(.small) }
                             Text("Connect Patreon")
-                                .fontWeight(.semibold)
+                                .font(unlockActionFont)
                         }
                         .foregroundStyle(Color.trailGreen)
                     }
                     .disabled(isConnectingPatreon)
+                    Text("We'll open Patreon in a new window.")
+                        .font(TrailFont.meta)
+                        .foregroundStyle(.secondary)
                 }
             }
         }
