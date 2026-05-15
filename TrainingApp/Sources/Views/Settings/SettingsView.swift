@@ -14,7 +14,6 @@ struct SettingsView: View {
     @State private var showingDeletePlan = false
     @State private var errorMessage: String?
     @State private var showingError = false
-    @State private var showingPatreonGatePreview = false
 
     var body: some View {
         NavigationStack {
@@ -200,7 +199,7 @@ struct SettingsView: View {
         Toggle(isOn: $patreon.isRequired) {
             VStack(alignment: .leading, spacing: 2) {
                 Text("Require Patreon").font(TrailFont.body)
-                Text("Gate the app behind a SWAP $5+ membership")
+                Text("Lock SWAP plans behind a Patreon membership")
                     .font(TrailFont.meta)
                     .foregroundStyle(.secondary)
             }
@@ -305,12 +304,6 @@ struct SettingsView: View {
         }
         .buttonStyle(.plain)
         .disabled(!patreon.isConnected || patreon.isVerifying)
-
-        divider()
-        buttonRow("Show Patreon Gate", icon: "rectangle.on.rectangle", color: Color.trailGreen) {
-            showingPatreonGatePreview = true
-        }
-        .sheet(isPresented: $showingPatreonGatePreview) { PatreonGateView() }
     }
 
     private func forceReverify() {

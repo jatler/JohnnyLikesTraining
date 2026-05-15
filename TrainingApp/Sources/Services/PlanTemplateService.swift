@@ -6,20 +6,43 @@ final class PlanTemplateService {
 
     private init() {}
 
-    private let enabledTemplateIDs: [String] = [
+    /// Plans shown to every user regardless of Patreon state.
+    private let freeTemplateIDs: [String] = [
         "swap_6_week_6w",
         "swap_base_building_12w",
         "champion_100k"
     ]
 
+    /// Plans appended to the picker only when the user is an active patron
+    /// (or the Patreon gate is disabled entirely in Settings).
+    private let patronOnlyTemplateIDs: [String] = [
+        "swap_marathon_8w",
+        "swap_50k_12w",
+        "swap_50mile_12w",
+        "swap_100k_16w",
+        "swap_100mile_12w",
+        "swap_lower_volume_ultra_12w",
+        "swap_200_mile_16w"
+    ]
+
     // MARK: - Available Templates
 
-    /// All bundled plan templates the user can choose from.
-    var availableTemplates: [TrainingPlanTemplate] { bundledTemplates }
+    /// Returns plans in display order: free tier first (always shown),
+    /// then patron-only plans appended when `includesPatronOnly` is true.
+    func availableTemplates(includesPatronOnly: Bool) -> [TrainingPlanTemplate] {
+        let ids = includesPatronOnly ? freeTemplateIDs + patronOnlyTemplateIDs : freeTemplateIDs
+        return ids.compactMap { bundledTemplates[$0] }
+    }
 
-    private lazy var bundledTemplates: [TrainingPlanTemplate] = loadBundledTemplates()
+    /// True if this template is gated behind a Patreon membership.
+    func isPatronOnly(_ template: TrainingPlanTemplate) -> Bool {
+        patronOnlyTemplateIDs.contains(template.id)
+    }
 
-    private func loadBundledTemplates() -> [TrainingPlanTemplate] {
+    private lazy var bundledTemplates: [String: TrainingPlanTemplate] = loadBundledTemplates()
+
+    private func loadBundledTemplates() -> [String: TrainingPlanTemplate] {
+        let enabled = Set(freeTemplateIDs + patronOnlyTemplateIDs)
         let paths = Bundle.main.paths(forResourcesOfType: "json", inDirectory: nil)
         var byID: [String: TrainingPlanTemplate] = [:]
 
@@ -29,8 +52,7 @@ final class PlanTemplateService {
                 let data = try Data(contentsOf: url)
                 let template = try JSONDecoder().decode(TrainingPlanTemplate.self, from: data)
 
-                // Keep only reviewed/approved plan templates.
-                guard enabledTemplateIDs.contains(template.id) else { continue }
+                guard enabled.contains(template.id) else { continue }
                 guard byID[template.id] == nil else { continue }
 
                 byID[template.id] = template
@@ -40,7 +62,7 @@ final class PlanTemplateService {
             }
         }
 
-        return enabledTemplateIDs.compactMap { byID[$0] }
+        return byID
     }
 
     // MARK: - Load from Bundle

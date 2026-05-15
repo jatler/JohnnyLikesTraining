@@ -6,6 +6,7 @@ struct PlanSetupView: View {
     @Environment(StrengthStore.self) private var strengthStore
     @Environment(HeatStore.self) private var heatStore
     @Environment(StretchStore.self) private var stretchStore
+    @Environment(PatreonService.self) private var patreon
     @Environment(\.dismiss) private var dismiss
 
     @State private var raceName = ""
@@ -15,8 +16,19 @@ struct PlanSetupView: View {
     @State private var selectedTemplate: TrainingPlanTemplate?
     @State private var showingError = false
     @State private var errorMessage = ""
+    @State private var isConnectingPatreon = false
 
-    private let templates = PlanTemplateService.shared.availableTemplates
+    private var premiumLocked: Bool {
+        PatreonService.arePremiumPlansLocked(
+            isRequired: patreon.isRequired,
+            isPatron: patreon.isPatron,
+            gracePeriodDaysRemaining: patreon.gracePeriodDaysRemaining
+        )
+    }
+
+    private var templates: [TrainingPlanTemplate] {
+        PlanTemplateService.shared.availableTemplates(includesPatronOnly: !premiumLocked)
+    }
 
     private var planStartDate: Date? {
         guard let template = selectedTemplate else { return nil }
@@ -60,6 +72,8 @@ struct PlanSetupView: View {
                                 .tag(template as TrainingPlanTemplate?)
                         }
                     }
+
+                    inlinePatreonBlock
                 } footer: {
                     if let template = selectedTemplate {
                         VStack(alignment: .leading, spacing: 4) {
@@ -101,7 +115,14 @@ struct PlanSetupView: View {
                     .disabled(!canCreate || planStore.isLoading)
                 }
             }
-            .navigationTitle("New Plan")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("New Plan")
+                        .font(.custom("Fraunces-Medium", size: 20, relativeTo: .headline))
+                        .foregroundStyle(Color.primary)
+                }
+            }
             .alert("Error", isPresented: $showingError) {
                 Button("OK") {}
             } message: {
@@ -117,6 +138,69 @@ struct PlanSetupView: View {
                     selectedTemplate = templates.first
                     #endif
                 }
+            }
+            .onChange(of: premiumLocked) { _, locked in
+                // If patron access flips off mid-flow, reset a now-hidden
+                // selection so the picker doesn't display a stale label.
+                if locked, let current = selectedTemplate,
+                   PlanTemplateService.shared.isPatronOnly(current) {
+                    selectedTemplate = templates.first
+                }
+            }
+        }
+    }
+
+    // MARK: - Inline Patreon block
+
+    @ViewBuilder
+    private var inlinePatreonBlock: some View {
+        if patreon.isRequired {
+            if patreon.isPatron || patreon.gracePeriodDaysRemaining != nil {
+                HStack(spacing: 8) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(Color.trailGreen)
+                    Text("Patreon connected — full catalog unlocked")
+                        .font(TrailFont.meta)
+                        .foregroundStyle(Color.trailGreen)
+                }
+            } else if patreon.isConnected {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Patreon connected — subscribe at $5+/mo to unlock the full SWAP catalog.")
+                        .font(TrailFont.meta)
+                        .foregroundStyle(.secondary)
+                    Link("Subscribe on Patreon \u{2197}", destination: BrandKit.patreonURL)
+                        .font(TrailFont.body)
+                        .foregroundStyle(Color.trailGreen)
+                }
+            } else {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Unlock the full SWAP catalog with a Patreon membership.")
+                        .font(TrailFont.meta)
+                        .foregroundStyle(.secondary)
+                    Button {
+                        connectPatreon()
+                    } label: {
+                        HStack(spacing: 6) {
+                            if isConnectingPatreon { ProgressView().controlSize(.small) }
+                            Text("Connect Patreon")
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundStyle(Color.trailGreen)
+                    }
+                    .disabled(isConnectingPatreon)
+                }
+            }
+        }
+    }
+
+    private func connectPatreon() {
+        Task {
+            isConnectingPatreon = true
+            defer { isConnectingPatreon = false }
+            do { try await patreon.authorize() }
+            catch {
+                errorMessage = error.localizedDescription
+                showingError = true
             }
         }
     }

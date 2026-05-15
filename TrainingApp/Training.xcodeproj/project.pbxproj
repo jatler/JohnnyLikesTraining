@@ -38,7 +38,6 @@
 		5A65C86A30E9432549A86497 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 011590607C69E2FCB2E332C7 /* Supabase */; };
 		5B13DA79B4AC7453D868630B /* Fraunces-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 747D2F3B56EEE28598D1536A /* Fraunces-LightItalic.ttf */; };
 		5C6B00911C4B919BE7AA7B0E /* PlanEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F8ED3535E0F5907E9AE4267 /* PlanEditView.swift */; };
-		5F862E196FF0910C46CC6F36 /* PatreonGateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76EDCC53D92978C810161580 /* PatreonGateView.swift */; };
 		6832E4507441BF620169D07F /* CompletionCelebrationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E83F3C614CE5AA720B42272B /* CompletionCelebrationStore.swift */; };
 		6F888519D7D6238904329600 /* SessionDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF23FA6E5F2C1983F9EF2ADA /* SessionDetailSheet.swift */; };
 		73B281FD62E689360910B786 /* champion_plan_100k.json in Resources */ = {isa = PBXBuildFile; fileRef = 2B21B45B9C3E88F085CD54AC /* champion_plan_100k.json */; };
@@ -138,7 +137,6 @@
 		73B7D590079EAFA75E76C507 /* CompleteStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompleteStatus.swift; sourceTree = "<group>"; };
 		73F7D70B55AEC2E0E3D0A3F1 /* TrainingPlanStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlanStore.swift; sourceTree = "<group>"; };
 		747D2F3B56EEE28598D1536A /* Fraunces-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-LightItalic.ttf"; sourceTree = "<group>"; };
-		76EDCC53D92978C810161580 /* PatreonGateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PatreonGateView.swift; sourceTree = "<group>"; };
 		7F1D1B0C706F6397245A0BF0 /* Fraunces-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-Medium.ttf"; sourceTree = "<group>"; };
 		80616D13A59D3EE3E33D4BB0 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		84A8563FB47BFB14F6BC6B82 /* StretchSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StretchSession.swift; sourceTree = "<group>"; };
@@ -334,7 +332,6 @@
 		7662D0B0BA66D0046981B7DF /* Paywall */ = {
 			isa = PBXGroup;
 			children = (
-				76EDCC53D92978C810161580 /* PatreonGateView.swift */,
 			);
 			path = Paywall;
 			sourceTree = "<group>";
@@ -606,7 +603,6 @@
 				0915E4711ED20257351B1921 /* MilesCompletionPrototype.swift in Sources */,
 				318F754953A5B84505A9ECBD /* OuraDaily.swift in Sources */,
 				A49A52EEDFEFF45B719A8233 /* OuraService.swift in Sources */,
-				5F862E196FF0910C46CC6F36 /* PatreonGateView.swift in Sources */,
 				35359EE4B2B5913A17135A3B /* PatreonService.swift in Sources */,
 				5773F6F736710A3238BFBAEF /* PendingSwap.swift in Sources */,
 				084A2112A895BB3DF1798AB7 /* PlanCacheService.swift in Sources */,

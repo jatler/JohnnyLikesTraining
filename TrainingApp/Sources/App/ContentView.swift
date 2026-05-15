@@ -27,46 +27,21 @@ struct MainTabView: View {
     @Environment(HeatStore.self) private var heatStore
     @Environment(StretchStore.self) private var stretchStore
 
-    private enum Tab: Hashable { case week, progress, strength, settings }
-    @State private var selectedTab: Tab = .week
-
-    private var shouldShowPatreonGate: Bool {
-        PatreonService.shouldShowGate(
-            isRequired: patreon.isRequired,
-            isPatron: patreon.isPatron,
-            gracePeriodDaysRemaining: patreon.gracePeriodDaysRemaining,
-            isOnSettingsTab: selectedTab == .settings
-        )
-    }
-
     var body: some View {
-        TabView(selection: $selectedTab) {
+        TabView {
             WeekView()
                 .tabItem { Label("Week", systemImage: "calendar") }
-                .tag(Tab.week)
 
             ProgressDashboardView()
                 .tabItem { Label("Progress", systemImage: "chart.bar.fill") }
-                .tag(Tab.progress)
 
             StrengthTemplateView()
                 .tabItem { Label("Strength", systemImage: "dumbbell.fill") }
-                .tag(Tab.strength)
 
             SettingsView()
                 .tabItem { Label("Settings", systemImage: "gearshape") }
-                .tag(Tab.settings)
         }
         .tint(Color.trailGreen)
-        .sheet(isPresented: Binding(
-            get: { shouldShowPatreonGate },
-            // Drag-to-dismiss is a no-op: the gate stays visible until the
-            // user becomes a patron, hits the grace window, or navigates to
-            // Settings. SwiftUI re-evaluates on every state change.
-            set: { _ in }
-        )) {
-            PatreonGateView()
-        }
         .task {
             // Refresh the Supabase session before any per-store load. The SDK
             // emits the persisted session as "current" at startup even when

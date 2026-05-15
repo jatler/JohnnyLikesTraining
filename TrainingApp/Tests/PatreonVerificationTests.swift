@@ -39,46 +39,45 @@ final class PatreonVerificationTests: XCTestCase {
         }
     }
 
-    // MARK: - Gate decision
+    // MARK: - Premium plan lock decision
 
-    func testGateOffWhenToggleDisabled() {
-        XCTAssertFalse(PatreonService.shouldShowGate(
-            isRequired: false, isPatron: false,
-            gracePeriodDaysRemaining: nil, isOnSettingsTab: false
+    func testUnlockedWhenToggleOff() {
+        XCTAssertFalse(PatreonService.arePremiumPlansLocked(
+            isRequired: false, isPatron: false, gracePeriodDaysRemaining: nil
         ))
     }
 
-    func testGateOnWhenToggleEnabledAndNonPatron() {
-        // The original bug: toggle ON + non-patron + no grace + not on settings
-        // tab should always fire the gate. Pre-fix, a `!DevSignIn.isAllowed`
-        // clause suppressed this in Debug builds. The pure decision must not
-        // re-introduce any build-flag bypass.
-        XCTAssertTrue(PatreonService.shouldShowGate(
-            isRequired: true, isPatron: false,
-            gracePeriodDaysRemaining: nil, isOnSettingsTab: false
+    func testLockedWhenToggleOnAndNonPatron() {
+        // Regression case for the prior dev-bypass bug. Toggle ON + not a
+        // patron must always lock premium plans, regardless of build flags.
+        XCTAssertTrue(PatreonService.arePremiumPlansLocked(
+            isRequired: true, isPatron: false, gracePeriodDaysRemaining: nil
         ))
     }
 
-    func testGateOffForActivePatron() {
-        XCTAssertFalse(PatreonService.shouldShowGate(
-            isRequired: true, isPatron: true,
-            gracePeriodDaysRemaining: nil, isOnSettingsTab: false
+    func testUnlockedForActivePatron() {
+        XCTAssertFalse(PatreonService.arePremiumPlansLocked(
+            isRequired: true, isPatron: true, gracePeriodDaysRemaining: nil
         ))
     }
 
-    func testGateOffDuringGracePeriod() {
-        XCTAssertFalse(PatreonService.shouldShowGate(
-            isRequired: true, isPatron: false,
-            gracePeriodDaysRemaining: 3, isOnSettingsTab: false
+    func testUnlockedDuringGracePeriod() {
+        XCTAssertFalse(PatreonService.arePremiumPlansLocked(
+            isRequired: true, isPatron: false, gracePeriodDaysRemaining: 3
         ))
     }
 
-    func testGateOffOnSettingsTab() {
-        // Settings tab must stay reachable so the user can disable Patreon
-        // even when every other condition would fire the gate.
-        XCTAssertFalse(PatreonService.shouldShowGate(
-            isRequired: true, isPatron: false,
-            gracePeriodDaysRemaining: nil, isOnSettingsTab: true
-        ))
+    // MARK: - Template tiers
+
+    func testAvailableTemplatesIncludesPatronOnlyWhenRequested() {
+        let free = PlanTemplateService.shared.availableTemplates(includesPatronOnly: false)
+        let all = PlanTemplateService.shared.availableTemplates(includesPatronOnly: true)
+        XCTAssertEqual(free.count, 3, "Free tier should expose 3 plans.")
+        XCTAssertEqual(all.count, 10, "Full catalog should expose 10 plans (3 free + 7 patron).")
+        // Free templates appear first in display order.
+        XCTAssertEqual(Array(all.prefix(3)).map(\.id), free.map(\.id))
+        for template in free {
+            XCTAssertFalse(PlanTemplateService.shared.isPatronOnly(template))
+        }
     }
 }
