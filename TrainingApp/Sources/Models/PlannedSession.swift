@@ -89,6 +89,27 @@ struct PlannedSession: Codable, Identifiable {
         manuallyComplete = try c.decodeIfPresent(Bool.self, forKey: .manuallyComplete) ?? false
     }
 
+    /// Numeric "N–M mi" range parsed from coach text, in miles. Mirrors
+    /// `displayTargetRange`'s parsing rules so the Progress chart's planned-range
+    /// ovals align with the ranges users already see per-session in the Week tab.
+    /// Falls back to (`targetDistanceMi`, `targetDistanceMi`) — a zero-width
+    /// range — when no explicit range is in the notes. Rest sessions, intervals
+    /// (whose split notes confuse the regex), and sessions with no distance
+    /// return nil.
+    var plannedDistanceRangeMi: (low: Double, high: Double)? {
+        if workoutType == .rest { return nil }
+        if workoutType == .intervals, let mi = targetDistanceMi { return (mi, mi) }
+        let text = [targetPaceDescription, notes]
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: "\n")
+        if let parsed = Self.firstNumericRange(in: text, unitPattern: "mi(?:les?)?") {
+            return parsed
+        }
+        if let mi = targetDistanceMi { return (mi, mi) }
+        return nil
+    }
+
     /// Best-effort display range parsed from verbatim coach text (notes + pace description).
     /// Runs prefer a parsed "N-M mi" range and fall back to a single-value mi formatted from
     /// `targetDistanceMi`. Cross-training / other non-distance sessions try "N-M hr" then
@@ -143,6 +164,27 @@ struct PlannedSession: Codable, Identifiable {
         let low = ns.substring(with: match.range(at: 1))
         let high = ns.substring(with: match.range(at: 2))
         return "\(low)\u{2013}\(high)"
+    }
+
+    /// Numeric counterpart to `firstRange` — returns the parsed (low, high) pair instead
+    /// of the en-dashed string. Used by `plannedDistanceRangeMi` so chart ovals can size
+    /// to the same coach-prescribed range users see as text in the Week tab.
+    private static func firstNumericRange(in text: String, unitPattern: String) -> (low: Double, high: Double)? {
+        let pattern = #"(\d+(?:\.\d+)?)\s*[\-–—]\s*(\d+(?:\.\d+)?)\s*(?:"# + unitPattern + #")\b"#
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) else {
+            return nil
+        }
+        let ns = text as NSString
+        let range = NSRange(location: 0, length: ns.length)
+        guard let match = regex.firstMatch(in: text, options: [], range: range),
+              match.numberOfRanges >= 3 else {
+            return nil
+        }
+        guard let low = Double(ns.substring(with: match.range(at: 1))),
+              let high = Double(ns.substring(with: match.range(at: 2))) else {
+            return nil
+        }
+        return (min(low, high), max(low, high))
     }
 
     private static func formatSingle(_ value: Double) -> String {

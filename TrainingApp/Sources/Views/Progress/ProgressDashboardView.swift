@@ -143,8 +143,10 @@ struct ProgressDashboardView: View {
                 // so they sit outside the shadow and can be tinted per-page.
                 .tabViewStyle(.page(indexDisplayMode: .never))
                 // +8pt to compensate for the 4pt vertical margin each card now
-                // claims for its shadow.
-                .frame(height: 256)
+                // claims for its shadow, +8pt more for the chart's top y-axis
+                // label gutter (188pt chart body = 8pt top + 160pt body + 20pt
+                // week labels).
+                .frame(height: 264)
                 chartPageDots
                 raceCard(entries: entries)
             }
@@ -186,7 +188,7 @@ struct ProgressDashboardView: View {
     private func color(for page: ChartPage) -> Color {
         switch page {
         case .miles: return Color.trailGreen
-        case .vert:  return Color(red: 0.54, green: 0.42, blue: 0.82)
+        case .vert:  return Color.trailPurple
         case .time:  return .orange
         }
     }
@@ -288,7 +290,7 @@ struct ProgressDashboardView: View {
                 focusedStat(
                     label: "VERT",
                     primary: entry?.elevationGainFt.map { formatFt($0) } ?? "—",
-                    primaryColor: entry?.elevationGainFt != nil ? Color(red: 0.54, green: 0.42, blue: 0.82) : .secondary,
+                    primaryColor: entry?.elevationGainFt != nil ? Color.trailPurple : .secondary,
                     secondary: "ft",
                     alignment: .center
                 )
@@ -353,7 +355,7 @@ struct ProgressDashboardView: View {
                 rightUnit: "mi"
             )
             MileageChart(entries: entries, focusedWeek: $focusedWeek)
-                .frame(height: 180)
+                .frame(height: 188)
         }
         .padding(12)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -390,7 +392,7 @@ struct ProgressDashboardView: View {
                 rightUnit: "ft"
             )
             ElevationChart(entries: entries, focusedWeek: $focusedWeek)
-                .frame(height: 180)
+                .frame(height: 188)
         }
         .padding(12)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -425,7 +427,7 @@ struct ProgressDashboardView: View {
                 rightUnit: "hr"
             )
             TotalTimeChart(entries: entries, focusedWeek: $focusedWeek)
-                .frame(height: 180)
+                .frame(height: 188)
         }
         .padding(12)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -753,10 +755,33 @@ struct ProgressDashboardView: View {
             let runHours = Double(raw.runSeconds) / 3600.0
             let crossTrainHours = Double(raw.crossTrainSeconds) / 3600.0
 
+            // Sum each trackable run's parsed coach range (low / high in mi) for
+            // the planned-range oval on the Miles chart. Sessions without an
+            // explicit "N–M mi" range contribute their single targetDistanceMi
+            // to both ends — same parsing PlannedSession.displayTargetRange uses
+            // for the per-session range pill in the Week tab.
+            var loMi: Double = 0
+            var hiMi: Double = 0
+            for session in raw.trackableRuns {
+                if let range = session.plannedDistanceRangeMi {
+                    loMi += range.low
+                    hiMi += range.high
+                } else if let mi = session.targetDistanceMi {
+                    loMi += mi
+                    hiMi += mi
+                }
+            }
+            // Guard against a week with no parseable sessions — fall back to
+            // plannedMi so the oval still anchors near the column rather than
+            // collapsing to zero.
+            if hiMi == 0 { loMi = plannedMi; hiMi = plannedMi }
+
             return WeekProgressEntry(
                 week: weekNum,
                 rangeLabel: rangeLabel(from: firstDate, to: lastDate),
                 plannedMi: plannedMi,
+                plannedMiLow: loMi,
+                plannedMiHigh: hiMi,
                 actualMi: isFuture ? nil : (actualMi > 0 ? actualMi : nil),
                 runHours: isFuture ? nil : (runHours > 0 ? runHours : nil),
                 crossTrainHours: isFuture ? nil : (crossTrainHours > 0 ? crossTrainHours : nil),
@@ -789,6 +814,12 @@ struct WeekProgressEntry: Identifiable, Equatable {
     let week: Int
     let rangeLabel: String
     let plannedMi: Double
+    /// Sum of each session's parsed low/high range (mi) for the week — used by
+    /// the Miles chart's planned-range oval. Falls back to a zero-width range
+    /// (low == high == plannedMi) when no session has an explicit "N–M mi" in
+    /// its coach notes.
+    let plannedMiLow: Double
+    let plannedMiHigh: Double
     let actualMi: Double?
     let runHours: Double?
     let crossTrainHours: Double?
@@ -809,274 +840,391 @@ struct WeekProgressEntry: Identifiable, Equatable {
     var plannedHours: Double { plannedMi / 6.0 }
 }
 
-// MARK: - Mileage Chart
+// MARK: - Lollipop chart primitive
+//
+// All three Progress charts share one renderer (`LollipopChart`). Each chart
+// card configures it via closures: `segments` produces the colored stack of
+// stem segments per column (one for Miles/Vert, two for Time), `plannedRange`
+// optionally returns the (low, high) range for a grey planned-range capsule
+// (Miles only), and `isInRange` flags weeks where the actual landed inside the
+// planned range — those weeks get the capsule tinted green as a small "you
+// nailed the plan" reward.
+//
+// Layout tokens come from "Bold Day Progress Handoff.html" §02. The chart
+// frame is 188pt: 8pt top gutter (so the topmost y-axis label has room),
+// 160pt chart body, 20pt bottom strip for week labels.
+
+private enum LollipopChartConstants {
+    static let topPad: CGFloat = 8        // pt above the chart body for the top y-axis label
+    static let labelArea: CGFloat = 20    // pt below the chart body for week labels
+    static let stemWidth: CGFloat = 2     // pt
+    static let dotDiameter: CGFloat = 12  // pt — radius 6 per spec
+    static let ovalWidth: CGFloat = 12    // pt
+    static let ovalStroke: CGFloat = 0.5  // pt — hairline
+    static let ovalFillOpacity: Double = 0.40
+    static let ovalNonCurrentOpacity: Double = 0.30
+    /// Warm grey #8A8478 used for the planned-range oval. Same hue as the
+    /// `textTertiary` token in the design handoff so the oval reads as a
+    /// background reference, not a colored data series.
+    static let ovalGrey = Color(red: 0.541, green: 0.518, blue: 0.471)
+    /// Past weeks fade their colors to this opacity. Current OR focused weeks
+    /// always render at full opacity — that pair-up is what makes the focus
+    /// state read clearly when the user swipes the focused-week card up top.
+    static let pastOpacity: Double = 0.55
+}
+
+/// One colored vertical contribution to a column's stack. Miles/Vert charts
+/// emit a single segment (the actual value); Time emits two (cross-train then
+/// run, stacked from baseline upward).
+private struct LollipopColumnSegment {
+    let value: Double
+    let color: Color
+}
+
+/// Y-axis labels, shared across all three charts. Renders all 5 tick labels
+/// (0, 25%, 50%, 75%, 100% of niceMax). The topmost label sits in the chart's
+/// 8pt top gutter, so it never clips the plot area.
+private struct ChartAxisLabels: View {
+    let niceMax: Double
+    let chartHeight: CGFloat
+    let axisWidth: CGFloat
+    let format: (Double) -> String
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            ForEach(0..<5, id: \.self) { tick in
+                let v = niceMax * Double(tick) / 4
+                let y = chartHeight - CGFloat(v / niceMax) * chartHeight
+                Text(format(v))
+                    .font(.system(size: 9, design: .monospaced))
+                    .foregroundStyle(.tertiary)
+                    .offset(x: -4, y: y - 6) // 4pt label gap per spec §02
+            }
+        }
+        .frame(width: axisWidth, height: chartHeight, alignment: .topTrailing)
+    }
+}
+
+private struct ChartGridlines: View {
+    let chartWidth: CGFloat
+    let chartHeight: CGFloat
+
+    var body: some View {
+        ForEach(0..<5, id: \.self) { tick in
+            let y = chartHeight * CGFloat(tick) / 4
+            Rectangle()
+                .fill(Color(.separator).opacity(0.5))
+                .frame(width: chartWidth, height: 0.5)
+                .offset(x: 0, y: y)
+        }
+    }
+}
+
+/// Tap target rectangles, one per column. Decoupled from the visual layer so
+/// the thin stems and dots don't fight a 22pt-wide tap zone for hit-testing.
+private struct LollipopTapTargets: View {
+    let entries: [WeekProgressEntry]
+    let columnWidth: CGFloat
+    let chartHeight: CGFloat
+    @Binding var focusedWeek: Int
+
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(entries) { entry in
+                Rectangle()
+                    .fill(Color.clear)
+                    .frame(width: columnWidth, height: chartHeight + LollipopChartConstants.labelArea)
+                    .contentShape(Rectangle())
+                    .onTapGesture { withAnimation(.easeOut(duration: 0.22)) { focusedWeek = entry.week } }
+            }
+        }
+    }
+}
+
+/// Week-number label below each column. Bold + accent for the highlighted
+/// week (focused OR current). A 1.5pt accent underline distinguishes the
+/// current week from a focused-but-past week — without it, they share the
+/// same bold/colored treatment and the user can't tell which is "today."
+private struct WeekTickLabel: View {
+    let entry: WeekProgressEntry
+    let focusedWeek: Int
+    let highlightColor: Color
+    let cx: CGFloat
+    let chartHeight: CGFloat
+
+    var body: some View {
+        let isHighlighted = entry.week == focusedWeek || entry.isCurrent
+        Text("\(entry.week)")
+            .font(.system(size: 9, design: .monospaced))
+            .fontWeight(isHighlighted ? .semibold : .regular)
+            .foregroundStyle(isHighlighted ? highlightColor : Color.secondary.opacity(0.55))
+            .position(x: cx, y: chartHeight + 11)
+        if entry.isCurrent {
+            Rectangle()
+                .fill(highlightColor)
+                .frame(width: 8, height: 1.5)
+                .position(x: cx, y: chartHeight + 18)
+        }
+    }
+}
+
+private struct LollipopChart: View {
+    let entries: [WeekProgressEntry]
+    let yMax: Double
+    let axisWidth: CGFloat
+    let axisFormat: (Double) -> String
+    /// Used for the focused-column highlight, the planned-range oval when
+    /// in-range, and the week-label color.
+    let highlightColor: Color
+    /// One or more colored segments stacked from baseline. Empty array = nothing
+    /// drawn (e.g. future weeks on Vert/Time).
+    let segments: (WeekProgressEntry) -> [LollipopColumnSegment]
+    /// nil = no planned-range capsule for this chart (Vert/Time).
+    let plannedRange: ((WeekProgressEntry) -> (low: Double, high: Double))?
+    /// nil = no in-range tinting; otherwise true means actual fell inside
+    /// the planned range and the capsule should render in `highlightColor`.
+    let isInRange: ((WeekProgressEntry) -> Bool)?
+    @Binding var focusedWeek: Int
+
+    var body: some View {
+        GeometryReader { geo in
+            let chartHeight = geo.size.height
+                - LollipopChartConstants.labelArea
+                - LollipopChartConstants.topPad
+            let chartWidth = max(1, geo.size.width - axisWidth)
+            let columnWidth = chartWidth / CGFloat(max(entries.count, 1))
+
+            HStack(alignment: .top, spacing: 0) {
+                ChartAxisLabels(niceMax: yMax, chartHeight: chartHeight,
+                                axisWidth: axisWidth, format: axisFormat)
+
+                ZStack(alignment: .topLeading) {
+                    ChartGridlines(chartWidth: chartWidth, chartHeight: chartHeight)
+
+                    focusIndicator(chartHeight: chartHeight, columnWidth: columnWidth)
+
+                    ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
+                        let cx = (CGFloat(index) + 0.5) * columnWidth
+                        column(entry: entry, cx: cx,
+                               chartHeight: chartHeight, columnWidth: columnWidth)
+                    }
+
+                    LollipopTapTargets(entries: entries, columnWidth: columnWidth,
+                                       chartHeight: chartHeight, focusedWeek: $focusedWeek)
+                }
+                .frame(width: chartWidth,
+                       height: chartHeight + LollipopChartConstants.labelArea,
+                       alignment: .topLeading)
+            }
+            .padding(.top, LollipopChartConstants.topPad)
+        }
+    }
+
+    /// Soft accent-tinted column behind the focused week. Position animates so
+    /// taps + chevron + focused-week-card swipe all glide between weeks.
+    @ViewBuilder
+    private func focusIndicator(chartHeight: CGFloat, columnWidth: CGFloat) -> some View {
+        let focusedIndex = entries.firstIndex(where: { $0.week == focusedWeek }) ?? 0
+        let cx = (CGFloat(focusedIndex) + 0.5) * columnWidth
+        let rectWidth = max(LollipopChartConstants.dotDiameter + 6, columnWidth - 4)
+        RoundedRectangle(cornerRadius: 4, style: .continuous)
+            .fill(highlightColor.opacity(0.10))
+            .frame(width: rectWidth, height: chartHeight)
+            .position(x: cx, y: chartHeight / 2)
+            .animation(.easeOut(duration: 0.22), value: focusedWeek)
+    }
+
+    @ViewBuilder
+    private func column(entry: WeekProgressEntry, cx: CGFloat,
+                        chartHeight: CGFloat, columnWidth: CGFloat) -> some View {
+        // Active = current week OR the week the user is currently focusing.
+        // Both pop to full opacity so the focused-week card up top and the
+        // chart below stay visually paired as the user swipes between weeks.
+        let isActive = entry.isCurrent || entry.week == focusedWeek
+
+        if let range = plannedRange?(entry) {
+            plannedOval(range: range, isActive: isActive, entry: entry,
+                        chartHeight: chartHeight, cx: cx)
+        }
+
+        let segs = segments(entry)
+        let total = segs.reduce(0.0) { $0 + $1.value }
+        if total > 0 {
+            stems(segments: segs, isActive: isActive,
+                  cx: cx, chartHeight: chartHeight)
+            // Dot color = topmost segment's color, in active or past flavor.
+            let topColor = segs.last?.color ?? highlightColor
+            let dotY = chartHeight - CGFloat(total / yMax) * chartHeight
+            Circle()
+                .fill(isActive ? topColor : topColor.opacity(LollipopChartConstants.pastOpacity))
+                .frame(width: LollipopChartConstants.dotDiameter,
+                       height: LollipopChartConstants.dotDiameter)
+                .position(x: cx, y: dotY)
+        }
+
+        WeekTickLabel(entry: entry, focusedWeek: focusedWeek,
+                      highlightColor: highlightColor,
+                      cx: cx, chartHeight: chartHeight)
+    }
+
+    @ViewBuilder
+    private func plannedOval(range: (low: Double, high: Double), isActive: Bool,
+                             entry: WeekProgressEntry,
+                             chartHeight: CGFloat, cx: CGFloat) -> some View {
+        let yHi = chartHeight - CGFloat(range.high / yMax) * chartHeight
+        let yLo = chartHeight - CGFloat(range.low / yMax) * chartHeight
+        let ovalH = max(yLo - yHi, LollipopChartConstants.ovalWidth)
+        // In-range weeks get an accent-tinted capsule — the small visual reward
+        // for hitting the prescribed range.
+        let inRange = isInRange?(entry) ?? false
+        let ovalColor = inRange ? highlightColor : LollipopChartConstants.ovalGrey
+        // Active (current or focused) weeks render at full opacity; everything
+        // else fades to 0.30 per spec §02.
+        let ovalOpacity = isActive ? 1.0 : LollipopChartConstants.ovalNonCurrentOpacity
+
+        Capsule()
+            .fill(ovalColor.opacity(LollipopChartConstants.ovalFillOpacity))
+            .overlay(
+                Capsule().stroke(ovalColor, lineWidth: LollipopChartConstants.ovalStroke)
+            )
+            .frame(width: LollipopChartConstants.ovalWidth, height: ovalH)
+            .opacity(ovalOpacity)
+            .position(x: cx, y: yHi + ovalH / 2)
+    }
+
+    /// Stack each segment as a flat-cap rectangle from the baseline up. Butt
+    /// caps avoid the rounded-cap pinch where two stacked segments meet
+    /// (visible on the Time chart's cross-then-run stem).
+    @ViewBuilder
+    private func stems(segments: [LollipopColumnSegment], isActive: Bool,
+                       cx: CGFloat, chartHeight: CGFloat) -> some View {
+        ForEach(0..<segments.count, id: \.self) { i in
+            let belowSum = segments.prefix(i).reduce(0.0) { $0 + $1.value }
+            let segValue = segments[i].value
+            if segValue > 0 {
+                let segBottomY = chartHeight - CGFloat(belowSum / yMax) * chartHeight
+                let segTopY = chartHeight - CGFloat((belowSum + segValue) / yMax) * chartHeight
+                let h = max(0, segBottomY - segTopY)
+                let raw = segments[i].color
+                let color = isActive ? raw : raw.opacity(LollipopChartConstants.pastOpacity)
+                Rectangle()
+                    .fill(color)
+                    .frame(width: LollipopChartConstants.stemWidth, height: h)
+                    .position(x: cx, y: segTopY + h / 2)
+            }
+        }
+    }
+}
+
+// MARK: - Per-metric chart wrappers
+//
+// Each wrapper is the call-site contract used by the chart cards. They keep
+// the surrounding card code unchanged while the per-chart configuration —
+// segments, planned range, in-range rule, axis format — lives in one place.
 
 private struct MileageChart: View {
     let entries: [WeekProgressEntry]
     @Binding var focusedWeek: Int
 
-    private let axisWidth: CGFloat = 22
-    private let barWidth: CGFloat = 12
-
     var body: some View {
-        GeometryReader { geo in
-            let chartHeight = geo.size.height - 20
-            let availableWidth = geo.size.width - axisWidth
-            let n = max(entries.count, 1)
-            let spacing = n > 1 ? max(2, (availableWidth - CGFloat(n) * barWidth) / CGFloat(n - 1)) : 0
-            let niceMax = niceMax(for: entries)
-
-            HStack(alignment: .top, spacing: 0) {
-                // Y-axis labels (hide the topmost so it doesn't clip)
-                ZStack(alignment: .topTrailing) {
-                    ForEach(0..<4, id: \.self) { tick in
-                        let v = niceMax * Double(tick) / 4
-                        let y = chartHeight - CGFloat(v / niceMax) * chartHeight
-                        Text("\(Int(v))")
-                            .font(.system(size: 9, design: .monospaced))
-                            .foregroundStyle(.tertiary)
-                            .offset(x: -3, y: y - 6)
-                    }
-                }
-                .frame(width: axisWidth, height: chartHeight, alignment: .topTrailing)
-
-                // Bars + gridlines
-                ZStack(alignment: .bottomLeading) {
-                    // Gridlines
-                    ForEach(0..<5, id: \.self) { tick in
-                        let y = chartHeight * CGFloat(tick) / 4
-                        Rectangle()
-                            .fill(Color(.separator).opacity(0.5))
-                            .frame(height: 0.5)
-                            .offset(y: -(chartHeight - y))
-                    }
-
-                    HStack(alignment: .bottom, spacing: spacing) {
-                        ForEach(entries) { entry in
-                            mileageBar(entry: entry, niceMax: niceMax, chartHeight: chartHeight)
-                                .frame(width: barWidth, height: chartHeight, alignment: .bottom)
-                                .overlay(alignment: .bottom) {
-                                    Text("\(entry.week)")
-                                        .font(.system(size: 9, design: .monospaced))
-                                        .fontWeight(entry.week == focusedWeek || entry.isCurrent ? .semibold : .regular)
-                                        .foregroundStyle(entry.week == focusedWeek || entry.isCurrent ? Color.trailGreen : Color.secondary.opacity(0.55))
-                                        .offset(y: 14)
-                                }
-                                .contentShape(Rectangle())
-                                .onTapGesture { withAnimation(.easeOut(duration: 0.22)) { focusedWeek = entry.week } }
-                        }
-                    }
-                    .frame(height: chartHeight, alignment: .bottom)
-                }
-                .frame(height: chartHeight, alignment: .bottom)
-            }
-        }
+        LollipopChart(
+            entries: entries,
+            yMax: Self.yMax(for: entries),
+            axisWidth: 22,
+            axisFormat: { "\(Int($0))" },
+            highlightColor: .trailGreen,
+            segments: { entry in
+                guard let mi = entry.actualMi, mi > 0 else { return [] }
+                return [LollipopColumnSegment(value: mi, color: .trailGreen)]
+            },
+            plannedRange: { ($0.plannedMiLow, $0.plannedMiHigh) },
+            isInRange: { entry in
+                guard let mi = entry.actualMi, !entry.isFuture else { return false }
+                guard entry.plannedMiHigh > entry.plannedMiLow else { return false }
+                return mi >= entry.plannedMiLow && mi <= entry.plannedMiHigh
+            },
+            focusedWeek: $focusedWeek
+        )
     }
 
-    @ViewBuilder
-    private func mileageBar(entry: WeekProgressEntry, niceMax: Double, chartHeight: CGFloat) -> some View {
-        let planH = CGFloat(entry.plannedMi / niceMax) * chartHeight
-        let actH = CGFloat((entry.actualMi ?? 0) / niceMax) * chartHeight
-        let remH = entry.isCurrent ? max(0, planH - actH) : 0
-
-        VStack(spacing: 0) {
-            if remH > 0 { Rectangle().fill(Color(.systemGray5)).frame(height: remH) }
-            if actH > 0 {
-                Rectangle()
-                    .fill(Color.trailGreen)
-                    .frame(height: actH)
-            }
-            if entry.isFuture && planH > 0 {
-                Rectangle().fill(Color(.systemGray5)).frame(height: planH)
-            }
-        }
-    }
-
-    private func niceMax(for entries: [WeekProgressEntry]) -> Double {
-        let raw = entries.map { max($0.plannedMi, $0.actualMi ?? 0) }.max() ?? 10
+    /// Y-scale spans the largest planned-range high or actual mi rounded up to
+    /// the next 10 — guarantees the oval's top never clips the plot area.
+    static func yMax(for entries: [WeekProgressEntry]) -> Double {
+        let raw = entries.map { max($0.plannedMiHigh, $0.actualMi ?? 0) }.max() ?? 10
         return max(10, ceil(raw / 10) * 10)
     }
 }
-
-// MARK: - Elevation Chart
 
 private struct ElevationChart: View {
     let entries: [WeekProgressEntry]
     @Binding var focusedWeek: Int
 
-    private let axisWidth: CGFloat = 28
-    private let barWidth: CGFloat = 12
-    private let purple = Color(red: 0.54, green: 0.42, blue: 0.82)
-    private let purpleLight = Color(red: 0.76, green: 0.71, blue: 0.90)
-
     var body: some View {
-        GeometryReader { geo in
-            let chartHeight = geo.size.height - 20
-            let availableWidth = geo.size.width - axisWidth
-            let n = max(entries.count, 1)
-            let spacing = n > 1 ? max(2, (availableWidth - CGFloat(n) * barWidth) / CGFloat(n - 1)) : 0
-            let niceMax = niceMax(for: entries)
-
-            HStack(alignment: .top, spacing: 0) {
-                ZStack(alignment: .topTrailing) {
-                    ForEach(0..<4, id: \.self) { tick in
-                        let v = niceMax * Double(tick) / 4
-                        let y = chartHeight - CGFloat(v / niceMax) * chartHeight
-                        Text(labelText(v))
-                            .font(.system(size: 9, design: .monospaced))
-                            .foregroundStyle(.tertiary)
-                            .offset(x: -3, y: y - 6)
-                    }
-                }
-                .frame(width: axisWidth, height: chartHeight, alignment: .topTrailing)
-
-                ZStack(alignment: .bottomLeading) {
-                    ForEach(0..<5, id: \.self) { tick in
-                        let y = chartHeight * CGFloat(tick) / 4
-                        Rectangle()
-                            .fill(Color(.separator).opacity(0.5))
-                            .frame(height: 0.5)
-                            .offset(y: -(chartHeight - y))
-                    }
-                    HStack(alignment: .bottom, spacing: spacing) {
-                        ForEach(entries) { entry in
-                            elevationBar(entry: entry, niceMax: niceMax, chartHeight: chartHeight)
-                                .frame(width: barWidth, height: chartHeight, alignment: .bottom)
-                                .overlay(alignment: .bottom) {
-                                    Text("\(entry.week)")
-                                        .font(.system(size: 9, design: .monospaced))
-                                        .fontWeight(entry.week == focusedWeek || entry.isCurrent ? .semibold : .regular)
-                                        .foregroundStyle(entry.week == focusedWeek || entry.isCurrent ? purple : Color.secondary.opacity(0.55))
-                                        .offset(y: 14)
-                                }
-                                .contentShape(Rectangle())
-                                .onTapGesture { withAnimation(.easeOut(duration: 0.22)) { focusedWeek = entry.week } }
-                        }
-                    }
-                    .frame(height: chartHeight, alignment: .bottom)
-                }
-                .frame(height: chartHeight, alignment: .bottom)
-            }
-        }
+        LollipopChart(
+            entries: entries,
+            yMax: Self.yMax(for: entries),
+            axisWidth: 28,
+            axisFormat: Self.labelText,
+            highlightColor: .trailPurple,
+            segments: { entry in
+                guard let ft = entry.elevationGainFt, ft > 0 else { return [] }
+                return [LollipopColumnSegment(value: ft, color: .trailPurple)]
+            },
+            plannedRange: nil,
+            isInRange: nil,
+            focusedWeek: $focusedWeek
+        )
     }
 
-    @ViewBuilder
-    private func elevationBar(entry: WeekProgressEntry, niceMax: Double, chartHeight: CGFloat) -> some View {
-        let plannedFt = entry.plannedMi * 55  // synthesize a planned elevation to keep ghost bars readable
-        let plannedH = CGFloat(plannedFt / niceMax) * chartHeight
-        let actualH = CGFloat((entry.elevationGainFt ?? 0) / niceMax) * chartHeight
-
-        if entry.isFuture {
-            Rectangle().fill(Color(.systemGray5)).frame(height: plannedH)
-                } else {
-            VStack(spacing: 0) {
-                if entry.isCurrent && plannedH > actualH {
-                    Rectangle().fill(Color(.systemGray5)).frame(height: plannedH - actualH)
-                }
-                if actualH > 0 {
-                    Rectangle().fill(entry.isCurrent ? purple : purpleLight).frame(height: actualH)
-                }
-            }
-            }
+    /// Y-scale rounded up to nearest 500 ft per spec §05. Floor of 1000 keeps
+    /// the chart legible during the first weeks of a fresh plan.
+    static func yMax(for entries: [WeekProgressEntry]) -> Double {
+        let raw = entries.compactMap { $0.elevationGainFt }.max() ?? 1000
+        return max(1000, ceil(raw / 500) * 500)
     }
 
-    private func niceMax(for entries: [WeekProgressEntry]) -> Double {
-        let raw = entries.map { max($0.elevationGainFt ?? 0, $0.plannedMi * 55) }.max() ?? 1000
-        return max(1000, ceil(raw / 1000) * 1000)
-    }
-
-    private func labelText(_ value: Double) -> String {
+    static func labelText(_ value: Double) -> String {
         if value >= 1000 { return String(format: "%.1fk", value / 1000) }
         return "\(Int(value))"
     }
 }
 
-// MARK: - Total Time Chart
-
 private struct TotalTimeChart: View {
     let entries: [WeekProgressEntry]
     @Binding var focusedWeek: Int
 
-    private let axisWidth: CGFloat = 22
-    private let barWidth: CGFloat = 12
-
     var body: some View {
-        GeometryReader { geo in
-            let chartHeight = geo.size.height - 20
-            let availableWidth = geo.size.width - axisWidth
-            let n = max(entries.count, 1)
-            let spacing = n > 1 ? max(2, (availableWidth - CGFloat(n) * barWidth) / CGFloat(n - 1)) : 0
-            let niceMax = niceMax(for: entries)
-
-            HStack(alignment: .top, spacing: 0) {
-                ZStack(alignment: .topTrailing) {
-                    ForEach(0..<4, id: \.self) { tick in
-                        let v = niceMax * Double(tick) / 4
-                        let y = chartHeight - CGFloat(v / niceMax) * chartHeight
-                        Text("\(Int(v))")
-                            .font(.system(size: 9, design: .monospaced))
-                            .foregroundStyle(.tertiary)
-                            .offset(x: -3, y: y - 6)
-                    }
-                }
-                .frame(width: axisWidth, height: chartHeight, alignment: .topTrailing)
-
-                ZStack(alignment: .bottomLeading) {
-                    ForEach(0..<5, id: \.self) { tick in
-                        let y = chartHeight * CGFloat(tick) / 4
-                        Rectangle()
-                            .fill(Color(.separator).opacity(0.5))
-                            .frame(height: 0.5)
-                            .offset(y: -(chartHeight - y))
-                    }
-                    HStack(alignment: .bottom, spacing: spacing) {
-                        ForEach(entries) { entry in
-                            timeBar(entry: entry, niceMax: niceMax, chartHeight: chartHeight)
-                                .frame(width: barWidth, height: chartHeight, alignment: .bottom)
-                                .overlay(alignment: .bottom) {
-                                    Text("\(entry.week)")
-                                        .font(.system(size: 9, design: .monospaced))
-                                        .fontWeight(entry.week == focusedWeek || entry.isCurrent ? .semibold : .regular)
-                                        .foregroundStyle(entry.week == focusedWeek || entry.isCurrent ? Color.trailGreen : Color.secondary.opacity(0.55))
-                                        .offset(y: 14)
-                                }
-                                .contentShape(Rectangle())
-                                .onTapGesture { withAnimation(.easeOut(duration: 0.22)) { focusedWeek = entry.week } }
-                        }
-                    }
-                    .frame(height: chartHeight, alignment: .bottom)
-                }
-                .frame(height: chartHeight, alignment: .bottom)
-            }
-        }
+        LollipopChart(
+            entries: entries,
+            yMax: Self.yMax(for: entries),
+            axisWidth: 24,
+            axisFormat: { "\(Int($0))h" },
+            highlightColor: .trailGreen,
+            segments: { entry in
+                let runH = entry.runHours ?? 0
+                let crossH = entry.crossTrainHours ?? 0
+                guard runH + crossH > 0 else { return [] }
+                // Cross-train (orange) on bottom, run (green) stacked above
+                // per spec §06. The dot inherits the topmost (run) color.
+                var out: [LollipopColumnSegment] = []
+                if crossH > 0 { out.append(LollipopColumnSegment(value: crossH, color: .orange)) }
+                if runH > 0 { out.append(LollipopColumnSegment(value: runH, color: .trailGreen)) }
+                return out
+            },
+            plannedRange: nil,
+            isInRange: nil,
+            focusedWeek: $focusedWeek
+        )
     }
 
-    @ViewBuilder
-    private func timeBar(entry: WeekProgressEntry, niceMax: Double, chartHeight: CGFloat) -> some View {
-        let runH = CGFloat((entry.runHours ?? 0) / niceMax) * chartHeight
-        let ctH = CGFloat((entry.crossTrainHours ?? 0) / niceMax) * chartHeight
-        let planH = CGFloat(entry.plannedHours / niceMax) * chartHeight
-        let remH = entry.isCurrent ? max(0, planH - runH - ctH) : 0
-
-        VStack(spacing: 0) {
-            if remH > 0 { Rectangle().fill(Color(.systemGray5)).frame(height: remH) }
-            if ctH > 0 { Rectangle().fill(Color.orange.opacity(entry.isCurrent ? 1.0 : 0.5)).frame(height: ctH) }
-            if runH > 0 {
-                Rectangle()
-                    .fill(entry.isCurrent ? Color.trailGreen : Color.trailGreen.opacity(0.55))
-                    .frame(height: runH)
-            }
-            if entry.isFuture && planH > 0 {
-                Rectangle().fill(Color(.systemGray5)).frame(height: planH)
-            }
-        }
-    }
-
-    private func niceMax(for entries: [WeekProgressEntry]) -> Double {
-        let raw = entries.map {
-            max($0.plannedHours, ($0.runHours ?? 0) + ($0.crossTrainHours ?? 0))
-        }.max() ?? 2
-        return max(2, ceil(raw / 2) * 2)
+    /// Y-scale taken from past + current weeks per spec §06: ceil(max(run + cross) + 1).
+    /// Floor of 2 keeps a brand-new plan from rendering with a degenerate axis.
+    static func yMax(for entries: [WeekProgressEntry]) -> Double {
+        let raw = entries
+            .filter { !$0.isFuture }
+            .map { ($0.runHours ?? 0) + ($0.crossTrainHours ?? 0) }
+            .max() ?? 1
+        return max(2, ceil(raw + 1))
     }
 }
 

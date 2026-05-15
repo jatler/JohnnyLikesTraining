@@ -9,6 +9,10 @@ extension Color {
     static let trailGreen = Color("AccentColor")
     static let trailGreenLight = Color.trailGreen.opacity(0.12)
     static let trailGreenSubtle = Color.trailGreen.opacity(0.06)
+    /// Elevation accent — the only non-green/orange chart color in the app.
+    /// Used by the Vert lollipop chart and the Vert stat in the focused-week
+    /// card, where it ties the stat to its chart.
+    static let trailPurple = Color(red: 0.541, green: 0.420, blue: 0.820) // #8A6BD1
 }
 
 // MARK: - Typography
