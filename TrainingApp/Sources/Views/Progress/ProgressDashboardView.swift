@@ -941,10 +941,11 @@ private struct LollipopTapTargets: View {
     }
 }
 
-/// Week-number label below each column. Bold + accent for the highlighted
-/// week (focused OR current). A 1.5pt accent underline distinguishes the
-/// current week from a focused-but-past week — without it, they share the
-/// same bold/colored treatment and the user can't tell which is "today."
+/// Week-number label below each column. Bold + accent only when this week is
+/// the currently focused one — so the highlight follows the focused-week card
+/// up top as the user swipes / chevrons through weeks. The current week always
+/// wears a 1.5pt accent underline so "today" stays findable while the user
+/// browses past weeks.
 private struct WeekTickLabel: View {
     let entry: WeekProgressEntry
     let focusedWeek: Int
@@ -953,11 +954,11 @@ private struct WeekTickLabel: View {
     let chartHeight: CGFloat
 
     var body: some View {
-        let isHighlighted = entry.week == focusedWeek || entry.isCurrent
+        let isFocused = entry.week == focusedWeek
         Text("\(entry.week)")
             .font(.system(size: 9, design: .monospaced))
-            .fontWeight(isHighlighted ? .semibold : .regular)
-            .foregroundStyle(isHighlighted ? highlightColor : Color.secondary.opacity(0.55))
+            .fontWeight(isFocused ? .semibold : .regular)
+            .foregroundStyle(isFocused ? highlightColor : Color.secondary.opacity(0.55))
             .position(x: cx, y: chartHeight + 11)
         if entry.isCurrent {
             Rectangle()
@@ -1001,8 +1002,6 @@ private struct LollipopChart: View {
                 ZStack(alignment: .topLeading) {
                     ChartGridlines(chartWidth: chartWidth, chartHeight: chartHeight)
 
-                    focusIndicator(chartHeight: chartHeight, columnWidth: columnWidth)
-
                     ForEach(Array(entries.enumerated()), id: \.element.id) { index, entry in
                         let cx = (CGFloat(index) + 0.5) * columnWidth
                         column(entry: entry, cx: cx,
@@ -1020,46 +1019,40 @@ private struct LollipopChart: View {
         }
     }
 
-    /// Soft accent-tinted column behind the focused week. Position animates so
-    /// taps + chevron + focused-week-card swipe all glide between weeks.
-    @ViewBuilder
-    private func focusIndicator(chartHeight: CGFloat, columnWidth: CGFloat) -> some View {
-        let focusedIndex = entries.firstIndex(where: { $0.week == focusedWeek }) ?? 0
-        let cx = (CGFloat(focusedIndex) + 0.5) * columnWidth
-        let rectWidth = max(LollipopChartConstants.dotDiameter + 6, columnWidth - 4)
-        RoundedRectangle(cornerRadius: 4, style: .continuous)
-            .fill(highlightColor.opacity(0.10))
-            .frame(width: rectWidth, height: chartHeight)
-            .position(x: cx, y: chartHeight / 2)
-            .animation(.easeOut(duration: 0.22), value: focusedWeek)
-    }
-
     @ViewBuilder
     private func column(entry: WeekProgressEntry, cx: CGFloat,
                         chartHeight: CGFloat, columnWidth: CGFloat) -> some View {
-        // Active = current week OR the week the user is currently focusing.
-        // Both pop to full opacity so the focused-week card up top and the
-        // chart below stay visually paired as the user swipes between weeks.
-        let isActive = entry.isCurrent || entry.week == focusedWeek
+        // The focused week is the only "active" one — its lollipop pops to
+        // full opacity. The current week is no different colorwise; it's
+        // marked by the underline beneath the week-number label so the user
+        // can find "today" without conflating it with their focus.
+        let isFocused = entry.week == focusedWeek
 
         if let range = plannedRange?(entry) {
-            plannedOval(range: range, isActive: isActive, entry: entry,
+            plannedOval(range: range, isActive: isFocused, entry: entry,
                         chartHeight: chartHeight, cx: cx)
         }
 
         let segs = segments(entry)
         let total = segs.reduce(0.0) { $0 + $1.value }
         if total > 0 {
-            stems(segments: segs, isActive: isActive,
-                  cx: cx, chartHeight: chartHeight)
-            // Dot color = topmost segment's color, in active or past flavor.
-            let topColor = segs.last?.color ?? highlightColor
-            let dotY = chartHeight - CGFloat(total / yMax) * chartHeight
-            Circle()
-                .fill(isActive ? topColor : topColor.opacity(LollipopChartConstants.pastOpacity))
-                .frame(width: LollipopChartConstants.dotDiameter,
-                       height: LollipopChartConstants.dotDiameter)
-                .position(x: cx, y: dotY)
+            // Render stem segments + dot at full opacity inside a compositing
+            // group so a single .opacity() applies to the whole lollipop as one
+            // shape — without compositingGroup, the dot's overlap with the
+            // top of the stem doubles up to ~80% opacity and creates a darker
+            // collar at the dot/stem junction.
+            ZStack(alignment: .topLeading) {
+                stems(segments: segs, cx: cx, chartHeight: chartHeight)
+                let topColor = segs.last?.color ?? highlightColor
+                let dotY = chartHeight - CGFloat(total / yMax) * chartHeight
+                Circle()
+                    .fill(topColor)
+                    .frame(width: LollipopChartConstants.dotDiameter,
+                           height: LollipopChartConstants.dotDiameter)
+                    .position(x: cx, y: dotY)
+            }
+            .compositingGroup()
+            .opacity(isFocused ? 1.0 : LollipopChartConstants.pastOpacity)
         }
 
         WeekTickLabel(entry: entry, focusedWeek: focusedWeek,
@@ -1094,9 +1087,11 @@ private struct LollipopChart: View {
 
     /// Stack each segment as a flat-cap rectangle from the baseline up. Butt
     /// caps avoid the rounded-cap pinch where two stacked segments meet
-    /// (visible on the Time chart's cross-then-run stem).
+    /// (visible on the Time chart's cross-then-run stem). Always renders at
+    /// full opacity — the caller's compositingGroup dims the whole lollipop
+    /// as one piece so dot/stem overlap doesn't double up.
     @ViewBuilder
-    private func stems(segments: [LollipopColumnSegment], isActive: Bool,
+    private func stems(segments: [LollipopColumnSegment],
                        cx: CGFloat, chartHeight: CGFloat) -> some View {
         ForEach(0..<segments.count, id: \.self) { i in
             let belowSum = segments.prefix(i).reduce(0.0) { $0 + $1.value }
@@ -1105,10 +1100,8 @@ private struct LollipopChart: View {
                 let segBottomY = chartHeight - CGFloat(belowSum / yMax) * chartHeight
                 let segTopY = chartHeight - CGFloat((belowSum + segValue) / yMax) * chartHeight
                 let h = max(0, segBottomY - segTopY)
-                let raw = segments[i].color
-                let color = isActive ? raw : raw.opacity(LollipopChartConstants.pastOpacity)
                 Rectangle()
-                    .fill(color)
+                    .fill(segments[i].color)
                     .frame(width: LollipopChartConstants.stemWidth, height: h)
                     .position(x: cx, y: segTopY + h / 2)
             }
