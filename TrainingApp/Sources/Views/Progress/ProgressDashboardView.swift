@@ -1071,10 +1071,6 @@ private struct LollipopChart: View {
         // for hitting the prescribed range.
         let inRange = isInRange?(entry) ?? false
         let ovalColor = inRange ? highlightColor : LollipopChartConstants.ovalGrey
-        // Oval shading is anchored to current-week status, NOT focused-week,
-        // so the planned range stays visually stable while the user swipes
-        // between weeks — only the lollipop reacts to focus.
-        let ovalOpacity = entry.isCurrent ? 1.0 : LollipopChartConstants.ovalNonCurrentOpacity
 
         Capsule()
             .fill(ovalColor.opacity(LollipopChartConstants.ovalFillOpacity))
@@ -1082,7 +1078,10 @@ private struct LollipopChart: View {
                 Capsule().stroke(ovalColor, lineWidth: LollipopChartConstants.ovalStroke)
             )
             .frame(width: LollipopChartConstants.ovalWidth, height: ovalH)
-            .opacity(ovalOpacity)
+            // Every week's oval reads at the same shade — current week no
+            // longer pops to full opacity. Lets the lollipops and the
+            // current-week underline carry the "where you are" signal.
+            .opacity(LollipopChartConstants.ovalNonCurrentOpacity)
             .position(x: cx, y: yHi + ovalH / 2)
     }
 
