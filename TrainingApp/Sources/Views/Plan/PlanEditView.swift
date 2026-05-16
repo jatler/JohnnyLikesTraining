@@ -17,11 +17,11 @@ struct PlanEditView: View {
     private let originalTemplateId: String?
 
     private var templates: [TrainingPlanTemplate] {
-        // Catalog is temporarily capped at the 3 free plans regardless of
-        // patron state. Flip to `!locked` (mirroring PlanSetupView) when
-        // the additional plans are ready to ship.
-        _ = patreon // keep the env dependency wired for the upcoming flip
-        return PlanTemplateService.shared.availableTemplates(includesPatronOnly: false)
+        // Mirrors PlanSetupView: toggle ON → intro plan only, toggle OFF →
+        // the 3 dogfood plans.
+        PlanTemplateService.shared.availableTemplates(
+            tier: patreon.isRequired ? .introOnly : .free
+        )
     }
 
     init(plan: TrainingPlan, template: TrainingPlanTemplate?) {

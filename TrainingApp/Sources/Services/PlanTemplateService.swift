@@ -6,15 +6,22 @@ final class PlanTemplateService {
 
     private init() {}
 
-    /// Plans shown to every user regardless of Patreon state.
+    /// Single "intro" plan shown when the Patreon toggle is on — a public-
+    /// facing teaser so the picker shows one clean starter plan.
+    private let introTemplateIDs: [String] = [
+        "swap_6_week_6w"
+    ]
+
+    /// Default tier shown when the Patreon toggle is off. Three reviewed
+    /// dogfood plans.
     private let freeTemplateIDs: [String] = [
         "swap_6_week_6w",
         "swap_base_building_12w",
         "champion_100k"
     ]
 
-    /// Plans appended to the picker only when the user is an active patron
-    /// (or the Patreon gate is disabled entirely in Settings).
+    /// Plans bundled for a future patron-unlock surface. Currently unused
+    /// by any tier — reserved for when the Patreon catalog ships.
     private let patronOnlyTemplateIDs: [String] = [
         "swap_marathon_8w",
         "swap_50k_12w",
@@ -27,10 +34,21 @@ final class PlanTemplateService {
 
     // MARK: - Available Templates
 
-    /// Returns plans in display order: free tier first (always shown),
-    /// then patron-only plans appended when `includesPatronOnly` is true.
-    func availableTemplates(includesPatronOnly: Bool) -> [TrainingPlanTemplate] {
-        let ids = includesPatronOnly ? freeTemplateIDs + patronOnlyTemplateIDs : freeTemplateIDs
+    /// Picker tiers. Pickers compute their tier from Patreon state and
+    /// ask the service for the matching ordered template list.
+    enum Tier {
+        case introOnly  // Patreon toggle ON: single intro plan
+        case free       // Patreon toggle OFF: the 3 dogfood plans
+        case full       // free + patron-only (reserved, not currently surfaced)
+    }
+
+    func availableTemplates(tier: Tier) -> [TrainingPlanTemplate] {
+        let ids: [String]
+        switch tier {
+        case .introOnly: ids = introTemplateIDs
+        case .free:      ids = freeTemplateIDs
+        case .full:      ids = freeTemplateIDs + patronOnlyTemplateIDs
+        }
         return ids.compactMap { bundledTemplates[$0] }
     }
 

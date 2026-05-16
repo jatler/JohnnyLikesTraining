@@ -69,15 +69,25 @@ final class PatreonVerificationTests: XCTestCase {
 
     // MARK: - Template tiers
 
-    func testAvailableTemplatesIncludesPatronOnlyWhenRequested() {
-        let free = PlanTemplateService.shared.availableTemplates(includesPatronOnly: false)
-        let all = PlanTemplateService.shared.availableTemplates(includesPatronOnly: true)
+    func testIntroTierIsTheSixWeekPlanOnly() {
+        let intro = PlanTemplateService.shared.availableTemplates(tier: .introOnly)
+        XCTAssertEqual(intro.count, 1, "Intro tier should expose 1 plan.")
+        XCTAssertEqual(intro.first?.id, "swap_6_week_6w")
+    }
+
+    func testFreeTierIsTheThreeDogfoodPlans() {
+        let free = PlanTemplateService.shared.availableTemplates(tier: .free)
         XCTAssertEqual(free.count, 3, "Free tier should expose 3 plans.")
-        XCTAssertEqual(all.count, 10, "Full catalog should expose 10 plans (3 free + 7 patron).")
-        // Free templates appear first in display order.
-        XCTAssertEqual(Array(all.prefix(3)).map(\.id), free.map(\.id))
         for template in free {
             XCTAssertFalse(PlanTemplateService.shared.isPatronOnly(template))
         }
+    }
+
+    func testFullTierIsFreePlusPatron() {
+        let free = PlanTemplateService.shared.availableTemplates(tier: .free)
+        let full = PlanTemplateService.shared.availableTemplates(tier: .full)
+        XCTAssertEqual(full.count, 10, "Full catalog should expose 10 plans (3 free + 7 patron).")
+        // Free templates appear first in display order.
+        XCTAssertEqual(Array(full.prefix(3)).map(\.id), free.map(\.id))
     }
 }

@@ -18,19 +18,13 @@ struct PlanSetupView: View {
     @State private var errorMessage = ""
     @State private var isConnectingPatreon = false
 
-    private var premiumLocked: Bool {
-        PatreonService.arePremiumPlansLocked(
-            isRequired: patreon.isRequired,
-            isPatron: patreon.isPatron,
-            gracePeriodDaysRemaining: patreon.gracePeriodDaysRemaining
-        )
-    }
-
     private var templates: [TrainingPlanTemplate] {
-        // Catalog is temporarily capped at the 3 free plans regardless of
-        // patron state. Flip to `!premiumLocked` to re-enable the patron
-        // tier when the additional plans are ready to ship.
-        PlanTemplateService.shared.availableTemplates(includesPatronOnly: false)
+        // Toggle ON narrows the picker to the single intro plan; toggle OFF
+        // shows the 3 dogfood plans. Patron-state expansion is wired up in
+        // PlanTemplateService.Tier.full but not currently surfaced.
+        PlanTemplateService.shared.availableTemplates(
+            tier: patreon.isRequired ? .introOnly : .free
+        )
     }
 
     private var planStartDate: Date? {
@@ -142,11 +136,11 @@ struct PlanSetupView: View {
                     #endif
                 }
             }
-            .onChange(of: premiumLocked) { _, locked in
-                // If patron access flips off mid-flow, reset a now-hidden
-                // selection so the picker doesn't display a stale label.
-                if locked, let current = selectedTemplate,
-                   PlanTemplateService.shared.isPatronOnly(current) {
+            .onChange(of: patreon.isRequired) { _, _ in
+                // If the visible tier changes mid-flow and the current
+                // selection drops out, reset to the first available plan.
+                if let current = selectedTemplate,
+                   !templates.contains(where: { $0.id == current.id }) {
                     selectedTemplate = templates.first
                 }
             }
