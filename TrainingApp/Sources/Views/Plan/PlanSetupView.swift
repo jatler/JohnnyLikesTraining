@@ -9,7 +9,7 @@ struct PlanSetupView: View {
     @Environment(PatreonService.self) private var patreon
     @Environment(\.dismiss) private var dismiss
 
-    @State private var raceName = ""
+    @State private var raceName = "TRTER 100k"
     @State private var raceDate = Calendar.current.date(
         from: DateComponents(year: 2026, month: 7, day: 18)
     )!
@@ -127,13 +127,7 @@ struct PlanSetupView: View {
             }
             .onAppear {
                 if selectedTemplate == nil {
-                    #if DEBUG
-                    raceName = "MJ"
-                    raceDate = Calendar.current.date(from: DateComponents(year: 2026, month: 5, day: 9))!
-                    selectedTemplate = templates.first(where: { $0.name.localizedCaseInsensitiveContains("champion") }) ?? templates.first
-                    #else
                     selectedTemplate = templates.first
-                    #endif
                 }
             }
             .onChange(of: patreon.isRequired) { _, _ in

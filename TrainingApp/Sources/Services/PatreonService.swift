@@ -13,14 +13,11 @@ final class PatreonService {
     /// Non-nil when patron_status has lapsed but the 7-day grace window is still open.
     private(set) var gracePeriodDaysRemaining: Int?
 
-    /// Master switch for the Patreon paywall. Off by default so the app is
-    /// usable without any Patreon setup; flipped on in Settings once the
-    /// integration is ready to gate users.
-    var isRequired: Bool {
-        didSet { UserDefaults.standard.set(isRequired, forKey: Self.isRequiredKey) }
-    }
-
-    private static let isRequiredKey = "patreon_integration_required"
+    /// Master switch for the Patreon paywall. Session-scoped: resets to OFF
+    /// on every cold launch so the app boots into the unrestricted dogfood
+    /// state. Flip in Settings to preview the gated experience within a
+    /// session.
+    var isRequired: Bool = false
 
     /// Pure decision for whether the patron-only plan tier is hidden from
     /// the new-plan picker. Extracted as a static function so it can be
@@ -48,7 +45,6 @@ final class PatreonService {
     // MARK: - Init
 
     init() {
-        isRequired = UserDefaults.standard.bool(forKey: Self.isRequiredKey)
         isConnected = KeychainService.get(.patreonAccessToken) != nil
         isPatron = KeychainService.get(.patreonIsPatron) == "true"
         if let raw = KeychainService.get(.patreonLastVerifiedAt),
