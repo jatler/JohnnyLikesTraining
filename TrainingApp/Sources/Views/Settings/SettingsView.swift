@@ -23,10 +23,6 @@ struct SettingsView: View {
                     VStack(spacing: 16) {
                         gracePeriodBanner
                         sectionCard(label: "PATREON") { patreonSection }
-                        if DevSignIn.isAllowed {
-                            sectionCard(label: "PATREON DEBUG") { patreonDebugSection }
-                            sectionCard(label: "DESIGN LAB") { designLabSection }
-                        }
                         sectionCard(label: "STRAVA") { stravaSection }
                         sectionCard(label: "OURA") { ouraSection }
                         sectionCard(label: "TRAINING PLAN") { planSection }
@@ -237,82 +233,6 @@ struct SettingsView: View {
         } else {
             divider()
             buttonRow("Connect Patreon", icon: "star.circle.fill", color: Color.trailGreen) { connectPatreon() }
-        }
-    }
-
-    // MARK: - Design Lab
-
-    @ViewBuilder
-    private var designLabSection: some View {
-        NavigationLink {
-            MilesCompletionPrototype()
-        } label: {
-            HStack(spacing: 10) {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(Color.trailGreen)
-                Text("Completion Pulse Lab")
-                    .font(TrailFont.body)
-                Spacer()
-                Image(systemName: "chevron.right")
-                    .font(TrailFont.meta)
-                    .foregroundStyle(.secondary)
-            }
-            .padding(.vertical, 6)
-        }
-        .buttonStyle(.plain)
-    }
-
-    // MARK: - Patreon Debug
-    //
-    // Visible only on Debug builds (or Release with DEV_SIGNIN_ALLOWED=YES).
-    // Surfaces the entitlement state during a live demo to David & Megan and
-    // gives a one-tap "force re-verify" that hits the Patreon identity API.
-
-    @ViewBuilder
-    private var patreonDebugSection: some View {
-        infoRow("Connected", patreon.isConnected ? "yes" : "no")
-        divider()
-        infoRow("isPatron", patreon.isPatron ? "yes" : "no")
-        divider()
-        infoRow(
-            "Last verified",
-            patreon.lastVerifiedAt?.formatted(.relative(presentation: .named)) ?? "never"
-        )
-        divider()
-        infoRow(
-            "Token expires",
-            patreon.tokenExpiresAt.map { $0.formatted(.relative(presentation: .named)) } ?? "—"
-        )
-        divider()
-        infoRow(
-            "Grace period",
-            patreon.gracePeriodDaysRemaining.map { "\($0)d remaining" } ?? "—"
-        )
-        divider()
-        Button { forceReverify() } label: {
-            HStack(spacing: 10) {
-                Image(systemName: "arrow.clockwise")
-                    .font(.system(size: 16))
-                    .foregroundStyle(Color.trailGreen)
-                    .frame(width: 24)
-                Text("Force re-verify").font(TrailFont.body)
-                Spacer()
-                if patreon.isVerifying { ProgressView() }
-            }
-            .contentShape(Rectangle())
-            .padding(.horizontal, 14).padding(.vertical, 12)
-        }
-        .buttonStyle(.plain)
-        .disabled(!patreon.isConnected || patreon.isVerifying)
-    }
-
-    private func forceReverify() {
-        Task {
-            do { try await patreon.verifyMembership() }
-            catch {
-                errorMessage = error.localizedDescription
-                showingError = true
-            }
         }
     }
 
