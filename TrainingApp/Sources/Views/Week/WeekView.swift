@@ -304,18 +304,27 @@ struct WeekView: View {
 
     private func sync() async {
         guard let userId = auth.currentUserId else { return }
-        // Hit the upstream APIs, not just the Supabase cache. loadActivities /
-        // loadDailyData only re-read what's already on Supabase — they don't
-        // pull new runs/readiness from Strava or Oura. syncActivities /
-        // syncDaily talk to the source. merge:true so a transient API blip
-        // doesn't wipe what's already cached locally.
-        if strava.isConnected {
-            try? await strava.syncActivities(userId: userId, merge: true)
-            strava.autoMatchActivities(sessions: planStore.sessions)
-        }
-        if oura.isConnected {
-            try? await oura.syncDaily(userId: userId, merge: true)
-        }
+        // Run Strava + Oura concurrently — they share nothing, so while
+        // one is awaiting URLSession the other can be in flight. Strava
+        // passes `after:` so a typical "nothing new" pull skips the
+        // 6-month default scan and just checks the last couple days
+        // (48h overlap covers late watch uploads). merge:true so a
+        // transient API blip doesn't wipe the local cache.
+        async let stravaDone: Void = syncStravaIfConnected(userId: userId)
+        async let ouraDone:   Void = syncOuraIfConnected(userId: userId)
+        _ = await (stravaDone, ouraDone)
+    }
+
+    private func syncStravaIfConnected(userId: UUID) async {
+        guard strava.isConnected else { return }
+        let cutoff = strava.lastSyncDate?.addingTimeInterval(-48 * 60 * 60)
+        try? await strava.syncActivities(userId: userId, after: cutoff, merge: true)
+        strava.autoMatchActivities(sessions: planStore.sessions)
+    }
+
+    private func syncOuraIfConnected(userId: UUID) async {
+        guard oura.isConnected else { return }
+        try? await oura.syncDaily(userId: userId, merge: true)
     }
 
     // MARK: - Tuesday podcast banner

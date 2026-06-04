@@ -306,7 +306,10 @@ final class StravaService {
         lastSyncDate = Date()
         saveToCache()
 
-        await persistActivities(mapped, userId: userId)
+        // Don't block the sync return on the Supabase upsert — the in-memory
+        // + on-disk cache is already updated, so the UI is current. Pull-to-
+        // refresh shouldn't wait for a network round-trip the user can't see.
+        Task { await persistActivities(mapped, userId: userId) }
     }
 
     // MARK: - Auto-Match
