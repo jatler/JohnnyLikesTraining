@@ -1,9 +1,9 @@
 {
   "id": "swap_100mile_12w",
-  "name": "SWAP 100MILE Plan (12 weeks)",
+  "name": "100 Mile Plan (12 weeks)",
   "author": "David Roche & Megan Roche, MD PhD",
-  "source": "SWAP Running",
-  "description": "Bundled training plan imported from SWAP_Plans PDF templates.",
+  "source": "Coach-provided PDF",
+  "description": "Bundled training plan from coach-provided PDF templates.",
   "duration_weeks": 12,
   "target_distances": [
     "100M"
@@ -31,7 +31,7 @@
       "workout_type": "easy",
       "target_distance_km": 9.654,
       "pace_description": null,
-      "notes": "4-8 mi easy or cross train 60-90 min. Cross train can be bike, hike, ski, or anything else, with the time being flexible. Hiking in particular is an opportunity to improve ultra potential. Keep it mostly easy, but it’s ok to push some climbs and have fun!"
+      "notes": "4-8 mi easy or cross train 60-90 min. Cross train can be bike, hike, ski, or anything else, with the time being flexible. Hiking in particular is an opportunity to improve ultra potential. Keep it mostly easy, but it\u2019s ok to push some climbs and have fun!"
     },
     {
       "week": 1,
@@ -55,7 +55,7 @@
       "workout_type": "long_run",
       "target_distance_km": 17.698999999999998,
       "pace_description": "8-14 miles easy on trails",
-      "notes": "8-14 miles easy on trails. Vert is helpful to prepare for ultras, but don’t chase vert at the expense of all else. Later on, vert will be more important if you have access where you live. Hike with purpose when needed!"
+      "notes": "8-14 miles easy on trails. Vert is helpful to prepare for ultras, but don\u2019t chase vert at the expense of all else. Later on, vert will be more important if you have access where you live. Hike with purpose when needed!"
     },
     {
       "week": 1,
@@ -87,7 +87,7 @@
       "workout_type": "intervals",
       "target_distance_km": null,
       "pace_description": null,
-      "notes": "2-3 mi easy, 8 x 1 min fast/2 min easy (think 5k effort, but not worrying about pace), 2-3 mi easy with 4 x 30 sec hills fast. On the hill strides, think powerful and fast on a 6-8% grade ideally--you’ll be winded at the top. Embrace your athletic self! Mtn legs"
+      "notes": "2-3 mi easy, 8 x 1 min fast/2 min easy (think 5k effort, but not worrying about pace), 2-3 mi easy with 4 x 30 sec hills fast. On the hill strides, think powerful and fast on a 6-8% grade ideally--you\u2019ll be winded at the top. Embrace your athletic self! Mtn legs"
     },
     {
       "week": 2,
@@ -111,7 +111,7 @@
       "workout_type": "long_run",
       "target_distance_km": 19.308,
       "pace_description": "10-14 mi easy on trails, ideally with vert",
-      "notes": "10-14 mi easy on trails, ideally with vert. Can run ups with a bit more effort on long runs if you feel good. And remember, it’s great to hike! Hiking is a key skill."
+      "notes": "10-14 mi easy on trails, ideally with vert. Can run ups with a bit more effort on long runs if you feel good. And remember, it\u2019s great to hike! Hiking is a key skill."
     },
     {
       "week": 2,
@@ -543,7 +543,7 @@
       "workout_type": "easy",
       "target_distance_km": 12.872,
       "pace_description": "6-10 mi e asy",
-      "notes": "6-10 mi e asy"
+      "notes": "6-10 mi easy"
     },
     {
       "week": 10,

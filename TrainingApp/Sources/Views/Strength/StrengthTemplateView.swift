@@ -393,30 +393,37 @@ struct StrengthTemplateView: View {
                 emptySegmentMessage(icon: "flame.fill", text: "No heat sessions scheduled")
             } else {
                 ForEach(entries, id: \.day) { entry in
-                    let isDone = heatStore.isComplete(entry.session.id)
-                    let actual = heatStore.log(for: entry.session.id)?.actualDurationMinutes
+                    // Resolve the session that actually belongs to (week, dayOfWeek).
+                    // entries is deduped to one row per dayOfWeek across the whole
+                    // plan — using entry.session.id directly would mark every
+                    // week's Monday complete from a single tap.
+                    let weekSession = heatStore.sessions.first {
+                        $0.weekNumber == week && $0.dayOfWeek == entry.day
+                    } ?? entry.session
+                    let isDone = heatStore.isComplete(weekSession.id)
+                    let actual = heatStore.log(for: weekSession.id)?.actualDurationMinutes
                     let scheduled = currentWeekHeatDate(for: entry.day, fallback: entry.session.scheduledDate, week: week)
-                    let detailMin = actual ?? entry.session.targetDurationMinutes
+                    let detailMin = actual ?? weekSession.targetDurationMinutes
 
                     boldDayRow(item: RowItem(
-                        id: entry.session.id,
+                        id: weekSession.id,
                         dayOfWeek: entry.day,
                         scheduledDate: scheduled,
-                        title: entry.session.sessionType.displayName,
+                        title: weekSession.sessionType.displayName,
                         detail: "\(detailMin) min",
-                        hue: entry.session.sessionType.color,
-                        icon: entry.session.sessionType.iconName,
+                        hue: weekSession.sessionType.color,
+                        icon: weekSession.sessionType.iconName,
                         state: rowState(
                             isDone: isDone,
-                            isSkipped: heatStore.isSkipped(entry.session.id),
+                            isSkipped: heatStore.isSkipped(weekSession.id),
                             scheduledDate: scheduled
                         ),
-                        celebrationId: entry.session.id,
-                        onTap: { selectedHeatSession = entry.session }
+                        celebrationId: weekSession.id,
+                        onTap: { selectedHeatSession = weekSession }
                     ))
                     .contextMenu {
                         Button {
-                            selectedHeatSession = entry.session
+                            selectedHeatSession = weekSession
                         } label: {
                             Label("Edit / Log", systemImage: "pencil")
                         }

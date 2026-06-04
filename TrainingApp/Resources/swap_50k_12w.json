@@ -1,9 +1,9 @@
 {
   "id": "swap_50k_12w",
-  "name": "SWAP 50K Plan (12 weeks)",
+  "name": "50K Plan (12 weeks)",
   "author": "David Roche & Megan Roche, MD PhD",
-  "source": "SWAP Running",
-  "description": "Bundled training plan imported from SWAP_Plans PDF templates.",
+  "source": "Coach-provided PDF",
+  "description": "Bundled training plan from coach-provided PDF templates.",
   "duration_weeks": 12,
   "target_distances": [
     "50K"
@@ -23,7 +23,7 @@
       "workout_type": "easy",
       "target_distance_km": 12.067499999999999,
       "pace_description": "5-10 miles easy with 5 x 20 sec hills fast",
-      "notes": "5-10 miles easy with 5 x 20 sec hills fast. On easy running, think smooth, with quick strides, and no tension in the body. On days you feel great, easy runs can be quicker as long as it feels easy and doesn’t impact recovery. On hill strides, find a moderate grade around 6-8% and run up as fast as you can go without sprinting, jogging down and around for 1-2 min before the next one"
+      "notes": "5-10 miles easy with 5 x 20 sec hills fast. On easy running, think smooth, with quick strides, and no tension in the body. On days you feel great, easy runs can be quicker as long as it feels easy and doesn\u2019t impact recovery. On hill strides, find a moderate grade around 6-8% and run up as fast as you can go without sprinting, jogging down and around for 1-2 min before the next one"
     },
     {
       "week": 1,
@@ -678,8 +678,8 @@
       "day": 7,
       "workout_type": "easy",
       "target_distance_km": null,
-      "pace_description": "PIZZA! That’s also implied in the whole training plan",
-      "notes": "PIZZA! That’s also implied in the whole training plan"
+      "pace_description": "PIZZA! That\u2019s also implied in the whole training plan",
+      "notes": "PIZZA! That\u2019s also implied in the whole training plan"
     }
   ]
 }

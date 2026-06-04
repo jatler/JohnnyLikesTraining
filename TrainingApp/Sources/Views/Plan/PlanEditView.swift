@@ -6,7 +6,6 @@ struct PlanEditView: View {
     @Environment(HeatStore.self) private var heatStore
     @Environment(StretchStore.self) private var stretchStore
     @Environment(AuthService.self) private var auth
-    @Environment(PatreonService.self) private var patreon
     @Environment(\.dismiss) private var dismiss
 
     @State private var raceName: String
@@ -17,11 +16,7 @@ struct PlanEditView: View {
     private let originalTemplateId: String?
 
     private var templates: [TrainingPlanTemplate] {
-        // Mirrors PlanSetupView: toggle ON → intro plan only, toggle OFF →
-        // the 3 dogfood plans.
-        PlanTemplateService.shared.availableTemplates(
-            tier: patreon.isRequired ? .introOnly : .free
-        )
+        PlanTemplateService.shared.availableTemplates()
     }
 
     init(plan: TrainingPlan, template: TrainingPlanTemplate?) {

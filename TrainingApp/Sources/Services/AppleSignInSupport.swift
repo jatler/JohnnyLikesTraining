@@ -3,13 +3,13 @@ import Foundation
 import Security
 
 enum DevSignIn {
-    /// Debug builds always allow the skip control. Release builds require `DevSignInAllowed` = YES in Info.plist (set `DEV_SIGNIN_ALLOWED` in Secrets.xcconfig or target build settings).
+    /// Debug-only. Release builds have no path to bypass sign-in — App Store
+    /// reviewers must use real credentials.
     static var isAllowed: Bool {
         #if DEBUG
         true
         #else
-        (Bundle.main.object(forInfoDictionaryKey: "DevSignInAllowed") as? String)?
-            .uppercased() == "YES"
+        false
         #endif
     }
 }

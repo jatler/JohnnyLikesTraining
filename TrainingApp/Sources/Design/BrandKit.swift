@@ -32,10 +32,7 @@ enum TrailFont {
 // MARK: - Brand Constants
 
 enum BrandKit {
-    static let appName = "SWAP Training"
-    static let coachCredit = "David & Megan Roche"
-    static let tagline = "Train with David & Megan Roche."
-    static let patreonURL = URL(string: "https://www.patreon.com/swap?utm_source=app&utm_medium=paywall")!
+    static let appName = "JohnnyLikesTraining"
 }
 
 // MARK: - Unified Card Chrome

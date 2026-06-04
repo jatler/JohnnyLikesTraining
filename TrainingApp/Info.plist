@@ -46,8 +46,6 @@
 		<string>GeistMono-Regular.ttf</string>
 		<string>GeistMono-Medium.ttf</string>
 	</array>
-	<key>DevSignInAllowed</key>
-	<string>$(DEV_SIGNIN_ALLOWED)</string>
 	<key>SUPABASE_URL</key>
 	<string>$(SUPABASE_URL)</string>
 	<key>SUPABASE_ANON_KEY</key>

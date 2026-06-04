@@ -184,20 +184,51 @@ final class StravaService {
 
     // MARK: - Disconnect
 
-    func disconnect() async {
+    /// Disconnect from Strava: deauthorize the token with Strava, then purge all
+    /// imported data per the Strava API Agreement requirement to delete user data
+    /// when access is revoked.
+    func disconnect(userId: UUID?) async {
         if let accessToken = KeychainService.get(.stravaAccessToken) {
             var request = URLRequest(url: URL(string: "https://www.strava.com/oauth/deauthorize")!)
             request.httpMethod = "POST"
             request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             _ = try? await URLSession.shared.data(for: request)
         }
+        await purgeData(userId: userId)
+    }
+
+    /// Delete every trace of Strava data tied to this user: Supabase rows, Keychain
+    /// tokens, local cache, in-memory state. Safe to call when not connected.
+    /// Called by sign-out and disconnect to comply with the Strava API Agreement.
+    func purgeData(userId: UUID?) async {
         KeychainService.deleteAll(for: .strava)
         isConnected = false
         activities = []
         lastSyncDate = nil
         athleteName = nil
         LocalCacheService.remove(key: "strava_activities")
+
+        guard let userId else { return }
+        _ = await SupabaseService.shared.execute(
+            table: "strava_activities",
+            operation: "delete_all_for_user"
+        ) {
+            try await supabase
+                .from("strava_activities")
+                .delete()
+                .eq("user_id", value: userId.uuidString)
+                .execute()
+        }
     }
+
+    #if DEBUG
+    /// Inject synthesized activities for App Store screenshot generation. Marks
+    /// the service as connected so UI that gates on connection state renders.
+    func applyDemoActivities(_ demo: [StravaActivity]) {
+        activities = demo
+        isConnected = true
+    }
+    #endif
 
     // MARK: - Local Cache
 

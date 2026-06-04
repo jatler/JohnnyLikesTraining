@@ -6,7 +6,6 @@ struct PlanSetupView: View {
     @Environment(StrengthStore.self) private var strengthStore
     @Environment(HeatStore.self) private var heatStore
     @Environment(StretchStore.self) private var stretchStore
-    @Environment(PatreonService.self) private var patreon
     @Environment(\.dismiss) private var dismiss
 
     @State private var raceName = "TRTER 100k"
@@ -16,15 +15,9 @@ struct PlanSetupView: View {
     @State private var selectedTemplate: TrainingPlanTemplate?
     @State private var showingError = false
     @State private var errorMessage = ""
-    @State private var isConnectingPatreon = false
 
     private var templates: [TrainingPlanTemplate] {
-        // Toggle ON narrows the picker to the single intro plan; toggle OFF
-        // shows the 3 dogfood plans. Patron-state expansion is wired up in
-        // PlanTemplateService.Tier.full but not currently surfaced.
-        PlanTemplateService.shared.availableTemplates(
-            tier: patreon.isRequired ? .introOnly : .free
-        )
+        PlanTemplateService.shared.availableTemplates()
     }
 
     private var planStartDate: Date? {
@@ -69,17 +62,10 @@ struct PlanSetupView: View {
                                 .tag(template as TrainingPlanTemplate?)
                         }
                     }
-
-                    inlinePatreonBlock
                 } footer: {
                     if let template = selectedTemplate {
                         VStack(alignment: .leading, spacing: 4) {
-                            if template.source == "SWAP Running" {
-                                Text("By \(BrandKit.coachCredit) • \(template.durationWeeks) weeks")
-                                    .foregroundStyle(Color.trailGreen)
-                            } else {
-                                Text("\(template.durationWeeks) weeks \u{2022} \(template.author)")
-                            }
+                            Text("\(template.durationWeeks) weeks \u{2022} \(template.author)")
                             Text(template.description)
                         }
                     }
@@ -129,78 +115,6 @@ struct PlanSetupView: View {
                 if selectedTemplate == nil {
                     selectedTemplate = templates.first
                 }
-            }
-            .onChange(of: patreon.isRequired) { _, _ in
-                // If the visible tier changes mid-flow and the current
-                // selection drops out, reset to the first available plan.
-                if let current = selectedTemplate,
-                   !templates.contains(where: { $0.id == current.id }) {
-                    selectedTemplate = templates.first
-                }
-            }
-        }
-    }
-
-    // MARK: - Inline Patreon block
-
-    /// Shared font for the primary action line across not-connected and
-    /// not-patron states. Same weight + size so the affordance reads as
-    /// one role regardless of where the user is in the unlock flow.
-    private var unlockActionFont: Font {
-        .system(size: 17, weight: .semibold)
-    }
-
-    @ViewBuilder
-    private var inlinePatreonBlock: some View {
-        if patreon.isRequired {
-            if patreon.isPatron || patreon.gracePeriodDaysRemaining != nil {
-                HStack(spacing: 8) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(Color.trailGreen)
-                    Text("Patreon connected — full catalog unlocked")
-                        .font(TrailFont.meta)
-                        .foregroundStyle(Color.trailGreen)
-                }
-            } else if patreon.isConnected {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Patreon connected — subscribe at $5+/mo to unlock the full SWAP catalog.")
-                        .font(TrailFont.meta)
-                        .foregroundStyle(.secondary)
-                    Link(destination: BrandKit.patreonURL) {
-                        Text("Subscribe on Patreon \u{2197}")
-                            .font(unlockActionFont)
-                            .foregroundStyle(Color.trailGreen)
-                    }
-                }
-            } else {
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Unlock the full SWAP catalog with a Patreon membership.")
-                        .font(TrailFont.meta)
-                        .foregroundStyle(.secondary)
-                    Button {
-                        connectPatreon()
-                    } label: {
-                        HStack(spacing: 6) {
-                            if isConnectingPatreon { ProgressView().controlSize(.small) }
-                            Text("Connect Patreon")
-                                .font(unlockActionFont)
-                        }
-                        .foregroundStyle(Color.trailGreen)
-                    }
-                    .disabled(isConnectingPatreon)
-                }
-            }
-        }
-    }
-
-    private func connectPatreon() {
-        Task {
-            isConnectingPatreon = true
-            defer { isConnectingPatreon = false }
-            do { try await patreon.authorize() }
-            catch {
-                errorMessage = error.localizedDescription
-                showingError = true
             }
         }
     }
@@ -271,5 +185,4 @@ extension TrainingPlanTemplate: Hashable {
         .environment(StrengthStore())
         .environment(HeatStore())
         .environment(StretchStore())
-        .environment(PatreonService())
 }

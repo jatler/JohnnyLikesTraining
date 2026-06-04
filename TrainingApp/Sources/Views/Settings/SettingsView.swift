@@ -5,12 +5,10 @@ struct SettingsView: View {
     @Environment(TrainingPlanStore.self) private var planStore
     @Environment(StravaService.self) private var strava
     @Environment(OuraService.self) private var oura
-    @Environment(PatreonService.self) private var patreon
 
     @State private var showingSignOutAlert = false
     @State private var showingDisconnectStrava = false
     @State private var showingDisconnectOura = false
-    @State private var showingDisconnectPatreon = false
     @State private var showingDeletePlan = false
     @State private var errorMessage: String?
     @State private var showingError = false
@@ -21,8 +19,6 @@ struct SettingsView: View {
                 header
                 ScrollView {
                     VStack(spacing: 16) {
-                        gracePeriodBanner
-                        sectionCard(label: "PATREON") { patreonSection }
                         sectionCard(label: "STRAVA") { stravaSection }
                         sectionCard(label: "OURA") { ouraSection }
                         sectionCard(label: "TRAINING PLAN") { planSection }
@@ -157,85 +153,6 @@ struct SettingsView: View {
         Divider().padding(.leading, 14)
     }
 
-    // MARK: - Grace Period Banner
-
-    @ViewBuilder
-    private var gracePeriodBanner: some View {
-        if let daysLeft = patreon.gracePeriodDaysRemaining {
-            HStack(spacing: 12) {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.yellow)
-                    .font(.system(size: 20))
-                    .frame(width: 43, height: 43)
-                    .background(Color.yellow.opacity(0.15), in: RoundedRectangle(cornerRadius: 15))
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Your access expires in \(daysLeft) day\(daysLeft == 1 ? "" : "s")")
-                        .font(TrailFont.body)
-                    Link("Resubscribe on Patreon ↗", destination: BrandKit.patreonURL)
-                        .font(TrailFont.data)
-                        .foregroundStyle(.yellow)
-                }
-                Spacer()
-            }
-            .padding(14)
-            .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 18))
-            .overlay(
-                RoundedRectangle(cornerRadius: 18)
-                    .strokeBorder(Color.yellow.opacity(0.4), lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
-        }
-    }
-
-    // MARK: - Patreon
-
-    @ViewBuilder
-    private var patreonSection: some View {
-        @Bindable var patreon = patreon
-        Toggle(isOn: $patreon.isRequired) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Require Patreon").font(TrailFont.body)
-                Text("Lock SWAP plans behind a Patreon membership")
-                    .font(TrailFont.meta)
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .tint(Color.trailGreen)
-        .padding(.horizontal, 14).padding(.vertical, 12)
-
-        if patreon.isConnected {
-            divider()
-            HStack {
-                HStack(spacing: 10) {
-                    Image(systemName: "star.circle.fill")
-                        .foregroundStyle(Color.trailGreen)
-                        .font(.system(size: 16))
-                    Text("SWAP Patreon").font(TrailFont.body)
-                }
-                Spacer()
-                Text("Connected").font(TrailFont.data).foregroundStyle(.green)
-            }
-            .padding(.horizontal, 14).padding(.vertical, 12)
-
-            if let lastVerified = patreon.lastVerifiedAt {
-                divider()
-                infoRow("Last verified", lastVerified.formatted(.relative(presentation: .named)))
-            }
-
-            divider()
-            buttonRow("Disconnect Patreon", color: .red) { showingDisconnectPatreon = true }
-                .alert("Disconnect Patreon?", isPresented: $showingDisconnectPatreon) {
-                    Button("Cancel", role: .cancel) {}
-                    Button("Disconnect", role: .destructive) { patreon.disconnect() }
-                } message: {
-                    Text("You'll lose access to SWAP training plans.")
-                }
-        } else {
-            divider()
-            buttonRow("Connect Patreon", icon: "star.circle.fill", color: Color.trailGreen) { connectPatreon() }
-        }
-    }
-
     // MARK: - Strava
 
     @ViewBuilder
@@ -278,7 +195,7 @@ struct SettingsView: View {
             buttonRow("Disconnect Strava", color: .red) { showingDisconnectStrava = true }
                 .alert("Disconnect Strava?", isPresented: $showingDisconnectStrava) {
                     Button("Cancel", role: .cancel) {}
-                    Button("Disconnect", role: .destructive) { Task { await strava.disconnect() } }
+                    Button("Disconnect", role: .destructive) { Task { await strava.disconnect(userId: auth.currentUserId) } }
                 } message: {
                     Text("Your synced activities will be removed from the app.")
                 }
@@ -390,9 +307,14 @@ struct SettingsView: View {
         buttonRow("Sign Out", color: .red) { showingSignOutAlert = true }
             .alert("Sign Out?", isPresented: $showingSignOutAlert) {
                 Button("Cancel", role: .cancel) {}
-                Button("Sign Out", role: .destructive) { Task { try? await auth.signOut() } }
+                Button("Sign Out", role: .destructive) {
+                    Task {
+                        await strava.purgeData(userId: auth.currentUserId)
+                        try? await auth.signOut()
+                    }
+                }
             } message: {
-                Text("You'll need to sign in again to access your training data.")
+                Text("Your Strava activities will be removed. You'll need to sign in again to access your training data.")
             }
     }
 
@@ -411,17 +333,6 @@ struct SettingsView: View {
     }
 
     // MARK: - Actions
-
-    private func connectPatreon() {
-        Task {
-            do {
-                try await patreon.authorize()
-            } catch {
-                errorMessage = error.localizedDescription
-                showingError = true
-            }
-        }
-    }
 
     private func connectStrava() {
         Task {
@@ -484,5 +395,4 @@ struct SettingsView: View {
         .environment(TrainingPlanStore())
         .environment(StravaService())
         .environment(OuraService())
-        .environment(PatreonService())
 }

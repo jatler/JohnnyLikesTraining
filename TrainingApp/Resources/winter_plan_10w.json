@@ -2,7 +2,7 @@
   "id": "winter_plan_10w",
   "name": "10-Week Winter Plan",
   "author": "David Roche & Megan Roche, MD PhD",
-  "source": "SWAP Running",
+  "source": "Coach-provided PDF",
   "description": "A 10-week winter plan focused on Z2 efficiency and top-end power. Options for indoor training and ski; flexible day placement for weather and life.",
   "duration_weeks": 10,
   "target_distances": [
@@ -32,7 +32,7 @@
       "workout_type": "easy",
       "target_distance_km": null,
       "pace_description": "Z2 uphill treadmill",
-      "notes": "60-90 min uphill treadmill in Zone 2 Z2 uphill treadmill is about finding a sustainable high-aerobic effort without much impact on the body. Aim for 10-15% grade, and whatever pace corresponds to the correct effort. It’s ok for effort to drift into Z3 as you go. Here is a tutorial. Practice fueling and hydration on these sessions!"
+      "notes": "60-90 min uphill treadmill in Zone 2 Z2 uphill treadmill is about finding a sustainable high-aerobic effort without much impact on the body. Aim for 10-15% grade, and whatever pace corresponds to the correct effort. It\u2019s ok for effort to drift into Z3 as you go. Here is a tutorial. Practice fueling and hydration on these sessions!"
     },
     {
       "week": 1,
@@ -64,7 +64,7 @@
       "workout_type": "easy",
       "target_distance_km": 17.7,
       "pace_description": "Easy or x-train flex",
-      "notes": "8-14 miles easy or 1-2+ hours easy x-train/uphill TM. Sunday is an adventure flex day! If you like winter sports, it’s a great time to go play on the snow for as long as you want. If you want to stay indoors, bike or uphill treadmill. Or you can go outside and add up some easy miles!"
+      "notes": "8-14 miles easy or 1-2+ hours easy x-train/uphill TM. Sunday is an adventure flex day! If you like winter sports, it\u2019s a great time to go play on the snow for as long as you want. If you want to stay indoors, bike or uphill treadmill. Or you can go outside and add up some easy miles!"
     },
     {
       "week": 2,
@@ -80,7 +80,7 @@
       "workout_type": "intervals",
       "target_distance_km": 9.7,
       "pace_description": "Hills or track effort",
-      "notes": "2-3 miles easy warm-up with a couple light strides, 2-3 x (4 x 400 fast) with 90 seconds easy jog between intervals and 3 min easy between sets, 1-2 miles steady, 1-3 miles easy. On the 400s, think 5k effort or so, practicing smooth speed. You can do this session on the track or on roads if you’d prefer to avoid the track."
+      "notes": "2-3 miles easy warm-up with a couple light strides, 2-3 x (4 x 400 fast) with 90 seconds easy jog between intervals and 3 min easy between sets, 1-2 miles steady, 1-3 miles easy. On the 400s, think 5k effort or so, practicing smooth speed. You can do this session on the track or on roads if you\u2019d prefer to avoid the track."
     },
     {
       "week": 2,
@@ -120,7 +120,7 @@
       "workout_type": "easy",
       "target_distance_km": 17.7,
       "pace_description": "Easy or x-train flex",
-      "notes": "8-14 miles easy or 1-2+ hours easy x-train/uphill TM. If you’re x-training or on the snow, you can go longer on these days if that sounds fun!"
+      "notes": "8-14 miles easy or 1-2+ hours easy x-train/uphill TM. If you\u2019re x-training or on the snow, you can go longer on these days if that sounds fun!"
     },
     {
       "week": 3,
@@ -248,7 +248,7 @@
       "workout_type": "intervals",
       "target_distance_km": 8.0,
       "pace_description": "Hills or track effort",
-      "notes": "2-3 miles easy warm-up with a couple light strides, 6-10 x 500 fast with 300 easy recovery (think 5k effort), 4 x 200 fast with 200 slow recovery (push these a bit), 2-3 miles easy cool-down. Really relax in the first 300 of each interval, making sure you aren’t going too hard. On the 200s, let yourself open up in the final 200 to work on top-end sustainable speed!"
+      "notes": "2-3 miles easy warm-up with a couple light strides, 6-10 x 500 fast with 300 easy recovery (think 5k effort), 4 x 200 fast with 200 slow recovery (push these a bit), 2-3 miles easy cool-down. Really relax in the first 300 of each interval, making sure you aren\u2019t going too hard. On the 200s, let yourself open up in the final 200 to work on top-end sustainable speed!"
     },
     {
       "week": 5,

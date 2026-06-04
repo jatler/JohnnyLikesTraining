@@ -1,0 +1,1021 @@
+{
+  "id": "pfitz_advanced_marathon_18w_70",
+  "name": "Advanced Marathoning \u2014 18 week, 70 mi",
+  "author": "Pete Pfitzinger & Scott Douglas",
+  "source": "Advanced Marathoning (3rd ed.)",
+  "description": "Pfitzinger & Douglas 18-week marathon schedule from Advanced Marathoning. Four mesocycles: Endurance, Lactate Threshold + Endurance, Race Preparation, and Taper. Six runs per week.",
+  "duration_weeks": 18,
+  "target_distances": [
+    "Marathon"
+  ],
+  "sessions": [
+    {
+      "week": 1,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "Rest or cross-training"
+    },
+    {
+      "week": 1,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 12.8748,
+      "pace_description": "General aerobic + speed 8 mi w/ 10 x 100 m strides",
+      "notes": "General aerobic + speed 8 mi w/ 10 x 100 m strides"
+    },
+    {
+      "week": 1,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": 17.7028,
+      "pace_description": "Medium-long run 11 mi",
+      "notes": "Medium-long run 11 mi"
+    },
+    {
+      "week": 1,
+      "day": 4,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 1,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 14.4841,
+      "pace_description": "General aerobic 9 mi",
+      "notes": "General aerobic 9 mi"
+    },
+    {
+      "week": 1,
+      "day": 6,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 1,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 24.1402,
+      "pace_description": "Medium-long run 15 mi",
+      "notes": "Medium-long run 15 mi"
+    },
+    {
+      "week": 2,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "Rest or cross-training"
+    },
+    {
+      "week": 2,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 12.8748,
+      "pace_description": "General aerobic + speed 8 mi w/ 10 x 100 m strides",
+      "notes": "General aerobic + speed 8 mi w/ 10 x 100 m strides"
+    },
+    {
+      "week": 2,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": 19.3121,
+      "pace_description": "Medium-long run 12 mi",
+      "notes": "Medium-long run 12 mi"
+    },
+    {
+      "week": 2,
+      "day": 4,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 2,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 14.4841,
+      "pace_description": "General aerobic 9 mi",
+      "notes": "General aerobic 9 mi"
+    },
+    {
+      "week": 2,
+      "day": 6,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 2,
+      "day": 7,
+      "workout_type": "long_run",
+      "target_distance_km": 27.3588,
+      "pace_description": "Long run 17 mi",
+      "notes": "Long run 17 mi"
+    },
+    {
+      "week": 3,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "Rest or cross-training"
+    },
+    {
+      "week": 3,
+      "day": 2,
+      "workout_type": "tempo",
+      "target_distance_km": 14.4841,
+      "pace_description": "Lactate threshold 9 mi w/ 4 mi @ 15K to half marathon race pace",
+      "notes": "Lactate threshold 9 mi w/ 4 mi @ 15K to half marathon race pace"
+    },
+    {
+      "week": 3,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": 20.9215,
+      "pace_description": "Medium-long run 13 mi",
+      "notes": "Medium-long run 13 mi"
+    },
+    {
+      "week": 3,
+      "day": 4,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 3,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 17.7028,
+      "pace_description": "Medium-long run 11 mi",
+      "notes": "Medium-long run 11 mi"
+    },
+    {
+      "week": 3,
+      "day": 6,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 3,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 24.1402,
+      "pace_description": "Medium-long run 15 mi",
+      "notes": "Medium-long run 15 mi"
+    },
+    {
+      "week": 4,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "Rest or cross-training"
+    },
+    {
+      "week": 4,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 14.4841,
+      "pace_description": "General aerobic + speed 9 mi w/ 10 x 100 m strides",
+      "notes": "General aerobic + speed 9 mi w/ 10 x 100 m strides"
+    },
+    {
+      "week": 4,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": 22.5308,
+      "pace_description": "Medium-long run 14 mi",
+      "notes": "Medium-long run 14 mi"
+    },
+    {
+      "week": 4,
+      "day": 4,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 4,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 17.7028,
+      "pace_description": "Medium-long run 11 mi",
+      "notes": "Medium-long run 11 mi"
+    },
+    {
+      "week": 4,
+      "day": 6,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 4,
+      "day": 7,
+      "workout_type": "long_run",
+      "target_distance_km": 28.9682,
+      "pace_description": "Long run 18 mi",
+      "notes": "Long run 18 mi"
+    },
+    {
+      "week": 5,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "Rest or cross-training"
+    },
+    {
+      "week": 5,
+      "day": 2,
+      "workout_type": "tempo",
+      "target_distance_km": 14.4841,
+      "pace_description": "Lactate threshold 9 mi w/ 4 mi @ 15K to half marathon race pace",
+      "notes": "Lactate threshold 9 mi w/ 4 mi @ 15K to half marathon race pace"
+    },
+    {
+      "week": 5,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": 22.5308,
+      "pace_description": "Medium-long run 14 mi",
+      "notes": "Medium-long run 14 mi"
+    },
+    {
+      "week": 5,
+      "day": 4,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 5,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 19.3121,
+      "pace_description": "Medium-long run 12 mi",
+      "notes": "Medium-long run 12 mi"
+    },
+    {
+      "week": 5,
+      "day": 6,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 5,
+      "day": 7,
+      "workout_type": "long_run",
+      "target_distance_km": 32.1869,
+      "pace_description": "Long run 20 mi",
+      "notes": "Long run 20 mi"
+    },
+    {
+      "week": 6,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "Rest or cross-training"
+    },
+    {
+      "week": 6,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 12.8748,
+      "pace_description": "General aerobic + speed 8 mi w/ 10 x 100 m strides",
+      "notes": "General aerobic + speed 8 mi w/ 10 x 100 m strides"
+    },
+    {
+      "week": 6,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": 19.3121,
+      "pace_description": "Medium-long run 12 mi",
+      "notes": "Medium-long run 12 mi"
+    },
+    {
+      "week": 6,
+      "day": 4,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 6,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 17.7028,
+      "pace_description": "Medium-long run 11 mi",
+      "notes": "Medium-long run 11 mi"
+    },
+    {
+      "week": 6,
+      "day": 6,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 6,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 22.5308,
+      "pace_description": "Medium-long run 14 mi",
+      "notes": "Medium-long run 14 mi"
+    },
+    {
+      "week": 7,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "Rest or cross-training"
+    },
+    {
+      "week": 7,
+      "day": 2,
+      "workout_type": "tempo",
+      "target_distance_km": 16.0934,
+      "pace_description": "Lactate threshold 10 mi w/ 5 mi @ 15K to half marathon race pace",
+      "notes": "Lactate threshold 10 mi w/ 5 mi @ 15K to half marathon race pace"
+    },
+    {
+      "week": 7,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": 22.5308,
+      "pace_description": "Medium-long run 14 mi",
+      "notes": "Medium-long run 14 mi"
+    },
+    {
+      "week": 7,
+      "day": 4,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 7,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 17.7028,
+      "pace_description": "Medium-long run 11 mi",
+      "notes": "Medium-long run 11 mi"
+    },
+    {
+      "week": 7,
+      "day": 6,
+      "workout_type": "easy",
+      "target_distance_km": 12.8748,
+      "pace_description": "General aerobic + speed 8 mi w/ 10 x 100 m strides",
+      "notes": "General aerobic + speed 8 mi w/ 10 x 100 m strides"
+    },
+    {
+      "week": 7,
+      "day": 7,
+      "workout_type": "long_run",
+      "target_distance_km": 33.7962,
+      "pace_description": "Long run 21 mi",
+      "notes": "Long run 21 mi"
+    },
+    {
+      "week": 8,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "Rest or cross-training"
+    },
+    {
+      "week": 8,
+      "day": 2,
+      "workout_type": "recovery",
+      "target_distance_km": 16.0934,
+      "pace_description": "Recovery 6 mi a.m., 4 mi p.m.",
+      "notes": "Recovery 6 mi a.m., 4 mi p.m."
+    },
+    {
+      "week": 8,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": 22.5308,
+      "pace_description": "Medium-long run 14 mi",
+      "notes": "Medium-long run 14 mi"
+    },
+    {
+      "week": 8,
+      "day": 4,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 8,
+      "day": 5,
+      "workout_type": "tempo",
+      "target_distance_km": 17.7028,
+      "pace_description": "Lactate threshold 11 mi w/ 6 mi @ 15K to half marathon race pace",
+      "notes": "Lactate threshold 11 mi w/ 6 mi @ 15K to half marathon race pace"
+    },
+    {
+      "week": 8,
+      "day": 6,
+      "workout_type": "recovery",
+      "target_distance_km": 9.6561,
+      "pace_description": "Recovery 6 mi",
+      "notes": "Recovery 6 mi"
+    },
+    {
+      "week": 8,
+      "day": 7,
+      "workout_type": "long_run",
+      "target_distance_km": 32.1869,
+      "pace_description": "Long run 20 mi",
+      "notes": "Long run 20 mi"
+    },
+    {
+      "week": 9,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "Rest or cross-training"
+    },
+    {
+      "week": 9,
+      "day": 2,
+      "workout_type": "recovery",
+      "target_distance_km": 16.0934,
+      "pace_description": "Recovery 6 mi a.m., 4 mi p.m.",
+      "notes": "Recovery 6 mi a.m., 4 mi p.m."
+    },
+    {
+      "week": 9,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": 24.1402,
+      "pace_description": "Medium-long run 15 mi",
+      "notes": "Medium-long run 15 mi"
+    },
+    {
+      "week": 9,
+      "day": 4,
+      "workout_type": "recovery",
+      "target_distance_km": 9.6561,
+      "pace_description": "Recovery 6 mi",
+      "notes": "Recovery 6 mi"
+    },
+    {
+      "week": 9,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 20.9215,
+      "pace_description": "Medium-long run 13 mi",
+      "notes": "Medium-long run 13 mi"
+    },
+    {
+      "week": 9,
+      "day": 6,
+      "workout_type": "easy",
+      "target_distance_km": 11.2654,
+      "pace_description": "Recovery + speed 7 mi w/ 6 x 100 m strides",
+      "notes": "Recovery + speed 7 mi w/ 6 x 100 m strides"
+    },
+    {
+      "week": 9,
+      "day": 7,
+      "workout_type": "tempo",
+      "target_distance_km": 24.1402,
+      "pace_description": "Marathon specific 15 mi w/ 12 mi @ marathon race pace",
+      "notes": "Marathon specific 15 mi w/ 12 mi @ marathon race pace"
+    },
+    {
+      "week": 10,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "Rest or cross-training"
+    },
+    {
+      "week": 10,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 16.0934,
+      "pace_description": "General aerobic 10 mi",
+      "notes": "General aerobic 10 mi"
+    },
+    {
+      "week": 10,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": 14.4841,
+      "pace_description": "VO2max 9 mi w/ 6 x 600 m @ 5K race pace; jog 90 sec between",
+      "notes": "VO2max 9 mi w/ 6 x 600 m @ 5K race pace; jog 90 sec between"
+    },
+    {
+      "week": 10,
+      "day": 4,
+      "workout_type": "recovery",
+      "target_distance_km": 9.6561,
+      "pace_description": "Recovery 6 mi",
+      "notes": "Recovery 6 mi"
+    },
+    {
+      "week": 10,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 17.7028,
+      "pace_description": "Medium-long run 11 mi",
+      "notes": "Medium-long run 11 mi"
+    },
+    {
+      "week": 10,
+      "day": 6,
+      "workout_type": "easy",
+      "target_distance_km": 12.8748,
+      "pace_description": "General aerobic + speed 8 mi w/ 10 x 100 m strides",
+      "notes": "General aerobic + speed 8 mi w/ 10 x 100 m strides"
+    },
+    {
+      "week": 10,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 24.1402,
+      "pace_description": "Medium-long run 15 mi",
+      "notes": "Medium-long run 15 mi"
+    },
+    {
+      "week": 11,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "Rest or cross-training"
+    },
+    {
+      "week": 11,
+      "day": 2,
+      "workout_type": "recovery",
+      "target_distance_km": 16.0934,
+      "pace_description": "Recovery 6 mi a.m., 4 mi p.m.",
+      "notes": "Recovery 6 mi a.m., 4 mi p.m."
+    },
+    {
+      "week": 11,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": 24.1402,
+      "pace_description": "Medium-long run 15 mi",
+      "notes": "Medium-long run 15 mi"
+    },
+    {
+      "week": 11,
+      "day": 4,
+      "workout_type": "recovery",
+      "target_distance_km": 9.6561,
+      "pace_description": "Recovery 6 mi",
+      "notes": "Recovery 6 mi"
+    },
+    {
+      "week": 11,
+      "day": 5,
+      "workout_type": "tempo",
+      "target_distance_km": 19.3121,
+      "pace_description": "Lactate threshold 12 mi w/ 7 mi @ 15K to half marathon race pace",
+      "notes": "Lactate threshold 12 mi w/ 7 mi @ 15K to half marathon race pace"
+    },
+    {
+      "week": 11,
+      "day": 6,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 11,
+      "day": 7,
+      "workout_type": "long_run",
+      "target_distance_km": 35.4056,
+      "pace_description": "Long run 22 mi",
+      "notes": "Long run 22 mi"
+    },
+    {
+      "week": 12,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "Rest or cross-training"
+    },
+    {
+      "week": 12,
+      "day": 2,
+      "workout_type": "intervals",
+      "target_distance_km": 14.4841,
+      "pace_description": "VO2max 9 mi w/ 5 x 600 m @ 5K race pace; jog 90 sec between",
+      "notes": "VO2max 9 mi w/ 5 x 600 m @ 5K race pace; jog 90 sec between"
+    },
+    {
+      "week": 12,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": 22.5308,
+      "pace_description": "Medium-long run 14 mi",
+      "notes": "Medium-long run 14 mi"
+    },
+    {
+      "week": 12,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": 16.0934,
+      "pace_description": "Recovery + speed 6 mi w/ 6 x 100 m strides a.m.; 4 mi p.m.",
+      "notes": "Recovery + speed 6 mi w/ 6 x 100 m strides a.m.; 4 mi p.m."
+    },
+    {
+      "week": 12,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 12,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": 19.3121,
+      "pace_description": "8-15K tune-up race",
+      "notes": "8-15K tune-up race (12 mi total: warm-up + race + cool-down)"
+    },
+    {
+      "week": 12,
+      "day": 7,
+      "workout_type": "long_run",
+      "target_distance_km": 28.9682,
+      "pace_description": "Long run 18 mi",
+      "notes": "Long run 18 mi"
+    },
+    {
+      "week": 13,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "Rest or cross-training"
+    },
+    {
+      "week": 13,
+      "day": 2,
+      "workout_type": "intervals",
+      "target_distance_km": 17.7028,
+      "pace_description": "VO2max 11 mi w/ 6 x 1,000 m @ 5K race pace; jog 90 sec between",
+      "notes": "VO2max 11 mi w/ 6 x 1,000 m @ 5K race pace; jog 90 sec between"
+    },
+    {
+      "week": 13,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": 24.1402,
+      "pace_description": "Medium-long run 15 mi",
+      "notes": "Medium-long run 15 mi"
+    },
+    {
+      "week": 13,
+      "day": 4,
+      "workout_type": "recovery",
+      "target_distance_km": 16.0934,
+      "pace_description": "Recovery 6 mi a.m., 4 mi p.m.",
+      "notes": "Recovery 6 mi a.m., 4 mi p.m."
+    },
+    {
+      "week": 13,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 19.3121,
+      "pace_description": "Medium-long run 12 mi",
+      "notes": "Medium-long run 12 mi"
+    },
+    {
+      "week": 13,
+      "day": 6,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 13,
+      "day": 7,
+      "workout_type": "tempo",
+      "target_distance_km": 27.3588,
+      "pace_description": "Marathon specific 17 mi w/ 14 mi @ marathon race pace",
+      "notes": "Marathon specific 17 mi w/ 14 mi @ marathon race pace"
+    },
+    {
+      "week": 14,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "Rest or cross-training"
+    },
+    {
+      "week": 14,
+      "day": 2,
+      "workout_type": "intervals",
+      "target_distance_km": 14.4841,
+      "pace_description": "VO2max 9 mi w/ 5 x 600 m @ 5K race pace; jog 2 min between",
+      "notes": "VO2max 9 mi w/ 5 x 600 m @ 5K race pace; jog 2 min between"
+    },
+    {
+      "week": 14,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": 20.9215,
+      "pace_description": "Medium-long run 13 mi",
+      "notes": "Medium-long run 13 mi"
+    },
+    {
+      "week": 14,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": 9.6561,
+      "pace_description": "Recovery + speed 6 mi w/ 6 x 100 m strides",
+      "notes": "Recovery + speed 6 mi w/ 6 x 100 m strides"
+    },
+    {
+      "week": 14,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 14,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": 19.3121,
+      "pace_description": "8-15K tune-up race",
+      "notes": "8-15K tune-up race (12 mi total: warm-up + race + cool-down)"
+    },
+    {
+      "week": 14,
+      "day": 7,
+      "workout_type": "long_run",
+      "target_distance_km": 28.9682,
+      "pace_description": "Long run 18 mi",
+      "notes": "Long run 18 mi"
+    },
+    {
+      "week": 15,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "Rest or cross-training"
+    },
+    {
+      "week": 15,
+      "day": 2,
+      "workout_type": "recovery",
+      "target_distance_km": 16.0934,
+      "pace_description": "Recovery 6 mi a.m., 4 mi p.m.",
+      "notes": "Recovery 6 mi a.m., 4 mi p.m."
+    },
+    {
+      "week": 15,
+      "day": 3,
+      "workout_type": "intervals",
+      "target_distance_km": 17.7028,
+      "pace_description": "VO2max 11 mi w/ 6 x 1,200 m @ 5K race pace; jog 2 min between",
+      "notes": "VO2max 11 mi w/ 6 x 1,200 m @ 5K race pace; jog 2 min between"
+    },
+    {
+      "week": 15,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": 22.5308,
+      "pace_description": "Medium-long run 14 mi",
+      "notes": "Medium-long run 14 mi"
+    },
+    {
+      "week": 15,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 12.8748,
+      "pace_description": "General aerobic + speed 8 mi w/ 8 x 100 m strides",
+      "notes": "General aerobic + speed 8 mi w/ 8 x 100 m strides"
+    },
+    {
+      "week": 15,
+      "day": 6,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 15,
+      "day": 7,
+      "workout_type": "long_run",
+      "target_distance_km": 32.1869,
+      "pace_description": "Long run 20 mi",
+      "notes": "Long run 20 mi"
+    },
+    {
+      "week": 16,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "Rest or cross-training"
+    },
+    {
+      "week": 16,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 11.2654,
+      "pace_description": "General aerobic + speed 7 mi w/ 8 x 100 m strides",
+      "notes": "General aerobic + speed 7 mi w/ 8 x 100 m strides"
+    },
+    {
+      "week": 16,
+      "day": 3,
+      "workout_type": "easy",
+      "target_distance_km": 19.3121,
+      "pace_description": "Medium-long run 12 mi",
+      "notes": "Medium-long run 12 mi"
+    },
+    {
+      "week": 16,
+      "day": 4,
+      "workout_type": "easy",
+      "target_distance_km": 9.6561,
+      "pace_description": "Recovery + speed 6 mi w/ 6 x 100 m strides",
+      "notes": "Recovery + speed 6 mi w/ 6 x 100 m strides"
+    },
+    {
+      "week": 16,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 16,
+      "day": 6,
+      "workout_type": "race",
+      "target_distance_km": 14.4841,
+      "pace_description": "8-10K tune-up race",
+      "notes": "8-10K tune-up race (9 mi total: warm-up + race + cool-down)"
+    },
+    {
+      "week": 16,
+      "day": 7,
+      "workout_type": "long_run",
+      "target_distance_km": 27.3588,
+      "pace_description": "Long run 17 mi",
+      "notes": "Long run 17 mi"
+    },
+    {
+      "week": 17,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "Rest or cross-training"
+    },
+    {
+      "week": 17,
+      "day": 2,
+      "workout_type": "easy",
+      "target_distance_km": 12.8748,
+      "pace_description": "General aerobic + speed 8 mi w/ 8 x 100 m strides",
+      "notes": "General aerobic + speed 8 mi w/ 8 x 100 m strides"
+    },
+    {
+      "week": 17,
+      "day": 3,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 17,
+      "day": 4,
+      "workout_type": "intervals",
+      "target_distance_km": 12.8748,
+      "pace_description": "VO2max 8 mi w/ 3 x 1,600 m @ 5K race pace; jog 2 min between",
+      "notes": "VO2max 8 mi w/ 3 x 1,600 m @ 5K race pace; jog 2 min between"
+    },
+    {
+      "week": 17,
+      "day": 5,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 17,
+      "day": 6,
+      "workout_type": "easy",
+      "target_distance_km": 11.2654,
+      "pace_description": "General aerobic + speed 7 mi w/ 8 x 100 m strides",
+      "notes": "General aerobic + speed 7 mi w/ 8 x 100 m strides"
+    },
+    {
+      "week": 17,
+      "day": 7,
+      "workout_type": "easy",
+      "target_distance_km": 20.9215,
+      "pace_description": "Medium-long run 13 mi",
+      "notes": "Medium-long run 13 mi"
+    },
+    {
+      "week": 18,
+      "day": 1,
+      "workout_type": "rest",
+      "target_distance_km": null,
+      "pace_description": "rest",
+      "notes": "Rest"
+    },
+    {
+      "week": 18,
+      "day": 2,
+      "workout_type": "recovery",
+      "target_distance_km": 14.4841,
+      "pace_description": "Recovery 5 mi a.m., 4 mi p.m.",
+      "notes": "Recovery 5 mi a.m., 4 mi p.m."
+    },
+    {
+      "week": 18,
+      "day": 3,
+      "workout_type": "tempo",
+      "target_distance_km": 11.2654,
+      "pace_description": "Dress rehearsal 7 mi w/ 2 mi @ marathon race pace",
+      "notes": "Dress rehearsal 7 mi w/ 2 mi @ marathon race pace"
+    },
+    {
+      "week": 18,
+      "day": 4,
+      "workout_type": "recovery",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery 5 mi",
+      "notes": "Recovery 5 mi"
+    },
+    {
+      "week": 18,
+      "day": 5,
+      "workout_type": "easy",
+      "target_distance_km": 8.0467,
+      "pace_description": "Recovery + speed 5 mi w/ 6 x 100 m strides",
+      "notes": "Recovery + speed 5 mi w/ 6 x 100 m strides"
+    },
+    {
+      "week": 18,
+      "day": 6,
+      "workout_type": "recovery",
+      "target_distance_km": 6.4374,
+      "pace_description": "Recovery 4 mi",
+      "notes": "Recovery 4 mi"
+    },
+    {
+      "week": 18,
+      "day": 7,
+      "workout_type": "race",
+      "target_distance_km": 42.1648,
+      "pace_description": "Goal marathon",
+      "notes": "Goal marathon \u2014 race day!"
+    }
+  ]
+}

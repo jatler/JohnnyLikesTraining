@@ -1,9 +1,9 @@
 {
   "id": "swap_50mile_12w",
-  "name": "SWAP 50MILE Plan (12 weeks)",
+  "name": "50 Mile Plan (12 weeks)",
   "author": "David Roche & Megan Roche, MD PhD",
-  "source": "SWAP Running",
-  "description": "Bundled training plan imported from SWAP_Plans PDF templates.",
+  "source": "Coach-provided PDF",
+  "description": "Bundled training plan from coach-provided PDF templates.",
   "duration_weeks": 12,
   "target_distances": [
     "50M"
@@ -23,7 +23,7 @@
       "workout_type": "easy",
       "target_distance_km": 10.4585,
       "pace_description": "3-10 mi easy",
-      "notes": "3-10 mi easy. Easy runs just mean relaxed, fun, mini adventures! Can be around the block or on trails or anything fun. High end of range is for very advanced athletes who are adapted to higher volume! Don’t overdo it. Mtn legs"
+      "notes": "3-10 mi easy. Easy runs just mean relaxed, fun, mini adventures! Can be around the block or on trails or anything fun. High end of range is for very advanced athletes who are adapted to higher volume! Don\u2019t overdo it. Mtn legs"
     },
     {
       "week": 1,
@@ -31,7 +31,7 @@
       "workout_type": "easy",
       "target_distance_km": 12.872,
       "pace_description": null,
-      "notes": "4-12 mi easy or cross train 60-90 min. Cross train can be bike, hike, ski, or anything else, with the time being flexible. Hiking in particular is an opportunity to improve ultra potential. Keep it mostly easy, but it’s ok to push some climbs and have fun!"
+      "notes": "4-12 mi easy or cross train 60-90 min. Cross train can be bike, hike, ski, or anything else, with the time being flexible. Hiking in particular is an opportunity to improve ultra potential. Keep it mostly easy, but it\u2019s ok to push some climbs and have fun!"
     },
     {
       "week": 1,
@@ -55,7 +55,7 @@
       "workout_type": "long_run",
       "target_distance_km": 18.5035,
       "pace_description": "8-15 miles easy on trails",
-      "notes": "8-15 miles easy on trails. Vert is helpful to prepare for ultras, but don’t chase vert at the expense of all else. Later on, vert will be more important if you have access where you live. Hike with purpose when needed!"
+      "notes": "8-15 miles easy on trails. Vert is helpful to prepare for ultras, but don\u2019t chase vert at the expense of all else. Later on, vert will be more important if you have access where you live. Hike with purpose when needed!"
     },
     {
       "week": 1,
@@ -79,7 +79,7 @@
       "workout_type": "easy",
       "target_distance_km": null,
       "pace_description": null,
-      "notes": "4-10 mi easy with 5 x 30 sec hills. All easy runs can be on any terrain you like, and as you get confident, you can even end them with steady running. On the hill strides, think powerful and fast on a 6-8% grade ideally--you’ll be winded at the top. Embrace your athletic self! Can do strides anytime after halfway of the run."
+      "notes": "4-10 mi easy with 5 x 30 sec hills. All easy runs can be on any terrain you like, and as you get confident, you can even end them with steady running. On the hill strides, think powerful and fast on a 6-8% grade ideally--you\u2019ll be winded at the top. Embrace your athletic self! Can do strides anytime after halfway of the run."
     },
     {
       "week": 2,

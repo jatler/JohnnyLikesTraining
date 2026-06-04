@@ -6,60 +6,30 @@ final class PlanTemplateService {
 
     private init() {}
 
-    /// Single "intro" plan shown when the Patreon toggle is on — a public-
-    /// facing teaser so the picker shows one clean starter plan.
-    private let introTemplateIDs: [String] = [
-        "swap_6_week_6w"
-    ]
-
-    /// Default tier shown when the Patreon toggle is off. Three reviewed
-    /// dogfood plans.
-    private let freeTemplateIDs: [String] = [
+    /// Ordered catalog of bundled plan IDs. The picker shows them in this order.
+    private let templateIDs: [String] = [
         "swap_6_week_6w",
         "swap_base_building_12w",
-        "champion_100k"
-    ]
-
-    /// Plans bundled for a future patron-unlock surface. Currently unused
-    /// by any tier — reserved for when the Patreon catalog ships.
-    private let patronOnlyTemplateIDs: [String] = [
+        "champion_100k",
         "swap_marathon_8w",
         "swap_50k_12w",
         "swap_50mile_12w",
         "swap_100k_16w",
         "swap_100mile_12w",
         "swap_lower_volume_ultra_12w",
-        "swap_200_mile_16w"
+        "swap_200_mile_16w",
+        "pfitz_advanced_marathon_18w_55",
+        "pfitz_advanced_marathon_18w_70"
     ]
 
     // MARK: - Available Templates
 
-    /// Picker tiers. Pickers compute their tier from Patreon state and
-    /// ask the service for the matching ordered template list.
-    enum Tier {
-        case introOnly  // Patreon toggle ON: single intro plan
-        case free       // Patreon toggle OFF: the 3 dogfood plans
-        case full       // free + patron-only (reserved, not currently surfaced)
-    }
-
-    func availableTemplates(tier: Tier) -> [TrainingPlanTemplate] {
-        let ids: [String]
-        switch tier {
-        case .introOnly: ids = introTemplateIDs
-        case .free:      ids = freeTemplateIDs
-        case .full:      ids = freeTemplateIDs + patronOnlyTemplateIDs
-        }
-        return ids.compactMap { bundledTemplates[$0] }
-    }
-
-    /// True if this template is gated behind a Patreon membership.
-    func isPatronOnly(_ template: TrainingPlanTemplate) -> Bool {
-        patronOnlyTemplateIDs.contains(template.id)
+    func availableTemplates() -> [TrainingPlanTemplate] {
+        templateIDs.compactMap { bundledTemplates[$0] }
     }
 
     /// Lookup by ID across the full catalog. Used when restoring an active
-    /// plan's template — a plan created when the user was a patron must
-    /// still resolve its template even if Patreon access has since lapsed.
+    /// plan's template.
     func template(withId id: String) -> TrainingPlanTemplate? {
         bundledTemplates[id]
     }
@@ -67,7 +37,7 @@ final class PlanTemplateService {
     private lazy var bundledTemplates: [String: TrainingPlanTemplate] = loadBundledTemplates()
 
     private func loadBundledTemplates() -> [String: TrainingPlanTemplate] {
-        let enabled = Set(freeTemplateIDs + patronOnlyTemplateIDs)
+        let enabled = Set(templateIDs)
         let paths = Bundle.main.paths(forResourcesOfType: "json", inDirectory: nil)
         var byID: [String: TrainingPlanTemplate] = [:]
 

@@ -1,8 +1,8 @@
 {
   "id": "swap_base_building_12w",
-  "name": "SWAP Base Building Plan (12 weeks)",
+  "name": "Base Building Plan (12 weeks)",
   "author": "David Roche & Megan Roche, MD PhD",
-  "source": "SWAP Running",
+  "source": "Coach-provided PDF",
   "description": "A 12-week aerobic base-building plan. Builds weekly volume on easy effort, layers in hill strides for neuromuscular work, and progressively extends the long run while holding overall intensity low. Best as the foundation before a race-specific block or as an off-season rebuild.",
   "duration_weeks": 12,
   "target_distances": [
@@ -143,7 +143,7 @@
       "workout_type": "intervals",
       "target_distance_km": 8.045,
       "pace_description": null,
-      "notes": "2-3 mi easy warm-up, 16 x 1 min fast/1 min easy (think 10k effort to start, progressing to faster effort as you go, with the easy recoveries as “floats” where you go slightly above easy), 4 min easy, 4 x 30 sec hills fast, 2-3 mi easy. Quick speed rebuild to start plan, true aerobic building starts now! Optional easy double or x-train"
+      "notes": "2-3 mi easy warm-up, 16 x 1 min fast/1 min easy (think 10k effort to start, progressing to faster effort as you go, with the easy recoveries as \u201cfloats\u201d where you go slightly above easy), 4 min easy, 4 x 30 sec hills fast, 2-3 mi easy. Quick speed rebuild to start plan, true aerobic building starts now! Optional easy double or x-train"
     },
     {
       "week": 3,
@@ -199,7 +199,7 @@
       "workout_type": "tempo",
       "target_distance_km": 14.481,
       "pace_description": null,
-      "notes": "6-12 mi easy/mod to mod, ideally over hills. On this run, start very relaxed, and after 20-30 min, pick up the effort to Zone 2/3 in a 5-Zone model.Don’t go too hard! No double or x-train this week"
+      "notes": "6-12 mi easy/mod to mod, ideally over hills. On this run, start very relaxed, and after 20-30 min, pick up the effort to Zone 2/3 in a 5-Zone model.Don\u2019t go too hard! No double or x-train this week"
     },
     {
       "week": 4,
@@ -311,7 +311,7 @@
       "workout_type": "easy",
       "target_distance_km": 8.045,
       "pace_description": null,
-      "notes": "2-3 mi easy, 4-6 x 5 min at half marathon effort with 2 min easy recovery, 4 x 30 sec hills fast, 2-3 mi easy. Key to avoid “burning” on these intervals, think Zone 3 to lower Zone 4 in 5-Zone model Optional easy double or x-train"
+      "notes": "2-3 mi easy, 4-6 x 5 min at half marathon effort with 2 min easy recovery, 4 x 30 sec hills fast, 2-3 mi easy. Key to avoid \u201cburning\u201d on these intervals, think Zone 3 to lower Zone 4 in 5-Zone model Optional easy double or x-train"
     },
     {
       "week": 6,

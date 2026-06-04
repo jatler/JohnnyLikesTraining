@@ -1,9 +1,9 @@
 {
   "id": "swap_6_week_6w",
-  "name": "SWAP 6-Week Plan (6 weeks)",
+  "name": "Trail Base Plan (6 weeks)",
   "author": "David Roche & Megan Roche, MD PhD",
-  "source": "SWAP Running",
-  "description": "A 6-week build and sharpening cycle for athletes with an existing aerobic base. Mixes hill strides, short hill repeats at 5K effort, and fartlek-style intervals with trail long runs that build to 8–16 miles. Good as a focused tune-up before a race or as a bridge between training blocks.",
+  "source": "Coach-provided PDF",
+  "description": "A 6-week build and sharpening cycle for athletes with an existing aerobic base. Mixes hill strides, short hill repeats at 5K effort, and fartlek-style intervals with trail long runs that build to 8\u201316 miles. Good as a focused tune-up before a race or as a bridge between training blocks.",
   "duration_weeks": 6,
   "target_distances": [
     "Build phase"

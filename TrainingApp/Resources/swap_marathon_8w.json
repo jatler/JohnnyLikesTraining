@@ -1,9 +1,9 @@
 {
   "id": "swap_marathon_8w",
-  "name": "SWAP Marathon Plan (8 weeks)",
+  "name": "Marathon Plan (8 weeks)",
   "author": "David Roche & Megan Roche, MD PhD",
-  "source": "SWAP Running",
-  "description": "Bundled training plan imported from SWAP_Plans PDF templates.",
+  "source": "Coach-provided PDF",
+  "description": "Bundled training plan from coach-provided PDF templates.",
   "duration_weeks": 8,
   "target_distances": [
     "Marathon"
@@ -55,7 +55,7 @@
       "workout_type": "long_run",
       "target_distance_km": 24.134999999999998,
       "pace_description": "12-18 mi easy/mod (20 min at M effort)",
-      "notes": "12-18 mi easy/mod (20 min at M effort). Easy/mod long runs allow athletes to pick up the pace to steady running if they feel good. This first M effort tempo is designed to be controlled. When the plan says “M effort,” it means to run on feel, rather than pace, since most trail runners will not specifically have their goal paces dialed in at the start of a short build. The plan switches to pace in the final few weeks!"
+      "notes": "12-18 mi easy/mod (20 min at M effort). Easy/mod long runs allow athletes to pick up the pace to steady running if they feel good. This first M effort tempo is designed to be controlled. When the plan says \u201cM effort,\u201d it means to run on feel, rather than pace, since most trail runners will not specifically have their goal paces dialed in at the start of a short build. The plan switches to pace in the final few weeks!"
     },
     {
       "week": 1,
@@ -311,7 +311,7 @@
       "workout_type": "easy",
       "target_distance_km": null,
       "pace_description": null,
-      "notes": "2-3 mi easy, 10k hard, 2-3 mi easy. Treat this like a little race simulation, and you can even do it on a net downhill of 100-250 ft. Plug it into an online calculator for pacing guidance! If you’re lower volume or more prone to fades, go a bit easier than calculator suggests for M pace workouts and race. Can also do a road race in place of a long run on a preceding week. Optional easy double Mtn legs"
+      "notes": "2-3 mi easy, 10k hard, 2-3 mi easy. Treat this like a little race simulation, and you can even do it on a net downhill of 100-250 ft. Plug it into an online calculator for pacing guidance! If you\u2019re lower volume or more prone to fades, go a bit easier than calculator suggests for M pace workouts and race. Can also do a road race in place of a long run on a preceding week. Optional easy double Mtn legs"
     },
     {
       "week": 6,

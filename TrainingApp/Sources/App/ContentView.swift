@@ -2,6 +2,11 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(AuthService.self) private var auth
+    @Environment(TrainingPlanStore.self) private var planStore
+    @Environment(StrengthStore.self) private var screenshotStrengthStore
+    @Environment(HeatStore.self) private var screenshotHeatStore
+    @Environment(StretchStore.self) private var screenshotStretchStore
+    @Environment(StravaService.self) private var screenshotStrava
 
     var body: some View {
         Group {
@@ -14,6 +19,23 @@ struct ContentView: View {
             }
         }
         .animation(.easeOut(duration: 0.3), value: auth.isAuthenticated)
+        .onAppear {
+            #if DEBUG
+            if ScreenshotMode.isEnabled {
+                if !auth.isAuthenticated { auth.devSignIn() }
+                if let userId = auth.currentUserId {
+                    ScreenshotMode.seedPlan(
+                        planStore: planStore,
+                        strengthStore: screenshotStrengthStore,
+                        heatStore: screenshotHeatStore,
+                        stretchStore: screenshotStretchStore,
+                        strava: screenshotStrava,
+                        userId: userId
+                    )
+                }
+            }
+            #endif
+        }
     }
 }
 
@@ -22,24 +44,35 @@ struct MainTabView: View {
     @Environment(TrainingPlanStore.self) private var planStore
     @Environment(StravaService.self) private var strava
     @Environment(OuraService.self) private var oura
-    @Environment(PatreonService.self) private var patreon
     @Environment(StrengthStore.self) private var strengthStore
     @Environment(HeatStore.self) private var heatStore
     @Environment(StretchStore.self) private var stretchStore
 
+    @State private var selectedTab: AppTab = {
+        #if DEBUG
+        ScreenshotMode.isEnabled ? ScreenshotMode.initialTab : .week
+        #else
+        .week
+        #endif
+    }()
+
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             WeekView()
                 .tabItem { Label("Week", systemImage: "calendar") }
+                .tag(AppTab.week)
 
             ProgressDashboardView()
                 .tabItem { Label("Progress", systemImage: "chart.bar.fill") }
+                .tag(AppTab.progress)
 
             StrengthTemplateView()
                 .tabItem { Label("Strength", systemImage: "dumbbell.fill") }
+                .tag(AppTab.strength)
 
             SettingsView()
                 .tabItem { Label("Settings", systemImage: "gearshape") }
+                .tag(AppTab.settings)
         }
         .tint(Color.trailGreen)
         .task {
@@ -50,13 +83,6 @@ struct MainTabView: View {
             await auth.refreshIfNeeded()
 
             guard let userId = auth.currentUserId else { return }
-
-            // Refresh patron status if the cached verification is older than
-            // 7 days. Without this the gate would never re-evaluate after a
-            // membership lapse until the user manually disconnected.
-            if patreon.isConnected {
-                try? await patreon.verifyMembershipIfStale()
-            }
 
             if !planStore.hasPlan {
                 await planStore.loadPlan(userId: userId)
@@ -155,7 +181,6 @@ struct MainTabView: View {
         .environment(TrainingPlanStore())
         .environment(StravaService())
         .environment(OuraService())
-        .environment(PatreonService())
         .environment(StrengthStore())
         .environment(HeatStore())
         .environment(StretchStore())

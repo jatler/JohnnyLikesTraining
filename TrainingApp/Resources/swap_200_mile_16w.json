@@ -1,9 +1,9 @@
 {
   "id": "swap_200_mile_16w",
-  "name": "SWAP 200 Mile Plan (16 weeks)",
+  "name": "200 Mile Plan (16 weeks)",
   "author": "David Roche & Megan Roche, MD PhD",
-  "source": "SWAP Running",
-  "description": "Bundled training plan imported from SWAP_Plans PDF templates.",
+  "source": "Coach-provided PDF",
+  "description": "Bundled training plan from coach-provided PDF templates.",
   "duration_weeks": 16,
   "target_distances": [
     "200M"
@@ -31,7 +31,7 @@
       "workout_type": "intervals",
       "target_distance_km": 8.045,
       "pace_description": null,
-      "notes": "2-3 miles easy warm-up, 6 x 2 min hills at 5k effort, 4 x 1 min hills at 5k effort, 2-3 miles easy. Muscle power is the first focus! PM: Optional 20-40 min treadhill—10-15% grade hike/run. Anytime “treadhill” is noted, you can run or x-train instead if no treadmill access (all doubles 20- 40 min unless otherwise noted) Mountain legs"
+      "notes": "2-3 miles easy warm-up, 6 x 2 min hills at 5k effort, 4 x 1 min hills at 5k effort, 2-3 miles easy. Muscle power is the first focus! PM: Optional 20-40 min treadhill\u201410-15% grade hike/run. Anytime \u201ctreadhill\u201d is noted, you can run or x-train instead if no treadmill access (all doubles 20- 40 min unless otherwise noted) Mountain legs"
     },
     {
       "week": 1,
@@ -39,7 +39,7 @@
       "workout_type": "easy",
       "target_distance_km": 9.654,
       "pace_description": null,
-      "notes": "4-8 miles easy or optional x- train. Can sub in x-train on any day as things build—for 200s, it’s much less important to focus on running economy, but we still want to promote long- term growth. Be very flexible based on how you feel! Speed legs"
+      "notes": "4-8 miles easy or optional x- train. Can sub in x-train on any day as things build\u2014for 200s, it\u2019s much less important to focus on running economy, but we still want to promote long- term growth. Be very flexible based on how you feel! Speed legs"
     },
     {
       "week": 1,
@@ -55,7 +55,7 @@
       "workout_type": "long_run",
       "target_distance_km": 19.308,
       "pace_description": "10-14 miles easy",
-      "notes": "10-14 miles easy. Ideally long runs are on fun trails, and it’s even better if you have some vert for musculoskeletal strength! Mountain legs"
+      "notes": "10-14 miles easy. Ideally long runs are on fun trails, and it\u2019s even better if you have some vert for musculoskeletal strength! Mountain legs"
     },
     {
       "week": 1,
@@ -206,8 +206,8 @@
       "day": 4,
       "workout_type": "easy",
       "target_distance_km": 12.067499999999999,
-      "pace_description": "5-10 miles easy Optional easy double—a relaxed jog or hike",
-      "notes": "5-10 miles easy Optional easy double—a relaxed jog or hike. Fast hikes are great training too! Speed legs"
+      "pace_description": "5-10 miles easy Optional easy double\u2014a relaxed jog or hike",
+      "notes": "5-10 miles easy Optional easy double\u2014a relaxed jog or hike. Fast hikes are great training too! Speed legs"
     },
     {
       "week": 4,
@@ -255,7 +255,7 @@
       "workout_type": "intervals",
       "target_distance_km": 4.0225,
       "pace_description": "2-3 miles easy, 4 x 5 min mod/hard around 10k effort with 2",
-      "notes": "2-3 miles easy, 4 x 5 min mod/hard around 10k effort with 2 min easy recovery, 4 min easy, 4 x 1 min hills around 5k effort, 2 miles easy. These first longer intervals may feel weird at first, don’t overdo it! Building this speed will make all paces easier on the body later. Optional treadhill or double Mountain legs"
+      "notes": "2-3 miles easy, 4 x 5 min mod/hard around 10k effort with 2 min easy recovery, 4 min easy, 4 x 1 min hills around 5k effort, 2 miles easy. These first longer intervals may feel weird at first, don\u2019t overdo it! Building this speed will make all paces easier on the body later. Optional treadhill or double Mountain legs"
     },
     {
       "week": 5,
@@ -367,7 +367,7 @@
       "workout_type": "tempo",
       "target_distance_km": 4.0225,
       "pace_description": "2-3 miles easy, 3 x 8 min around 1-hour effort with 3 min",
-      "notes": "2-3 miles easy, 3 x 8 min around 1-hour effort with 3 min easy recovery, 6 x 1 min around 10k effort with 30 sec easy recovery, 2 miles easy. Working on threshold now, which relies on previous workouts, and will fuel future workouts! It’s all building on itself woohoo! Optional treadhill or double with 2nd half faster Mountain legs"
+      "notes": "2-3 miles easy, 3 x 8 min around 1-hour effort with 3 min easy recovery, 6 x 1 min around 10k effort with 30 sec easy recovery, 2 miles easy. Working on threshold now, which relies on previous workouts, and will fuel future workouts! It\u2019s all building on itself woohoo! Optional treadhill or double with 2nd half faster Mountain legs"
     },
     {
       "week": 7,
@@ -615,7 +615,7 @@
       "workout_type": "long_run",
       "target_distance_km": null,
       "pace_description": null,
-      "notes": "50k moderate. 5 weeks out, view this almost like a shorter race—run in a focused way, aiming to get to the end fatigued. An advanced athlete could do a training race like a 50 miler or even 100k!"
+      "notes": "50k moderate. 5 weeks out, view this almost like a shorter race\u2014run in a focused way, aiming to get to the end fatigued. An advanced athlete could do a training race like a 50 miler or even 100k!"
     },
     {
       "week": 11,
@@ -791,7 +791,7 @@
       "workout_type": "easy",
       "target_distance_km": null,
       "pace_description": null,
-      "notes": "8-14 miles easy run/hike. Ideally around race effort—getting a feel for how you are going to approach the day."
+      "notes": "8-14 miles easy run/hike. Ideally around race effort\u2014getting a feel for how you are going to approach the day."
     },
     {
       "week": 15,

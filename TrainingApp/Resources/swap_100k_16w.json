@@ -1,9 +1,9 @@
 {
   "id": "swap_100k_16w",
-  "name": "SWAP 100K Plan (16 weeks)",
+  "name": "100K Plan (16 weeks)",
   "author": "David Roche & Megan Roche, MD PhD",
-  "source": "SWAP Running",
-  "description": "Bundled training plan imported from SWAP_Plans PDF templates.",
+  "source": "Coach-provided PDF",
+  "description": "Bundled training plan from coach-provided PDF templates.",
   "duration_weeks": 16,
   "target_distances": [
     "100K"
@@ -23,7 +23,7 @@
       "workout_type": "easy",
       "target_distance_km": 14.481,
       "pace_description": "6-12 miles easy plus 6 x 20 second hills fast",
-      "notes": "6-12 miles easy plus 6 x 20 second hills fast. On easy running, think smooth, relaxed, and light on feet. Ideally Z1/Z2, but it’s ok for HR to get higher on ups. Do easy runs by effort, and it’s ok to flow when it flows! On the hill strides, do them anytime after halfway, easing into them to avoid a pulled muscle, but you can push as fast as you can go without using sprinting form. Jog down the hill for recovery. If you have a treadmill, you can add 10-15 minutes on the uphill treadmill after any run at 10-15% grade for fatigue resistance! That can be weight vest hiking as well. Do the Core Snack routine 1-2 times every day!"
+      "notes": "6-12 miles easy plus 6 x 20 second hills fast. On easy running, think smooth, relaxed, and light on feet. Ideally Z1/Z2, but it\u2019s ok for HR to get higher on ups. Do easy runs by effort, and it\u2019s ok to flow when it flows! On the hill strides, do them anytime after halfway, easing into them to avoid a pulled muscle, but you can push as fast as you can go without using sprinting form. Jog down the hill for recovery. If you have a treadmill, you can add 10-15 minutes on the uphill treadmill after any run at 10-15% grade for fatigue resistance! That can be weight vest hiking as well. Do the Core Snack routine 1-2 times every day!"
     },
     {
       "week": 1,
@@ -55,7 +55,7 @@
       "workout_type": "long_run",
       "target_distance_km": 20.917,
       "pace_description": "10-16 miles easy/mod, progressing to steady effort",
-      "notes": "10-16 miles easy/mod, progressing to steady effort. On these easy/mod runs, it’s ok to let effort wander up. Practice fueling with plenty of carbs and hydration! Some vert is good, but choose whatever route seems most fun to you Ideally do your long runs on terrain with some climbing and descending! Vert is your friend, and vert is more important than mileage in most cases (even high volume athletes can prioritize shorter runs with vert). Think quick feet on the downhills, using every downhill as an opportunity to work on that skill. Mountain Legs"
+      "notes": "10-16 miles easy/mod, progressing to steady effort. On these easy/mod runs, it\u2019s ok to let effort wander up. Practice fueling with plenty of carbs and hydration! Some vert is good, but choose whatever route seems most fun to you Ideally do your long runs on terrain with some climbing and descending! Vert is your friend, and vert is more important than mileage in most cases (even high volume athletes can prioritize shorter runs with vert). Think quick feet on the downhills, using every downhill as an opportunity to work on that skill. Mountain Legs"
     },
     {
       "week": 1,
@@ -135,7 +135,7 @@
       "workout_type": "intervals",
       "target_distance_km": 7.2405,
       "pace_description": null,
-      "notes": "2-4 miles easy warm-up, 2-3 x (4 x 2 min fast/1 min easy) with 2 min easy between sets (think 10k to 5k effort), 2 miles moderate (think marathon), 1-2 miles easy. Really big and hard session! For the big workouts, there is a range of sets so that lower volume athletes don’t overdo it. Remember, the goal is not to go as hard or fast as you can, but to run smoothly and finish feeling strong! Always err on the side of less intensity, since health and the daily aerobic work is most important for long-term growth. Optional easy double or x-train Mountain Legs"
+      "notes": "2-4 miles easy warm-up, 2-3 x (4 x 2 min fast/1 min easy) with 2 min easy between sets (think 10k to 5k effort), 2 miles moderate (think marathon), 1-2 miles easy. Really big and hard session! For the big workouts, there is a range of sets so that lower volume athletes don\u2019t overdo it. Remember, the goal is not to go as hard or fast as you can, but to run smoothly and finish feeling strong! Always err on the side of less intensity, since health and the daily aerobic work is most important for long-term growth. Optional easy double or x-train Mountain Legs"
     },
     {
       "week": 3,
@@ -207,7 +207,7 @@
       "workout_type": "cross_train",
       "target_distance_km": null,
       "pace_description": "1-2 hours easy x-train",
-      "notes": "1-2 hours easy x-train. Make sure this is quality Z2 if you’re doing a non-impact activity like cycling. Now would be a great time to work on"
+      "notes": "1-2 hours easy x-train. Make sure this is quality Z2 if you\u2019re doing a non-impact activity like cycling. Now would be a great time to work on"
     },
     {
       "week": 4,
@@ -255,7 +255,7 @@
       "workout_type": "intervals",
       "target_distance_km": 8.045,
       "pace_description": null,
-      "notes": "2-3 miles easy warm-up, 3-5 x 800/400/200 fast on the track with 400 easy after 8s, 200 after 4s, 400 after 2s (think 10k/5k/3k effort on the intervals), 4 x 200 fast/200 slow (push), 2-3 miles easy cool-down. First track workout! If you don’t want to go to the track, do 3-4 x 3/2/1 min fast with 1 min easy between intervals and 3 min easy between sets (think 10k/5k/3k effort), plus 4 x 30 seconds fast/90 seconds easy (push). Track workout helps solidify speed gains! Optional easy double or x-train Mountain Legs"
+      "notes": "2-3 miles easy warm-up, 3-5 x 800/400/200 fast on the track with 400 easy after 8s, 200 after 4s, 400 after 2s (think 10k/5k/3k effort on the intervals), 4 x 200 fast/200 slow (push), 2-3 miles easy cool-down. First track workout! If you don\u2019t want to go to the track, do 3-4 x 3/2/1 min fast with 1 min easy between intervals and 3 min easy between sets (think 10k/5k/3k effort), plus 4 x 30 seconds fast/90 seconds easy (push). Track workout helps solidify speed gains! Optional easy double or x-train Mountain Legs"
     },
     {
       "week": 5,
@@ -335,7 +335,7 @@
       "workout_type": "long_run",
       "target_distance_km": null,
       "pace_description": null,
-      "notes": "10-16 miles easy over hills. Pure aerobic day! Let’s have this weekend be nice and relaxed! If your race has a ton of vert, now is a great time to start focusing on vert profiles like the race. Mountain Legs"
+      "notes": "10-16 miles easy over hills. Pure aerobic day! Let\u2019s have this weekend be nice and relaxed! If your race has a ton of vert, now is a great time to start focusing on vert profiles like the race. Mountain Legs"
     },
     {
       "week": 6,
@@ -447,7 +447,7 @@
       "workout_type": "long_run",
       "target_distance_km": 36.2025,
       "pace_description": "20-25 miles easy/mod with some very fast downhills on steep",
-      "notes": "20-25 miles easy/mod with some very fast downhills on steep terrain, plus 5 min harder near the end on an uphill. Aim to get sore from this one, dialing in eccentric muscle contractions that will be good for durability. If you’re doing major vert, even advanced athletes can be at the low end of the range Mountain Legs"
+      "notes": "20-25 miles easy/mod with some very fast downhills on steep terrain, plus 5 min harder near the end on an uphill. Aim to get sore from this one, dialing in eccentric muscle contractions that will be good for durability. If you\u2019re doing major vert, even advanced athletes can be at the low end of the range Mountain Legs"
     },
     {
       "week": 8,
@@ -471,7 +471,7 @@
       "workout_type": "easy",
       "target_distance_km": 17.698999999999998,
       "pace_description": "8-14 miles easy with 5 x 20 seconds fast/2 min easy",
-      "notes": "8-14 miles easy with 5 x 20 seconds fast/2 min easy. Dial back volume this week if you’re feeling beat up at all--we’re trying to have a slight overreach here for adaptation on the down week next week!"
+      "notes": "8-14 miles easy with 5 x 20 seconds fast/2 min easy. Dial back volume this week if you\u2019re feeling beat up at all--we\u2019re trying to have a slight overreach here for adaptation on the down week next week!"
     },
     {
       "week": 9,
@@ -559,7 +559,7 @@
       "workout_type": "long_run",
       "target_distance_km": 80.45,
       "pace_description": null,
-      "notes": "BIG DAY!!!! This can be a marathon, 50k, or even 50 mile race. If no racing, aim for a moderate 50k on terrain like the race, pushing moderately hard and with full fueling approach. You can move this backward to 8-10 weeks pre-race if there’s a race or 100k, just move around weeks accordingly. Goal: get very sore! Weeks 10 and 11 can be moved to accommodate a training race"
+      "notes": "BIG DAY!!!! This can be a marathon, 50k, or even 50 mile race. If no racing, aim for a moderate 50k on terrain like the race, pushing moderately hard and with full fueling approach. You can move this backward to 8-10 weeks pre-race if there\u2019s a race or 100k, just move around weeks accordingly. Goal: get very sore! Weeks 10 and 11 can be moved to accommodate a training race"
     },
     {
       "week": 10,
@@ -591,7 +591,7 @@
       "workout_type": "easy",
       "target_distance_km": null,
       "pace_description": null,
-      "notes": "4-10 miles easy. Really ease back in! Now is when to start focused heat suit training if your race might be very hot and you aren’t running in that type of heat consistently. In that case, aim for 2 x 30-60 minutes with a heat suit each week within the context of training, keeping heart rate in Z2 or easier. Don’t fry yourself! Heat suit could be on doubles or replacing some easy running."
+      "notes": "4-10 miles easy. Really ease back in! Now is when to start focused heat suit training if your race might be very hot and you aren\u2019t running in that type of heat consistently. In that case, aim for 2 x 30-60 minutes with a heat suit each week within the context of training, keeping heart rate in Z2 or easier. Don\u2019t fry yourself! Heat suit could be on doubles or replacing some easy running."
     },
     {
       "week": 11,
@@ -671,7 +671,7 @@
       "workout_type": "long_run",
       "target_distance_km": null,
       "pace_description": null,
-      "notes": "16-20 mi easy/mod with 20 min mod/hard, pushing a bit as you go. Fuel this just like race day or even more! Let’s start really gut training, particularly with"
+      "notes": "16-20 mi easy/mod with 20 min mod/hard, pushing a bit as you go. Fuel this just like race day or even more! Let\u2019s start really gut training, particularly with"
     },
     {
       "week": 12,
@@ -751,7 +751,7 @@
       "workout_type": "intervals",
       "target_distance_km": null,
       "pace_description": null,
-      "notes": "Uphill treadmill at 8-10% ideal, though this workout can also be done outside! 15-20 min easy warm-up, 8-12 x 5 min around 1-hour effort with 1 min easy recovery after each, 15-20 min easy cooldown. This is a big one, embrace the space! If you’re outside, something like 5-8 x 5 min hills would be ideal, stepping up from"
+      "notes": "Uphill treadmill at 8-10% ideal, though this workout can also be done outside! 15-20 min easy warm-up, 8-12 x 5 min around 1-hour effort with 1 min easy recovery after each, 15-20 min easy cooldown. This is a big one, embrace the space! If you\u2019re outside, something like 5-8 x 5 min hills would be ideal, stepping up from"
     },
     {
       "week": 14,
@@ -783,7 +783,7 @@
       "workout_type": "long_run",
       "target_distance_km": 25.744,
       "pace_description": "14-18 mi easy/mod to moderate (60-90 min mod/hard, just a",
-      "notes": "14-18 mi easy/mod to moderate (60-90 min mod/hard, just a nice effort to really open up the nervous system!) Only go beyond 1 hour if you’re high volume, feeling great, and recovering well. However, if you are feeling too tired, now is the time to dial back more"
+      "notes": "14-18 mi easy/mod to moderate (60-90 min mod/hard, just a nice effort to really open up the nervous system!) Only go beyond 1 hour if you\u2019re high volume, feeling great, and recovering well. However, if you are feeling too tired, now is the time to dial back more"
     },
     {
       "week": 14,
@@ -887,7 +887,7 @@
       "workout_type": "easy",
       "target_distance_km": 7.2405,
       "pace_description": "3-6 miles easy to steady plus 4 x 30 sec light hills around",
-      "notes": "3-6 miles easy to steady plus 4 x 30 sec light hills around 3k/5k effort. Z2 running ideal for tune-up. HR will be jumpy and that’s ok!"
+      "notes": "3-6 miles easy to steady plus 4 x 30 sec light hills around 3k/5k effort. Z2 running ideal for tune-up. HR will be jumpy and that\u2019s ok!"
     },
     {
       "week": 16,
