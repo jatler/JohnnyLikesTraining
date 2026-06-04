@@ -20,7 +20,7 @@ struct SignInView: View {
                     .minimumScaleFactor(0.7)
                     .padding(.horizontal, 16)
 
-                Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.1.1")")
+                Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.2.0")")
                     .font(TrailFont.body)
                     .foregroundStyle(.secondary)
             }

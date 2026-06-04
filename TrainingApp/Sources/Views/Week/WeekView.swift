@@ -332,7 +332,7 @@ struct WeekView: View {
                         Text("Happy Tuesday! It's Tuesday!")
                             .font(TrailFont.body)
                             .foregroundStyle(.primary)
-                        Text("Listen to the latest podcast")
+                        Text("Listen to the latest SWAP podcast")
                             .font(TrailFont.meta)
                             .foregroundStyle(.secondary)
                     }
