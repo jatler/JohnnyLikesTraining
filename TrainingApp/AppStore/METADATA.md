@@ -1,4 +1,4 @@
-# App Store Connect — Submission Sheet (v1.2.0, build 17)
+# App Store Connect — Submission Sheet (v1.2.1, build 18)
 
 Copy each field straight into App Store Connect. Character limits noted.
 
@@ -82,11 +82,13 @@ ultrarunning,trail,running,coach,strava,oura,marathon,100k,training plan,swap,ro
 
 ### What's New in This Version (4000 char)
 ```
-v1.2.0
-• Two new 18-week marathon plans — Pete Pfitzinger's Advanced Marathoning 55mi/wk and 70mi/wk schedules, transcribed from the 3rd-edition book
-• Full plan catalog now visible up front — no gating
-• Cleaner Settings — Patreon section removed
-• Build polish and stability
+v1.2.1
+• Pull-to-refresh in Week view is much faster — incremental Strava sync (only fetch what's new) and Strava + Oura now run in parallel
+• A "nothing new" swipe drops from ~5s to under 1s
+• Carries everything from v1.2.0:
+  – Two new 18-week marathon plans (Pfitzinger Advanced Marathoning 55mi and 70mi)
+  – Full plan catalog visible up front, no gating
+  – Cleaner Settings (Patreon section removed)
 ```
 
 ### Support URL
@@ -194,7 +196,7 @@ Before clicking "Submit for Review":
 
 - [ ] Branch `simplify` merged to `main`
 - [ ] Archive uploaded via Xcode Organizer (Window → Organizer → Distribute App → App Store Connect)
-- [ ] Build 17 selected on App Store Connect's Build picker
+- [ ] Build 18 selected on App Store Connect's Build picker
 - [ ] All 4 iPhone + 4 iPad screenshots uploaded (drag from `AppStore/Screenshots/`)
 - [ ] App Privacy questionnaire answered (see above)
 - [ ] Demo account credentials added to App Review Information
@@ -208,28 +210,27 @@ Before clicking "Submit for Review":
 
 ---
 
-## TestFlight — External Test Submission (v1.2.0, build 17)
+## TestFlight — External Test Submission (v1.2.1, build 18)
 
 Use these when submitting the build for external beta review in App Store Connect → TestFlight.
 
 ### What to Test (4000 char — shown to testers + reviewers)
 ```
-v1.2.0 — focus areas
+v1.2.1 — focus areas
 
-1. Pfitzinger Advanced Marathoning plans (new)
+1. Pull-to-refresh speed (new)
+   • Open the Week tab with Strava connected, swipe down to refresh
+   • First swipe after launch may still take 2-3s (initial 6-month catch-up)
+   • Every swipe after that should complete in under 1s when no new activity exists
+   • Oura users: readiness data and Strava data are now fetched in parallel
+   • Confirm no duplicated activities and no missing activities after a swipe
+
+2. Pfitzinger Advanced Marathoning plans (carried from v1.2.0)
    • From the plan picker, select "Advanced Marathoning — 18 week, 55 mi" or "70 mi"
    • Confirm all 18 weeks load with workout text matching the book (Mesocycles 1–4)
    • Goal marathon lands on day 7 (Sunday) of week 18 — pick a Sunday race date
 
-2. Full plan catalog
-   • The picker should show every bundled plan up front — no gating, no membership prompt
-   • Open a few plans and confirm coach notes are attached to each session
-
-3. Patreon removal
-   • Open Settings — confirm there is no Patreon section
-   • Sign-out, plan-delete, and Strava/Oura disconnect flows should still work
-
-4. Existing flows (regression sweep)
+3. Existing flows (regression sweep)
    • Mark Done animation still fires on cardio/strength/heat sessions
    • Athlete journal notes still persist on cardio + strength
    • Strava deep links from session detail sheets still open the activity
@@ -249,7 +250,7 @@ JohnnyLikesTraining brings published coaching plans for marathoners and ultrarun
 
 Pick a plan, set your race date, and open the app each morning to see exactly what to run and why. Strava activities auto-match to the prescribed workout. Optional Oura integration shows readiness next to today's session.
 
-This beta is testing v1.2.0 — two new 18-week marathon plans from Pete Pfitzinger's Advanced Marathoning (55mi and 70mi schedules), the full plan catalog visible by default, and a streamlined Settings.
+This beta is testing v1.2.1 — pull-to-refresh in the Week tab is now much faster (incremental Strava sync, parallel Strava + Oura fetches), plus everything from v1.2.0: two new 18-week marathon plans from Pete Pfitzinger's Advanced Marathoning (55mi and 70mi schedules), the full plan catalog visible by default, and a streamlined Settings.
 ```
 
 ### Feedback Email
@@ -272,7 +273,7 @@ Same as App Store review (above): provide a dedicated Apple ID with Sign in with
 
 ### Beta App Review Notes
 ```
-External beta of v1.2.0 (build 17). Sign in with Apple is required. All bundled plans (Champion 100K, the SWAP catalog from 6-week base through 200-mile, and the two new Pfitzinger 18-week marathon schedules) are visible in the picker without any membership or in-app purchase. Strava and Oura connections are optional and not required to evaluate the build.
+External beta of v1.2.1 (build 18). Sign in with Apple is required. Carries everything from v1.2.0 plus a Week-tab pull-to-refresh speed-up (incremental Strava sync, parallel Strava + Oura fetches). All bundled plans (Champion 100K, the SWAP catalog from 6-week base through 200-mile, and the two Pfitzinger 18-week marathon schedules) are visible in the picker without any membership or in-app purchase. Strava and Oura connections are optional and not required to evaluate the build.
 ```
 
 ---
