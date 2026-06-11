@@ -76,24 +76,37 @@ struct MainTabView: View {
         }
         .tint(Color.trailGreen)
         .task {
-            // Refresh the Supabase session before any per-store load. The SDK
-            // emits the persisted session as "current" at startup even when
-            // the access token is past expiry; without this refresh, every
-            // subsequent write 401s and surfaces as "Failed to save X."
-            await auth.refreshIfNeeded()
-
-            guard let userId = auth.currentUserId else { return }
-
-            if !planStore.hasPlan {
-                await planStore.loadPlan(userId: userId)
-            }
-
-            // Load from local cache first for instant display
+            // Local caches FIRST, before any network. The plan, the synced
+            // activities (with their saved session matches), and every store's
+            // last-known state are already on disk — rendering them must not
+            // wait on the auth round-trip or the Supabase plan fetch, or the
+            // Week tab sits without its completion checks for seconds on a
+            // cold start.
+            planStore.loadCachedPlan()
             strengthStore.loadFromCache()
             heatStore.loadFromCache()
             stretchStore.loadFromCache()
             strava.loadFromCache()
             oura.loadFromCache()
+            if strava.isConnected {
+                // Cached activities carry matchedSessionId from the last run,
+                // but re-validate against cached sessions so stale matches
+                // don't flash.
+                strava.autoMatchActivities(sessions: planStore.sessions)
+            }
+
+            // Refresh the Supabase session before any per-store network load.
+            // The SDK emits the persisted session as "current" at startup even
+            // when the access token is past expiry; without this refresh,
+            // every subsequent write 401s and surfaces as "Failed to save X."
+            await auth.refreshIfNeeded()
+
+            guard let userId = auth.currentUserId else { return }
+
+            // Reconcile the cached plan with Supabase (swaps, skips, overrides
+            // may have changed on another device). The cache is already on
+            // screen, so this await no longer blocks first render.
+            await planStore.loadPlan(userId: userId)
 
             // Then refresh from Supabase in background
             if let plan = planStore.activePlan {

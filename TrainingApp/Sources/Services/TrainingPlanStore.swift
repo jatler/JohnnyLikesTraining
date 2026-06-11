@@ -565,18 +565,24 @@ final class TrainingPlanStore {
 
     // MARK: - Load from Supabase
 
+    /// Restore the last-known plan from the local cache only — no network.
+    /// Called synchronously at startup so the Week list renders instantly;
+    /// loadPlan then reconciles with Supabase in the background.
+    func loadCachedPlan() {
+        guard activePlan == nil, let cached = PlanCacheService.loadCached() else { return }
+        activePlan = cached.plan
+        sessions = cached.sessions
+        skips = cached.skips
+        swaps = cached.swaps
+        overrides = cached.overrides
+    }
+
     func loadPlan(userId: UUID) async {
         isLoading = true
         defer { isLoading = false }
 
         // Load from local cache first for instant display
-        if activePlan == nil, let cached = PlanCacheService.loadCached() {
-            activePlan = cached.plan
-            sessions = cached.sessions
-            skips = cached.skips
-            swaps = cached.swaps
-            overrides = cached.overrides
-        }
+        loadCachedPlan()
 
         guard !isOffline else { return }
 

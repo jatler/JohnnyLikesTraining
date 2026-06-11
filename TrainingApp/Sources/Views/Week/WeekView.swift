@@ -87,15 +87,23 @@ struct WeekView: View {
         .onPreferenceChange(BannerHeightKey.self) { height in
             BannerGapDetent.bannerHeight = height
         }
-        .onAppear {
-            if !hasInitialized {
-                selectedWeek = planStore.currentWeekNumber ?? 1
-                hasInitialized = true
-            }
-        }
+        .onAppear { primeSelectedWeek() }
+        // If the cached plan lands a beat after first render, re-prime — a
+        // cold start that appeared before the plan loaded used to pin the
+        // view to Week 1 instead of the current week.
+        .onChange(of: planStore.currentWeekNumber) { _, _ in primeSelectedWeek() }
         .sheet(item: $selectedSession) { session in
             SessionDetailSheet(session: session)
         }
+    }
+
+    /// Land on the current training week once the plan is available. Runs on
+    /// appear and again if the plan loads after first render; locks after the
+    /// first successful prime so it never fights the user's own swiping.
+    private func primeSelectedWeek() {
+        guard !hasInitialized, let week = planStore.currentWeekNumber else { return }
+        selectedWeek = week
+        hasInitialized = true
     }
 
     // MARK: - Week Navigator
