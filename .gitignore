@@ -13,3 +13,4 @@ supabase/.temp/
 # macOS
 .DS_Store
 .gstack/
+scripts/source_images_adv/
