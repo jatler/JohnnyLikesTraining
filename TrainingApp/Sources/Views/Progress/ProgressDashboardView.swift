@@ -1,3 +1,4 @@
+import AuthenticationServices
 import SwiftUI
 import UIKit
 
@@ -14,6 +15,7 @@ struct ProgressDashboardView: View {
     @State private var focusedWeek: Int = 1
     @State private var selectedChartPage: ChartPage = .miles
     @State private var syncError: String?
+    @State private var showStravaReconnect = false
 
     private enum ChartPage: Int, CaseIterable, Identifiable {
         case miles, vert, time
@@ -50,6 +52,12 @@ struct ProgressDashboardView: View {
                 Button("OK") { syncError = nil }
             } message: {
                 Text(syncError ?? "")
+            }
+            .alert("Strava Connection Expired", isPresented: $showStravaReconnect) {
+                Button("Reconnect") { reconnectStrava() }
+                Button("Not Now", role: .cancel) {}
+            } message: {
+                Text("Strava needs a quick re-authorization. Your activities will sync right after.")
             }
         }
     }
@@ -217,10 +225,27 @@ struct ProgressDashboardView: View {
             try await strava.syncActivities(userId: userId, after: strava.incrementalSyncCutoff, merge: true)
         } catch is CancellationError {
         } catch let error as URLError where error.code == .cancelled {
+        } catch StravaError.connectionExpired {
+            showStravaReconnect = true
         } catch {
             syncError = error.localizedDescription
         }
         strava.autoMatchActivities(sessions: planStore.sessions)
+    }
+
+    /// One-tap recovery for an expired Strava connection — see WeekView.reconnectStrava().
+    private func reconnectStrava() {
+        Task {
+            do {
+                try await strava.authorize()
+                if let userId = auth.currentUserId {
+                    await syncStravaIfConnected(userId: userId)
+                }
+            } catch let error as ASWebAuthenticationSessionError where error.code == .canceledLogin {
+            } catch {
+                syncError = error.localizedDescription
+            }
+        }
     }
 
     private func syncOuraIfConnected(userId: UUID) async {

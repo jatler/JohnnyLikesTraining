@@ -1,3 +1,4 @@
+import AuthenticationServices
 import SwiftUI
 
 struct WeekView: View {
@@ -12,6 +13,7 @@ struct WeekView: View {
     @State private var hasInitialized = false
     @State private var showingPlanSetup = false
     @State private var syncError: String?
+    @State private var showStravaReconnect = false
 
     var body: some View {
         NavigationStack {
@@ -38,6 +40,12 @@ struct WeekView: View {
                 Button("OK") { syncError = nil }
             } message: {
                 Text(syncError ?? "")
+            }
+            .alert("Strava Connection Expired", isPresented: $showStravaReconnect) {
+                Button("Reconnect") { reconnectStrava() }
+                Button("Not Now", role: .cancel) {}
+            } message: {
+                Text("Strava needs a quick re-authorization. Your activities will sync right after.")
             }
         }
     }
@@ -358,12 +366,34 @@ struct WeekView: View {
         } catch let error as URLError where error.code == .cancelled {
             // Same dismissal, surfaced through URLSession instead of Swift
             // concurrency — also not an error.
+        } catch StravaError.connectionExpired {
+            // Recoverable in place: offer the one-tap re-auth instead of
+            // sending the user spelunking through Settings.
+            showStravaReconnect = true
         } catch {
             // Never fail silently — a swallowed error here is indistinguishable
             // from "pull-to-refresh is broken."
             syncError = error.localizedDescription
         }
         strava.autoMatchActivities(sessions: planStore.sessions)
+    }
+
+    /// One-tap recovery for an expired Strava connection: re-run OAuth (the
+    /// web sheet auto-approves when a Strava session cookie exists), then sync
+    /// immediately so the pull the user just made completes.
+    private func reconnectStrava() {
+        Task {
+            do {
+                try await strava.authorize()
+                if let userId = auth.currentUserId {
+                    await syncStravaIfConnected(userId: userId)
+                }
+            } catch let error as ASWebAuthenticationSessionError where error.code == .canceledLogin {
+                // User backed out of the sheet — their call, no alert.
+            } catch {
+                syncError = error.localizedDescription
+            }
+        }
     }
 
     private func syncOuraIfConnected(userId: UUID) async {

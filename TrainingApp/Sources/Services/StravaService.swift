@@ -122,7 +122,11 @@ final class StravaService {
                 }
                 continuation.resume(returning: code)
             }
-            self.authSession?.prefersEphemeralWebBrowserSession = true
+            // Non-ephemeral so Safari's Strava session cookie survives between
+            // authorizations: with approval_prompt=auto, a re-auth after token
+            // expiry then completes without re-entering credentials — the web
+            // sheet flashes and returns the code in one tap.
+            self.authSession?.prefersEphemeralWebBrowserSession = false
             self.authSession?.presentationContextProvider = ASWebAuthPresentationContext.shared
             let started = self.authSession?.start() ?? false
             print("[Strava OAuth] Session started: \(started)")
