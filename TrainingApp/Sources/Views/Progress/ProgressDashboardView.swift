@@ -817,15 +817,23 @@ struct ProgressDashboardView: View {
         }
     }
 
-    private func rangeLabel(from start: Date, to end: Date) -> String {
+    // Shared formatters — rangeLabel runs once per week on every recompute of
+    // the dashboard entries, and DateFormatter is expensive to build.
+    private static let monthDayFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM d"
-        let startStr = formatter.string(from: start)
-        let endStr: String = {
-            let sameMonth = Calendar.current.isDate(start, equalTo: end, toGranularity: .month)
-            formatter.dateFormat = sameMonth ? "d" : "MMM d"
-            return formatter.string(from: end)
-        }()
+        return formatter
+    }()
+    private static let dayOnlyFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d"
+        return formatter
+    }()
+
+    private func rangeLabel(from start: Date, to end: Date) -> String {
+        let startStr = Self.monthDayFormatter.string(from: start)
+        let sameMonth = Calendar.current.isDate(start, equalTo: end, toGranularity: .month)
+        let endStr = (sameMonth ? Self.dayOnlyFormatter : Self.monthDayFormatter).string(from: end)
         return "\(startStr)–\(endStr)"
     }
 }

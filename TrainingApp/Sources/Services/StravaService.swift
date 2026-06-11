@@ -298,6 +298,8 @@ final class StravaService {
         var allActivities: [StravaAPIActivity] = []
         var page = 1
         let perPage = 100
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
 
         while true {
             var components = URLComponents(string: "\(Config.stravaBaseURL)/athlete/activities")!
@@ -318,8 +320,6 @@ final class StravaService {
                 throw StravaError.apiFailed
             }
 
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
             let batch = try decoder.decode([StravaAPIActivity].self, from: data)
 
             let importable = batch.filter { Self.importableActivityTypes.contains($0.type) }
@@ -438,16 +438,14 @@ final class StravaService {
         if !changed.isEmpty {
             saveToCache()
             enqueuePersist { [supabase] in
-                for activity in changed {
-                    do {
-                        try await supabase.from("strava_activities")
-                            .upsert(activity, onConflict: "strava_id")
-                            .execute()
-                    } catch {
-                        #if DEBUG
-                        print("Failed to persist match for activity \(activity.stravaId): \(error)")
-                        #endif
-                    }
+                do {
+                    try await supabase.from("strava_activities")
+                        .upsert(changed, onConflict: "strava_id")
+                        .execute()
+                } catch {
+                    #if DEBUG
+                    print("Failed to persist matches for \(changed.count) activities: \(error)")
+                    #endif
                 }
             }
         }

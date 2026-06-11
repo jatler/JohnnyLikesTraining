@@ -27,7 +27,12 @@ enum KeychainService {
         var addQuery = query
         addQuery[kSecValueData as String] = data
         addQuery[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlock
-        SecItemAdd(addQuery as CFDictionary, nil)
+        let status = SecItemAdd(addQuery as CFDictionary, nil)
+        if status != errSecSuccess {
+            // A lost token here means silent auth failures later (e.g. Strava
+            // sync dying with no error) — make the root cause visible.
+            print("⚠️ Keychain save failed for \(key.rawValue): OSStatus \(status)")
+        }
     }
 
     static func get(_ key: Key) -> String? {

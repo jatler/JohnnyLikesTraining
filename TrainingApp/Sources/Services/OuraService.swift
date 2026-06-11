@@ -13,6 +13,15 @@ final class OuraService {
     private var authSession: ASWebAuthenticationSession?
     private var pendingOAuthState: String?
 
+    /// Oura's API speaks calendar-day strings ("yyyy-MM-dd") in the user's
+    /// local timezone. DateFormatter is expensive to build, so share one.
+    private static let dayFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone.current
+        return formatter
+    }()
+
     init() {
         isConnected = KeychainService.get(.ouraAccessToken) != nil
     }
@@ -184,9 +193,7 @@ final class OuraService {
             throw OuraError.notConnected
         }
 
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone.current
+        let formatter = Self.dayFormatter
 
         // Oura API end_date is exclusive, so add 1 day to include today's data
         let today = Date()
@@ -436,11 +443,7 @@ final class OuraService {
     // MARK: - Query Helpers
 
     func todayReadiness() -> OuraDaily? {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone.current
-        let todayStr = formatter.string(from: Date())
-        return dailyData.first { formatter.string(from: $0.date) == todayStr }
+        data(for: Date())
     }
 
     func data(for date: Date) -> OuraDaily? {
@@ -482,14 +485,13 @@ final class OuraService {
             return
         }
 
-        for entry in data {
-            do {
-                try await supabase.from("oura_daily")
-                    .upsert(entry, onConflict: "user_id,date")
-                    .execute()
-            } catch {
-                print("Failed to persist Oura data for \(entry.date): \(error)")
-            }
+        guard !data.isEmpty else { return }
+        do {
+            try await supabase.from("oura_daily")
+                .upsert(data, onConflict: "user_id,date")
+                .execute()
+        } catch {
+            print("Failed to persist Oura data (\(data.count) entries): \(error)")
         }
     }
 }

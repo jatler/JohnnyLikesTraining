@@ -137,23 +137,21 @@ final class HeatStore {
         sessions.removeAll { $0.dayOfWeek == dayOfWeek }
         logs.removeAll { removedIds.contains($0.sessionId) }
         saveToCache()
-        guard !isOffline else { return }
+        guard !isOffline, !removedIds.isEmpty else { return }
 
-        if let planId = sessions.first?.planId {
-            Task { await persistAllSessions(planId: planId) }
-        } else {
-            Task {
-                for id in removedIds {
-                    let result = await SupabaseService.shared.execute(table: "heat_sessions", operation: "delete") {
-                        try await supabase.from("heat_sessions")
-                            .delete()
-                            .eq("id", value: id)
-                            .execute()
-                    }
-                    if case .failure(let err) = result, !err.isRetryable {
-                        lastError = err.userFacing
-                    }
-                }
+        // Upserting the surviving sessions can't remove rows, so the old path
+        // (persistAllSessions when other days remained) left the deleted day's
+        // rows in Supabase to resurrect on the next load. Always delete the
+        // removed rows explicitly, in one batched request.
+        Task {
+            let result = await SupabaseService.shared.execute(table: "heat_sessions", operation: "delete") {
+                try await supabase.from("heat_sessions")
+                    .delete()
+                    .in("id", values: removedIds.map(\.uuidString))
+                    .execute()
+            }
+            if case .failure(let err) = result, !err.isRetryable {
+                lastError = err.userFacing
             }
         }
     }
