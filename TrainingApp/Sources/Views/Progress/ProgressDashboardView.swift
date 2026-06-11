@@ -216,6 +216,7 @@ struct ProgressDashboardView: View {
         do {
             try await strava.syncActivities(userId: userId, after: strava.incrementalSyncCutoff, merge: true)
         } catch is CancellationError {
+        } catch let error as URLError where error.code == .cancelled {
         } catch {
             syncError = error.localizedDescription
         }

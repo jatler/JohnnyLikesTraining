@@ -195,7 +195,7 @@ final class StravaService {
                 isConnected = false
                 throw StravaError.connectionExpired
             }
-            throw StravaError.tokenRefreshFailed
+            throw StravaError.tokenRefreshFailed(status: status)
         }
 
         let token = try JSONDecoder().decode(StravaTokenResponse.self, from: data)
@@ -281,7 +281,32 @@ final class StravaService {
 
     // MARK: - Fetch Activities
 
+    /// Sync with one automatic retry on transient failures. The first sync of
+    /// every app session is the one that refreshes the expired access token
+    /// and rides on a just-woken network stack — exactly the attempt most
+    /// likely to hit a one-off failure. Definitive states (connection expired,
+    /// not connected) and cancellations are never retried.
     func syncActivities(userId: UUID, after: Date? = nil, merge: Bool = false) async throws {
+        do {
+            try await syncActivitiesOnce(userId: userId, after: after, merge: merge)
+        } catch StravaError.connectionExpired {
+            throw StravaError.connectionExpired
+        } catch StravaError.notConnected {
+            throw StravaError.notConnected
+        } catch StravaError.missingCredentials {
+            throw StravaError.missingCredentials
+        } catch let error as CancellationError {
+            throw error
+        } catch let error as URLError where error.code == .cancelled {
+            throw error
+        } catch {
+            print("⚠️ Strava sync attempt 1 failed (\(error)) — retrying once")
+            try await Task.sleep(nanoseconds: 700_000_000)
+            try await syncActivitiesOnce(userId: userId, after: after, merge: merge)
+        }
+    }
+
+    private func syncActivitiesOnce(userId: UUID, after: Date? = nil, merge: Bool = false) async throws {
         guard isConnected else { throw StravaError.notConnected }
         isSyncing = true
         defer { isSyncing = false }
@@ -317,7 +342,7 @@ final class StravaService {
                 let status = (response as? HTTPURLResponse)?.statusCode ?? -1
                 let body = String(data: data, encoding: .utf8) ?? "(no body)"
                 print("❌ Strava activities fetch failed — HTTP \(status): \(body)")
-                throw StravaError.apiFailed
+                throw StravaError.apiFailed(status: status)
             }
 
             let batch = try decoder.decode([StravaAPIActivity].self, from: data)
@@ -603,9 +628,9 @@ enum StravaError: LocalizedError {
     case notConnected
     case noAuthCode
     case tokenExchangeFailed
-    case tokenRefreshFailed
+    case tokenRefreshFailed(status: Int)
     case connectionExpired
-    case apiFailed
+    case apiFailed(status: Int)
     case stateMismatch
 
     var errorDescription: String? {
@@ -614,9 +639,12 @@ enum StravaError: LocalizedError {
         case .notConnected: "Strava is not connected."
         case .noAuthCode: "No authorization code received from Strava."
         case .tokenExchangeFailed: "Failed to exchange authorization code for tokens."
-        case .tokenRefreshFailed: "Couldn't reach Strava. Check your connection and try again."
+        // Status codes surface in the alert so a screenshot of the message is
+        // enough to identify the failing layer (-1 = no HTTP response at all).
+        case .tokenRefreshFailed(let status):
+            "Couldn't refresh the Strava connection (HTTP \(status)). Try again in a moment."
         case .connectionExpired: "Your Strava connection expired. Reconnect in Settings."
-        case .apiFailed: "Strava API request failed."
+        case .apiFailed(let status): "Strava sync failed (HTTP \(status)). Try again in a moment."
         case .stateMismatch: "OAuth state parameter mismatch — possible CSRF attack."
         }
     }

@@ -355,6 +355,9 @@ struct WeekView: View {
             try await strava.syncActivities(userId: userId, after: strava.incrementalSyncCutoff, merge: true)
         } catch is CancellationError {
             // User dismissed the refresh or paged away — not an error.
+        } catch let error as URLError where error.code == .cancelled {
+            // Same dismissal, surfaced through URLSession instead of Swift
+            // concurrency — also not an error.
         } catch {
             // Never fail silently — a swallowed error here is indistinguishable
             // from "pull-to-refresh is broken."
