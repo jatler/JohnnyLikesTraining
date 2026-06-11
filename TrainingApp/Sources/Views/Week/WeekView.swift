@@ -11,6 +11,7 @@ struct WeekView: View {
     @State private var selectedSession: PlannedSession?
     @State private var hasInitialized = false
     @State private var showingPlanSetup = false
+    @State private var syncError: String?
 
     var body: some View {
         NavigationStack {
@@ -29,6 +30,14 @@ struct WeekView: View {
                 Button("OK") { planStore.lastError = nil }
             } message: {
                 Text(planStore.lastError ?? "")
+            }
+            .alert("Sync Failed", isPresented: Binding(
+                get: { syncError != nil },
+                set: { if !$0 { syncError = nil } }
+            )) {
+                Button("OK") { syncError = nil }
+            } message: {
+                Text(syncError ?? "")
             }
         }
     }
@@ -303,6 +312,13 @@ struct WeekView: View {
     // MARK: - Sync (pull-to-refresh)
 
     private func sync() async {
+        #if DEBUG
+        // The pull-to-refresh UI test passes a marker path so it can verify the
+        // gesture actually reaches this method — it has silently broken before.
+        if let marker = ProcessInfo.processInfo.environment["PTR_SYNC_MARKER"] {
+            try? "fired \(Date())".write(toFile: marker, atomically: true, encoding: .utf8)
+        }
+        #endif
         guard let userId = auth.currentUserId else { return }
         // Run Strava + Oura concurrently — they share nothing, so while
         // one is awaiting URLSession the other can be in flight. Strava
@@ -317,8 +333,15 @@ struct WeekView: View {
 
     private func syncStravaIfConnected(userId: UUID) async {
         guard strava.isConnected else { return }
-        let cutoff = strava.lastSyncDate?.addingTimeInterval(-48 * 60 * 60)
-        try? await strava.syncActivities(userId: userId, after: cutoff, merge: true)
+        do {
+            try await strava.syncActivities(userId: userId, after: strava.incrementalSyncCutoff, merge: true)
+        } catch is CancellationError {
+            // User dismissed the refresh or paged away — not an error.
+        } catch {
+            // Never fail silently — a swallowed error here is indistinguishable
+            // from "pull-to-refresh is broken."
+            syncError = error.localizedDescription
+        }
         strava.autoMatchActivities(sessions: planStore.sessions)
     }
 

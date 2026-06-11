@@ -34,8 +34,8 @@ targets:
         CODE_SIGN_ENTITLEMENTS: Training.entitlements
         PRODUCT_BUNDLE_IDENTIFIER: com.jatler.Training
         SWIFT_VERSION: "5.9"
-        MARKETING_VERSION: "1.2.1" # short version / CFBundleShortVersionString
-        CURRENT_PROJECT_VERSION: "18" # build / CFBundleVersion
+        MARKETING_VERSION: "1.2.2" # short version / CFBundleShortVersionString
+        CURRENT_PROJECT_VERSION: "19" # build / CFBundleVersion
         GENERATE_INFOPLIST_FILE: false
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: YES
@@ -71,15 +71,30 @@ targets:
     dependencies:
       - target: Training
 
+  TrainingUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
+    settings:
+      base:
+        SWIFT_VERSION: "5.9"
+        GENERATE_INFOPLIST_FILE: true
+        TEST_TARGET_NAME: Training
+    dependencies:
+      - target: Training
+
 schemes:
   Training:
     build:
       targets:
         Training: all
         TrainingTests: [test]
+        TrainingUITests: [test]
     run:
       config: Debug
     test:
       config: Debug
       targets:
         - TrainingTests
+        - TrainingUITests

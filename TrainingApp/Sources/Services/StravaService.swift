@@ -7,12 +7,26 @@ final class StravaService {
     private(set) var isConnected = false
     private(set) var isSyncing = false
     private(set) var activities: [StravaActivity] = []
-    private(set) var lastSyncDate: Date?
+    private(set) var lastSyncDate: Date? {
+        didSet {
+            if let lastSyncDate {
+                UserDefaults.standard.set(lastSyncDate, forKey: Self.lastSyncDefaultsKey)
+            } else {
+                UserDefaults.standard.removeObject(forKey: Self.lastSyncDefaultsKey)
+            }
+        }
+    }
     private(set) var athleteName: String?
+
+    private static let lastSyncDefaultsKey = "strava_last_sync_date"
 
     private let supabase = SupabaseService.shared.client
     private var authSession: ASWebAuthenticationSession?
     private var pendingOAuthState: String?
+    /// Serializes background Supabase writes (sync upserts + auto-match upserts)
+    /// so a fire-and-forget persist can't land after a newer write and clobber
+    /// matched_session_id with stale data.
+    private var persistChain: Task<Void, Never>?
 
     private static let importableActivityTypes: Set<String> = [
         "Run", "TrailRun", "VirtualRun",
@@ -24,7 +38,22 @@ final class StravaService {
     ]
 
     init() {
-        isConnected = KeychainService.get(.stravaAccessToken) != nil
+        // A connection is only usable if we can also refresh it — an access
+        // token without a refresh token/expiry made every sync throw
+        // .notConnected forever while the UI still said "Connected". Treat
+        // partial keychain state as disconnected and clean it up so Settings
+        // shows the Connect button instead of a dead toggle.
+        if KeychainService.get(.stravaAccessToken) != nil,
+           KeychainService.get(.stravaRefreshToken) != nil,
+           KeychainService.get(.stravaExpiresAt) != nil {
+            isConnected = true
+        } else {
+            if KeychainService.get(.stravaAccessToken) != nil {
+                KeychainService.deleteAll(for: .strava)
+            }
+            isConnected = false
+        }
+        lastSyncDate = UserDefaults.standard.object(forKey: Self.lastSyncDefaultsKey) as? Date
 
         #if DEBUG && targetEnvironment(simulator)
         if false && !Config.stravaDevRefreshToken.isEmpty { // TODO: re-enable after getting fresh token
@@ -157,8 +186,15 @@ final class StravaService {
             let status = (response as? HTTPURLResponse)?.statusCode ?? -1
             let body = String(data: data, encoding: .utf8) ?? "(no body)"
             print("❌ Strava token refresh failed — HTTP \(status): \(body)")
-            KeychainService.deleteAll(for: .strava)
-            isConnected = false
+            // Only a definitive rejection of the refresh token means the
+            // connection is dead. A Strava 5xx or captive-portal response used
+            // to wipe the keychain here, silently disconnecting the user —
+            // every later pull-to-refresh then no-oped with no way to tell why.
+            if (400...403).contains(status) {
+                KeychainService.deleteAll(for: .strava)
+                isConnected = false
+                throw StravaError.connectionExpired
+            }
             throw StravaError.tokenRefreshFailed
         }
 
@@ -295,11 +331,7 @@ final class StravaService {
 
         let mapped = allActivities.map { $0.toStravaActivity(userId: userId) }
         if merge {
-            var existingById = Dictionary(uniqueKeysWithValues: activities.map { ($0.stravaId, $0) })
-            for activity in mapped {
-                existingById[activity.stravaId] = activity
-            }
-            activities = existingById.values.sorted { $0.activityDate > $1.activityDate }
+            activities = Self.merged(existing: activities, incoming: mapped)
         } else {
             activities = mapped
         }
@@ -309,7 +341,52 @@ final class StravaService {
         // Don't block the sync return on the Supabase upsert — the in-memory
         // + on-disk cache is already updated, so the UI is current. Pull-to-
         // refresh shouldn't wait for a network round-trip the user can't see.
-        Task { await persistActivities(mapped, userId: userId) }
+        enqueuePersist { [weak self] in await self?.persistActivities(mapped, userId: userId) }
+    }
+
+    /// Where an incremental sync should start: 48h behind the last successful
+    /// sync, so late watch uploads still land. nil (no prior sync) falls back
+    /// to the full 6-month window in syncActivities.
+    nonisolated static func incrementalCutoff(lastSync: Date?) -> Date? {
+        lastSync?.addingTimeInterval(-48 * 60 * 60)
+    }
+
+    var incrementalSyncCutoff: Date? { Self.incrementalCutoff(lastSync: lastSyncDate) }
+
+    /// Incoming activities replace same-stravaId entries, everything else is
+    /// kept, newest first. Duplicate ids within either list collapse to the
+    /// later element instead of crashing Dictionary(uniqueKeysWithValues:).
+    nonisolated static func merged(existing: [StravaActivity], incoming: [StravaActivity]) -> [StravaActivity] {
+        var byId = Dictionary(existing.map { ($0.stravaId, $0) }, uniquingKeysWith: { _, last in last })
+        for activity in incoming {
+            byId[activity.stravaId] = activity
+        }
+        return byId.values.sorted { $0.activityDate > $1.activityDate }
+    }
+
+    /// Union of a Supabase load and the in-memory list where the more recently
+    /// synced copy of each activity wins. Pull-to-refresh fires its Supabase
+    /// upsert without awaiting it, so a concurrent loadActivities can return
+    /// rows that predate what's already on screen — a blind replace here made
+    /// freshly synced runs vanish.
+    nonisolated static func mergedByRecency(local: [StravaActivity], remote: [StravaActivity]) -> [StravaActivity] {
+        var byId = Dictionary(remote.map { ($0.stravaId, $0) }, uniquingKeysWith: { _, last in last })
+        for activity in local {
+            if let remoteCopy = byId[activity.stravaId], remoteCopy.syncedAt >= activity.syncedAt {
+                continue
+            }
+            byId[activity.stravaId] = activity
+        }
+        return byId.values.sorted { $0.activityDate > $1.activityDate }
+    }
+
+    /// Serialize background Supabase writes so later writes (auto-match
+    /// updates) can't be overwritten by an earlier still-in-flight upsert.
+    private func enqueuePersist(_ block: @escaping () async -> Void) {
+        persistChain = Task { [previous = persistChain] in
+            await previous?.value
+            await block()
+        }
     }
 
     // MARK: - Auto-Match
@@ -360,7 +437,7 @@ final class StravaService {
         // Save updated matches to local cache + Supabase
         if !changed.isEmpty {
             saveToCache()
-            Task {
+            enqueuePersist { [supabase] in
                 for activity in changed {
                     do {
                         try await supabase.from("strava_activities")
@@ -405,9 +482,12 @@ final class StravaService {
             #if DEBUG
             print("Supabase loaded \(loaded.count) Strava activities (had \(activities.count) in memory)")
             #endif
-            // Don't overwrite existing data with empty Supabase result
-            if !loaded.isEmpty || activities.isEmpty {
-                activities = loaded
+            // Merge instead of replace — a pull-to-refresh may have synced
+            // activities whose background upsert hasn't reached Supabase yet,
+            // and a blind replace would wipe them off the screen.
+            let combined = Self.mergedByRecency(local: activities, remote: loaded)
+            if !combined.isEmpty {
+                activities = combined
                 saveToCache()
             }
         } catch {
@@ -526,6 +606,7 @@ enum StravaError: LocalizedError {
     case noAuthCode
     case tokenExchangeFailed
     case tokenRefreshFailed
+    case connectionExpired
     case apiFailed
     case stateMismatch
 
@@ -535,7 +616,8 @@ enum StravaError: LocalizedError {
         case .notConnected: "Strava is not connected."
         case .noAuthCode: "No authorization code received from Strava."
         case .tokenExchangeFailed: "Failed to exchange authorization code for tokens."
-        case .tokenRefreshFailed: "Failed to refresh Strava access token."
+        case .tokenRefreshFailed: "Couldn't reach Strava. Check your connection and try again."
+        case .connectionExpired: "Your Strava connection expired. Reconnect in Settings."
         case .apiFailed: "Strava API request failed."
         case .stateMismatch: "OAuth state parameter mismatch — possible CSRF attack."
         }

@@ -24,6 +24,7 @@
 		2A2882EF65D9D87E33B384E3 /* StretchLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1E80497D9A53018EEB5DDC9 /* StretchLog.swift */; };
 		314A48FC6E46199FB265D062 /* swap_6_week_6w.json in Resources */ = {isa = PBXBuildFile; fileRef = B67572F92E767F702F3E8237 /* swap_6_week_6w.json */; };
 		318F754953A5B84505A9ECBD /* OuraDaily.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38427D1E7D9E72609E2756A6 /* OuraDaily.swift */; };
+		32483DF0E2176813EFD05945 /* StravaSyncLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EC892EC3C7A9AB9BA72D9B8 /* StravaSyncLogicTests.swift */; };
 		340974BD8F3C6D08E7B5BFAC /* ProgressionEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C01F97738C00E24FC785ED9 /* ProgressionEngineTests.swift */; };
 		37B726D9F8A5BF41AA7BCC4C /* ExerciseHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8903D44D8C5F1FCC00E5F9DA /* ExerciseHistoryView.swift */; };
 		39C0F0E80BC49A04136D8EC1 /* Fraunces-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9A7B5C389858A370B1F4C111 /* Fraunces-SemiBold.ttf */; };
@@ -41,6 +42,7 @@
 		5B13DA79B4AC7453D868630B /* Fraunces-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 747D2F3B56EEE28598D1536A /* Fraunces-LightItalic.ttf */; };
 		5C6B00911C4B919BE7AA7B0E /* PlanEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F8ED3535E0F5907E9AE4267 /* PlanEditView.swift */; };
 		6832E4507441BF620169D07F /* CompletionCelebrationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E83F3C614CE5AA720B42272B /* CompletionCelebrationStore.swift */; };
+		6DCC8F838D2CE23DE332A862 /* PullToRefreshUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F94C28E7B27CA70B6CAB788 /* PullToRefreshUITests.swift */; };
 		6F888519D7D6238904329600 /* SessionDetailSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF23FA6E5F2C1983F9EF2ADA /* SessionDetailSheet.swift */; };
 		73B281FD62E689360910B786 /* champion_plan_100k.json in Resources */ = {isa = PBXBuildFile; fileRef = 2B21B45B9C3E88F085CD54AC /* champion_plan_100k.json */; };
 		74326E628177691CA8E40514 /* swap_50mile_12w.json in Resources */ = {isa = PBXBuildFile; fileRef = 43AD51FDF5F6406D076D2693 /* swap_50mile_12w.json */; };
@@ -100,6 +102,13 @@
 			remoteGlobalIDString = 18F6C878EF626BA5B3598160;
 			remoteInfo = Training;
 		};
+		FA9CE044D2AE5A6317ADA718 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F87A075ACE17116F1975ED18 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 18F6C878EF626BA5B3598160;
+			remoteInfo = Training;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -142,6 +151,7 @@
 		73B7D590079EAFA75E76C507 /* CompleteStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompleteStatus.swift; sourceTree = "<group>"; };
 		73F7D70B55AEC2E0E3D0A3F1 /* TrainingPlanStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlanStore.swift; sourceTree = "<group>"; };
 		747D2F3B56EEE28598D1536A /* Fraunces-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-LightItalic.ttf"; sourceTree = "<group>"; };
+		7EC892EC3C7A9AB9BA72D9B8 /* StravaSyncLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StravaSyncLogicTests.swift; sourceTree = "<group>"; };
 		7F1D1B0C706F6397245A0BF0 /* Fraunces-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-Medium.ttf"; sourceTree = "<group>"; };
 		80616D13A59D3EE3E33D4BB0 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		84A8563FB47BFB14F6BC6B82 /* StretchSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StretchSession.swift; sourceTree = "<group>"; };
@@ -150,6 +160,7 @@
 		8903D44D8C5F1FCC00E5F9DA /* ExerciseHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseHistoryView.swift; sourceTree = "<group>"; };
 		8ADAD3D34B51A5F9879C3200 /* LocalCacheService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalCacheService.swift; sourceTree = "<group>"; };
 		8F8ED3535E0F5907E9AE4267 /* PlanEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanEditView.swift; sourceTree = "<group>"; };
+		8F94C28E7B27CA70B6CAB788 /* PullToRefreshUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PullToRefreshUITests.swift; sourceTree = "<group>"; };
 		8F993B088CB2456C7010C691 /* DistanceFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceFormatter.swift; sourceTree = "<group>"; };
 		918F92B620FAA4E228B0FEA8 /* ProgressDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressDashboardView.swift; sourceTree = "<group>"; };
 		9505322259DE7B0D0FA76407 /* CompletionPulse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionPulse.swift; sourceTree = "<group>"; };
@@ -162,6 +173,7 @@
 		A5A9E6C67CD0AF43E444A4EF /* HeatPerWeekTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeatPerWeekTests.swift; sourceTree = "<group>"; };
 		A98D857A910A6C8E66D69313 /* PendingSwap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingSwap.swift; sourceTree = "<group>"; };
 		AA46B6C9B4227B13C53E5123 /* swap_lower_volume_ultra_12w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_lower_volume_ultra_12w.json; sourceTree = "<group>"; };
+		B36C292FA9A21357154D57A1 /* TrainingUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TrainingUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4A6D8A749283F165620F1C8 /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
 		B4CD0A46894A328DDC0FE678 /* PlannedSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlannedSession.swift; sourceTree = "<group>"; };
 		B67572F92E767F702F3E8237 /* swap_6_week_6w.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = swap_6_week_6w.json; sourceTree = "<group>"; };
@@ -230,6 +242,7 @@
 			children = (
 				02C33C9015C1F9FCA1CD7F9C /* Training.app */,
 				06D72E3E3CB8A152A28F3971 /* TrainingTests.xctest */,
+				B36C292FA9A21357154D57A1 /* TrainingUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -333,6 +346,7 @@
 				D3B804FFEB9BCC2927068518 /* PlanCacheServiceTests.swift */,
 				6395FB77D8158EC94B32CC70 /* PlanTemplateDateMathTests.swift */,
 				6C01F97738C00E24FC785ED9 /* ProgressionEngineTests.swift */,
+				7EC892EC3C7A9AB9BA72D9B8 /* StravaSyncLogicTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -354,6 +368,14 @@
 				FF23FA6E5F2C1983F9EF2ADA /* SessionDetailSheet.swift */,
 			);
 			path = Calendar;
+			sourceTree = "<group>";
+		};
+		932391DE666AA7AED4CA635E /* UITests */ = {
+			isa = PBXGroup;
+			children = (
+				8F94C28E7B27CA70B6CAB788 /* PullToRefreshUITests.swift */,
+			);
+			path = UITests;
 			sourceTree = "<group>";
 		};
 		AC138D8B2E4E582ED903FDBD /* Sources */ = {
@@ -384,6 +406,7 @@
 				AC138D8B2E4E582ED903FDBD /* Sources */,
 				6F9C9D347A986A243AFE3345 /* Tests */,
 				CCF67F2ED023CB6B8C398D7F /* TrainingApp */,
+				932391DE666AA7AED4CA635E /* UITests */,
 				1F075F0DF15A55FF3B56AACA /* Products */,
 			);
 			sourceTree = "<group>";
@@ -503,6 +526,24 @@
 			productReference = 06D72E3E3CB8A152A28F3971 /* TrainingTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		D85C8EAA3F95103066B8E2C5 /* TrainingUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E1ED20895B912CCDC309D853 /* Build configuration list for PBXNativeTarget "TrainingUITests" */;
+			buildPhases = (
+				ECDB1A5B172060069AEB38B9 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				053749E5BD025CA82DD1A724 /* PBXTargetDependency */,
+			);
+			name = TrainingUITests;
+			packageProductDependencies = (
+			);
+			productName = TrainingUITests;
+			productReference = B36C292FA9A21357154D57A1 /* TrainingUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -515,6 +556,9 @@
 					18F6C878EF626BA5B3598160 = {
 						DevelopmentTeam = WHKX4QF56D;
 						ProvisioningStyle = Automatic;
+					};
+					D85C8EAA3F95103066B8E2C5 = {
+						TestTargetID = 18F6C878EF626BA5B3598160;
 					};
 				};
 			};
@@ -537,6 +581,7 @@
 			targets = (
 				18F6C878EF626BA5B3598160 /* Training */,
 				5BCAE8140F096DE5CFF8A0B9 /* TrainingTests */,
+				D85C8EAA3F95103066B8E2C5 /* TrainingUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -581,6 +626,7 @@
 				8E5EBD9AA2DCDF5E7FE811FF /* PlanCacheServiceTests.swift in Sources */,
 				E040DE78B92E745857C15194 /* PlanTemplateDateMathTests.swift in Sources */,
 				340974BD8F3C6D08E7B5BFAC /* ProgressionEngineTests.swift in Sources */,
+				32483DF0E2176813EFD05945 /* StravaSyncLogicTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -647,9 +693,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		ECDB1A5B172060069AEB38B9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6DCC8F838D2CE23DE332A862 /* PullToRefreshUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		053749E5BD025CA82DD1A724 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 18F6C878EF626BA5B3598160 /* Training */;
+			targetProxy = FA9CE044D2AE5A6317ADA718 /* PBXContainerItemProxy */;
+		};
 		5E96FB75F756D8E111823DCE /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 18F6C878EF626BA5B3598160 /* Training */;
@@ -715,6 +774,42 @@
 			};
 			name = Release;
 		};
+		136D762069DF6A198BE900F8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jatler.TrainingUITests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Training;
+			};
+			name = Release;
+		};
+		3E9A2467AF01EF2D06355825 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jatler.TrainingUITests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Training;
+			};
+			name = Debug;
+		};
 		3FA1BB4210567AF9B1046B60 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -741,7 +836,7 @@
 				CODE_SIGN_ENTITLEMENTS = Training.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_TEAM = WHKX4QF56D;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;
@@ -750,7 +845,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jatler.Training;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
@@ -786,7 +881,7 @@
 				CODE_SIGN_ENTITLEMENTS = Training.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 18;
+				CURRENT_PROJECT_VERSION = 19;
 				DEVELOPMENT_TEAM = WHKX4QF56D;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;
@@ -795,7 +890,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.1;
+				MARKETING_VERSION = 1.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jatler.Training;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -894,6 +989,15 @@
 			buildConfigurations = (
 				BB24FBEFC7C942EC134DAAF0 /* Debug */,
 				0A792ABC923B7A88933D13AE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E1ED20895B912CCDC309D853 /* Build configuration list for PBXNativeTarget "TrainingUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3E9A2467AF01EF2D06355825 /* Debug */,
+				136D762069DF6A198BE900F8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

@@ -13,6 +13,7 @@ struct ProgressDashboardView: View {
     @State private var showingPlanSetup = false
     @State private var focusedWeek: Int = 1
     @State private var selectedChartPage: ChartPage = .miles
+    @State private var syncError: String?
 
     private enum ChartPage: Int, CaseIterable, Identifiable {
         case miles, vert, time
@@ -42,6 +43,14 @@ struct ProgressDashboardView: View {
             .toolbar(.hidden, for: .navigationBar)
             .onAppear(perform: primeFocusedWeek)
             .onChange(of: planStore.allWeekNumbers) { _, _ in primeFocusedWeek() }
+            .alert("Sync Failed", isPresented: Binding(
+                get: { syncError != nil },
+                set: { if !$0 { syncError = nil } }
+            )) {
+                Button("OK") { syncError = nil }
+            } message: {
+                Text(syncError ?? "")
+            }
         }
     }
 
@@ -196,13 +205,26 @@ struct ProgressDashboardView: View {
     private func sync() async {
         guard let userId = auth.currentUserId else { return }
         // Pull from the source APIs, not just the Supabase cache — see WeekView.sync().
-        if strava.isConnected {
-            try? await strava.syncActivities(userId: userId, merge: true)
-            strava.autoMatchActivities(sessions: planStore.sessions)
+        // Incremental cutoff + concurrent Strava/Oura, same as WeekView's pull.
+        async let stravaDone: Void = syncStravaIfConnected(userId: userId)
+        async let ouraDone:   Void = syncOuraIfConnected(userId: userId)
+        _ = await (stravaDone, ouraDone)
+    }
+
+    private func syncStravaIfConnected(userId: UUID) async {
+        guard strava.isConnected else { return }
+        do {
+            try await strava.syncActivities(userId: userId, after: strava.incrementalSyncCutoff, merge: true)
+        } catch is CancellationError {
+        } catch {
+            syncError = error.localizedDescription
         }
-        if oura.isConnected {
-            try? await oura.syncDaily(userId: userId, merge: true)
-        }
+        strava.autoMatchActivities(sessions: planStore.sessions)
+    }
+
+    private func syncOuraIfConnected(userId: UUID) async {
+        guard oura.isConnected else { return }
+        try? await oura.syncDaily(userId: userId, merge: true)
     }
 
     // MARK: - Focused Week Card
