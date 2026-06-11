@@ -259,7 +259,19 @@ struct WeekView: View {
     @ViewBuilder
     private func trailingStatus(session: PlannedSession, activity: StravaActivity?, skipped: Bool, isToday: Bool) -> some View {
         if let activity {
-            if activity.isCrossTraining {
+            // Run miles always win the label: a day with an easy run + a bike
+            // commute should read "6.2 mi", not the commute's hours, no matter
+            // which activity happened to win the session match. Miles sum
+            // across every run on the day (doubles days). Cross-train hours
+            // only show when the day had no run at all.
+            let dayMiles = strava.runActivities(on: session.scheduledDate).reduce(0.0) { $0 + $1.distanceMi }
+            if dayMiles > 0 {
+                CompleteStatus(
+                    magnitude: dayMiles,
+                    label: String(format: "%.1f mi", dayMiles),
+                    sessionId: session.id
+                )
+            } else if activity.isCrossTraining {
                 // Sum cross-training hours across every cross-train activity on
                 // this session's date — parallel to how runs aggregate miles.
                 let crossDay = strava.activities(on: session.scheduledDate).filter(\.isCrossTraining)
@@ -270,13 +282,11 @@ struct WeekView: View {
                     sessionId: session.id
                 )
             } else {
-                // Default + run path: aggregate miles across every run on this
-                // session's date — handles doubles days where multiple Strava
-                // runs land on one scheduled session.
-                let dayMiles = strava.runActivities(on: session.scheduledDate).reduce(0.0) { $0 + $1.distanceMi }
+                // Matched something with no run mileage (strength, yoga) —
+                // completion dot, no label.
                 CompleteStatus(
-                    magnitude: dayMiles,
-                    label: dayMiles > 0 ? String(format: "%.1f mi", dayMiles) : "",
+                    magnitude: 0,
+                    label: "",
                     sessionId: session.id
                 )
             }
