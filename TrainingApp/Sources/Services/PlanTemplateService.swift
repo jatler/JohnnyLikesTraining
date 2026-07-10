@@ -93,9 +93,11 @@ final class PlanTemplateService {
         // Week N starts on Monday, so Saturday = Monday + 5.
         // Plan start (Week 1 Monday) = raceDate - ((durationWeeks - 1) * 7 + 5) days
         let daysBeforeRace = (template.durationWeeks - 1) * 7 + 5
-        guard let planStart = calendar.date(byAdding: .day, value: -daysBeforeRace, to: raceDate) else {
-            fatalError("Could not compute plan start date")
-        }
+        // Interval fallback instead of trapping: plan generation must never
+        // crash, and a fixed 24h day is correct within a minute or two even
+        // across a DST boundary.
+        let planStart = calendar.date(byAdding: .day, value: -daysBeforeRace, to: raceDate)
+            ?? raceDate.addingTimeInterval(-Double(daysBeforeRace) * 24 * 3600)
 
         let planId = UUID()
         let now = Date()
@@ -112,7 +114,8 @@ final class PlanTemplateService {
 
         let sessions: [PlannedSession] = template.sessions.enumerated().map { index, session in
             let dayOffset = (session.week - 1) * 7 + (session.day - 1)
-            let scheduledDate = calendar.date(byAdding: .day, value: dayOffset, to: planStart)!
+            let scheduledDate = calendar.date(byAdding: .day, value: dayOffset, to: planStart)
+                ?? planStart.addingTimeInterval(Double(dayOffset) * 24 * 3600)
 
             return PlannedSession(
                 id: UUID(),

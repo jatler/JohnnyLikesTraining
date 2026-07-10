@@ -2,7 +2,8 @@ import Foundation
 
 enum PlanCacheService {
     private static var cacheDirectory: URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+            ?? FileManager.default.temporaryDirectory
     }
 
     private static var planURL: URL { cacheDirectory.appendingPathComponent("cached_plan.json") }
@@ -38,7 +39,9 @@ enum PlanCacheService {
             try encoder.encode(swaps).write(to: swapsURL, options: .atomic)
             try encoder.encode(overrides).write(to: overridesURL, options: .atomic)
         } catch {
-            // Cache write failure is non-critical
+            // Cache write failure is non-critical, but log it — a silently
+            // missing cache reads as "my plan disappeared" on next cold start.
+            print("PlanCacheService: failed to write plan cache: \(error)")
         }
     }
 
@@ -81,6 +84,7 @@ enum PlanCacheService {
             try data.write(to: pendingSwapsURL, options: .atomic)
         } catch {
             // Cache write failure is non-critical — pending swap is still in memory.
+            print("PlanCacheService: failed to write pending swaps: \(error)")
         }
     }
 

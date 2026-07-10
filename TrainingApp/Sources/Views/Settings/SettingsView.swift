@@ -322,13 +322,19 @@ struct SettingsView: View {
 
     private var aboutSection: some View {
         VStack(spacing: 0) {
-            infoRow("Version", Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.2.3")
-            divider()
-            linkRow("Privacy Policy", destination: URL(string: "https://johnnylikestraining.com/privacy.html")!) { EmptyView() }
-            divider()
-            linkRow("Terms of Service", destination: URL(string: "https://johnnylikestraining.com/terms.html")!) { EmptyView() }
-            divider()
-            linkRow("Support", icon: "envelope", destination: URL(string: "mailto:atler.j@me.com")!) { EmptyView() }
+            infoRow("Version", Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.2.4")
+            if let privacyURL = URL(string: "https://johnnylikestraining.com/privacy.html") {
+                divider()
+                linkRow("Privacy Policy", destination: privacyURL) { EmptyView() }
+            }
+            if let termsURL = URL(string: "https://johnnylikestraining.com/terms.html") {
+                divider()
+                linkRow("Terms of Service", destination: termsURL) { EmptyView() }
+            }
+            if let supportURL = URL(string: "mailto:atler.j@me.com") {
+                divider()
+                linkRow("Support", icon: "envelope", destination: supportURL) { EmptyView() }
+            }
         }
     }
 

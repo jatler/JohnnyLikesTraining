@@ -2,7 +2,8 @@ import Foundation
 
 enum LocalCacheService {
     private static var cacheDirectory: URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+            ?? FileManager.default.temporaryDirectory
     }
 
     private static let encoder: JSONEncoder = {
@@ -19,7 +20,13 @@ enum LocalCacheService {
 
     static func save<T: Encodable>(_ value: T, key: String) {
         let url = cacheDirectory.appendingPathComponent("cache_\(key).json")
-        try? encoder.encode(value).write(to: url, options: .atomic)
+        do {
+            try encoder.encode(value).write(to: url, options: .atomic)
+        } catch {
+            // Non-critical, but log it — a silent write failure means stale
+            // data on next cold start with no trail to explain it.
+            print("LocalCacheService: failed to write cache_\(key).json: \(error)")
+        }
     }
 
     static func load<T: Decodable>(_ type: T.Type, key: String) -> T? {

@@ -166,7 +166,8 @@ final class TrainingPlanStore {
 
         for i in sessions.indices {
             let dayOffset = (sessions[i].weekNumber - 1) * 7 + (sessions[i].dayOfWeek - 1)
-            sessions[i].scheduledDate = calendar.date(byAdding: .day, value: dayOffset, to: newStart)!
+            sessions[i].scheduledDate = calendar.date(byAdding: .day, value: dayOffset, to: newStart)
+                ?? newStart.addingTimeInterval(Double(dayOffset) * 24 * 3600)
         }
 
         Task { await persistDateUpdate() }
