@@ -103,6 +103,9 @@
 
 ## Pre-Beta (by May 1, 2026)
 
+### ~~Fix: Pull-to-refresh crash during sync (CRITICAL)~~ ✅
+- **Completed:** v1.2.4 (2026-07-09) — TestFlight crash log confirmed `Dictionary(uniqueKeysWithValues:)` trap at OuraService.swift:318 (duplicate day keys from `?? Date()` parse fallbacks). Fixed with `uniquingKeysWith:` + POSIX locale on dayFormatter; same trap fixed in StravaService.autoMatchActivities. App-wide hardening: removed ~16 force-unwrapped URLs, forced calendar math, reachable fatalError in PlanTemplateService, `urls[0]` cache indexing. 3 regression tests added (30 total).
+
 ### Strava: Delete imported data from Supabase on disconnect
 - **What:** In `StravaService.disconnect()`, after removing Keychain tokens, also delete all rows from `strava_activities` where `user_id` matches the current user. The privacy policy now promises this behavior.
 - **Why:** Strava API Agreement requires deleting all user data when a user revokes access. Currently disconnect only removes local tokens; imported activities persist in Supabase.
