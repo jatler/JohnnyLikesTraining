@@ -17,6 +17,12 @@ final class OuraService {
     /// local timezone. DateFormatter is expensive to build, so share one.
     private static let dayFormatter: DateFormatter = {
         let formatter = DateFormatter()
+        // POSIX locale pins the Gregorian calendar and digit set — on devices
+        // with a Buddhist/Japanese calendar or non-Latin digits, a bare
+        // "yyyy-MM-dd" formatter can fail to parse Oura's day strings, and the
+        // `?? Date()` fallbacks downstream then stack multiple days onto one
+        // key (the pull-to-refresh crash).
+        formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "yyyy-MM-dd"
         formatter.timeZone = TimeZone.current
         return formatter
@@ -37,7 +43,9 @@ final class OuraService {
         let state = UUID().uuidString
         pendingOAuthState = state
 
-        var components = URLComponents(string: Config.ouraAuthorizeURL)!
+        guard var components = URLComponents(string: Config.ouraAuthorizeURL) else {
+            throw OuraError.missingCredentials
+        }
         components.queryItems = [
             URLQueryItem(name: "client_id", value: Config.ouraClientId),
             URLQueryItem(name: "redirect_uri", value: Config.ouraRedirectURI),
@@ -45,10 +53,13 @@ final class OuraService {
             URLQueryItem(name: "scope", value: Config.ouraScope),
             URLQueryItem(name: "state", value: state)
         ]
+        guard let authorizeURL = components.url else {
+            throw OuraError.missingCredentials
+        }
 
         let code = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
             self.authSession = ASWebAuthenticationSession(
-                url: components.url!,
+                url: authorizeURL,
                 callbackURLScheme: "training"
             ) { [weak self] callbackURL, error in
                 self?.authSession = nil
@@ -82,7 +93,9 @@ final class OuraService {
     }
 
     private func exchangeCodeForToken(_ code: String) async throws {
-        let url = URL(string: Config.ouraTokenURL)!
+        guard let url = URL(string: Config.ouraTokenURL) else {
+            throw OuraError.missingCredentials
+        }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
@@ -123,7 +136,9 @@ final class OuraService {
 
         if Date().timeIntervalSince1970 < expiresAt - 300 { return }
 
-        let url = URL(string: Config.ouraTokenURL)!
+        guard let url = URL(string: Config.ouraTokenURL) else {
+            throw OuraError.missingCredentials
+        }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
@@ -197,8 +212,10 @@ final class OuraService {
 
         // Oura API end_date is exclusive, so add 1 day to include today's data
         let today = Date()
-        let endDate = Calendar.current.date(byAdding: .day, value: 1, to: today)!
-        let startDate = Calendar.current.date(byAdding: .day, value: -days, to: today)!
+        let endDate = Calendar.current.date(byAdding: .day, value: 1, to: today)
+            ?? today.addingTimeInterval(24 * 3600)
+        let startDate = Calendar.current.date(byAdding: .day, value: -days, to: today)
+            ?? today.addingTimeInterval(-Double(days) * 24 * 3600)
 
         let readinessData = try await fetchReadiness(
             accessToken: accessToken,
@@ -315,9 +332,14 @@ final class OuraService {
 
         let newData = merged.values.sorted { $0.date < $1.date }
         if merge {
-            var existingByDate = Dictionary(uniqueKeysWithValues: dailyData.map {
-                (Calendar.current.startOfDay(for: $0.date), $0)
-            })
+            // uniquingKeysWith, not uniqueKeysWithValues: rows whose day string
+            // failed to parse fall back to Date() and can collide on the same
+            // start-of-day — a duplicate key here trapped every following
+            // pull-to-refresh. Keep the most recently synced row.
+            var existingByDate = Dictionary(
+                dailyData.map { (Calendar.current.startOfDay(for: $0.date), $0) },
+                uniquingKeysWith: { a, b in a.syncedAt >= b.syncedAt ? a : b }
+            )
             for entry in newData {
                 existingByDate[Calendar.current.startOfDay(for: entry.date)] = entry
             }
@@ -334,13 +356,18 @@ final class OuraService {
     // MARK: - API Calls
 
     private func fetchReadiness(accessToken: String, start: String, end: String) async throws -> [OuraReadinessEntry] {
-        var components = URLComponents(string: "\(Config.ouraBaseURL)/usercollection/daily_readiness")!
+        guard var components = URLComponents(string: "\(Config.ouraBaseURL)/usercollection/daily_readiness") else {
+            throw OuraError.missingCredentials
+        }
         components.queryItems = [
             URLQueryItem(name: "start_date", value: start),
             URLQueryItem(name: "end_date", value: end)
         ]
+        guard let url = components.url else {
+            throw OuraError.missingCredentials
+        }
 
-        var request = URLRequest(url: components.url!)
+        var request = URLRequest(url: url)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -353,13 +380,18 @@ final class OuraService {
     }
 
     private func fetchSleep(accessToken: String, start: String, end: String) async throws -> [OuraSleepEntry] {
-        var components = URLComponents(string: "\(Config.ouraBaseURL)/usercollection/daily_sleep")!
+        guard var components = URLComponents(string: "\(Config.ouraBaseURL)/usercollection/daily_sleep") else {
+            throw OuraError.missingCredentials
+        }
         components.queryItems = [
             URLQueryItem(name: "start_date", value: start),
             URLQueryItem(name: "end_date", value: end)
         ]
+        guard let url = components.url else {
+            throw OuraError.missingCredentials
+        }
 
-        var request = URLRequest(url: components.url!)
+        var request = URLRequest(url: url)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -376,7 +408,10 @@ final class OuraService {
         var nextToken: String? = nil
 
         repeat {
-            var components = URLComponents(string: "\(Config.ouraBaseURL)/usercollection/sleep")!
+            guard var components = URLComponents(string: "\(Config.ouraBaseURL)/usercollection/sleep") else {
+                print("Oura sleep periods fetch skipped — invalid base URL")
+                return []
+            }
             components.queryItems = [
                 URLQueryItem(name: "start_date", value: start),
                 URLQueryItem(name: "end_date", value: end)
@@ -384,8 +419,12 @@ final class OuraService {
             if let token = nextToken {
                 components.queryItems?.append(URLQueryItem(name: "next_token", value: token))
             }
+            guard let url = components.url else {
+                print("Oura sleep periods fetch skipped — could not build URL")
+                return []
+            }
 
-            var request = URLRequest(url: components.url!)
+            var request = URLRequest(url: url)
             request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
             let (data, response) = try await URLSession.shared.data(for: request)
@@ -451,7 +490,8 @@ final class OuraService {
     }
 
     func recentReadiness(days: Int = 7) -> [OuraDaily] {
-        let cutoff = Calendar.current.date(byAdding: .day, value: -days, to: Date())!
+        let cutoff = Calendar.current.date(byAdding: .day, value: -days, to: Date())
+            ?? Date().addingTimeInterval(-Double(days) * 24 * 3600)
         return dailyData
             .filter { $0.date >= cutoff }
             .sorted { $0.date < $1.date }
