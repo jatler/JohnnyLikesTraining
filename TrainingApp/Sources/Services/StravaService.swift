@@ -78,7 +78,9 @@ final class StravaService {
         let state = UUID().uuidString
         pendingOAuthState = state
 
-        var components = URLComponents(string: Config.stravaAuthorizeURL)!
+        guard var components = URLComponents(string: Config.stravaAuthorizeURL) else {
+            throw StravaError.missingCredentials
+        }
         components.queryItems = [
             URLQueryItem(name: "client_id", value: Config.stravaClientId),
             URLQueryItem(name: "redirect_uri", value: Config.stravaRedirectURI),
@@ -87,13 +89,16 @@ final class StravaService {
             URLQueryItem(name: "approval_prompt", value: "auto"),
             URLQueryItem(name: "state", value: state)
         ]
+        guard let authorizeURL = components.url else {
+            throw StravaError.missingCredentials
+        }
 
-        print("[Strava OAuth] Authorize URL: \(components.url!)")
+        print("[Strava OAuth] Authorize URL: \(authorizeURL)")
         print("[Strava OAuth] Client ID: \(Config.stravaClientId.prefix(4))***")
 
         let code = try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
             self.authSession = ASWebAuthenticationSession(
-                url: components.url!,
+                url: authorizeURL,
                 callbackURLScheme: "http"
             ) { [weak self] callbackURL, error in
                 self?.authSession = nil
@@ -137,7 +142,9 @@ final class StravaService {
     }
 
     private func exchangeCodeForToken(_ code: String) async throws {
-        let url = URL(string: Config.stravaTokenURL)!
+        guard let url = URL(string: Config.stravaTokenURL) else {
+            throw StravaError.missingCredentials
+        }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -172,7 +179,9 @@ final class StravaService {
 
         if Date().timeIntervalSince1970 < expiresAt - 300 { return }
 
-        let url = URL(string: Config.stravaTokenURL)!
+        guard let url = URL(string: Config.stravaTokenURL) else {
+            throw StravaError.missingCredentials
+        }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -228,8 +237,9 @@ final class StravaService {
     /// imported data per the Strava API Agreement requirement to delete user data
     /// when access is revoked.
     func disconnect(userId: UUID?) async {
-        if let accessToken = KeychainService.get(.stravaAccessToken) {
-            var request = URLRequest(url: URL(string: "https://www.strava.com/oauth/deauthorize")!)
+        if let accessToken = KeychainService.get(.stravaAccessToken),
+           let deauthorizeURL = URL(string: "https://www.strava.com/oauth/deauthorize") {
+            var request = URLRequest(url: deauthorizeURL)
             request.httpMethod = "POST"
             request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
             _ = try? await URLSession.shared.data(for: request)
@@ -321,7 +331,9 @@ final class StravaService {
             throw StravaError.notConnected
         }
 
-        let startDate = after ?? Calendar.current.date(byAdding: .month, value: -6, to: Date())!
+        let startDate = after
+            ?? Calendar.current.date(byAdding: .month, value: -6, to: Date())
+            ?? Date().addingTimeInterval(-183 * 24 * 3600)
         let epoch = Int(startDate.timeIntervalSince1970)
 
         var allActivities: [StravaAPIActivity] = []
@@ -331,14 +343,19 @@ final class StravaService {
         decoder.dateDecodingStrategy = .iso8601
 
         while true {
-            var components = URLComponents(string: "\(Config.stravaBaseURL)/athlete/activities")!
+            guard var components = URLComponents(string: "\(Config.stravaBaseURL)/athlete/activities") else {
+                throw StravaError.missingCredentials
+            }
             components.queryItems = [
                 URLQueryItem(name: "after", value: String(epoch)),
                 URLQueryItem(name: "page", value: String(page)),
                 URLQueryItem(name: "per_page", value: String(perPage))
             ]
+            guard let activitiesURL = components.url else {
+                throw StravaError.missingCredentials
+            }
 
-            var request = URLRequest(url: components.url!)
+            var request = URLRequest(url: activitiesURL)
             request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
             let (data, response) = try await URLSession.shared.data(for: request)
@@ -421,7 +438,9 @@ final class StravaService {
     // MARK: - Auto-Match
 
     func autoMatchActivities(sessions: [PlannedSession]) {
-        let sessionsById = Dictionary(uniqueKeysWithValues: sessions.map { ($0.id, $0) })
+        // uniquingKeysWith, not uniqueKeysWithValues: a duplicate session id
+        // (cache-reconcile/swap-replay edge cases) must not trap mid-pull.
+        let sessionsById = Dictionary(sessions.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         var changed: [StravaActivity] = []
         for i in activities.indices {
             let originalMatchId = activities[i].matchedSessionId

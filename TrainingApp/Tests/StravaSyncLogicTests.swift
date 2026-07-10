@@ -83,15 +83,79 @@ final class StravaSyncLogicTests: XCTestCase {
         XCTAssertEqual(result[0].matchedSessionId, match)
     }
 
+    // MARK: - autoMatchActivities crash regression
+
+    /// 1.2.3 pull-to-refresh crash: autoMatchActivities built its session
+    /// lookup with Dictionary(uniqueKeysWithValues:), which traps the moment
+    /// planStore.sessions contains a duplicate row (cache-reconcile/swap-replay
+    /// edge cases). It must tolerate duplicates and still match.
+    @MainActor
+    func testAutoMatchToleratesDuplicateSessionsWithoutCrashing() {
+        let strava = StravaService()
+        strava.applyDemoActivities([activity(stravaId: 1, name: "Run", daysAgo: 0, onLocalToday: true)])
+
+        let session = plannedSession(on: Date())
+        strava.autoMatchActivities(sessions: [session, session])
+
+        XCTAssertEqual(strava.activities.first?.matchedSessionId, session.id,
+                       "Duplicate sessions must dedupe, not trap, and the run still matches")
+    }
+
+    // MARK: - formattedPace trap safety
+
+    func testFormattedPaceSurvivesPathologicalValues() {
+        for pace: Double? in [nil, 0, -5, .infinity, .nan, 1e308] {
+            var run = activity(stravaId: 1, name: "Run", daysAgo: 0)
+            run.averagePacePerKm = pace
+            XCTAssertEqual(run.formattedPace, "—",
+                           "Pace \(String(describing: pace)) must render as a dash, not trap Int(_:)")
+        }
+    }
+
+    func testFormattedPaceStillFormatsNormalValues() {
+        var run = activity(stravaId: 1, name: "Run", daysAgo: 0)
+        run.averagePacePerKm = 6.0 // 6:00 /km ≈ 9:39 /mi
+        XCTAssertEqual(run.formattedPace, "9:39 /mi")
+    }
+
     // MARK: - Helpers
+
+    private func plannedSession(on date: Date) -> PlannedSession {
+        PlannedSession(
+            id: UUID(),
+            planId: UUID(),
+            weekNumber: 1,
+            dayOfWeek: 1,
+            scheduledDate: date,
+            workoutType: .easy,
+            targetDistanceKm: 10,
+            targetPaceDescription: nil,
+            notes: nil,
+            sortOrder: 1
+        )
+    }
+
+    /// Noon UTC carrying today's *local* (y, m, d): `isOnLocalDay` reads the
+    /// activity's startDateLocal with a UTC calendar, so this matches a
+    /// session scheduled "today" in every device timezone.
+    private func utcNoonMatchingLocalToday() -> Date {
+        var utc = Calendar(identifier: .gregorian)
+        utc.timeZone = TimeZone(identifier: "UTC")!
+        var comps = Calendar.current.dateComponents([.year, .month, .day], from: Date())
+        comps.hour = 12
+        return utc.date(from: comps)!
+    }
 
     private func activity(
         stravaId: Int64,
         name: String,
         daysAgo: Int,
-        syncedSecondsAgo: TimeInterval = 0
+        syncedSecondsAgo: TimeInterval = 0,
+        onLocalToday: Bool = false
     ) -> StravaActivity {
-        let date = Calendar.current.date(byAdding: .day, value: -daysAgo, to: Date())!
+        let date = onLocalToday
+            ? utcNoonMatchingLocalToday()
+            : Calendar.current.date(byAdding: .day, value: -daysAgo, to: Date())!
         return StravaActivity(
             id: UUID(),
             userId: UUID(),

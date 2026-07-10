@@ -134,8 +134,11 @@ struct StravaActivity: Codable, Identifiable {
     }
 
     var formattedPace: String {
-        guard let pace = averagePacePerKm else { return "—" }
+        guard let pace = averagePacePerKm, pace.isFinite, pace > 0 else { return "—" }
         let pacePerMi = pace / 0.621371
+        // Int(_:) traps on non-finite or out-of-range Doubles; a garbage pace
+        // (e.g. near-zero average speed) shouldn't crash a row render.
+        guard pacePerMi < Double(Int.max) else { return "—" }
         let minutes = Int(pacePerMi)
         let seconds = Int((pacePerMi - Double(minutes)) * 60)
         return String(format: "%d:%02d /mi", minutes, seconds)
