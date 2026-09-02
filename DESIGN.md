@@ -462,7 +462,7 @@ Three charts render inside the Progress tab's paginated `TabView` (page dots alw
 
 ## Banners (Week tab)
 
-Stacked above the session list inside `weekContent`, two alert banners share a single chrome spec. Both sit below the green banner and above the horizontal `TabView` of week rows, each with 12pt horizontal + 12pt top padding.
+Stacked above the session list inside `weekContent`, three alert banners share a single chrome spec. All sit below the green banner and above the horizontal `TabView` of week rows, each with 12pt horizontal + 12pt top padding. Stack order top-down: offline, readiness, Tuesday.
 
 ### Shared chrome
 
@@ -471,6 +471,14 @@ Stacked above the session list inside `weekContent`, two alert banners share a s
 - 1pt accent stroke at `.opacity(0.3)`; fill at `.opacity(0.08)`.
 - Shadow: `Color.black.opacity(0.08)`, radius 3, y 1.
 - Leading SF Symbol rendered at default body size (no `.title2` or other size modifier) so icons across stacked banners match.
+
+### Offline banner
+
+- Trigger: `AuthService.isServerUnreachable` — the last Supabase session refresh got no verdict (no network, 5xx, paused project). The user stays signed in on the cached plan; this banner is the only signal that writes are queued rather than synced.
+- Accent: `.orange` (stroke + leading icon), same warning tier as readiness.
+- Content: `wifi.exclamationmark` SF Symbol, "Can't reach the training server" in `TrailFont.body` primary, "Showing your saved plan. Changes sync when it's back — pull down to retry." in `TrailFont.meta` secondary.
+- Not tappable. Pull-to-refresh re-runs the session refresh; a success clears the flag and the banner.
+- Never shown for a genuine token rejection — that path signs the user out to `SignInView` instead.
 
 ### Readiness banner
 

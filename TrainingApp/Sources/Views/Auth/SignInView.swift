@@ -71,12 +71,26 @@ struct SignInView: View {
         }
     }
 
-    private static func message(for error: Error) -> String {
+    private static func message(for error: Error) -> String? {
         if let apple = error as? AppleSignInError {
             return apple.localizedDescription
         }
+        if let asError = error as? ASAuthorizationError {
+            // The user backed out of the Apple sheet — their call, no error.
+            return asError.code == .canceled ? nil : asError.localizedDescription
+        }
+        if AuthService.isTransientSessionFailure(error) {
+            return Self.serverUnreachableMessage
+        }
         return error.localizedDescription
     }
+
+    /// Shown when Sign in with Apple succeeded locally but the token exchange
+    /// with Supabase never got an answer. The raw URLError / 5xx text reads
+    /// like the user did something wrong; they didn't.
+    static let serverUnreachableMessage = """
+    Can't reach the training server right now. Check your connection and try again in a minute. If you host this project on Supabase's free tier, make sure the project hasn't been paused for inactivity.
+    """
 }
 
 #Preview {

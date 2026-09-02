@@ -56,6 +56,10 @@ struct WeekView: View {
         VStack(spacing: 0) {
             weekNavigator
 
+            offlineBanner
+                .padding(.horizontal, 12)
+                .padding(.top, 12)
+
             if let todaySession = todaySession {
                 readinessBanner(for: todaySession)
                     .padding(.horizontal, 12)
@@ -346,6 +350,12 @@ struct WeekView: View {
         }
         #endif
         guard let userId = auth.currentUserId else { return }
+        // Re-try the session refresh first. When the last one failed because
+        // the server was unreachable, this is the user's manual "reconnect":
+        // a success clears the offline banner before the syncs below run.
+        if auth.isServerUnreachable {
+            await auth.refreshIfNeeded()
+        }
         // Run Strava + Oura concurrently — they share nothing, so while
         // one is awaiting URLSession the other can be in flight. Strava
         // passes `after:` so a typical "nothing new" pull skips the
@@ -399,6 +409,39 @@ struct WeekView: View {
     private func syncOuraIfConnected(userId: UUID) async {
         guard oura.isConnected else { return }
         try? await oura.syncDaily(userId: userId, merge: true)
+    }
+
+    // MARK: - Offline banner
+
+    /// Shown while `AuthService.isServerUnreachable` is set: the app is running
+    /// on the cached plan because Supabase never answered the last session
+    /// refresh. Pull-to-refresh re-tries the refresh and clears the banner.
+    @ViewBuilder
+    private var offlineBanner: some View {
+        if auth.isServerUnreachable {
+            HStack(spacing: 12) {
+                Image(systemName: "wifi.exclamationmark")
+                    .foregroundStyle(.orange)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Can't reach the training server")
+                        .font(TrailFont.body)
+                        .foregroundStyle(.primary)
+                    Text("Showing your saved plan. Changes sync when it's back — pull down to retry.")
+                        .font(TrailFont.meta)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+            }
+            .padding(10)
+            .background(Color.orange.opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .strokeBorder(Color.orange.opacity(0.3), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.08), radius: 3, x: 0, y: 1)
+        }
     }
 
     // MARK: - Tuesday podcast banner

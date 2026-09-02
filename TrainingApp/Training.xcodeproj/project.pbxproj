@@ -25,6 +25,7 @@
 		314A48FC6E46199FB265D062 /* swap_6_week_6w.json in Resources */ = {isa = PBXBuildFile; fileRef = B67572F92E767F702F3E8237 /* swap_6_week_6w.json */; };
 		318F754953A5B84505A9ECBD /* OuraDaily.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38427D1E7D9E72609E2756A6 /* OuraDaily.swift */; };
 		32483DF0E2176813EFD05945 /* StravaSyncLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EC892EC3C7A9AB9BA72D9B8 /* StravaSyncLogicTests.swift */; };
+		A19CBABF885AF660DE1B6B31 /* AuthSessionFailureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03FA8E5BECC269D195B80859 /* AuthSessionFailureTests.swift */; };
 		340974BD8F3C6D08E7B5BFAC /* ProgressionEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C01F97738C00E24FC785ED9 /* ProgressionEngineTests.swift */; };
 		37B726D9F8A5BF41AA7BCC4C /* ExerciseHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8903D44D8C5F1FCC00E5F9DA /* ExerciseHistoryView.swift */; };
 		39C0F0E80BC49A04136D8EC1 /* Fraunces-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9A7B5C389858A370B1F4C111 /* Fraunces-SemiBold.ttf */; };
@@ -152,6 +153,7 @@
 		73F7D70B55AEC2E0E3D0A3F1 /* TrainingPlanStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingPlanStore.swift; sourceTree = "<group>"; };
 		747D2F3B56EEE28598D1536A /* Fraunces-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-LightItalic.ttf"; sourceTree = "<group>"; };
 		7EC892EC3C7A9AB9BA72D9B8 /* StravaSyncLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StravaSyncLogicTests.swift; sourceTree = "<group>"; };
+		03FA8E5BECC269D195B80859 /* AuthSessionFailureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthSessionFailureTests.swift; sourceTree = "<group>"; };
 		7F1D1B0C706F6397245A0BF0 /* Fraunces-Medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Fraunces-Medium.ttf"; sourceTree = "<group>"; };
 		80616D13A59D3EE3E33D4BB0 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		84A8563FB47BFB14F6BC6B82 /* StretchSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StretchSession.swift; sourceTree = "<group>"; };
@@ -341,6 +343,7 @@
 		6F9C9D347A986A243AFE3345 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				03FA8E5BECC269D195B80859 /* AuthSessionFailureTests.swift */,
 				01E3A62ED721DEA19C5D3E93 /* DistanceFormatterTests.swift */,
 				A5A9E6C67CD0AF43E444A4EF /* HeatPerWeekTests.swift */,
 				D3B804FFEB9BCC2927068518 /* PlanCacheServiceTests.swift */,
@@ -621,6 +624,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A19CBABF885AF660DE1B6B31 /* AuthSessionFailureTests.swift in Sources */,
 				8CBBB4192F87FE7DA620AAFF /* DistanceFormatterTests.swift in Sources */,
 				1FDD9117DB8ECE5B3BC863F1 /* HeatPerWeekTests.swift in Sources */,
 				8E5EBD9AA2DCDF5E7FE811FF /* PlanCacheServiceTests.swift in Sources */,

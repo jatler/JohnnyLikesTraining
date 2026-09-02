@@ -18,6 +18,13 @@ final class AuthService {
     /// 401 silently.
     var needsReauthentication = false
 
+    /// True when the last session check or refresh failed because Supabase
+    /// could not be reached — device offline, DNS failure, timeout, a 5xx, or
+    /// a paused project. The persisted session is kept and the user stays
+    /// signed in on local caches; writes fail as retryable and re-queue.
+    /// Cleared by the next successful refresh (foreground, pull-to-refresh).
+    var isServerUnreachable = false
+
     var isDevBypass = false
 
     init() {
@@ -32,32 +39,87 @@ final class AuthService {
 
         do {
             let session = try await supabase.auth.session
-            currentUserId = session.user.id
-            isAuthenticated = true
+            applySignedIn(session)
         } catch {
-            isAuthenticated = false
-            currentUserId = nil
+            handleSessionFailure(error, context: "checkSession")
         }
     }
 
     /// Force-refresh the Supabase session. Called on app launch and on
     /// `scenePhase` → `.active` so the JWT is fresh before any writes fire.
-    /// If the refresh token is itself expired/revoked, sets
-    /// `needsReauthentication = true` so the UI can prompt for sign-in.
+    ///
+    /// Only a genuine token rejection (400/401/403 from the auth endpoint,
+    /// or no stored session at all) signs the user out. A server that can't
+    /// be reached keeps the persisted session and flips `isServerUnreachable`
+    /// instead — signing out there would strand the user on a sign-in screen
+    /// that can't succeed either, with their whole plan sitting in the cache.
     func refreshIfNeeded() async {
         if isDevBypass { return }
         do {
-            _ = try await supabase.auth.refreshSession()
-            let session = try await supabase.auth.session
-            currentUserId = session.user.id
+            let session = try await supabase.auth.refreshSession()
+            applySignedIn(session)
+        } catch {
+            handleSessionFailure(error, context: "refresh")
+        }
+    }
+
+    private func applySignedIn(_ session: Session) {
+        currentUserId = session.user.id
+        isAuthenticated = true
+        needsReauthentication = false
+        isServerUnreachable = false
+    }
+
+    private func handleSessionFailure(_ error: Error, context: String) {
+        if Self.isTransientSessionFailure(error),
+           let cached = supabase.auth.currentSession {
+            print("[Auth] \(context) failed but server is unreachable — staying signed in on the cached session: \(error)")
+            currentUserId = cached.user.id
             isAuthenticated = true
             needsReauthentication = false
-        } catch {
-            print("[Auth] refresh failed: \(error)")
-            needsReauthentication = true
-            isAuthenticated = false
-            currentUserId = nil
+            isServerUnreachable = true
+            return
         }
+
+        print("[Auth] \(context) failed — session rejected, sign-in required: \(error)")
+        needsReauthentication = true
+        isAuthenticated = false
+        currentUserId = nil
+        isServerUnreachable = false
+    }
+
+    /// Classifies a failure from `auth.session` / `auth.refreshSession`.
+    ///
+    /// Returns `true` when the failure says nothing about the validity of the
+    /// stored refresh token — the request never got a verdict from GoTrue.
+    /// Returns `false` when the server explicitly rejected the session
+    /// (`sessionMissing`, or a 4xx auth response such as
+    /// `refresh_token_not_found` / `refresh_token_already_used`), which is the
+    /// only case where the user must sign in again.
+    nonisolated static func isTransientSessionFailure(_ error: Error) -> Bool {
+        if let authError = error as? AuthError {
+            switch authError {
+            case .sessionMissing:
+                return false
+            case let .api(_, _, _, response):
+                return Self.isTransientStatus(response.statusCode)
+            default:
+                return false
+            }
+        }
+        if let http = error as? HTTPError {
+            return Self.isTransientStatus(http.response.statusCode)
+        }
+        if error is URLError { return true }
+        if error is CancellationError { return true }
+        // A paused project serves an HTML holding page, which surfaces as a
+        // decoding failure rather than an auth error — treat like any other
+        // non-verdict from the server.
+        return true
+    }
+
+    private nonisolated static func isTransientStatus(_ status: Int) -> Bool {
+        status >= 500 || status == 408 || status == 429
     }
 
     func devSignIn() {
